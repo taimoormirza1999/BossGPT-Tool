@@ -1635,6 +1635,15 @@ if (isset($_GET['api'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- iziToast CSS & JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/izitoast/dist/css/iziToast.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/izitoast/dist/js/iziToast.min.js"></script>
+    <!-- Tailwind CSS -->
+    <!-- <script src="https://unpkg.com/@tailwindcss/browser@4"></script> -->
+    <!-- Custom css -->
+    <!-- <link rel="stylesheet" href="custom.css"> -->
+    <!-- Custom js -->
+    <script src="./custom.js"></script>
     <style>
         .chat-container {
             height: calc(100vh - 200px);
@@ -2743,6 +2752,10 @@ if (isset($_GET['api'])) {
                                         data-bs-target="#activityLogModal">
                                         <i class="bi bi-clock-history"></i> Activity Log
                                     </button>
+                                    <button type="button" class="btn btn-sm btn-info me-2"
+                                        onclick='Toast("success", "Success!", "Project has been created successfully.")'>
+                                        <i class="bi bi-clock-history"></i> Toast Success
+                                    </button>
                                     <button type="button" class="btn btn-sm btn-primary me-2" data-bs-toggle="modal"
                                         data-bs-target="#newTaskModal">
                                         <i class="bi bi-plus"></i> New Task
@@ -2905,7 +2918,7 @@ if (isset($_GET['api'])) {
             </div>
 
             <!-- Assign User Modal -->
-            <div class="modal fade" id="assignUserModal" tabindex="-1">
+            <!-- <div class="modal fade" id="assignUserModal" tabindex="-1">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -2932,8 +2945,67 @@ if (isset($_GET['api'])) {
                         </div>
                     </div>
                 </div>
+            </div> -->
+            <div class="modal fade" id="assignUserModal" tabindex="-1" aria-labelledby="assignUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-lg">
+            <div class="modal-header bg-primary text-white border-0 rounded-t-lg">
+                <h5 class="modal-title" id="assignUserModalLabel">Assign User to Project</h5>
+                <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            <div class="modal-body">
+                <form id="assignUserForm">
+                    <!-- Select User Dropdown -->
+                    <div class="mb-3">
+                        <label for="userSelect" class="form-label">Select User</label>
+                        <select class="form-select" id="userSelect" required>
+                            <option value="">Select a user</option>
+                        </select>
+                    </div>
+                    <!-- Role in Project -->
+                    <div class="mb-3">
+                        <label for="userRole" class="form-label">Role in Project</label>
+                        <input type="text" class="form-control" id="userRole" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="assignUserBtn">Assign User</button>
+            </div>
+        </div>
+    </div>
+</div>
 
+
+
+<!-- New User Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addUserForm">
+                    <div class="mb-3">
+                        <label for="newUserName" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="newUserName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newUserEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="newUserEmail" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="saveUserBtn">Save User</button>
+            </div>
+        </div>
+    </div>
+</div>
             <!-- New Task Modal -->
             <div class="modal fade" id="newTaskModal" tabindex="-1">
                 <div class="modal-dialog">
@@ -3807,6 +3879,11 @@ if (isset($_GET['api'])) {
                             } else {
                                 alert('Failed to load users');
                             }
+                            // Add "New User" option
+            const newUserOption = document.createElement('option');
+            newUserOption.value = 'new';
+            newUserOption.textContent = '+ Add New User';
+            userSelect.appendChild(newUserOption);
                         })
                         .catch(error => {
                             console.error('Error loading users:', error);
@@ -3814,6 +3891,13 @@ if (isset($_GET['api'])) {
                         })
                         .finally(hideLoading);
                 });
+                // Handle "New User" selection
+document.getElementById('userSelect').addEventListener('change', function () {
+    if (this.value === 'new') {
+        new bootstrap.Modal(document.getElementById('addUserModal')).show();
+        this.value = ''; // Reset dropdown selection
+    }
+});
 
                 // Helper functions
                 function appendMessage(message, sender) {
