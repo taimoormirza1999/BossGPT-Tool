@@ -1,17 +1,20 @@
 <?php
 //Added to load the environment variables
 require_once 'env.php';
+require_once './classes/UserManager.php';
 loadEnv();
+
+
 // Added to persist the login cookie for one year
 session_set_cookie_params(60 * 60 * 24 * 365);
 ini_set('session.gc_maxlifetime', 60 * 60 * 24 * 365);
 
 session_start();
 error_reporting(E_ALL);
-ini_set('display_errors', 0);
+ini_set('display_errors', 1);
 ini_set('log_errors', 1);
 ini_set('error_log', 'error.log');
-
+error_reporting(E_ALL);
 // Database configuration
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
@@ -331,6 +334,22 @@ class ProjectManager
             return $stmt->fetchAll();
         } catch (Exception $e) {
             error_log("Get Projects Error: " . $e->getMessage());
+            throw $e;
+        }
+    }
+    public function getProjectUsers($project_id)
+    {
+        try {
+            $stmt = $this->db->prepare(
+                "SELECT u.id, u.username, u.email, pu.role 
+                 FROM users u 
+                 JOIN project_users pu ON u.id = pu.user_id 
+                 WHERE pu.project_id = ?"
+            );
+            $stmt->execute([$project_id]);
+            return $stmt->fetchAll();
+        } catch (Exception $e) {
+            error_log("Get Project Users Error: " . $e->getMessage());
             throw $e;
         }
     }
@@ -1327,6 +1346,16 @@ if (isset($_GET['api'])) {
                 ];
                 break;
 
+            case 'get_project_users':
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (!isset($data['project_id'])) {
+                    throw new Exception('Project ID is required');
+                }
+
+                $users = $project_manager->getProjectUsers($data['project_id']);
+                $response = ['success' => true, 'users' => $users];
+                break;
+
             case 'send_message':
                 $data = json_decode(file_get_contents('php://input'), true);
                 if (!isset($data['message']) || !isset($data['project_id'])) {
@@ -1423,7 +1452,38 @@ if (isset($_GET['api'])) {
                 $project_manager->assignUserToProject($data['project_id'], $data['user_id'], $data['role']);
                 $response = ['success' => true];
                 break;
+                case 'create_user':
+                    header('Content-Type: application/json');
+                    try {
+                        error_log("Received create user request");
 
+                        $data = json_decode(file_get_contents('php://input'), true);
+                        if (!$data) {
+                            throw new Exception('Invalid request data');
+                        }
+                        
+                        $userManager = new UserManager();
+                        $result = $userManager->createUser(
+                            $data['username'],
+                            $data['email'],
+                            $data['project_id'] ?? null,
+                            $data['role'] ?? null
+                        );
+                        
+                        echo json_encode([
+                            'success' => true,
+                            'message' => 'User created successfully',
+                            'data' => $result
+                        ]);
+                    } catch (Exception $e) {
+                        error_log("Error in create_user: " . $e->getMessage());
+                        http_response_code(400);
+                        echo json_encode([
+                            'success' => false,
+                            'message' => $e->getMessage()
+                        ]);
+                    }
+                    exit;
             case 'get_users':
                 $stmt = $db->query("SELECT id, username, email FROM users ORDER BY username ASC");
                 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -1643,7 +1703,7 @@ if (isset($_GET['api'])) {
     <!-- Custom css -->
     <!-- <link rel="stylesheet" href="custom.css"> -->
     <!-- Custom js -->
-    <script src="./custom.js"></script>
+    <script src="./assets/js/custom.js"></script>
     <style>
         .chat-container {
             height: calc(100vh - 200px);
@@ -2598,8 +2658,10 @@ if (isset($_GET['api'])) {
     if ($auth->isLoggedIn()):
         ?>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="?page=dashboard">Project Manager AI</a>
+            <div class="container-fluid " style="width: 95%;">
+                <!-- <a class="navbar-brand" href="?page=dashboard">Project Manager AI</a> -->
+                <a class="navbar-brand" href="?page=dashboard"><img src="assets/images/bossgptlogo.svg" alt="Logo"
+                        style="width: 130px; height: 55px;"></a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -2752,9 +2814,8 @@ if (isset($_GET['api'])) {
                                         data-bs-target="#activityLogModal">
                                         <i class="bi bi-clock-history"></i> Activity Log
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-info me-2"
-                                        onclick='Toast("success", "Success!", "Project has been created successfully.")'>
-                                        <i class="bi bi-clock-history"></i> Toast Success
+                                    <button type="button" class="btn btn-sm btn-info me-2" onclick='sendEmailBtn()'>
+                                        <i class="bi bi-clock-history"></i> Toast Successs
                                     </button>
                                     <button type="button" class="btn btn-sm btn-primary me-2" data-bs-toggle="modal"
                                         data-bs-target="#newTaskModal">
@@ -2946,66 +3007,77 @@ if (isset($_GET['api'])) {
                     </div>
                 </div>
             </div> -->
-            <div class="modal fade" id="assignUserModal" tabindex="-1" aria-labelledby="assignUserModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-lg">
-            <div class="modal-header bg-primary text-white border-0 rounded-t-lg">
-                <h5 class="modal-title" id="assignUserModalLabel">Assign User to Project</h5>
-                <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="assignUserForm">
-                    <!-- Select User Dropdown -->
-                    <div class="mb-3">
-                        <label for="userSelect" class="form-label">Select User</label>
-                        <select class="form-select" id="userSelect" required>
-                            <option value="">Select a user</option>
-                        </select>
+            <div class="modal fade" id="assignUserModal" tabindex="-1" aria-labelledby="assignUserModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow-lg rounded-lg">
+                        <div class="modal-header bg-primary text-white border-0 rounded-t-lg">
+                            <h5 class="modal-title" id="assignUserModalLabel">Assign User to Project</h5>
+                            <button type="button" class="btn-close text-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="assignUserForm">
+                                <!-- Select User Dropdown -->
+                                <div class="mb-3">
+                                    <label for="userSelect" class="form-label">Select User</label>
+                                    <select class="form-select" id="userSelect" required>
+                                        <option value="">Select a user</option>
+                                    </select>
+                                </div>
+                                <!-- Role in Project -->
+                                <div class="mb-3">
+                                    <label for="userRole" class="form-label">Role in Project</label>
+                                    <input type="text" class="form-control" id="userRole" required>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer border-0">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-primary" id="assignUserBtn">Assign User</button>
+                        </div>
                     </div>
-                    <!-- Role in Project -->
-                    <div class="mb-3">
-                        <label for="userRole" class="form-label">Role in Project</label>
-                        <input type="text" class="form-control" id="userRole" required>
-                    </div>
-                </form>
+                </div>
             </div>
-            <div class="modal-footer border-0">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="assignUserBtn">Assign User</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 
 
-<!-- New User Modal -->
-<div class="modal fade" id="addUserModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add New User</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="addUserForm">
-                    <div class="mb-3">
-                        <label for="newUserName" class="form-label">Full Name</label>
-                        <input type="text" class="form-control" id="newUserName" required>
+            <!-- New User Modal -->
+            <div class="modal fade" id="addUserModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Add New User</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="addUserForm">
+                                <div class="mb-3">
+                                    <label for="newUserName" class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" id="newUserName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="newUserEmail" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="newUserEmail" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="newUserRole" class="form-label">Role</label>
+                                    <select class="form-select" id="newUserRole" required>
+                                        <option value="">Select Role</option>
+                                        <option value="admin">Admin</option>
+                                        <option value="manager">Manager</option>
+                                        <option value="member">Member</option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" id="saveUserBtn">Save User</button>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="newUserEmail" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="newUserEmail" required>
-                    </div>
-                </form>
+                </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-success" id="saveUserBtn">Save User</button>
-            </div>
-        </div>
-    </div>
-</div>
             <!-- New Task Modal -->
             <div class="modal fade" id="newTaskModal" tabindex="-1">
                 <div class="modal-dialog">
@@ -3880,10 +3952,10 @@ if (isset($_GET['api'])) {
                                 alert('Failed to load users');
                             }
                             // Add "New User" option
-            const newUserOption = document.createElement('option');
-            newUserOption.value = 'new';
-            newUserOption.textContent = '+ Add New User';
-            userSelect.appendChild(newUserOption);
+                            const newUserOption = document.createElement('option');
+                            newUserOption.value = 'new';
+                            newUserOption.textContent = '+ Add New User';
+                            userSelect.appendChild(newUserOption);
                         })
                         .catch(error => {
                             console.error('Error loading users:', error);
@@ -3892,13 +3964,85 @@ if (isset($_GET['api'])) {
                         .finally(hideLoading);
                 });
                 // Handle "New User" selection
-document.getElementById('userSelect').addEventListener('change', function () {
-    if (this.value === 'new') {
-        new bootstrap.Modal(document.getElementById('addUserModal')).show();
-        this.value = ''; // Reset dropdown selection
+                document.getElementById('userSelect').addEventListener('change', function () {
+                    if (this.value === 'new') {
+                        new bootstrap.Modal(document.getElementById('addUserModal')).show();
+                        this.value = ''; // Reset dropdown selection
+                    }
+                });
+                document.getElementById('saveUserBtn').addEventListener('click', function() {
+    const username = document.getElementById('newUserName').value.trim();
+    const email = document.getElementById('newUserEmail').value.trim();
+    const role = document.getElementById('newUserRole').value.trim();
+    
+    if (!username || !email || !role) {
+        alert('Please fill in all fields');
+        return;
     }
-});
 
+    showLoading();
+    
+
+    fetch('?api=create_user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            username: username,
+            email: email,
+            project_id: currentProject,
+            role: role
+        })
+    })
+    .then(async response => {
+        const text = await response.text();
+        // console.log('Raw server response:', text); // Debug log
+        
+        try {
+            const data = JSON.parse(text);
+            // console.log('Parsed response:', data); // Debug log
+            return data;
+        } catch (e) {
+            console.error('JSON parse error:', e);
+            console.error('Raw response was:', text);
+            throw new Error(`Server response error: ${text}`);
+        }
+    })
+    .then(data => {
+        if (data.success) {
+            // Close the add user modal
+            bootstrap.Modal.getInstance(document.getElementById('addUserModal')).hide();
+            
+            // Clear the form
+            document.getElementById('newUserName').value = '';
+            document.getElementById('newUserEmail').value = '';
+            document.getElementById('newUserRole').value = '';
+            
+            // Refresh the user list in the assign user modal
+            const userSelect = document.getElementById('userSelect');
+             // Remove the existing "Add New User" option if it exists
+             const addNewOption = Array.from(userSelect.options).find(option => option.value === 'new');
+            if (addNewOption) {
+                addNewOption.remove();
+            }
+            // Add the new user option
+            const newOption = new Option(
+                `${username} (${email}) - ${role}`, 
+                data.data.user_id
+            );
+            userSelect.add(newOption);
+            
+            // Show success message
+            alert('User created successfully! An email has been sent with login details.');
+        } else {
+            throw new Error(data.message || 'Failed to create user');
+        }
+    })
+    .catch(error => {
+        console.error('Error creating user:', error);
+        alert(`Error creating user: ${error.message}`);
+    })
+    .finally(hideLoading);
+});
                 // Helper functions
                 function appendMessage(message, sender) {
                     const div = document.createElement('div');
@@ -3971,7 +4115,13 @@ document.getElementById('userSelect').addEventListener('change', function () {
                     }
 
                     showLoading();
-                    fetch('?api=get_users')
+                    fetch('?api=get_project_users', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            project_id: currentProject
+                        })
+                    })
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
@@ -3979,7 +4129,7 @@ document.getElementById('userSelect').addEventListener('change', function () {
                                 $(assigneeSelect).empty();  // Clear using jQuery
                                 data.users.forEach(user => {
                                     const newOption = new Option(
-                                        `${user.username} (${user.email})`,
+                                        `${user.username} (${user.role})`,
                                         user.id,
                                         false,
                                         false
@@ -3988,12 +4138,12 @@ document.getElementById('userSelect').addEventListener('change', function () {
                                 });
                                 $(assigneeSelect).trigger('change');  // Update Select2
                             } else {
-                                alert('Failed to load users');
+                                alert('Failed to load project users');
                             }
                         })
                         .catch(error => {
-                            console.error('Error loading users:', error);
-                            alert('Error loading users');
+                            console.error('Error loading project users:', error);
+                            alert('Error loading project users');
                         })
                         .finally(hideLoading);
                 });
@@ -4096,6 +4246,11 @@ document.getElementById('userSelect').addEventListener('change', function () {
                     const title = document.getElementById('subtaskTitle').value.trim();
                     const description = document.getElementById('subtaskDescription').value.trim();
                     const dueDate = document.getElementById('subtaskDueDate').value;
+                    
+                    if(!currentProject){
+                        alert('Please select a project first');
+                        return;
+                    }
 
                     if (!title) {
                         alert('Please enter a subtask title');
@@ -4743,6 +4898,46 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                     .finally(hideLoading);
             });
         }); // End of DOMContentLoaded
+
+        function sendEmailBtn(templateType = "daily_report") {
+            fetch("sendmail.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    to: "taimoorhamza1999@gmail.com",
+                    template: templateType, // "daily_report" or "reminder"
+                    userName: "Taimoor", // Dynamic user name
+                    taskSummary: "Completed project setup, fixed login bug, and started UI design.",
+                    motivation: "Great job today! Keep up the momentum.",
+                    encouragement: "Let's stay on track and complete our goals!",
+                    deadlineNote: "Remember to finish the pending tasks by tomorrow."
+                })
+            })
+                .then(response => {
+                    return response.text(); // Read response as text first
+                })
+                .then(text => {
+                    try {
+                        let data = JSON.parse(text); // Try parsing JSON
+                        if (data.status === "success") {
+                            Toast("success", "Success", data.message);
+                        } else {
+                            Toast("error", "Error", data.message);
+                        }
+                    } catch (error) {
+                        console.error("JSON Parse Error:", error, text);
+                        Toast("error", "Error", "Invalid response format!");
+                    }
+                })
+                .catch(error => {
+                    Toast("error", "Error", "Something went wrong!");
+                    console.error("Fetch error:", error);
+                });
+        }
+
+
     </script>
 </body>
 
