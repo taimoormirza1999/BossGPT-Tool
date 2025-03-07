@@ -11,11 +11,11 @@ ini_set('session.gc_maxlifetime', 60 * 60 * 24 * 365);
 
 session_start();
 error_reporting(E_ALL);
-ini_set('display_errors', 0);
+ini_set('display_errors', getenv('DISPLAY_ERRORS'));
 ini_set('log_errors', 0);
 ini_set('error_log', 'error.log');
 error_reporting(E_ALL);
-define('TESTING_FEATURE', 1);
+define('TESTING_FEATURE', getenv('TESTING_FEATURE'));
 // Database configuration
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
