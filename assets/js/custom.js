@@ -1,9 +1,10 @@
+// alert("DFDF")
 // Toasts iziToast Helper
-function Toast(type, title, message) {
+function Toast(type, title, message, positionToast) {
   const toastOptions = {
     title: title,
     message: message,
-    position: "topRight",
+    position: positionToast?positionToast:"bottomCenter",
   };
   switch (type) {
     case "info":
@@ -46,4 +47,32 @@ function Toast(type, title, message) {
     default:
       console.warn("Unknown toast type:", type);
   }
+}
+
+function hideModalWithDelay(modalId, delay = 1500) {
+  setTimeout(() => {
+      // Try both jQuery and Bootstrap methods for maximum compatibility
+      try {
+          // Using jQuery if available
+          if (typeof $ !== 'undefined') {
+              $(`#${modalId}`).modal('hide');
+          } else {
+              // Using Bootstrap native
+              const modalElement = document.getElementById(modalId);
+              const modalInstance = bootstrap.Modal.getInstance(modalElement);
+              if (modalInstance) {
+                  modalInstance.hide();
+              }
+          }
+      } catch (error) {
+          console.error('Error hiding modal:', error);
+      }
+  }, delay);
+}
+
+function showToastAndHideModal(modalId, toastType, toastTitle, toastMessage, delay = 1500) {
+  // Show toast first
+  Toast(toastType, toastTitle, toastMessage);
+  // Hide modal with delay
+  hideModalWithDelay(modalId, delay);
 }

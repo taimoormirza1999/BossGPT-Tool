@@ -11,14 +11,15 @@ ini_set('session.gc_maxlifetime', 60 * 60 * 24 * 365);
 
 session_start();
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
-ini_set('log_errors', 1);
+ini_set('display_errors', 0);
+ini_set('log_errors', 0);
 ini_set('error_log', 'error.log');
 error_reporting(E_ALL);
+define('TESTING_FEATURE', 1);
 // Database configuration
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_PASS', 'pas');
 define('DB_NAME', 'project_manager');
 
 // OpenAI API configuration
@@ -1348,6 +1349,7 @@ if (isset($_GET['api'])) {
 
             case 'get_project_users':
                 $data = json_decode(file_get_contents('php://input'), true);
+                header('Content-Type: application/json');
                 if (!isset($data['project_id'])) {
                     throw new Exception('Project ID is required');
                 }
@@ -1355,6 +1357,36 @@ if (isset($_GET['api'])) {
                 $users = $project_manager->getProjectUsers($data['project_id']);
                 $response = ['success' => true, 'users' => $users];
                 break;
+            case 'get_all_project_users':
+                header('Content-Type: application/json');
+                try {
+                    if (!isset($_GET['project_id'])) {
+                        throw new Exception('Project ID is required');
+                    }
+
+                    // $projectManager = new ProjectManager();
+                    // $users = $project_manager->getProjectUsers($data['project_id']);
+                    $stmt = $db->prepare("
+                    SELECT u.id, u.username, u.email, pu.role 
+                    FROM users u 
+                    LEFT JOIN project_users pu ON u.id = pu.user_id 
+                    WHERE pu.project_id = ?
+                ");
+                
+                $stmt->execute([$_GET['project_id']]);
+                $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    echo json_encode([
+                        'success' => true,
+                        'users' => $users
+                    ]);
+                } catch (Exception $e) {
+                    // http_response_code(400);
+                    echo json_encode([
+                        'success' => false,
+                        'message' => $e->getMessage()
+                    ]);
+                }
+                exit;
 
             case 'send_message':
                 $data = json_decode(file_get_contents('php://input'), true);
@@ -1452,38 +1484,38 @@ if (isset($_GET['api'])) {
                 $project_manager->assignUserToProject($data['project_id'], $data['user_id'], $data['role']);
                 $response = ['success' => true];
                 break;
-                case 'create_user':
-                    header('Content-Type: application/json');
-                    try {
-                        error_log("Received create user request");
+            case 'create_user':
+                header('Content-Type: application/json');
+                try {
+                    error_log("Received create user request");
 
-                        $data = json_decode(file_get_contents('php://input'), true);
-                        if (!$data) {
-                            throw new Exception('Invalid request data');
-                        }
-                        
-                        $userManager = new UserManager();
-                        $result = $userManager->createUser(
-                            $data['username'],
-                            $data['email'],
-                            $data['project_id'] ?? null,
-                            $data['role'] ?? null
-                        );
-                        
-                        echo json_encode([
-                            'success' => true,
-                            'message' => 'User created successfully',
-                            'data' => $result
-                        ]);
-                    } catch (Exception $e) {
-                        error_log("Error in create_user: " . $e->getMessage());
-                        http_response_code(400);
-                        echo json_encode([
-                            'success' => false,
-                            'message' => $e->getMessage()
-                        ]);
+                    $data = json_decode(file_get_contents('php://input'), true);
+                    if (!$data) {
+                        throw new Exception('Invalid request data');
                     }
-                    exit;
+
+                    $userManager = new UserManager();
+                    $result = $userManager->createUser(
+                        $data['username'],
+                        $data['email'],
+                        $data['project_id'] ?? null,
+                        $data['role'] ?? null
+                    );
+
+                    echo json_encode([
+                        'success' => true,
+                        'message' => 'User created successfully',
+                        'data' => $result
+                    ]);
+                } catch (Exception $e) {
+                    error_log("Error in create_user: " . $e->getMessage());
+                    http_response_code(400);
+                    echo json_encode([
+                        'success' => false,
+                        'message' => $e->getMessage()
+                    ]);
+                }
+                exit;
             case 'get_users':
                 $stmt = $db->query("SELECT id, username, email FROM users ORDER BY username ASC");
                 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -1700,6 +1732,17 @@ if (isset($_GET['api'])) {
     <script src="https://cdn.jsdelivr.net/npm/izitoast/dist/js/iziToast.min.js"></script>
     <!-- Tailwind CSS -->
     <!-- <script src="https://unpkg.com/@tailwindcss/browser@4"></script> -->
+ <!-- Favicon links -->
+ <!-- <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest"> -->
+    
+    <link rel="icon" type="image/png" sizes="32x32" href="faviconbossgpt.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="manifest" href="site.webmanifest">
     <!-- Custom css -->
     <!-- <link rel="stylesheet" href="custom.css"> -->
     <!-- Custom js -->
@@ -2661,7 +2704,7 @@ if (isset($_GET['api'])) {
             <div class="container-fluid " style="width: 95%;">
                 <!-- <a class="navbar-brand" href="?page=dashboard">Project Manager AI</a> -->
                 <a class="navbar-brand" href="?page=dashboard"><img src="assets/images/bossgptlogo.svg" alt="Logo"
-                        style="width: 130px; height: 55px;"></a>
+                        style="width: 130px; height: 60px;"></a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -2814,9 +2857,14 @@ if (isset($_GET['api'])) {
                                         data-bs-target="#activityLogModal">
                                         <i class="bi bi-clock-history"></i> Activity Log
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-info me-2" onclick='sendEmailBtn()'>
-                                        <i class="bi bi-clock-history"></i> Toast Successs
-                                    </button>
+                                    <?php if (TESTING_FEATURE === 1): ?>
+                                        <button type="button" class="btn btn-sm btn-info me-2" onclick='sendEmailBtn()'>
+                                            <i class="bi bi-clock-history"></i> Testing Feature Button
+                                        </button>
+                                    <?php endif; ?>
+                                    <!-- <button type="button" class="btn btn-sm btn-info me-2" onclick='sendEmailBtn()'>
+                                        <i class="bi bi-clock-history"></i> Testing Feature Button
+                                    </button> -->
                                     <button type="button" class="btn btn-sm btn-primary me-2" data-bs-toggle="modal"
                                         data-bs-target="#newTaskModal">
                                         <i class="bi bi-plus"></i> New Task
@@ -3938,31 +3986,55 @@ if (isset($_GET['api'])) {
                 // Populate the user dropdown when the "Assign User" modal is shown
                 const assignUserModal = document.getElementById('assignUserModal');
                 assignUserModal.addEventListener('shown.bs.modal', function () {
-                    showLoading();
-                    fetch('?api=get_users')
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                const userSelect = document.getElementById('userSelect');
-                                userSelect.innerHTML = '<option value="">Select a user</option>';
-                                data.users.forEach(user => {
-                                    userSelect.innerHTML += `<option value="${user.id}">${user.username} (${user.email})</option>`;
-                                });
-                            } else {
-                                alert('Failed to load users');
-                            }
-                            // Add "New User" option
-                            const newUserOption = document.createElement('option');
-                            newUserOption.value = 'new';
-                            newUserOption.textContent = '+ Add New User';
-                            userSelect.appendChild(newUserOption);
-                        })
-                        .catch(error => {
-                            console.error('Error loading users:', error);
-                            alert('Error loading users');
-                        })
-                        .finally(hideLoading);
+    if (!currentProject) {
+        showToastAndHideModal(
+            'assignUserModal',
+            'error',
+            'Error',
+            'Please select a project first'
+        );
+        return;
+    }
+
+    showLoading();
+    fetch(`?api=get_all_project_users&project_id=${currentProject}`)
+        .then(async response => {
+            const text = await response.text();
+            console.log('Raw response:', text); // Debug log
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                console.error('JSON parse error:', e);
+                throw new Error('Invalid server response');
+            }
+        })
+        .then(data => {
+            if (data.success) {
+                const userSelect = document.getElementById('userSelect');
+                userSelect.innerHTML = '<option value="">Select a user</option>';
+                
+                // Add project users
+                data.users.forEach(user => {
+                    userSelect.innerHTML += `<option value="${user.id}">${user.username} (${user.email}) - ${user.role}</option>`;
                 });
+                
+                // Add "Add New User" option at the end
+                userSelect.innerHTML += '<option value="new">+ Add New User</option>';
+            } else {
+                throw new Error(data.message || 'Failed to load users');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading users:', error);
+            showToastAndHideModal(
+                'assignUserModal',
+                'error',
+                'Error',
+                'Failed to load users'
+            );
+        })
+        .finally(hideLoading);
+});
                 // Handle "New User" selection
                 document.getElementById('userSelect').addEventListener('change', function () {
                     if (this.value === 'new') {
@@ -3970,79 +4042,79 @@ if (isset($_GET['api'])) {
                         this.value = ''; // Reset dropdown selection
                     }
                 });
-                document.getElementById('saveUserBtn').addEventListener('click', function() {
-    const username = document.getElementById('newUserName').value.trim();
-    const email = document.getElementById('newUserEmail').value.trim();
-    const role = document.getElementById('newUserRole').value.trim();
-    
-    if (!username || !email || !role) {
-        alert('Please fill in all fields');
-        return;
-    }
+                document.getElementById('saveUserBtn').addEventListener('click', function () {
+                    const username = document.getElementById('newUserName').value.trim();
+                    const email = document.getElementById('newUserEmail').value.trim();
+                    const role = document.getElementById('newUserRole').value.trim();
 
-    showLoading();
-    
+                    if (!username || !email || !role) {
+                        alert('Please fill in all fields');
+                        return;
+                    }
 
-    fetch('?api=create_user', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            username: username,
-            email: email,
-            project_id: currentProject,
-            role: role
-        })
-    })
-    .then(async response => {
-        const text = await response.text();
-        // console.log('Raw server response:', text); // Debug log
-        
-        try {
-            const data = JSON.parse(text);
-            // console.log('Parsed response:', data); // Debug log
-            return data;
-        } catch (e) {
-            console.error('JSON parse error:', e);
-            console.error('Raw response was:', text);
-            throw new Error(`Server response error: ${text}`);
-        }
-    })
-    .then(data => {
-        if (data.success) {
-            // Close the add user modal
-            bootstrap.Modal.getInstance(document.getElementById('addUserModal')).hide();
-            
-            // Clear the form
-            document.getElementById('newUserName').value = '';
-            document.getElementById('newUserEmail').value = '';
-            document.getElementById('newUserRole').value = '';
-            
-            // Refresh the user list in the assign user modal
-            const userSelect = document.getElementById('userSelect');
-             // Remove the existing "Add New User" option if it exists
-             const addNewOption = Array.from(userSelect.options).find(option => option.value === 'new');
-            if (addNewOption) {
-                addNewOption.remove();
-            }
-            // Add the new user option
-            const newOption = new Option(
-                `${username} (${email}) - ${role}`, 
-                data.data.user_id
-            );
-            userSelect.add(newOption);
-            
-            // Show success message
-            alert('User created successfully! An email has been sent with login details.');
-        } else {
-            throw new Error(data.message || 'Failed to create user');
-        }
-    })
-    .catch(error => {
-        console.error('Error creating user:', error);
-        alert(`Error creating user: ${error.message}`);
-    })
-    .finally(hideLoading);
-});
+                    showLoading();
+
+
+                    fetch('?api=create_user', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            username: username,
+                            email: email,
+                            project_id: currentProject,
+                            role: role
+                        })
+                    })
+                        .then(async response => {
+                            const text = await response.text();
+                            // console.log('Raw server response:', text); // Debug log
+
+                            try {
+                                const data = JSON.parse(text);
+                                // console.log('Parsed response:', data); // Debug log
+                                return data;
+                            } catch (e) {
+                                console.error('JSON parse error:', e);
+                                console.error('Raw response was:', text);
+                                throw new Error(`Server response error: ${text}`);
+                            }
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                // Close the add user modal
+                                bootstrap.Modal.getInstance(document.getElementById('addUserModal')).hide();
+
+                                // Clear the form
+                                document.getElementById('newUserName').value = '';
+                                document.getElementById('newUserEmail').value = '';
+                                document.getElementById('newUserRole').value = '';
+
+                                // Refresh the user list in the assign user modal
+                                const userSelect = document.getElementById('userSelect');
+                                // Remove the existing "Add New User" option if it exists
+                                const addNewOption = Array.from(userSelect.options).find(option => option.value === 'new');
+                                if (addNewOption) {
+                                    addNewOption.remove();
+                                }
+                                // Add the new user option
+                                const newOption = new Option(
+                                    `${username} (${email}) - ${role}`,
+                                    data.data.user_id
+                                );
+                                userSelect.add(newOption);
+
+                                // Show success message
+                                alert('User created successfully! An email has been sent with login details.');
+                            } else {
+                                throw new Error(data.message || 'Failed to create user');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error creating user:', error);
+                            alert(`Error creating user: ${error.message}`);
+                        })
+                        .finally(hideLoading);
+                });
                 // Helper functions
                 function appendMessage(message, sender) {
                     const div = document.createElement('div');
@@ -4246,8 +4318,8 @@ if (isset($_GET['api'])) {
                     const title = document.getElementById('subtaskTitle').value.trim();
                     const description = document.getElementById('subtaskDescription').value.trim();
                     const dueDate = document.getElementById('subtaskDueDate').value;
-                    
-                    if(!currentProject){
+
+                    if (!currentProject) {
                         alert('Please select a project first');
                         return;
                     }
