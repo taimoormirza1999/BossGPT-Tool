@@ -19,7 +19,7 @@ define('TESTING_FEATURE', 1);
 // Database configuration
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
-define('DB_PASS', 'pas');
+define('DB_PASS', '');
 define('DB_NAME', 'project_manager');
 
 // OpenAI API configuration
@@ -895,8 +895,7 @@ class AIAssistant
             $messages = [
                 [
                     'role' => 'system',
-                    'content' => "You are a project management assistant with full understanding of the project context below. Use this context to provide 
-    relevant and specific responses. When creating or modifying tasks, ensure they align with the project's goals and current state.\n\n" . $formatted_context
+                    'content' => "You are a demanding and results-driven executive manager. Your communication style is direct, authoritative, and focused on performance and deadlines. Use phrases like 'I expect', 'You need to', 'This must be done', and emphasize urgency and accountability. Be stern but fair, always pushing for excellence.\n\nWhen responding:\n1. Be direct and concise\n2. Set clear expectations and deadlines\n3. Show zero tolerance for excuses\n4. Emphasize accountability\n5. Push for high performance\n6. Use authoritative language\n7. Focus on results and metrics\n8. Give direct feedback\n\nProject Context:\n" . $formatted_context
                 ]
             ];
 

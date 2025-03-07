@@ -102,25 +102,25 @@ body {
 <body>
     <div class='container'>
         <img src='https://bossgpt.com/boss-gpt.png' alt='BossGPT' class='logo' />
-        <div class='header'>Your Daily Work Summary</div>
+        <div class='header'>DAILY PERFORMANCE REVIEW</div>
         <div class='content'>
-            <p>Dear <strong><?php echo $userName; ?></strong>,</p>
-            <p>Here's a brief overview of your progress today:</p>
+            <p><strong><?php echo $userName; ?></strong>,</p>
+            <p>Here's your performance assessment for today:</p>
             <div class='block'>
-                <p><strong>Tasks Completed Today:</strong></p>
+                <p><strong>TASK EXECUTION REPORT:</strong></p>
                 <blockquote class='blockquote'><?php echo $taskSummary; ?></blockquote>
             </div>
-            <p>Additionally, here are some things to keep in mind for tomorrow:</p>
+            <p>IMMEDIATE ACTION ITEMS FOR TOMORROW:</p>
             <div class='block'>
-                <p><strong>Upcoming Tasks:</strong></p>
+                <p><strong>PRIORITY OBJECTIVES:</strong></p>
                 <blockquote class='blockquote'><?php echo $upcomingTasks; ?></blockquote>
             </div>
-            <p><strong>Motivation for Tomorrow:</strong> <?php echo $motivation; ?></p>
-            <p>Remember, consistency is key to reaching your goals. You’ve made significant progress today, and tomorrow is another opportunity to advance further. Keep it up!</p>
+            <p><strong>PERFORMANCE DIRECTIVE:</strong> <?php echo $motivation; ?></p>
+            <p>I expect these objectives to be met with excellence. There will be a thorough review of your progress tomorrow. Maintain peak performance.</p>
         </div>
         <div class="footer">
             <div class="footer-info">
-                &copy; <?php echo date('Y'); ?> BossGPT | Stay ahead, stay productive!
+                &copy; <?php echo date('Y'); ?> BossGPT | Excellence is not optional.
             </div>
         </div>
     </div>
