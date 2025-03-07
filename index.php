@@ -1371,9 +1371,9 @@ if (isset($_GET['api'])) {
                     LEFT JOIN project_users pu ON u.id = pu.user_id 
                     WHERE pu.project_id = ?
                 ");
-                
-                $stmt->execute([$_GET['project_id']]);
-                $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                    $stmt->execute([$_GET['project_id']]);
+                    $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     echo json_encode([
                         'success' => true,
                         'users' => $users
@@ -1731,17 +1731,17 @@ if (isset($_GET['api'])) {
     <script src="https://cdn.jsdelivr.net/npm/izitoast/dist/js/iziToast.min.js"></script>
     <!-- Tailwind CSS -->
     <!-- <script src="https://unpkg.com/@tailwindcss/browser@4"></script> -->
- <!-- Favicon links -->
- <!-- <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-touch-icon.png">
+    <!-- Favicon links -->
+    <!-- <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
     <link rel="manifest" href="/assets/favicon/site.webmanifest"> -->
-    
+
     <link rel="icon" type="image/png" sizes="32x32" href="faviconbossgpt.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-<link rel="manifest" href="site.webmanifest">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="manifest" href="site.webmanifest">
     <!-- Custom css -->
     <!-- <link rel="stylesheet" href="custom.css"> -->
     <!-- Custom js -->
@@ -2856,8 +2856,9 @@ if (isset($_GET['api'])) {
                                         data-bs-target="#activityLogModal">
                                         <i class="bi bi-clock-history"></i> Activity Log
                                     </button>
-                                    <?php if (TESTING_FEATURE === 1): ?>
-                                        <button type="button" class="btn btn-sm btn-info me-2" onclick='sendEmailBtn()'>
+
+                                    <?php if (TESTING_FEATURE == 1): ?>
+                                        <button type="button" class="btn btn-sm btn-info me-2" onclick=' showChatLoading()'>
                                             <i class="bi bi-clock-history"></i> Testing Feature Button
                                         </button>
                                     <?php endif; ?>
@@ -2901,9 +2902,9 @@ if (isset($_GET['api'])) {
 
                     <!-- Chat Panel - now spans 3 columns -->
                     <div class="col-md-3">
-                        <div class="card h-100">
+                        <div class="card">
                             <div class="card-header">
-                                <h5 class="mb-0">AI Assistant</h5>
+                                <h5 class="mb-0">AI Project Manager <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 640 512" class="text-5xl" height="1.6em" width="1.6em" xmlns="http://www.w3.org/2000/svg"><path d="M32,224H64V416H32A31.96166,31.96166,0,0,1,0,384V256A31.96166,31.96166,0,0,1,32,224Zm512-48V448a64.06328,64.06328,0,0,1-64,64H160a64.06328,64.06328,0,0,1-64-64V176a79.974,79.974,0,0,1,80-80H288V32a32,32,0,0,1,64,0V96H464A79.974,79.974,0,0,1,544,176ZM264,256a40,40,0,1,0-40,40A39.997,39.997,0,0,0,264,256Zm-8,128H192v32h64Zm96,0H288v32h64ZM456,256a40,40,0,1,0-40,40A39.997,39.997,0,0,0,456,256Zm-8,128H384v32h64ZM640,256V384a31.96166,31.96166,0,0,1-32,32H576V224h32A31.96166,31.96166,0,0,1,640,256Z"></path></svg></h5>
                             </div>
                             <div class="card-body p-0">
                                 <div class="chat-container">
@@ -3061,7 +3062,7 @@ if (isset($_GET['api'])) {
                         <div class="modal-header bg-primary text-white border-0 rounded-t-lg">
                             <h5 class="modal-title" id="assignUserModalLabel">Assign User to Project</h5>
                             <button type="button" class="btn-close text-white" data-bs-dismiss="modal"
-                                aria-label="Close"></button>
+                                aria-label="Close "></button>
                         </div>
                         <div class="modal-body">
                             <form id="assignUserForm">
@@ -3127,9 +3128,9 @@ if (isset($_GET['api'])) {
             </div>
             <!-- New Task Modal -->
             <div class="modal fade" id="newTaskModal" tabindex="-1">
-                <div class="modal-dialog">
+                <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
-                        <div class="modal-header">
+                        <div class="modal-header bg-primary text-white border-0 rounded-t-lg">
                             <h5 class="modal-title">Create New Task</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
@@ -3204,9 +3205,9 @@ if (isset($_GET['api'])) {
 
             <!-- Activity Log Modal -->
             <div class="modal fade" id="activityLogModal" tabindex="-1">
-                <div class="modal-dialog modal-lg">
+                <div class="modal-dialog modal-lg modal-dialog-centered ">
                     <div class="modal-content">
-                        <div class="modal-header">
+                        <div class="modal-header bg-primary text-white border-0 rounded-t-lg">
                             <h5 class="modal-title">Project Activity Log</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
@@ -3673,8 +3674,16 @@ if (isset($_GET['api'])) {
                 // Handle chat form submission
                 chatForm.addEventListener('submit', function (e) {
                     e.preventDefault();
+                  
                     if (!currentProject) {
-                        alert('Please select a project first');
+                        // alert('Please select a project first');
+                        // return;
+                        showToastAndHideModal(
+                            'assignUserModal',
+                            'error',
+                            'Error',
+                            'Please select a project first'
+                        );
                         return;
                     }
 
@@ -3684,7 +3693,7 @@ if (isset($_GET['api'])) {
                     appendMessage(message, 'user');
                     messageInput.value = '';
 
-                    showLoading();
+                    showChatLoading();
                     fetch('?api=send_message', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -3710,7 +3719,7 @@ if (isset($_GET['api'])) {
                             }
                         })
                         .catch(error => console.error('Error sending message:', error))
-                        .finally(hideLoading);
+                        .finally(hideChatLoading);
                 });
 
                 // Handle new project creation
@@ -3985,55 +3994,55 @@ if (isset($_GET['api'])) {
                 // Populate the user dropdown when the "Assign User" modal is shown
                 const assignUserModal = document.getElementById('assignUserModal');
                 assignUserModal.addEventListener('shown.bs.modal', function () {
-    if (!currentProject) {
-        showToastAndHideModal(
-            'assignUserModal',
-            'error',
-            'Error',
-            'Please select a project first'
-        );
-        return;
-    }
+                    if (!currentProject) {
+                        showToastAndHideModal(
+                            'assignUserModal',
+                            'error',
+                            'Error',
+                            'Please select a project first'
+                        );
+                        return;
+                    }
 
-    showLoading();
-    fetch(`?api=get_all_project_users&project_id=${currentProject}`)
-        .then(async response => {
-            const text = await response.text();
-            console.log('Raw response:', text); // Debug log
-            try {
-                return JSON.parse(text);
-            } catch (e) {
-                console.error('JSON parse error:', e);
-                throw new Error('Invalid server response');
-            }
-        })
-        .then(data => {
-            if (data.success) {
-                const userSelect = document.getElementById('userSelect');
-                userSelect.innerHTML = '<option value="">Select a user</option>';
-                
-                // Add project users
-                data.users.forEach(user => {
-                    userSelect.innerHTML += `<option value="${user.id}">${user.username} (${user.email}) - ${user.role}</option>`;
+                    showLoading();
+                    fetch(`?api=get_all_project_users&project_id=${currentProject}`)
+                        .then(async response => {
+                            const text = await response.text();
+                            console.log('Raw response:', text); // Debug log
+                            try {
+                                return JSON.parse(text);
+                            } catch (e) {
+                                console.error('JSON parse error:', e);
+                                throw new Error('Invalid server response');
+                            }
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                const userSelect = document.getElementById('userSelect');
+                                userSelect.innerHTML = '<option value="">Select a user</option>';
+
+                                // Add project users
+                                data.users.forEach(user => {
+                                    userSelect.innerHTML += `<option value="${user.id}">${user.username} (${user.email}) - ${user.role}</option>`;
+                                });
+
+                                // Add "Add New User" option at the end
+                                userSelect.innerHTML += '<option value="new">+ Add New User</option>';
+                            } else {
+                                throw new Error(data.message || 'Failed to load users');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error loading users:', error);
+                            showToastAndHideModal(
+                                'assignUserModal',
+                                'error',
+                                'Error',
+                                'Failed to load users'
+                            );
+                        })
+                        .finally(hideLoading);
                 });
-                
-                // Add "Add New User" option at the end
-                userSelect.innerHTML += '<option value="new">+ Add New User</option>';
-            } else {
-                throw new Error(data.message || 'Failed to load users');
-            }
-        })
-        .catch(error => {
-            console.error('Error loading users:', error);
-            showToastAndHideModal(
-                'assignUserModal',
-                'error',
-                'Error',
-                'Failed to load users'
-            );
-        })
-        .finally(hideLoading);
-});
                 // Handle "New User" selection
                 document.getElementById('userSelect').addEventListener('change', function () {
                     if (this.value === 'new') {
@@ -4180,8 +4189,14 @@ if (isset($_GET['api'])) {
                 const newTaskModal = document.getElementById('newTaskModal');
                 newTaskModal.addEventListener('shown.bs.modal', function () {
                     if (!currentProject) {
-                        alert('Please select a project first');
-                        bootstrap.Modal.getInstance(newTaskModal).hide();
+                        // alert('Please select a project first');
+                        showToastAndHideModal(
+                            'newTaskModal',
+                            'error',
+                            'Error',
+                            'Please select a project first'
+                        );
+                        // bootstrap.Modal.getInstance(newTaskModal).hide();
                         return;
                     }
 
@@ -4399,7 +4414,13 @@ if (isset($_GET['api'])) {
                 const activityLogModal = document.getElementById('activityLogModal');
                 activityLogModal.addEventListener('show.bs.modal', function () {
                     if (!currentProject) {
-                        alert('Please select a project first');
+                        // alert('Please select a project first');
+                        showToastAndHideModal(
+                            'activityLogModal',
+                            'error',
+                            'Error',
+                            'Please select a project first'
+                        );
                         return;
                     }
                     loadActivityLog();
@@ -5008,7 +5029,7 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                 });
         }
 
-
+        initializeChatLoading();
     </script>
 </body>
 
