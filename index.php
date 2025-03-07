@@ -19,7 +19,7 @@ define('TESTING_FEATURE', 1);
 // Database configuration
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_PASS', getenv('DB_PASS'));
 define('DB_NAME', 'project_manager');
 
 // OpenAI API configuration
