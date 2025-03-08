@@ -207,3 +207,13 @@ function hideChatLoading() {
       loadingElement.remove();
   }
 }
+
+
+function openNewProjectModal() {
+  // Get your existing new project modal
+  const modal = new bootstrap.Modal(document.getElementById('newProjectModal'));
+  modal.show();
+}
+function scrollToBottom() {
+  welcomeThread.scrollTop = welcomeThread.scrollHeight;
+}
