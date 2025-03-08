@@ -1747,6 +1747,10 @@ if (isset($_GET['api'])) {
     <!-- Custom js -->
     <script src="./assets/js/custom.js"></script>
     <style>
+        .suggestion-item{
+            border-radius: 16px !important;
+    border-color: gray !important;
+        }
         .chat-container {
             height: calc(100vh - 200px);
             display: flex;
@@ -3915,6 +3919,7 @@ if (isset($_GET['api'])) {
                                 bootstrap.Modal.getInstance(document.getElementById('newProjectModal')).hide();
                                 document.getElementById('projectTitle').value = '';
                                 document.getElementById('projectDescription').value = '';
+                                Toast("success", "Success", "Project created successfully", "bottomCenter");
                             }
                         })
                         .catch(error => console.error('Error creating project:', error))
@@ -4693,14 +4698,14 @@ if (isset($_GET['api'])) {
                 function renderSuggestedTasks(suggestions) {
                     const suggestionsContainer = document.createElement('div');
                     suggestionsContainer.className = 'suggestions-container mt-3';
-                    suggestionsContainer.innerHTML = '<h6>Suggested Tasks & Features</h6>';
+                    suggestionsContainer.innerHTML = '<h6 class="mb-3">Suggested Tasks & Features</h6>';
                     suggestions.forEach(suggestion => {
                         const suggestionDiv = document.createElement('div');
                         suggestionDiv.className = 'suggestion-item border p-2 mb-2';
                         suggestionDiv.innerHTML = `
                             <strong>${escapeHtml(suggestion.title)}</strong><br>
-                            <span>${escapeHtml(suggestion.description)}</span><br>
-                            ${suggestion.due_date ? `<em>Due: ${escapeHtml(suggestion.due_date)}</em>` : ''}<br>
+                            <span class="my-2">${escapeHtml(suggestion.description)}</span><br>
+                            ${suggestion.due_date ? `<i class="bi bi-calendar-event"></i><em class="text-muted"> Due: ${escapeHtml(suggestion.due_date)}</em>` : ''}<br>
                             <button class="btn btn-sm btn-primary mt-1">Add Task</button>
                          `;
                         suggestionDiv.querySelector('button').addEventListener('click', () => {
