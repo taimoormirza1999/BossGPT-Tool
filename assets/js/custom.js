@@ -217,3 +217,6 @@ function openNewProjectModal() {
 function scrollToBottom() {
   welcomeThread.scrollTop = welcomeThread.scrollHeight;
 }
+
+
+// Welcome AI Messages 

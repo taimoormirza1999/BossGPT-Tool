@@ -2919,219 +2919,160 @@ if (isset($_GET['api'])) {
                             <div class="card-body p-0">
                                 <div class="chat-container">
                                     <div class="chat-messages" id="chatMessages">
-                                        <!-- Chat messages will be loaded here -->
-                                        <?php
-                                        // If no projects exist, show the welcome guide
-                                        if (empty($projects)) {
-                                            // Define welcome messages array
-                                            $welcomeMessages = [
-                                                [
-                                                    'delay' => 0,
-                                                    'title' => '👋 Welcome to BossGPT!',
-                                                    'content' => "I'm your AI Project Manager, ready to help you organize and manage your projects efficiently."
-                                                ],
-                                                [
-                                                    'delay' => 2000,
-                                                    'title' => '🚀 Let\'s Get Started!',
-                                                    'content' => [
-                                                        'text' => "To begin your journey, click the \"Create New Project\" button above. Here's what I can help you with:",
-                                                        'list' => [
-                                                            '✨ Project planning and organization',
-                                                            '📋 Task management and tracking',
-                                                            '👥 Team collaboration',
-                                                            '📊 Progress monitoring'
-                                                        ]
-                                                    ]
-                                                ],
-                                                [
-                                                    'delay' => 3000,
-                                                    'title' => '💡 How I Can Help',
-                                                    'content' => [
-                                                        'text' => 'Once you create a project, I can:',
-                                                        'list' => [
-                                                            '🤖 Generate task suggestions based on your project needs',
-                                                            '📅 Help manage deadlines and priorities',
-                                                            '🔍 Provide insights and recommendations',
-                                                            '💬 Answer questions about your project anytime'
-                                                        ]
-                                                    ]
-                                                ],
-                                                [
-                                                    'delay' => 4000,
-                                                    'title' => '🎯 Next Steps',
-                                                    'content' => [
-                                                        'text' => 'To get the most out of BossGPT:',
-                                                        'list' => [
-                                                            'Click "Create New Project" and give your project a name',
-                                                            'Describe your project goals and requirements',
-                                                            'I\'ll help you break it down into manageable tasks',
-                                                            'Invite team members to collaborate'
-                                                        ],
-                                                        'isOrdered' => true
-                                                    ]
-                                                ],
-                                                [
-                                                    'delay' => 5000,
-                                                    'title' => '🌟 Ready to Begin?',
-                                                    'content' => [
-                                                        'text' => 'Create your first project and let\'s make something amazing together!',
-                                                        'cta' => true
-                                                    ]
-                                                ]
-                                            ];
-                                            ?>
-                                            <div class="welcome-guide">
-                                                <div class="message-thread" id="welcomeThread">
-                                                    <!-- Messages will be inserted here by JavaScript -->
-                                                </div>
-                                            </div>
+                                    <?php if (empty($projects)): ?>
+    <div class="welcome-guide">
+        <div class="message-thread" id="welcomeThread">
+            <!-- Messages will be inserted here by JavaScript -->
+        </div>
+    </div>
 
-                                            <script>
-                                                document.addEventListener('DOMContentLoaded', function () {
-                                                    const welcomeMessages = <?php echo json_encode($welcomeMessages); ?>;
-                                                    const welcomeThread = document.getElementById('welcomeThread');
+    <script>
+    // Immediately invoke function to initialize welcome messages
+    (function initializeWelcomeMessages() {
+        console.log('Initializing welcome messages...'); // Debug log
 
-                                                    function createMessageElement(message) {
-                                                        const messageDiv = document.createElement('div');
-                                                        messageDiv.className = 'ai-message';
+        const welcomeThread = document.getElementById('welcomeThread');
+        const chatMessages = document.getElementById('chatMessages');
+        
+        if (!welcomeThread || !chatMessages) {
+            console.error('Required elements not found!');
+            return;
+        }
 
-                                                        let content = `
-                <div class="ai-avatar">
-                    <div class="chat-loading-avatar">
-                        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 640 512" height="1.5em" width="1.5em" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M32,224H64V416H32A31.96166,31.96166,0,0,1,0,384V256A31.96166,31.96166,0,0,1,32,224Zm512-48V448a64.06328,64.06328,0,0,1-64,64H160a64.06328,64.06328,0,0,1-64-64V176a79.974,79.974,0,0,1,80-80H288V32a32,32,0,0,1,64,0V96H464A79.974,79.974,0,0,1,544,176ZM264,256a40,40,0,1,0-40,40A39.997,39.997,0,0,0,264,256Zm-8,128H192v32h64Zm96,0H288v32h64ZM456,256a40,40,0,1,0-40,40A39.997,39.997,0,0,0,456,256Zm-8,128H384v32h64ZM640,256V384a31.96166,31.96166,0,0,1-32,32H576V224h32A31.96166,31.96166,0,0,1,640,256Z"></path>
-                        </svg>
-                    </div>
-                </div>
-                <div class="message ai">
-                    <h5>${message.title}</h5>`;
+        const welcomeMessages = [
+            {
+                delay: 0,
+                title: '👋 Welcome to BossGPT!',
+                content: "I'm your AI Project Manager, ready to help you organize and manage your projects efficiently."
+            },
+            {
+                delay: 2000,
+                title: '🚀 Let\'s Get Started!',
+                content: {
+                    text: "To begin your journey, click the \"Create New Project\" button above. Here's what I can help you with:",
+                    list: [
+                        '✨ Project planning and organization',
+                        '📋 Task management and tracking',
+                        '👥 Team collaboration',
+                        '📊 Progress monitoring'
+                    ]
+                }
+            },
+            {
+                delay: 4000,
+                title: '💡 How I Can Help',
+                content: {
+                    text: 'Once you create a project, I can:',
+                    list: [
+                        '🤖 Generate task suggestions based on your project needs',
+                        '📅 Help manage deadlines and priorities',
+                        '🔍 Provide insights and recommendations',
+                        '💬 Answer questions about your project anytime'
+                    ]
+                }
+            },
+            {
+                delay: 6000,
+                title: '🎯 Next Steps',
+                content: {
+                    text: 'To get the most out of BossGPT:',
+                    list: [
+                        'Click "Create New Project" and give your project a name',
+                        'Describe your project goals and requirements',
+                        'I\'ll help you break it down into manageable tasks',
+                        'Invite team members to collaborate'
+                    ],
+                    isOrdered: true
+                }
+            },
+            {
+                delay: 8000,
+                title: '🌟 Ready to Begin?',
+                content: {
+                    text: 'Create your first project and let\'s make something amazing together!',
+                    cta: true
+                }
+            }
+        ];
 
-                                                        if (typeof message.content === 'string') {
-                                                            content += `<p>${message.content}</p>`;
-                                                        } else {
-                                                            content += `<p>${message.content.text}</p>`;
-                                                            if (message.content.list) {
-                                                                const listType = message.content.isOrdered ? 'ol' : 'ul';
-                                                                content += `<${listType}>`;
-                                                                message.content.list.forEach(item => {
-                                                                    content += `<li>${item}</li>`;
-                                                                });
-                                                                content += `</${listType}>`;
-                                                            }
-                                                            if (message.content.cta) {
-                                                                content += `
-                        <div class="cta-message">
-                            <button class="btn btn-primary mt-3" onclick="openNewProjectModal()">
-                                <i class="fas fa-plus-circle"></i> Create New Project
-                            </button>
-                        </div>`;
-                                                            }
-                                                        }
+        async function showMessage(message) {
+    console.log('Showing message:', message.title); // Debug log
 
-                                                        content += '</div>';
-                                                        messageDiv.innerHTML = content;
-                                                        return messageDiv;
-                                                    }
+    // Show loading animation first
+    showChatLoading();
 
-                                                    async function showMessage(message) {
-                                                        // Show loading animation first
-                                                        const loadingDiv = document.createElement('div');
-                                                        loadingDiv.className = 'chat-loading';
-                                                        loadingDiv.innerHTML = `
-                <div class="chat-loading-container">
-                    <div class="chat-loading-avatar">
-                        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 640 512" height="1.5em" width="1.5em" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M32,224H64V416H32A31.96166,31.96166,0,0,1,0,384V256A31.96166,31.96166,0,0,1,32,224Zm512-48V448a64.06328,64.06328,0,0,1-64,64H160a64.06328,64.06328,0,0,1-64-64V176a79.974,79.974,0,0,1,80-80H288V32a32,32,0,0,1,64,0V96H464A79.974,79.974,0,0,1,544,176ZM264,256a40,40,0,1,0-40,40A39.997,39.997,0,0,0,264,256Zm-8,128H192v32h64Zm96,0H288v32h64ZM456,256a40,40,0,1,0-40,40A39.997,39.997,0,0,0,456,256Zm-8,128H384v32h64ZM640,256V384a31.96166,31.96166,0,0,1-32,32H576V224h32A31.96166,31.96166,0,0,1,640,256Z"></path>
-                        </svg>
-                    </div>
-                    <div class="dots">
-                        <div class="dot"></div>
-                        <div class="dot"></div>
-                        <div class="dot"></div>
-                    </div>
+    // Wait for loading animation
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    // Hide loading animation
+    hideChatLoading();
+
+    // Create the message div
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'ai-message';
+    messageDiv.style.opacity = "0";  // Start invisible
+    messageDiv.style.transition = "opacity 0.5s ease-in-out"; // Smooth transition
+
+    let content = `
+        <div class="ai-avatar">
+            <div class="chat-loading-avatar">
+                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 640 512" height="1.5em" width="1.5em" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M32,224H64V416H32A31.96166,31.96166,0,0,1,0,384V256A31.96166,31.96166,0,0,1,32,224Zm512-48V448a64.06328,64.06328,0,0,1-64,64H160a64.06328,64.06328,0,0,1-64-64V176a79.974,79.974,0,0,1,80-80H288V32a32,32,0,0,1,64,0V96H464A79.974,79.974,0,0,1,544,176ZM264,256a40,40,0,1,0-40,40A39.997,39.997,0,0,0,264,256Zm-8,128H192v32h64Zm96,0H288v32h64ZM456,256a40,40,0,1,0-40,40A39.997,39.997,0,0,0,456,256Zm-8,128H384v32h64ZM640,256V384a31.96166,31.96166,0,0,1-32,32H576V224h32A31.96166,31.96166,0,0,1,640,256Z"></path>
+                </svg>
+            </div>
+        </div>
+        <div class="message ai text-center mt-3">
+            <h5>${message.title}</h5>`;
+
+    if (typeof message.content === 'string') {
+        content += `<p>${message.content}</p>`;
+    } else {
+        content += `<p>${message.content.text}</p>`;
+        if (message.content.list) {
+            const listType = message.content.isOrdered ? 'ol' : 'ul';
+            content += `<${listType}>`;
+            message.content.list.forEach(item => {
+                content += `<li>${item}</li>`;
+            });
+            content += `</${listType}>`;
+        }
+        if (message.content.cta) {
+            content += `
+                <div class="cta-message">
+                    <button class="btn btn-primary mt-3" onclick="openNewProjectModal()">
+                        <i class="fas fa-plus-circle"></i> Create New Project
+                    </button>
                 </div>`;
-                                                        welcomeThread.appendChild(loadingDiv);
+        }
+    }
 
-                                                        // Wait for 1.5 seconds to show loading
-                                                        await new Promise(resolve => setTimeout(resolve, 1500));
+    content += '</div>';
+    messageDiv.innerHTML = content;
+    welcomeThread.appendChild(messageDiv);
 
-                                                        // Remove loading animation
-                                                        loadingDiv.remove();
+    // Apply fade-in effect
+    setTimeout(() => {
+        messageDiv.style.opacity = "1"; 
+    }, 100);
 
-                                                        // Show actual message
-                                                        const messageElement = createMessageElement(message);
-                                                        welcomeThread.appendChild(messageElement);
-                                                        messageElement.style.animation = 'slideIn 0.5s ease forwards';
-                                                        // scrollToBottom();
-                                                        scrollToBottom(chatMessages);
-                                                    }
+    // Scroll to bottom smoothly
+    chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: "smooth" });
+}
 
-                                                    async function displayMessages() {
-                                                        for (const message of welcomeMessages) {
-                                                            await new Promise(resolve => setTimeout(resolve, message.delay));
-                                                            await showMessage(message);
-                                                        }
-                                                    }
 
-                                                    displayMessages();
-                                                });
-                                            </script>
+        async function displayMessages() {
+            // console.log('Starting to display messages...'); // Debug log
+            for (const message of welcomeMessages) {
+                await new Promise(resolve => setTimeout(resolve, message.delay));
+                await showMessage(message);
+            }
+        }
 
-                                            <style>
-                                                .welcome-guide {
-                                                    max-width: 800px;
-                                                    margin: 0 auto;
-                                                }
-
-                                                .message-thread {
-                                                    display: flex;
-                                                    flex-direction: column;
-                                                    max-height: 80vh;
-                                                    overflow-y: auto;
-                                                    scroll-behavior: smooth;
-                                                    gap: 20px;
-                                                }
-
-                                              
-                                                @keyframes slideIn {
-                                                    to {
-                                                        opacity: 1;
-                                                        transform: translateY(0);
-                                                    }
-                                                }
-
-                                                /* .message-content {
-                                                    background: var(--message-bg, #f0f2f5);
-                                                    padding: 15px 20px;
-                                                    border-radius: 15px;
-                                                    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-                                                    max-width: 600px;
-                                                }*/
-                                                .welcome-guide .message {
-                                                    padding: 0.8rem 1rem 0rem;
-                                                }
-                                                .welcome-guide .message h5 {
-                                                    /* color: var(--primary-color, #2374e1); */
-                                                    /* margin-bottom: 10px; */
-                                                }
-
-                                                .welcome-guide .message ul,
-                                                .welcome-guide .message ol {
-                                                    padding-left: 20px;
-                                                    /* margin-top: 10px; */
-                                                }
-
-                                                .welcome-guide .message li {
-                                                    /* margin-bottom: 4px; */
-                                                }
-
-                                                .welcome-guide .message .cta-message {
-                                                    text-align: center;
-                                                }
-                                            </style>
-                                            <?php
-                                        }
-                                        ?>
+        // Start displaying messages
+        displayMessages().catch(error => console.error('Error displaying messages:', error));
+    })();
+    </script>
+<?php endif; ?>
                                     </div>
                                     <div class="chat-input">
                                         <form id="chatForm" class="d-flex">
