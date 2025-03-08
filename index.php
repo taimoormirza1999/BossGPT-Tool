@@ -2703,7 +2703,7 @@ if (isset($_GET['api'])) {
             <div class="container-fluid " style="width: 95%;">
                 <!-- <a class="navbar-brand" href="?page=dashboard">Project Manager AI</a> -->
                 <a class="navbar-brand" href="?page=dashboard"><img src="assets/images/bossgptlogo.svg" alt="Logo"
-                        style="width: 10rem; height: 60px;"></a>
+                        style="width: 150px; height: 60px;"></a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
