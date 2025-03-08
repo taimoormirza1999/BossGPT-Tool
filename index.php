@@ -2703,7 +2703,7 @@ if (isset($_GET['api'])) {
             <div class="container-fluid " style="width: 95%;">
                 <!-- <a class="navbar-brand" href="?page=dashboard">Project Manager AI</a> -->
                 <a class="navbar-brand" href="?page=dashboard"><img src="assets/images/bossgptlogo.svg" alt="Logo"
-                        style="width: 130px; height: 60px;"></a>
+                        style="width: 140px; height: 60px;"></a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -2927,11 +2927,12 @@ if (isset($_GET['api'])) {
 
             <!-- New Project Modal -->
             <div class="modal fade" id="newProjectModal" tabindex="-1">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow-lg rounded-lg">
+                        <div class="modal-header bg-primary text-white border-0 rounded-t-lg">
                             <h5 class="modal-title">Create New Project</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            <button type="button" class="btn-close text-white" data-bs-dismiss="modal"
+                                aria-label="Close "></button>
                         </div>
                         <div class="modal-body">
                             <form id="newProjectForm">
@@ -3728,7 +3729,13 @@ if (isset($_GET['api'])) {
                     const description = document.getElementById('projectDescription').value.trim();
 
                     if (!title) {
-                        alert('Please enter a project title');
+                        // alert('Please enter a project title');
+                        showToastAndHideModal(
+                            '',
+                            'error',
+                            'Error',
+                            'Please enter a project title'
+                        );
                         return;
                     }
 
