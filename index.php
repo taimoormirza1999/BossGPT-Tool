@@ -359,18 +359,45 @@ class ProjectManager
     {
         try {
             $stmt = $this->db->prepare(
-                "SELECT t.id, t.project_id, t.title, t.description, t.picture, t.status, t.due_date, t.created_at, t.updated_at, 
-                        GROUP_CONCAT(DISTINCT u.username) as assigned_usernames,
-                        GROUP_CONCAT(DISTINCT u.id) as assigned_user_ids,
-                        (SELECT JSON_ARRAYAGG(JSON_OBJECT('id', s.id, 'title', s.title, 'description', s.description, 'status', s.status, 'due_date', s.due_date))
-                         FROM subtasks s WHERE s.task_id = t.id) as subtasks
-                 FROM tasks t
-                 LEFT JOIN task_assignees ta ON t.id = ta.task_id
-                 LEFT JOIN users u ON ta.user_id = u.id
-                 WHERE t.project_id = ? AND t.status != 'deleted'
-                 GROUP BY t.id, t.project_id, t.title, t.description, t.picture, t.status, t.due_date, t.created_at, t.updated_at
-                 ORDER BY t.created_at DESC"
+                "SELECT 
+                    t.id, 
+                    t.project_id, 
+                    t.title, 
+                    t.description, 
+                    t.picture, 
+                    t.status, 
+                    t.due_date, 
+                    t.created_at, 
+                    t.updated_at, 
+                    COALESCE(GROUP_CONCAT(DISTINCT u.username SEPARATOR ', '), '') AS assigned_usernames,
+                    COALESCE(GROUP_CONCAT(DISTINCT u.id SEPARATOR ', '), '') AS assigned_user_ids,
+                    COALESCE(
+                        (
+                            SELECT CONCAT('[', 
+                                GROUP_CONCAT(
+                                    CONCAT(
+                                        '{\"id\":', s.id, 
+                                        ',\"title\":\"', s.title, 
+                                        '\",\"description\":\"', COALESCE(s.description, ''), 
+                                        '\",\"status\":\"', s.status, 
+                                        '\",\"due_date\":\"', COALESCE(s.due_date, ''), '\"}'
+                                    ) 
+                                    SEPARATOR ','
+                                ), 
+                            ']') 
+                            FROM subtasks s 
+                            WHERE s.task_id = t.id
+                        ), '[]'
+                    ) AS subtasks
+                FROM tasks t
+                LEFT JOIN task_assignees ta ON t.id = ta.task_id
+                LEFT JOIN users u ON ta.user_id = u.id
+                WHERE t.project_id = ? 
+                AND t.status != 'deleted'
+                GROUP BY t.id, t.project_id, t.title, t.description, t.picture, t.status, t.due_date, t.created_at, t.updated_at
+                ORDER BY t.created_at DESC"
             );
+            
             $stmt->execute([$project_id]);
             $tasks = $stmt->fetchAll();
 
