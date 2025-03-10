@@ -397,7 +397,7 @@ class ProjectManager
                 GROUP BY t.id, t.project_id, t.title, t.description, t.picture, t.status, t.due_date, t.created_at, t.updated_at
                 ORDER BY t.created_at DESC"
             );
-            
+
             $stmt->execute([$project_id]);
             $tasks = $stmt->fetchAll();
 
@@ -1666,7 +1666,20 @@ if (isset($_GET['api'])) {
                     }
                     $fileName = uniqid() . '.' . $type;
                     $filePath = $uploadDir . '/' . $fileName;
-                    file_put_contents($filePath, $imgData);
+
+                    // Debug information to check directory permissions and file writing
+                    error_log("Attempting to save image to: " . realpath($uploadDir) . "/$fileName");
+                    error_log("Directory exists: " . (file_exists($uploadDir) ? 'Yes' : 'No'));
+                    error_log("Directory writable: " . (is_writable($uploadDir) ? 'Yes' : 'No'));
+
+                    $result = file_put_contents($filePath, $imgData);
+                    if ($result === false) {
+                        error_log("Failed to write image file. Error: " . error_get_last()['message']);
+                        throw new Exception('Failed to save image file. Check server permissions.');
+                    } else {
+                        error_log("Successfully wrote $result bytes to $filePath");
+                    }
+
                     $picture = $filePath;
                 }
                 $assignees = isset($data['assignees']) ? $data['assignees'] : [];
@@ -1774,10 +1787,11 @@ if (isset($_GET['api'])) {
     <!-- Custom js -->
     <script src="./assets/js/custom.js"></script>
     <style>
-        .suggestion-item{
+        .suggestion-item {
             border-radius: 16px !important;
-    border-color: gray !important;
+            border-color: gray !important;
         }
+
         .chat-container {
             height: calc(100vh - 200px);
             display: flex;
@@ -2711,8 +2725,22 @@ if (isset($_GET['api'])) {
             font-size: 1rem !important;
             border-radius: 10px !important;
         }
+
+        .required-asterisk {
+            color: #dc3545;
+            margin-left: 3px;
+            font-weight: bold;
+        }
     </style>
 </head>
+<!-- Reuseable Stuff -->
+
+<?php
+function required_field()
+{
+    return '<span class="required-asterisk">*</span>';
+}
+?>
 
 <body>
     <?php
@@ -2950,101 +2978,101 @@ if (isset($_GET['api'])) {
                             <div class="card-body p-0">
                                 <div class="chat-container">
                                     <div class="chat-messages" id="chatMessages">
-                                    <?php if (empty($projects)): ?>
-    <div class="welcome-guide">
-        <div class="message-thread" id="welcomeThread">
-            <!-- Messages will be inserted here by JavaScript -->
-        </div>
-    </div>
+                                        <?php if (empty($projects)): ?>
+                                            <div class="welcome-guide">
+                                                <div class="message-thread" id="welcomeThread">
+                                                    <!-- Messages will be inserted here by JavaScript -->
+                                                </div>
+                                            </div>
 
-    <script>
-    // Immediately invoke function to initialize welcome messages
-    (function initializeWelcomeMessages() {
-        console.log('Initializing welcome messages...'); // Debug log
+                                            <script>
+                                                // Immediately invoke function to initialize welcome messages
+                                                (function initializeWelcomeMessages() {
+                                                    console.log('Initializing welcome messages...'); // Debug log
 
-        const welcomeThread = document.getElementById('welcomeThread');
-        const chatMessages = document.getElementById('chatMessages');
-        
-        if (!welcomeThread || !chatMessages) {
-            console.error('Required elements not found!');
-            return;
-        }
+                                                    const welcomeThread = document.getElementById('welcomeThread');
+                                                    const chatMessages = document.getElementById('chatMessages');
 
-        const welcomeMessages = [
-            {
-                delay: 0,
-                title: '👋 Welcome to BossGPT!',
-                content: "I'm your AI Project Manager, ready to help you organize and manage your projects efficiently."
-            },
-            {
-                delay: 2000,
-                title: '🚀 Let\'s Get Started!',
-                content: {
-                    text: "To begin your journey, click the \"Create New Project\" button above. Here's what I can help you with:",
-                    list: [
-                        '✨ Project planning and organization',
-                        '📋 Task management and tracking',
-                        '👥 Team collaboration',
-                        '📊 Progress monitoring'
-                    ]
-                }
-            },
-            {
-                delay: 4000,
-                title: '💡 How I Can Help',
-                content: {
-                    text: 'Once you create a project, I can:',
-                    list: [
-                        '🤖 Generate task suggestions based on your project needs',
-                        '📅 Help manage deadlines and priorities',
-                        '🔍 Provide insights and recommendations',
-                        '💬 Answer questions about your project anytime'
-                    ]
-                }
-            },
-            {
-                delay: 6000,
-                title: '🎯 Next Steps',
-                content: {
-                    text: 'To get the most out of BossGPT:',
-                    list: [
-                        'Click "Create New Project" and give your project a name',
-                        'Describe your project goals and requirements',
-                        'I\'ll help you break it down into manageable tasks',
-                        'Invite team members to collaborate'
-                    ],
-                    isOrdered: true
-                }
-            },
-            {
-                delay: 8000,
-                title: '🌟 Ready to Begin?',
-                content: {
-                    text: 'Create your first project and let\'s make something amazing together!',
-                    cta: true
-                }
-            }
-        ];
+                                                    if (!welcomeThread || !chatMessages) {
+                                                        console.error('Required elements not found!');
+                                                        return;
+                                                    }
 
-        async function showMessage(message) {
-    console.log('Showing message:', message.title); // Debug log
+                                                    const welcomeMessages = [
+                                                        {
+                                                            delay: 0,
+                                                            title: '👋 Welcome to BossGPT!',
+                                                            content: "I'm your AI Project Manager, ready to help you organize and manage your projects efficiently."
+                                                        },
+                                                        {
+                                                            delay: 2000,
+                                                            title: '🚀 Let\'s Get Started!',
+                                                            content: {
+                                                                text: "To begin your journey, click the \"Create New Project\" button above. Here's what I can help you with:",
+                                                                list: [
+                                                                    '✨ Project planning and organization',
+                                                                    '📋 Task management and tracking',
+                                                                    '👥 Team collaboration',
+                                                                    '📊 Progress monitoring'
+                                                                ]
+                                                            }
+                                                        },
+                                                        {
+                                                            delay: 4000,
+                                                            title: '💡 How I Can Help',
+                                                            content: {
+                                                                text: 'Once you create a project, I can:',
+                                                                list: [
+                                                                    '🤖 Generate task suggestions based on your project needs',
+                                                                    '📅 Help manage deadlines and priorities',
+                                                                    '🔍 Provide insights and recommendations',
+                                                                    '💬 Answer questions about your project anytime'
+                                                                ]
+                                                            }
+                                                        },
+                                                        {
+                                                            delay: 6000,
+                                                            title: '🎯 Next Steps',
+                                                            content: {
+                                                                text: 'To get the most out of BossGPT:',
+                                                                list: [
+                                                                    'Click "Create New Project" and give your project a name',
+                                                                    'Describe your project goals and requirements',
+                                                                    'I\'ll help you break it down into manageable tasks',
+                                                                    'Invite team members to collaborate'
+                                                                ],
+                                                                isOrdered: true
+                                                            }
+                                                        },
+                                                        {
+                                                            delay: 8000,
+                                                            title: '🌟 Ready to Begin?',
+                                                            content: {
+                                                                text: 'Create your first project and let\'s make something amazing together!',
+                                                                cta: true
+                                                            }
+                                                        }
+                                                    ];
 
-    // Show loading animation first
-    showChatLoading();
+                                                    async function showMessage(message) {
+                                                        console.log('Showing message:', message.title); // Debug log
 
-    // Wait for loading animation
-    await new Promise(resolve => setTimeout(resolve, 1500));
+                                                        // Show loading animation first
+                                                        showChatLoading();
 
-    // Hide loading animation
-    hideChatLoading();
+                                                        // Wait for loading animation
+                                                        await new Promise(resolve => setTimeout(resolve, 1500));
 
-    // Create the message div
-    const messageDiv = document.createElement('div');
-    messageDiv.className = 'ai-message';
-    messageDiv.style.opacity = "0";  // Start invisible
-    messageDiv.style.transition = "opacity 0.5s ease-in-out"; // Smooth transition
+                                                        // Hide loading animation
+                                                        hideChatLoading();
 
-    let content = `
+                                                        // Create the message div
+                                                        const messageDiv = document.createElement('div');
+                                                        messageDiv.className = 'ai-message';
+                                                        messageDiv.style.opacity = "0";  // Start invisible
+                                                        messageDiv.style.transition = "opacity 0.5s ease-in-out"; // Smooth transition
+
+                                                        let content = `
         <div class="ai-avatar">
             <div class="chat-loading-avatar">
                 <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 640 512" height="1.5em" width="1.5em" xmlns="http://www.w3.org/2000/svg">
@@ -3055,55 +3083,55 @@ if (isset($_GET['api'])) {
         <div class="message ai text-center mt-3">
             <h5>${message.title}</h5>`;
 
-    if (typeof message.content === 'string') {
-        content += `<p>${message.content}</p>`;
-    } else {
-        content += `<p>${message.content.text}</p>`;
-        if (message.content.list) {
-            const listType = message.content.isOrdered ? 'ol' : 'ul';
-            content += `<${listType}>`;
-            message.content.list.forEach(item => {
-                content += `<li>${item}</li>`;
-            });
-            content += `</${listType}>`;
-        }
-        if (message.content.cta) {
-            content += `
+                                                        if (typeof message.content === 'string') {
+                                                            content += `<p>${message.content}</p>`;
+                                                        } else {
+                                                            content += `<p>${message.content.text}</p>`;
+                                                            if (message.content.list) {
+                                                                const listType = message.content.isOrdered ? 'ol' : 'ul';
+                                                                content += `<${listType}>`;
+                                                                message.content.list.forEach(item => {
+                                                                    content += `<li>${item}</li>`;
+                                                                });
+                                                                content += `</${listType}>`;
+                                                            }
+                                                            if (message.content.cta) {
+                                                                content += `
                 <div class="cta-message">
                     <button class="btn btn-primary mt-3" onclick="openNewProjectModal()">
                         <i class="fas fa-plus-circle"></i> Create New Project
                     </button>
                 </div>`;
-        }
-    }
+                                                            }
+                                                        }
 
-    content += '</div>';
-    messageDiv.innerHTML = content;
-    welcomeThread.appendChild(messageDiv);
+                                                        content += '</div>';
+                                                        messageDiv.innerHTML = content;
+                                                        welcomeThread.appendChild(messageDiv);
 
-    // Apply fade-in effect
-    setTimeout(() => {
-        messageDiv.style.opacity = "1"; 
-    }, 100);
+                                                        // Apply fade-in effect
+                                                        setTimeout(() => {
+                                                            messageDiv.style.opacity = "1";
+                                                        }, 100);
 
-    // Scroll to bottom smoothly
-    chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: "smooth" });
-}
+                                                        // Scroll to bottom smoothly
+                                                        chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: "smooth" });
+                                                    }
 
 
-        async function displayMessages() {
-            // console.log('Starting to display messages...'); // Debug log
-            for (const message of welcomeMessages) {
-                await new Promise(resolve => setTimeout(resolve, message.delay));
-                await showMessage(message);
-            }
-        }
+                                                    async function displayMessages() {
+                                                        // console.log('Starting to display messages...'); // Debug log
+                                                        for (const message of welcomeMessages) {
+                                                            await new Promise(resolve => setTimeout(resolve, message.delay));
+                                                            await showMessage(message);
+                                                        }
+                                                    }
 
-        // Start displaying messages
-        displayMessages().catch(error => console.error('Error displaying messages:', error));
-    })();
-    </script>
-<?php endif; ?>
+                                                    // Start displaying messages
+                                                    displayMessages().catch(error => console.error('Error displaying messages:', error));
+                                                })();
+                                            </script>
+                                        <?php endif; ?>
                                     </div>
                                     <div class="chat-input">
                                         <form id="chatForm" class="d-flex">
@@ -3131,12 +3159,16 @@ if (isset($_GET['api'])) {
                         <div class="modal-body">
                             <form id="newProjectForm">
                                 <div class="mb-3">
-                                    <label for="projectTitle" class="form-label">Project Title</label>
-                                    <input type="text" class="form-control" id="projectTitle" required>
+                                    <label for="projectTitle" class="form-label">Project
+                                        Title<?php echo required_field(); ?></label>
+                                    <input type="text" class="form-control" id="projectTitle"
+                                        placeholder="Enter project title" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="projectDescription" class="form-label">Description</label>
-                                    <textarea class="form-control" id="projectDescription" rows="3"></textarea>
+                                    <label for="projectDescription"
+                                        class="form-label">Description<?php echo required_field(); ?></label>
+                                    <textarea class="form-control" id="projectDescription" rows="3"
+                                        placeholder="Define your project in few lines."></textarea>
                                 </div>
                             </form>
                         </div>
@@ -3263,15 +3295,18 @@ if (isset($_GET['api'])) {
                             <form id="assignUserForm">
                                 <!-- Select User Dropdown -->
                                 <div class="mb-3">
-                                    <label for="userSelect" class="form-label">Select User</label>
+                                    <label for="userSelect" class="form-label">Select
+                                        User<?php echo required_field(); ?></label>
                                     <select class="form-select" id="userSelect" required>
                                         <option value="">Select a user</option>
                                     </select>
                                 </div>
                                 <!-- Role in Project -->
                                 <div class="mb-3">
-                                    <label for="userRole" class="form-label">Role in Project</label>
-                                    <input type="text" class="form-control" id="userRole" required>
+                                    <label for="userRole" class="form-label">Role in
+                                        Project<?php echo required_field(); ?></label>
+                                    <input type="text" placeholder="Enter role (e.g., Developer, Designer, Manager)"
+                                        class="form-control" id="userRole" required>
                                 </div>
                             </form>
                         </div>
@@ -3289,21 +3324,23 @@ if (isset($_GET['api'])) {
             <div class="modal fade" id="addUserModal" tabindex="-1">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
-                        <div class="modal-header">
+                        <div class="modal-header bg-primary text-white border-0 rounded-t-lg">
                             <h5 class="modal-title">Add New User</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body">
                             <form id="addUserForm">
                                 <div class="mb-3">
-                                    <label for="newUserName" class="form-label">Full Name</label>
+                                    <label for="newUserName" class="form-label">User
+                                        Name<?php echo required_field(); ?></label>
                                     <input type="text" class="form-control" id="newUserName" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="newUserEmail" class="form-label">Email</label>
+                                    <label for="newUserEmail"
+                                        class="form-label">Email<?php echo required_field(); ?></label>
                                     <input type="email" class="form-control" id="newUserEmail" required>
                                 </div>
-                                <div class="mb-3">
+                                <!-- <div class="mb-3">
                                     <label for="newUserRole" class="form-label">Role</label>
                                     <select class="form-select" id="newUserRole" required>
                                         <option value="">Select Role</option>
@@ -3311,6 +3348,11 @@ if (isset($_GET['api'])) {
                                         <option value="manager">Manager</option>
                                         <option value="member">Member</option>
                                     </select>
+                                </div> -->
+                                <div class="mb-3">
+                                    <label for="newUserRole" class="form-label">Role<?php echo required_field(); ?></label>
+                                    <input type="text" class="form-control" id="newUserRole"
+                                        placeholder="Enter role (e.g., Developer, Designer, Manager)" required>
                                 </div>
                             </form>
                         </div>
@@ -3332,19 +3374,23 @@ if (isset($_GET['api'])) {
                         <div class="modal-body">
                             <form id="newTaskForm">
                                 <div class="mb-3">
-                                    <label for="newTaskTitle" class="form-label">Task Title</label>
+                                    <label for="newTaskTitle" class="form-label">Task
+                                        Title<?php echo required_field(); ?></label>
                                     <input type="text" class="form-control" id="newTaskTitle" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="newTaskDescription" class="form-label">Description</label>
+                                    <label for="newTaskDescription"
+                                        class="form-label">Description<?php echo required_field(); ?></label>
                                     <textarea class="form-control" id="newTaskDescription" rows="3"></textarea>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="newTaskDueDate" class="form-label">Due Date</label>
+                                    <label for="newTaskDueDate" class="form-label">Due
+                                        Date<?php echo required_field(); ?></label>
                                     <input type="date" class="form-control" id="newTaskDueDate">
                                 </div>
                                 <div class="mb-3">
-                                    <label for="newTaskAssignees" class="form-label">Assigned Users</label>
+                                    <label for="newTaskAssignees" class="form-label">Assigned
+                                        Users<?php echo required_field(); ?></label>
                                     <select class="form-select select2-multiple" id="newTaskAssignees" multiple required>
                                         <!-- Options will be populated by JavaScript -->
                                     </select>
@@ -3352,7 +3398,8 @@ if (isset($_GET['api'])) {
                                         select/deselect.</small>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="newTaskPicture" class="form-label">Task Picture</label>
+                                    <label for="newTaskPicture" class="form-label">Task
+                                        Picture<?php echo required_field(); ?></label>
                                     <input type="file" class="form-control" id="newTaskPicture" accept="image/*">
                                 </div>
                             </form>
@@ -3452,6 +3499,8 @@ if (isset($_GET['api'])) {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
+
+
         document.addEventListener('DOMContentLoaded', function () {
             // First check if we're on the dashboard page
             const isDashboard = document.querySelector('.chat-container') !== null;
@@ -3553,6 +3602,7 @@ if (isset($_GET['api'])) {
                                         selectProject(tab.dataset.id);
                                     });
                                 });
+                                return 2;
                             }
                         })
                         .catch(error => {
@@ -3571,9 +3621,21 @@ if (isset($_GET['api'])) {
 
                 // Select project
                 function selectProject(projectId) {
+                    // currentProject = projectId;
+                    projectId = parseInt(projectId);
+                    currentProject = parseInt(projectId);
+                    if (isNaN(projectId)) {
+                        console.error('Invalid project ID:', projectId);
+                        return;
+                    }
+                    console.log('Selecting project:', projectId);
                     currentProject = projectId;
+                    // document.querySelectorAll('.project-item').forEach(item => {
+                    //     item.classList.toggle('active', item.dataset.id === projectId);
+                    // });
                     document.querySelectorAll('.project-item').forEach(item => {
-                        item.classList.toggle('active', item.dataset.id === projectId);
+                        const itemId = parseInt(item.dataset.id);
+                        item.classList.toggle('active', itemId === projectId);
                     });
                     loadTasks(projectId);
                     loadChatHistory(projectId);
@@ -3947,6 +4009,11 @@ if (isset($_GET['api'])) {
                                 document.getElementById('projectTitle').value = '';
                                 document.getElementById('projectDescription').value = '';
                                 Toast("success", "Success", "Project created successfully", "bottomCenter");
+                               
+                                selectProject(data.project_id);
+                                setTimeout(() => {
+                                    displayProjectCreationWelcomeMessages(title);
+                                }, 5000);
                             }
                         })
                         .catch(error => console.error('Error creating project:', error))
@@ -3965,13 +4032,19 @@ if (isset($_GET['api'])) {
 
                     // Fetch all users to populate the multi-select
                     showLoading();
-                    fetch('?api=get_users')
+                    fetch('?api=get_project_users', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            project_id: currentProject
+                        })
+                    })
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
                                 data.users.forEach(user => {
                                     const newOption = new Option(
-                                        `${user.username} (${user.email})`,
+                                        `${user.username} (${user.email}) - (${user.role})`,
                                         user.id,
                                         false,
                                         false
@@ -4312,9 +4385,11 @@ if (isset($_GET['api'])) {
                                     data.data.user_id
                                 );
                                 userSelect.add(newOption);
-
+                                showToastAndHideModal('addUserModal', 'success', "Success", "User created successfully! An email has been sent with login credientials.")
+                                bootstrap.Modal.getInstance(document.getElementById('assignUserModal')).hide();
                                 // Show success message
-                                alert('User created successfully! An email has been sent with login details.');
+                                // Toast('success', "Success","User created successfully! An email has been sent with login details." )
+                                // alert('User created successfully! An email has been sent with login details.');
                             } else {
                                 throw new Error(data.message || 'Failed to create user');
                             }
@@ -4345,6 +4420,8 @@ if (isset($_GET['api'])) {
 
                 // Initial load
                 loadProjects();
+                // selectProject(5);
+
 
                 // Font size management
                 const fontSizeRange = document.getElementById('fontSizeRange');
@@ -4439,7 +4516,13 @@ if (isset($_GET['api'])) {
                 // Handle new task creation
                 document.getElementById('createTaskBtn').addEventListener('click', function () {
                     if (!currentProject) {
-                        alert('Please select a project first');
+                        // alert('Please select a project first');
+                        showToastAndHideModal(
+                            'newTaskModal',
+                            'error',
+                            'Error',
+                            'Please select a project first'
+                        );
                         return;
                     }
 
@@ -5230,6 +5313,7 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                     console.error("Fetch error:", error);
                 });
         }
+
 
         initializeChatLoading();
     </script>

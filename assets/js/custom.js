@@ -1,4 +1,4 @@
-// alert("DFDF")
+
 // Toasts iziToast Helper
 function Toast(type, title, message, positionToast) {
   const toastOptions = {
@@ -220,3 +220,47 @@ function scrollToBottom() {
 
 
 // Welcome AI Messages 
+function displayProjectCreationWelcomeMessages(title) {
+  const chatMessages = document.getElementById('chatMessages');
+  if (!chatMessages) return;
+
+  chatMessages.innerHTML = ''; // Clear previous messages
+
+  const welcomeMessages = [
+      {
+          message: `👋 Hi! I'm here to help you with your project "${title}"`,
+          delay: 1000
+      },
+      {
+          message: "You can ask me to:\n• Create new tasks of your project\n• Assign or subTasks\n• Get project insights\n• Manage team assignments",
+          delay: 1500
+      }
+  ];
+
+  showChatLoading(); // Show loading animation
+
+  welcomeMessages.forEach((msg, index) => {
+      setTimeout(() => {
+          if (index === welcomeMessages.length - 1) {
+              hideChatLoading(); // Hide loading animation when last message is displayed
+          }
+
+          const messageDiv = document.createElement('div');
+          messageDiv.className = 'ai-message';
+          messageDiv.innerHTML = `
+              <div class="ai-avatar">
+                  <div class="chat-loading-avatar">
+                      <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 640 512" height="1.5em" width="1.5em" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M32,224H64V416H32A31.96166,31.96166,0,0,1,0,384V256A31.96166,31.96166,0,0,1,32,224Zm512-48V448a64.06328,64.06328,0,0,1-64,64H160a64.06328,64.06328,0,0,1-64-64V176a79.974,79.974,0,0,1,80-80H288V32a32,32,0,0,1,64,0V96H464A79.974,79.974,0,0,1,544,176ZM264,256a40,40,0,1,0-40,40A39.997,39.997,0,0,0,264,256Zm-8,128H192v32h64Zm96,0H288v32h64ZM456,256a40,40,0,1,0-40,40A39.997,39.997,0,0,0,456,256Zm-8,128H384v32h64ZM640,256V384a31.96166,31.96166,0,0,1-32,32H576V224h32A31.96166,31.96166,0,0,1,640,256Z"></path>
+                      </svg>
+                  </div>
+              </div>
+              <div class="message ai">
+                  <p>${msg.message.replace(/\n/g, '<br>')}</p>
+              </div>
+          `;
+          chatMessages.appendChild(messageDiv);
+          scrollToBottom(); // Ensure chat scrolls to the latest message
+      }, msg.delay);
+  });
+}
