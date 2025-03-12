@@ -4,7 +4,6 @@ require_once 'env.php';
 require_once './classes/UserManager.php';
 loadEnv();
 
-
 // Added to persist the login cookie for one year
 session_set_cookie_params(60 * 60 * 24 * 365);
 ini_set('session.gc_maxlifetime', 60 * 60 * 24 * 365);
@@ -3517,6 +3516,8 @@ function required_field()
                         clearTimeout(timeout);
                         timeout = setTimeout(later, wait);
                     };
+
+
                 }
 
                 // Create the debounced update function
@@ -4009,7 +4010,7 @@ function required_field()
                                 document.getElementById('projectTitle').value = '';
                                 document.getElementById('projectDescription').value = '';
                                 Toast("success", "Success", "Project created successfully", "bottomCenter");
-                               
+
                                 selectProject(data.project_id);
                                 setTimeout(() => {
                                     displayProjectCreationWelcomeMessages(title);
@@ -5314,9 +5315,58 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                 });
         }
 
-
         initializeChatLoading();
     </script>
+
+    <!-- Firebase -->
+    <?php if (isset($page) && $page === 'dashboard'): ?>
+        <script type="module">
+            // Import the functions you need from the SDKs you need
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+            import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-messaging.js";
+
+            // TODO: Add SDKs for Firebase products that you want to use
+            // https://firebase.google.com/docs/web/setup#available-libraries
+
+            // Your web app's Firebase configuration
+            const firebaseConfig = {
+                apiKey: "AIzaSyAPByoVru7fAR1Mk8_y8AW73vWVRwEDma4",
+                authDomain: "bossgpt-367ab.firebaseapp.com",
+                projectId: "bossgpt-367ab",
+                storageBucket: "bossgpt-367ab.firebasestorage.app",
+                messagingSenderId: "1078128619253",
+                appId: "1:1078128619253:web:edf3e5f2306ab349191fbc"
+            };
+
+            // Initialize Firebase
+            const app = initializeApp(firebaseConfig);
+            const messaging = getMessaging(app);
+
+            // Register service worker first
+            navigator.serviceWorker.register("./assets/js/sw.js")
+                .then((registration) => {
+                    console.log('Service worker registered:', registration);
+
+                    // Then get the messaging token
+                    return getToken(messaging, {
+                        serviceWorkerRegistration: registration,
+                        vapidKey: 'BNvQzVggQ4j6sTH5W6sxSa4K8Q-K0BhPn2tJT1en85dcp1P46M4EFJjoxe_uJI3PnEgQ06LO2mgv0SvcpBfyL00'
+                    });
+                })
+                .then((currentToken) => {
+                    if (currentToken) {
+                        console.log("FCM Token:", currentToken);
+                        // Here you can send the token to your server
+                    } else {
+                        console.log('No FCM token available. Request permission to generate one.');
+                        // You might want to request permission here
+                    }
+                })
+                .catch((err) => {
+                    console.error('Service worker registration or token retrieval failed:', err);
+                });
+        </script>
+    <?php endif; ?>
 </body>
 
 </html>
