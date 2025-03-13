@@ -13,7 +13,7 @@ function sendTemplateEmail($to, $subject, $template, $data) {
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
         $mail->Username = 'taimoorhamza199@gmail.com';
-        $mail->Password = 'plrjixcrrqvvjwvn';
+        $mail->Password = 'qyiujnhjbwtmpkma';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
@@ -34,7 +34,7 @@ function sendTemplateEmail($to, $subject, $template, $data) {
 
     } catch (Exception $e) {
         error_log("Email Error: " . $e->getMessage());
-        return false;
+        return $e->getMessage();
     }
     /**
  * Send verification email to new users

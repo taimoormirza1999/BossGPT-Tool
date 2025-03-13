@@ -1,25 +1,22 @@
 <?php
-require_once __DIR__ . '/../functions.php';  // Add this at the top to include functions.php
-
-
+require_once __DIR__ . '/../functions.php';
+ // Add this at the top to include functions.php
 class UserManager {
     private $db;
 
     public function __construct() {
         $this->db = Database::getInstance()->getConnection();
-    }
-
+    } 
+    
     // public function createUser($username, $email, $projectId = null, $role = null) {
     //     try {
     //         $this->db->beginTransaction();
-
     //         // Check if user exists
     //         $stmt = $this->db->prepare("SELECT id FROM users WHERE email = ?");
     //         $stmt->execute([$email]);
     //         if ($stmt->fetch()) {
     //             throw new Exception("User with this email already exists");
     //         }
-
     //         // Generate temporary password and verification token
     //         $tempPassword = $this->generateTempPassword();
     //         $verificationToken = bin2hex(random_bytes(32));
@@ -43,39 +40,32 @@ class UserManager {
     //             );
     //             $stmt->execute([$projectId, $userId, $role, $invitationToken]);
     //         }
-
     //         $this->db->commit();
-
     //         // Send welcome email with credentials
     //         $this->sendWelcomeEmail($email, $username, $tempPassword, $verificationToken);
-
     //         return [
     //             'success' => true,
     //             'user_id' => $userId,
     //             'message' => 'User created successfully. Welcome email sent.'
     //         ];
-
     //     } catch (Exception $e) {
     //         $this->db->rollBack();
     //         throw $e;
     //     }
     // }
-
-    public function createUser($username, $email, $projectId = null, $role = null) {
+    public function createUser($username, $email, $projectId = null, $role = null, $BASE_URL) {
         try {
             $this->db->beginTransaction();
     
             // Check if user exists
-            $stmt = $this->db->prepare("SELECT id FROM users WHERE email = ?");
-            $stmt->execute([$email]);
+            $stmt = $this->db->prepare("SELECT id FROM users WHERE username  = ?");
+            $stmt->execute([$username]);
             if ($stmt->fetch()) {
-                throw new Exception("User with this email already exists");
+                throw new Exception("User with this username already exists");
             }
-    
             // Generate temporary password and verification token
             $tempPassword = $this->generateTempPassword();
             $verificationToken = bin2hex(random_bytes(32));
-            
             // Create user - Changed 'password' to 'password_hash' to match the database schema
             $stmt = $this->db->prepare(
                 "INSERT INTO users (username, email, password_hash) 
@@ -83,9 +73,7 @@ class UserManager {
             );
             $hashedPassword = password_hash($tempPassword, PASSWORD_DEFAULT);
             $stmt->execute([$username, $email, $hashedPassword]);
-            
             $userId = $this->db->lastInsertId();
-    
             // If projectId and role are provided, add user to project
             if ($projectId && $role) {
                 $stmt = $this->db->prepare(
@@ -93,12 +81,24 @@ class UserManager {
                      VALUES (?, ?, ?)"
                 );
                 $stmt->execute([$projectId, $userId, $role]);
+
+                // Log the activity
+                $stmt = $this->db->prepare("
+                    INSERT INTO activity_log (project_id, user_id, action_type, description) 
+                    VALUES (?, ?, ?, ?)
+                ");
+                $stmt->execute([
+                    $projectId,
+                    $userId,
+                    'user_assigned',
+                    "User {$username} has been added to the project as {$role}"
+                ]);
             }
     
             $this->db->commit();
     
             // Send welcome email with credentials
-            $this->sendWelcomeEmail($email, $username, $tempPassword);
+            $this->sendWelcomeEmail($email, $username, $tempPassword, $BASE_URL);
     
             return [
                 'success' => true,
@@ -111,6 +111,22 @@ class UserManager {
             throw $e;
         }
     }
+    public function getProjectUsers($project_id)
+    {
+        try {
+            $stmt = $this->db->prepare(
+                "SELECT u.id, u.username, u.email, pu.role, u.fcm_token
+                 FROM users u 
+                 JOIN project_users pu ON u.id = pu.user_id 
+                 WHERE pu.project_id = ?"
+            );
+            $stmt->execute([$project_id]);
+            return $stmt->fetchAll();
+        } catch (Exception $e) {
+            error_log("Get Project Users Error: " . $e->getMessage());
+            throw $e;
+        }
+    }
     private function generateTempPassword($length = 10) {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*';
         $password = '';
@@ -120,9 +136,11 @@ class UserManager {
         return $password;
     }
 
-    private function sendWelcomeEmail($email, $username, $tempPassword, ) {
-        $verificationLink = "https://yourwebsite.com/verify.php?token=" . "dfgd";
+    public function sendWelcomeEmail($email, $username, $tempPassword, $BASE_URL, )
+    {
         
+        $verificationLink =  $BASE_URL. "/verify.php";
+    
         $subject = "Welcome to BossGPT - Your Account Details";
         $template = 'welcome_email';
         
@@ -132,8 +150,10 @@ class UserManager {
             'tempPassword' => $tempPassword,
             'verificationLink' => $verificationLink
         ];
+        // return "shgfjs";
         
         return sendTemplateEmail($email, $subject, $template, $emailData);
     }
+    
 }
 ?>

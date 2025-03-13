@@ -91,10 +91,11 @@
             font-size: 12px;
         }
         .container {
-            padding: 20px;
+            padding: 20px 0;
         }
         .logo {
             width: 200px;
+            margin-bottom: 10px;
         }
         .footer-info {
             font-size: 11px;

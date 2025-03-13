@@ -37,18 +37,31 @@ if (empty($token)) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #f8f9fa;
+            font-family: Arial, sans-serif; 
+        background-color: #000; 
+        color: #fff; 
+        margin: 0; 
+        padding: 20px;
+        font-family: 'Segoe UI','Georgia', 'Times New Roman', serif,'Helvetica Neue'; 
+            /* background-color: #f8f9fa; */
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
         }
+        .mbtn-white{
+            background: rgba(90, 90, 90, 0.4); 
+            border: 1.6px solid rgba(151, 151, 151, 0.2);
+            padding: 10px 2rem!important;
+            border-radius: 16px !important;
+        }
         .verification-container {
-            max-width: 500px;
-            padding: 30px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            max-width: 90%;
+            padding: 4rem 10rem;
+            background: rgba(51, 51, 51, 0.4); 
+            border-radius: 16px;
+            border: 2px solid rgba(51, 51, 51, 0.2);
+            box-shadow: 0 0 20px rgba(0,0,0,0.9);
             text-align: center;
         }
         .success-icon {
@@ -61,6 +74,12 @@ if (empty($token)) {
             font-size: 48px;
             margin-bottom: 20px;
         }
+        @media (max-width: 768px) {
+            .verification-container {
+                padding: 2rem 4rem;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -74,7 +93,7 @@ if (empty($token)) {
             <i class="bi bi-x-circle-fill error-icon"></i>
             <h2 class="mb-4">Verification Failed</h2>
             <p class="text-danger"><?php echo $message; ?></p>
-            <a href="index.php" class="btn btn-secondary mt-3">Return to Home</a>
+            <a href="index.php" class="btn mbtn-white mt-3 text-white">Return to Home</a>
         <?php endif; ?>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>

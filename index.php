@@ -1,7 +1,10 @@
 <?php
+
+
 //Added to load the environment variables
 require_once 'env.php';
 require_once './classes/UserManager.php';
+require_once './classes/NotificationManager.php';
 loadEnv();
 
 // Added to persist the login cookie for one year
@@ -68,7 +71,7 @@ class Database
             "CREATE TABLE IF NOT EXISTS users (
                 id INT PRIMARY KEY AUTO_INCREMENT,
                 username VARCHAR(50) UNIQUE NOT NULL,
-                email VARCHAR(100) UNIQUE NOT NULL,
+                email VARCHAR(100) NOT NULL,
                 password_hash VARCHAR(255) NOT NULL,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )",
@@ -169,7 +172,7 @@ class Auth
         $this->db = Database::getInstance()->getConnection();
     }
 
-    public function register($username, $email, $password)
+    public function register($username, $email, $password, $fcm_token)
     {
         try {
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -187,8 +190,8 @@ class Auth
             }
 
             $password_hash = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $this->db->prepare("INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)");
-            $stmt->execute([$username, $email, $password_hash]);
+            $stmt = $this->db->prepare("INSERT INTO users (username, email, password_hash, fcm_token) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$username, $email, $password_hash, $fcm_token]);
 
             return true;
         } catch (Exception $e) {
@@ -305,6 +308,7 @@ class ProjectManager
             );
             $stmt->execute([$title, $description, $user_id]);
             $project_id = $this->db->lastInsertId();
+            $this->assignUserToProject($project_id, $user_id, "Creator");
 
             // Log the activity
             $this->logActivity(
@@ -1305,7 +1309,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $auth->register(
                         $_POST['username'],
                         $_POST['email'],
-                        $_POST['password']
+                        $_POST['password'],
+                        $_POST['fcm_token']
                     );
 
                     // After successful registration, log the user in
@@ -1384,33 +1389,11 @@ if (isset($_GET['api'])) {
                 break;
             case 'get_all_project_users':
                 header('Content-Type: application/json');
-                try {
-                    if (!isset($_GET['project_id'])) {
-                        throw new Exception('Project ID is required');
-                    }
-
-                    // $projectManager = new ProjectManager();
-                    // $users = $project_manager->getProjectUsers($data['project_id']);
-                    $stmt = $db->prepare("
-                    SELECT u.id, u.username, u.email, pu.role 
-                    FROM users u 
-                    LEFT JOIN project_users pu ON u.id = pu.user_id 
-                    WHERE pu.project_id = ?
-                ");
-
-                    $stmt->execute([$_GET['project_id']]);
-                    $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                    echo json_encode([
-                        'success' => true,
-                        'users' => $users
-                    ]);
-                } catch (Exception $e) {
-                    // http_response_code(400);
-                    echo json_encode([
-                        'success' => false,
-                        'message' => $e->getMessage()
-                    ]);
-                }
+                $users = $project_manager->getProjectUsers($_GET['project_id']);
+                echo json_encode([
+                    'success' => true,
+                    'users' => $users
+                ]);
                 exit;
 
             case 'send_message':
@@ -1512,7 +1495,7 @@ if (isset($_GET['api'])) {
             case 'create_user':
                 header('Content-Type: application/json');
                 try {
-                    error_log("Received create user request");
+                    // error_log("Received create user request");
 
                     $data = json_decode(file_get_contents('php://input'), true);
                     if (!$data) {
@@ -1524,7 +1507,8 @@ if (isset($_GET['api'])) {
                         $data['username'],
                         $data['email'],
                         $data['project_id'] ?? null,
-                        $data['role'] ?? null
+                        $data['role'] ?? null,
+                        getenv('BASE_URL')
                     );
 
                     echo json_encode([
@@ -1609,6 +1593,30 @@ if (isset($_GET['api'])) {
                     LIMIT 100
                 ");
                 $stmt->execute([$data['project_id']]);
+                $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                $response = ['success' => true, 'logs' => $logs];
+                break;
+            case 'get_unreadnotifications':
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (!isset($_GET['project_id'])) {
+                    throw new Exception('Project ID is required');
+                }
+
+                $stmt = $db->prepare("
+                    SELECT 
+                        al.action_type,
+                        al.description,
+                        al.created_at,
+                        u.username,
+                        al.status as notification_status
+                    FROM activity_log al
+                    LEFT JOIN users u ON al.user_id = u.id
+                    WHERE al.project_id = ? AND al.status = 'unread'
+                    ORDER BY al.created_at DESC
+                    LIMIT 100
+                ");
+                $stmt->execute([$_GET['project_id']]);
                 $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 $response = ['success' => true, 'logs' => $logs];
@@ -1737,7 +1745,98 @@ if (isset($_GET['api'])) {
                 $stmt->execute([$data['due_date'], $data['subtask_id']]);
                 $response = ['success' => true];
                 break;
+            // Email
+            case 'send_welcome_email':
+                $data = json_decode(file_get_contents('php://input'), true);
+                $BASE_URL = getenv('BASE_URL');
+        
+                if (!isset($data['email']) || !isset($data['username']) || !isset($data['tempPassword'])) {
+                    $response = [
+                        'success' => false,
+                        'message' => "Error: Missing required fields (email, username, tempPassword)."
+                    ];
+                    echo json_encode($response);
+                    exit;
+                }
+            
+                $userManager = new UserManager();
+                // Send email
+                $emailSent = $userManager->sendWelcomeEmail($data['email'], $data['username'], $data['tempPassword'], $BASE_URL);
+                if ($emailSent) {
+                    $response = [
+                        'success' => true,
+                        'message' => "An invite has been sent along with login credentials."
+                    ];
+                } else {
+                    $response = [
+                        'success' => false,
+                        'message' => $userManager->sendWelcomeEmail($data['email'], $data['username'], $data['tempPassword'])
+                    ];
+                }
+                // $emailSent = $userManager->sendWelcomeEmail($data['email'], $data['username'], $data['tempPassword']);
+                // $response = [
+                //     'success' => false,
+                //     'message' => "Error: Database connection (\b) is not set."
+                // ];
+                echo json_encode($response);
+                exit;
+                // if ($emailSent) {
+                //     $response = [
+                //         'success' => true,
+                //         'message' => "An invite has been sent along with login credentials."
+                //     ];
+                // } else {
+                //     $response = [
+                //         'success' => false,
+                //         'message' => "Failed to send the invite."
+                //     ];
+                // }
+            
+                echo json_encode($response);
+                exit;
+            
 
+            // Notification
+            case 'send_notification_project':
+                $data = json_decode(file_get_contents('php://input'), true);
+                // if (!isset($data['task_id'])) {
+                //     throw new Exception('Task ID is required');
+                // }
+                $userManager = new UserManager();
+                if (!isset($db)) {
+                    $response = [
+                        'success' => false,
+                        'message' => "Error: Database connection (\$db) is not set."
+                    ];
+
+                }
+
+                if (!isset($userManager)) {
+                   
+                    $response = [
+                        'success' => false,
+                        'message' => "Error: UserManager (\$userManager) is not set."
+                    ];
+                }
+                // try {
+                //     $notificationManager = new NotificationManager($db, $userManager);
+                //     $response_data = $notificationManager->sendProjectNotification($data['project_id'], $data['title'], $data['body']);
+                //     $response = [
+                //         'success' => true,
+                //         'message' => $response_data
+                //     ];
+                // } catch (Exception $e) {
+                //     // error_log("API Error: " . $e->getMessage());
+                //     $response = [
+                //         'success' => false,
+                //         'message' => "Error: " . $e->getMessage()
+                //     ];
+                //     // http_response_code(500);
+                // }
+                // Print the response for debugging
+                // $response_data=$notificationManager->sendProjectNotificatio($data['project_id'], $data['title'], $data['body']);
+                // $response = ['success' => true, 'message' => "$response_data"];
+                break;
             default:
                 throw new Exception('Invalid API endpoint');
         }
@@ -1770,6 +1869,8 @@ if (isset($_GET['api'])) {
     <script src="https://cdn.jsdelivr.net/npm/izitoast/dist/js/iziToast.min.js"></script>
     <!-- Tailwind CSS -->
     <!-- <script src="https://unpkg.com/@tailwindcss/browser@4"></script> -->
+    <!-- Custom js -->
+    <script src="./assets/js/custom.js"></script>
     <!-- Favicon links -->
     <!-- <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
@@ -1782,9 +1883,8 @@ if (isset($_GET['api'])) {
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     <link rel="manifest" href="site.webmanifest">
     <!-- Custom css -->
-    <!-- <link rel="stylesheet" href="custom.css"> -->
-    <!-- Custom js -->
-    <script src="./assets/js/custom.js"></script>
+    <link rel="stylesheet" href="./assets/css/custom.css">
+
     <style>
         .suggestion-item {
             border-radius: 16px !important;
@@ -1792,7 +1892,8 @@ if (isset($_GET['api'])) {
         }
 
         .chat-container {
-            height: calc(100vh - 200px);
+            height: calc(100vh - 230px);
+            /* height: 80vh; */
             display: flex;
             flex-direction: column;
         }
@@ -1801,6 +1902,7 @@ if (isset($_GET['api'])) {
             flex-grow: 1;
             overflow-y: auto;
             padding: 1rem;
+            /* max-height: 60vh; */
             max-height: calc(100vh - 300px);
         }
 
@@ -1811,6 +1913,7 @@ if (isset($_GET['api'])) {
         }
 
         .task-column {
+            /* min-height: 60vh; */
             min-height: calc(100vh - 300px);
             background: #f8f9fa;
             border-radius: 12px;
@@ -2590,6 +2693,7 @@ if (isset($_GET['api'])) {
             max-width: 100vw;
             /* Ensure container doesn't exceed viewport width */
             overflow-x: hidden;
+
             /* Prevent horizontal scrolling */
         }
 
@@ -2604,9 +2708,7 @@ if (isset($_GET['api'])) {
         }
 
         /* Find the existing .task-card style and update/add these styles */
-        .task-card {
-            /* ... existing styles ... */
-        }
+
 
         .task-card h6 {
             font-size: 1.1em;
@@ -2646,6 +2748,63 @@ if (isset($_GET['api'])) {
         .ai-add-subtask-btn {
             font-size: 0.9em;
             /* Make button text relative to base font size */
+        }
+
+        /* Scrollable Navigation Bar */
+        .nav-tabs {
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            -ms-overflow-style: -ms-autohiding-scrollbar;
+            white-space: nowrap;
+            scrollbar-width: thin;
+            padding-bottom: 5px;
+            /* Prevent scrollbar from covering content */
+        }
+
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .nav-tabs::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        /* Handle for Chrome, Safari and Opera */
+        .nav-tabs::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+
+        /* Handle on hover */
+        .nav-tabs::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        /* Track */
+        .nav-tabs::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 4px;
+        }
+
+        /* Dark mode scrollbar */
+        body.dark-mode .nav-tabs::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        body.dark-mode .nav-tabs::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Prevent tab items from wrapping */
+        .nav-tabs .nav-item {
+            float: none;
+            display: inline-block;
+            margin-bottom: 0;
+        }
+
+        /* Container adjustments */
+        #projectTabs {
+            position: relative;
+            padding-bottom: 0.5rem;
         }
     </style>
     <style>
@@ -2731,6 +2890,84 @@ if (isset($_GET['api'])) {
             font-weight: bold;
         }
     </style>
+    <style>
+        /* Nav container with position relative for absolute positioning of buttons */
+        .nav-container {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        /* Scrollable Navigation Bar */
+        .nav-tabs {
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            -ms-overflow-style: -ms-autohiding-scrollbar;
+            white-space: nowrap;
+            scrollbar-width: none;
+            /* Firefox */
+            -ms-overflow-style: none;
+            /* IE and Edge */
+            position: relative;
+            padding: 0 40px;
+            /* Make room for scroll buttons */
+            padding-top: 0.5rem;
+        }
+
+        /* Hide scrollbar completely */
+        .nav-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Scroll Buttons */
+        .nav-scroll-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #dee2e6;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-scroll-btn:hover {
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-scroll-btn.left {
+            left: 0;
+        }
+
+        .nav-scroll-btn.right {
+            right: 0;
+        }
+
+        /* Dark mode styles for scroll buttons */
+        body.dark-mode .nav-scroll-btn {
+            background: rgba(54, 55, 56, 0.9);
+            border-color: #2f3031;
+            color: #e4e6eb;
+        }
+
+        body.dark-mode .nav-scroll-btn:hover {
+            background: #3a3b3c;
+        }
+
+        /* Show buttons when nav container is hovered and has overflow */
+        .nav-container:hover .nav-scroll-btn.show {
+            display: flex;
+        }
+    </style>
 </head>
 <!-- Reuseable Stuff -->
 
@@ -2758,10 +2995,10 @@ function required_field()
     if ($auth->isLoggedIn()):
         ?>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <div class="container-fluid " style="width: 95%;">
-                <!-- <a class="navbar-brand" href="?page=dashboard">Project Manager AI</a> -->
-                <a class="navbar-brand" href="?page=dashboard"><img src="assets/images/bossgptlogo.svg" alt="Logo"
-                        style="width: 150px; height: 60px;"></a>
+            <div class="container-fluid" style="width: 98%; overflow: visible;">
+                <a class="navbar-brand" href="?page=dashboard">
+                    <img src="assets/images/bossgptlogo.svg" alt="Logo" style="width: 150px; height: 60px;">
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -2773,17 +3010,45 @@ function required_field()
                         </li>
                     </ul>
                     <div class="d-flex align-items-center">
-                        <span class="navbar-text me-4">
-                            Welcome, <?= htmlspecialchars($_SESSION['username']) ?>
-                        </span>
+                        <span class="navbar-text me-4">Welcome, <?= htmlspecialchars($_SESSION['username']) ?></span>
+
                         <div class="d-flex align-items-center me-4">
                             <label for="fontSizeRange" class="text-light me-2 mb-0">Font Size:</label>
                             <input type="range" class="form-range" id="fontSizeRange" min="12" max="24" step="1"
                                 style="width: 100px;">
                             <span id="fontSizeValue" class="text-light ms-2" style="min-width: 45px;">16px</span>
                         </div>
-                        <!-- Added Dark Mode Toggle Button -->
-                        <button id="toggleDarkModeBtn" class="btn btn-outline-light me-2">Dark Mode</button>
+
+                        <!-- Notification Icon with Red Badge -->
+                        <?php
+                        $unreadNotifications = 0;
+                        $notifications = [];
+                        ?>
+                        <div class="dropdown">
+                            <input type="hidden" id="myselectedcurrentProject" value="0">
+                            <button class="btn btn-outline-light position-relative" id="notificationDropdown"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-bell"></i>
+                                <span
+                                    class="badge rounded-pill bg-danger position-absolute top-0 start-100 translate-middle"
+                                    id="notificationBadge" style="display: none;">0</span>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end" id="notificationDropdownMenu"
+                                aria-labelledby="notificationDropdown"
+                                style="min-width: 300px; max-height: 400px; overflow-y: auto;">
+                                <div class="dropdown-header border-bottom p-2 pb-3 pl-5">
+                                    <strong class="mb-5">Notifications</strong>
+                                </div>
+                                <div class="notification-list">
+                                    <div class="dropdown-item text-center">Loading notifications...</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dark Mode Toggle Button -->
+                        <button id="toggleDarkModeBtn" class="btn btn-outline-light mx-2">Dark Mode</button>
+
+                        <!-- Logout Form -->
                         <form method="POST" class="d-inline">
                             <input type="hidden" name="action" value="logout">
                             <button type="submit" class="btn btn-outline-light">Logout</button>
@@ -2864,6 +3129,7 @@ function required_field()
                                 <?php endif; ?>
                                 <form method="POST">
                                     <input type="hidden" name="action" value="register">
+                                    <input type="hidden" name="fcm_token" value="0" id="fcm_token">
                                     <div class="mb-3">
                                         <label for="username" class="form-label">Username</label>
                                         <input type="text" class="form-control" id="username" name="username" required>
@@ -2897,14 +3163,16 @@ function required_field()
             <!-- Replace the existing row div with this new layout -->
             <div class="container-fluid">
                 <!-- New Tab Navigation -->
-                <ul class="nav nav-tabs mb-3" id="projectTabs">
-                    <li class="nav-item">
-                        <button type="button" class="btn btn-primary ms-2" data-bs-toggle="modal"
-                            data-bs-target="#newProjectModal">
-                            <i class="bi bi-plus"></i> New Project
-                        </button>
-                    </li>
-                </ul>
+                <div class="nav-container">
+                    <ul class="nav nav-tabs mb-3" id="projectTabs">
+                        <li class="nav-item">
+                            <button type="button" class="btn btn-primary ms-2" data-bs-toggle="modal"
+                                data-bs-target="#newProjectModal">
+                                <i class="bi bi-plus"></i> New Project
+                            </button>
+                        </li>
+                    </ul>
+                </div>
 
                 <!-- Main Content Area -->
                 <div class="row">
@@ -2920,7 +3188,8 @@ function required_field()
                                     </button>
 
                                     <?php if (TESTING_FEATURE == 1): ?>
-                                        <button type="button" class="btn btn-sm btn-info me-2" onclick=' showChatLoading()'>
+                                        <button type="button" class="btn btn-sm btn-info me-2"
+                                            onclick='sendWelcomeEmailTest()'>
                                             <i class="bi bi-clock-history"></i> Testing Feature Button
                                         </button>
                                     <?php endif; ?>
@@ -3332,12 +3601,12 @@ function required_field()
                                 <div class="mb-3">
                                     <label for="newUserName" class="form-label">User
                                         Name<?php echo required_field(); ?></label>
-                                    <input type="text" class="form-control" id="newUserName" required>
+                                    <input type="text" class="form-control text-lowercase" id="newUserName" required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="newUserEmail"
                                         class="form-label">Email<?php echo required_field(); ?></label>
-                                    <input type="email" class="form-control" id="newUserEmail" required>
+                                    <input type="email" class="form-control text-lowercase" id="newUserEmail" required>
                                 </div>
                                 <!-- <div class="mb-3">
                                     <label for="newUserRole" class="form-label">Role</label>
@@ -3621,25 +3890,29 @@ function required_field()
                 }
 
                 // Select project
-                function selectProject(projectId) {
+                function selectProject(projectId, selectedProjectTitle="") {
                     // currentProject = projectId;
                     projectId = parseInt(projectId);
                     currentProject = parseInt(projectId);
+                    $('#myselectedcurrentProject').val(currentProject);
+                    // call to fetch notifications
+                    fetchNotificationsAndOpen(false);
                     if (isNaN(projectId)) {
                         console.error('Invalid project ID:', projectId);
                         return;
                     }
-                    console.log('Selecting project:', projectId);
+                    // console.log('Selecting project:', projectId);
                     currentProject = projectId;
-                    // document.querySelectorAll('.project-item').forEach(item => {
-                    //     item.classList.toggle('active', item.dataset.id === projectId);
-                    // });
+                  
                     document.querySelectorAll('.project-item').forEach(item => {
                         const itemId = parseInt(item.dataset.id);
                         item.classList.toggle('active', itemId === projectId);
                     });
                     loadTasks(projectId);
                     loadChatHistory(projectId);
+                    // setTimeout(() => {
+                    //                 displayProjectCreationWelcomeMessages(title);
+                    //             }, 2000);
                 }
 
                 // Load chat history
@@ -3666,6 +3939,15 @@ function required_field()
                                     data.history.forEach(msg => {
                                         appendMessage(msg.message, msg.sender);
                                     });
+                                }
+                                // console.log("object "+data.history.length)
+                                const count = data.history.length;
+                                
+                               
+                                if (count == 0) {
+                                    setTimeout(() => {
+                                    displayProjectCreationWelcomeMessages("title");
+                                }, 2000);
                                 }
                             } else {
                                 throw new Error(data.message || 'Failed to load chat history');
@@ -4012,9 +4294,9 @@ function required_field()
                                 Toast("success", "Success", "Project created successfully", "bottomCenter");
 
                                 selectProject(data.project_id);
-                                setTimeout(() => {
-                                    displayProjectCreationWelcomeMessages(title);
-                                }, 5000);
+                                // setTimeout(() => {
+                                //     displayProjectCreationWelcomeMessages(title);
+                                // }, 2000);
                             }
                         })
                         .catch(error => console.error('Error creating project:', error))
@@ -4386,7 +4668,7 @@ function required_field()
                                     data.data.user_id
                                 );
                                 userSelect.add(newOption);
-                                showToastAndHideModal('addUserModal', 'success', "Success", "User created successfully! An email has been sent with login credientials.")
+                                showToastAndHideModal('addUserModal', 'success', "Success", "User assigned successfully! An invite has been sent along with login credentials.")
                                 bootstrap.Modal.getInstance(document.getElementById('assignUserModal')).hide();
                                 // Show success message
                                 // Toast('success', "Success","User created successfully! An email has been sent with login details." )
@@ -4397,7 +4679,7 @@ function required_field()
                         })
                         .catch(error => {
                             console.error('Error creating user:', error);
-                            alert(`Error creating user: ${error.message}`);
+                            alert(`Error creating user ...: ${error.message}`);
                         })
                         .finally(hideLoading);
                 });
@@ -5314,12 +5596,57 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                     console.error("Fetch error:", error);
                 });
         }
+        function sendWelcomeEmailTest() {
+    fetch('?api=send_welcome_email', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            email: "taimoorhamza1999@gmail.com",
+            username: "User123",
+            tempPassword: "TempPass123"
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("Failed to send email.");
+    });
+}
+        function sendNotificationTest(projectId=42, title="DFs Title", body="DFs Body") {
+            alert("Sending Notification Test");
+            fetch('?api=send_notification_project', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    action: 'send_notification_project',
+                    project_id: projectId,
+                    title: title,
+                    body: body
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log("✅ Notification sent successfully:", data.message);
+                    } else {
+                        console.error("❌ Error sending notification:", data.error);
+                    }
+                })
+                .catch(error => console.error("❌ Request failed:", error));
+        }
 
         initializeChatLoading();
     </script>
 
     <!-- Firebase -->
-    <?php if (isset($page) && $page === 'dashboard'): ?>
+    <?php if (isset($page) && $page === 'register'): ?>
         <script type="module">
             // Import the functions you need from the SDKs you need
             import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
@@ -5327,7 +5654,6 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
 
             // TODO: Add SDKs for Firebase products that you want to use
             // https://firebase.google.com/docs/web/setup#available-libraries
-
             // Your web app's Firebase configuration
             const firebaseConfig = {
                 apiKey: "AIzaSyAPByoVru7fAR1Mk8_y8AW73vWVRwEDma4",
@@ -5356,7 +5682,8 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                 .then((currentToken) => {
                     if (currentToken) {
                         console.log("FCM Token:", currentToken);
-                        // Here you can send the token to your server
+                        // Set the token in the hidden input
+                        document.getElementById('fcm_token').value = currentToken;                        // Here you can send the token to your server
                     } else {
                         console.log('No FCM token available. Request permission to generate one.');
                         // You might want to request permission here
@@ -5367,6 +5694,7 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                 });
         </script>
     <?php endif; ?>
+
 </body>
 
 </html>
