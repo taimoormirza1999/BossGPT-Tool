@@ -10,12 +10,13 @@ function fetchNotificationsAndOpen(showDropdown = true) {
     const dropdown = new bootstrap.Dropdown(document.getElementById('notificationDropdown'));
     const currentProject = $('#myselectedcurrentProject').val();
 
-    if (!currentProject) {
+    if (!currentProject || currentProject == undefined) {
         Toast("error", "Error", "Please select a project first");
         isFetchingNotifications = false;
         return;
     }
     
+
     fetchNotifications(currentProject)
         .then(() => {
             if (showDropdown && !isDropdownOpen) {
@@ -57,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (notificationDropdown) {
         notificationDropdown.addEventListener('click', fetchNotificationsAndOpen);
         // Initial fetch
-        fetchNotifications();
+        // fetchNotifications();
         // Set up periodic refresh
         setInterval(fetchNotifications, 30000); // Refresh every 30 seconds
     }
