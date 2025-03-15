@@ -3913,9 +3913,6 @@ function required_field()
                     });
                     loadTasks(projectId);
                     loadChatHistory(projectId);
-                    // setTimeout(() => {
-                    //                 displayProjectCreationWelcomeMessages(title);
-                    //             }, 2000);
                 }
 
                 // Load chat history
@@ -3946,11 +3943,12 @@ function required_field()
                                 // console.log("object "+data.history.length)
                                 const count = data.history.length;
                                 
-                               
-                                if (count == 0) {
+                                if (count === 0 && $('#chatMessages').is(':empty')) {
                                     setTimeout(() => {
-                                    displayProjectCreationWelcomeMessages("title");
-                                }, 2000);
+                                        if ($('#chatMessages').is(':empty')) {
+                                            displayProjectCreationWelcomeMessages("title");
+                                        }
+                                    }, 2000);
                                 }
                             } else {
                                 throw new Error(data.message || 'Failed to load chat history');
@@ -4297,9 +4295,6 @@ function required_field()
                                 Toast("success", "Success", "Project created successfully", "bottomCenter");
 
                                 selectProject(data.project_id);
-                                // setTimeout(() => {
-                                //     displayProjectCreationWelcomeMessages(title);
-                                // }, 2000);
                             }
                         })
                         .catch(error => console.error('Error creating project:', error))
