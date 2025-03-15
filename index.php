@@ -1884,8 +1884,10 @@ if (isset($_GET['api'])) {
     <link rel="manifest" href="site.webmanifest">
     <!-- Custom css -->
     <link rel="stylesheet" href="./assets/css/custom.css">
+    
 
     <style>
+        
         .suggestion-item {
             border-radius: 16px !important;
             border-color: gray !important;
@@ -2618,6 +2620,7 @@ if (isset($_GET['api'])) {
 
         body.dark-mode .nav-tabs .nav-link {
             color: #b0b3b8;
+            /* font-weight:700; */
         }
 
         body.dark-mode .nav-tabs .nav-link:hover:not(.active) {
