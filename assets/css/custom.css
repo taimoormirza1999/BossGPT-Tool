@@ -5,6 +5,15 @@
   --bs-primary: #fff; /* New primary color */
   --bs-primary-rgb: 255, 255, 255; /* RGB equivalent of #ff5733 */
 }
+.dark-primaryborder{
+  background: var(--bs-primary-dark);
+  border: 1.6px solid rgb(58 59 60)!important;
+  font-size: small;
+}
+.dark-mode .dark-primaryborder{
+  background: var(--bs-primary-dark);
+  border: 1.6px solid rgb(58 59 60)!important;
+}
 
 .register-page,.login-page{
     background: #000;
@@ -26,6 +35,16 @@
     filter: brightness(0.7)!important;
     color: var(--bs-primary-black)!important;
 }
+
+body.dark-mode .nav-tabs .nav-link.active{
+    color: var(--bs-primary-white) !important;
+    border-bottom-color: var(--bs-primary-white) !important;
+}
+body .nav-tabs .nav-link.active{
+    color: var(--bs-primary-dark) !important;
+    border-bottom-color: var(--bs-primary-dark) !important;
+}
+
 input:focus,
 input:focus-visible,textarea:focus {
   border-color: var(--bs-primary-white) !important;

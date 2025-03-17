@@ -165,7 +165,8 @@ function initializeChatLoading() {
           width: 8px;
           height: 8px;
           border-radius: 50%;
-          background-color: var(--primary-color, #0d6efd);
+        //   background-color: var(--primary-color, #0d6efd);
+         background: #3a3b3c;
           opacity: 0.6;
       }
 

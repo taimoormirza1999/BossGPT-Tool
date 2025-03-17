@@ -65,11 +65,11 @@ class UserManager
 
                 // Create user
                 $stmt = $this->db->prepare(
-                    "INSERT INTO users (username, email, password_hash, varification_token) 
-                     VALUES (?, ?, ?, ?)"
+                    "INSERT INTO users (username, email, password_hash) 
+                     VALUES (?, ?, ?)"
                 );
                 $hashedPassword = password_hash($tempPassword, PASSWORD_DEFAULT);
-                $stmt->execute([$username, $email, $hashedPassword, "testingtoken"]);
+                $stmt->execute([$username, $email, $hashedPassword]);
                 $userId = $this->db->lastInsertId();
 
                 // If projectId and role are provided, add user to project
@@ -79,7 +79,6 @@ class UserManager
                          VALUES (?, ?, ?)"
                     );
                     $stmt->execute([$projectId, $userId, $role]);
-
                     // Log the activity
                     $stmt = $this->db->prepare("
                         INSERT INTO activity_log (project_id, user_id, action_type, description) 
@@ -92,16 +91,10 @@ class UserManager
                         "User {$username} has been added to the project as {$role}"
                     ]);
                 }
-
                 $this->db->commit();
-
                 // Send welcome email with credentials
-                $this->sendWelcomeEmail($email, $username, $tempPassword, $BASE_URL, "testingtoken");
-
+                $this->sendInviteUserEmail($email, $username, $tempPassword, $BASE_URL, "testingtoken");
                 // Execute email script in the background
-
-
-
                 return [
                     'success' => true,
                     'user_id' => $userId,
@@ -161,21 +154,16 @@ class UserManager
         $command = "php sendEmail.php $emailDataJson > /dev/null 2>&1 &";
         exec($command);
 
-        // return "Welcome email is being processed asynchronously.";
-        //    return  sendTemplateEmail($emailData['email'], $emailData['subject'], $emailData['template'], $emailData['data']);
-
     }
-    public function sendInviteUser($email, $username, $tempPassword, $BASE_URL, $token)
+    public function sendInviteUserEmail($email, $username, $tempPassword, $BASE_URL, $token)
     {
 
         $verificationLink = $BASE_URL . "/verify.php?token=" . $token;
 
         $subject = "Welcome to BossGPT - Your Account Details";
-        $template = 'welcome_email';
-
+        $template = 'invite_user';
         // Prepare data for email template
         $emailData = [
-
             'email' => $email,
             'subject' => $subject,
             'template' => $template,
@@ -185,10 +173,9 @@ class UserManager
                 'verificationLink' => $verificationLink
             ]
         ];
-        // return "shgfjs";
 
-        $emailDataJson = escapeshellarg(json_encode($emailData)); // Convert array to JSON and escape it
-        $command = "php sendEmail.php $emailDataJson > /dev/null 2>&1 &";
+        // $emailDataJson = escapeshellarg(json_encode($emailData)); // Convert array to JSON and escape it
+        $command = "php sendEmail.php $$emailData > /dev/null 2>&1 &";
         exec($command);
 
         // return "Welcome email is being processed asynchronously.";
@@ -198,8 +185,6 @@ class UserManager
 
     public function assignedUserEmailNotifer($newUser, $projectTilte, $newRole, $projectAllUsers)
     {
-
-        //    return $newUser." has been added to the project: ".$projectTilte." at new Role: ".$newRole." project All Users: ".json_encode($projectAllUsers);
         $allUsers = [];
         $subject = "New User Added to Project " . $projectTilte;
         // $template = "new_user_added_to_project";
@@ -224,8 +209,6 @@ class UserManager
     }
     public function newTaskAddedEmailNotifer($taskCreator, $projectTilte, $taksTitle, $projectAllUsers)
     {
-
-        //    return $newUser." has been added to the project: ".$projectTilte." at new Role: ".$newRole." project All Users: ".json_encode($projectAllUsers);
         $allUsers = [];
         $subject = "New User Added to Project " . $projectTilte;
         // $template = "new_user_added_to_project";

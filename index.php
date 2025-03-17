@@ -196,7 +196,7 @@ class Auth
             $password_hash = password_hash($password, PASSWORD_DEFAULT);
             $stmt = $this->db->prepare("INSERT INTO users (username, email, password_hash, fcm_token) VALUES (?, ?, ?, ?)");
             $stmt->execute([$username, $email, $password_hash, $fcm_token]);
-           
+
             return true;
         } catch (Exception $e) {
             error_log("Registration error: " . $e->getMessage());
@@ -320,13 +320,6 @@ class ProjectManager
                 'project_created',
                 "Created new project: $title"
             );
-
-            // Send notification to all users with pusher
-            Notification::send('project_'+$project_id, 'project_created', ['message' => 'New project created: ' . $title]);
-            // $pusher = new Pusher('83a162dc942242f89892', {
-            //     cluster: 'ap2'
-            // });
-            // $pusher->trigger('my-channel', 'my-event', ['message' => 'New project created: ' . $title]);
 
             return $project_id;
         } catch (Exception $e) {
@@ -1330,10 +1323,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $_POST['fcm_token']
                     );
 
-                    $user= new UserManager();
-                    $user->sendWelcomeEmail($_POST['email'],    $_POST['username'], $_ENV['BASE_URL']);                    // After successful registration, log the user in
+                    $user = new UserManager();
+                    // After successful registration, log the user in
+                    $user->sendWelcomeEmail($_POST['email'], $_POST['username'], $_ENV['BASE_URL']);                    // After successful registration, log the user in
                     $auth->login($_POST['email'], $_POST['password']);
                     header('Location: ?page=dashboard');
+
                     exit;
 
                 case 'login':
@@ -1504,8 +1499,10 @@ if (isset($_GET['api'])) {
 
             case 'assign_user_to_project':
 
-                $data = json_decode(file_get_contents('php://input'), 
-                true);
+                $data = json_decode(
+                    file_get_contents('php://input'),
+                    true
+                );
                 if (!isset($data['project_id']) || !isset($data['user_id']) || !isset($data['role'])) {
                     throw new Exception('Project ID, user ID, and role are required');
                 }
@@ -1520,20 +1517,20 @@ if (isset($_GET['api'])) {
                     if (!$data) {
                         throw new Exception('Invalid request data');
                     }
-                  
-                    $project_manager = new ProjectManager();
-                    $projectTilte =  $project_manager->getProjectName($data['project_id']);
-                    $projectAllUsers =  $project_manager->getProjectUsers($data['project_id']);
-                    $userManager = new UserManager();
-                    // $result = $userManager->createOrAssignUser(
-                    //     $data['username'],
-                    //     $data['email'],
-                    //     $data['project_id'] ?? null,
-                    //     $data['role'] ?? null,
-                    //     $_ENV['BASE_URL']
-                    // );
 
-                    $result = $userManager->assignedUserEmailNotifer( $data['username'], $projectTilte, $data['role'],$projectAllUsers);
+                    $project_manager = new ProjectManager();
+                    $projectTilte = $project_manager->getProjectName($data['project_id']);
+                    $projectAllUsers = $project_manager->getProjectUsers($data['project_id']);
+                    $userManager = new UserManager();
+                    $result = $userManager->createOrAssignUser(
+                        $data['username'],
+                        $data['email'],
+                        $data['project_id'] ?? null,
+                        $data['role'] ?? null,
+                        $_ENV['BASE_URL']
+                    );
+
+                    // $result = $userManager->assignedUserEmailNotifer($data['username'], $projectTilte, $data['role'], $projectAllUsers);
                     // return; 
 
                     echo json_encode([
@@ -1541,7 +1538,7 @@ if (isset($_GET['api'])) {
                         'message' => 'User created successfully',
                         'data' => $result
                     ]);
-             
+
                 } catch (Exception $e) {
                     error_log("Error in create_user: " . $e->getMessage());
                     http_response_code(400);
@@ -2654,9 +2651,9 @@ if (isset($_GET['api'])) {
         }
 
         body.dark-mode .nav-tabs .nav-link.active {
-            color: #2374e1;
+            /* color: #2374e1; */
             background-color: #18191a;
-            border-bottom-color: #2374e1;
+            /* border-bottom-color: #2374e1; */
         }
 
         /* Responsive adjustments */
@@ -3105,11 +3102,13 @@ function required_field()
 
         function include_login_page()
         {
-            global $error_message; 
+            global $error_message;
             ?>
             <div class="d-flex justify-content-center align-items-center min-vh-100 login-page ">
                 <div class="row justify-content-center w-100 position-relative">
-                <img src="assets/images/bossgptlogo.svg" alt="Logo" class="position-absolute top-0 start-50 translate-middle " style="margin-top: -100px; width: 15rem; height: 10rem;position: absolute;top: 50%;left: 50%;transform: translate(-50%,-50%);">
+                    <img src="assets/images/bossgptlogo.svg" alt="Logo"
+                        class="position-absolute top-0 start-50 translate-middle "
+                        style="margin-top: -100px; width: 15rem; height: 10rem;position: absolute;top: 50%;left: 50%;transform: translate(-50%,-50%);">
                     <div class="col-md-6 col-lg-4">
                         <div class="card">
                             <div class="card-body">
@@ -3134,7 +3133,7 @@ function required_field()
                                 <p class="text-center mt-3">
                                     <a href="?page=register">Need an account? Register</a>
                                 </p>
-                             
+
                             </div>
                         </div>
                     </div>
@@ -3148,7 +3147,9 @@ function required_field()
             ?>
             <div class="d-flex justify-content-center align-items-center min-vh-100 register-page">
                 <div class="row justify-content-center w-100 position-relative">
-                <img src="assets/images/bossgptlogo.svg" alt="Logo" class="position-absolute top-0 start-50 translate-middle " style="margin-top: -3rem; width: 15rem; height: 10rem;position: absolute;top: 50%;left: 50%;transform: translate(-50%,-50%);">
+                    <img src="assets/images/bossgptlogo.svg" alt="Logo"
+                        class="position-absolute top-0 start-50 translate-middle "
+                        style="margin-top: -3rem; width: 15rem; height: 10rem;position: absolute;top: 50%;left: 50%;transform: translate(-50%,-50%);">
                     <div class="col-md-6 col-lg-4 mt-5">
                         <div class="card">
                             <div class="card-body">
@@ -3584,37 +3585,34 @@ function required_field()
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content border-0 shadow-lg rounded-lg">
                         <div class="modal-header bg-primary text-white border-0 rounded-t-lg">
-                            <h5 class="modal-title" id="assignUserModalLabel">Assign User to Project</h5>
+                            <h5 class="modal-title" id="assignUserModalLabel">Invite User to Project</h5>
                             <button type="button" class="btn-close text-white" data-bs-dismiss="modal"
                                 aria-label="Close "></button>
                         </div>
-                        <div class="modal-body">
-                            <form id="assignUserForm">
-                                <!-- Select User Dropdown -->
-                                <div class="mb-3">
-                                    <label for="userSelect" class="form-label">Select
-                                        User<?php echo required_field(); ?></label>
-                                    <select class="form-select" id="userSelect" required>
-                                        <option value="">Select a user</option>
-                                    </select>
-                                </div>
-                                <!-- Role in Project -->
-                                <div class="mb-3">
-                                    <label for="userRole" class="form-label">Role in
-                                        Project<?php echo required_field(); ?></label>
-                                    <input type="text" placeholder="Enter role (e.g., Developer, Designer, Manager)"
-                                        class="form-control" id="userRole" required>
-                                </div>
-                            </form>
+                        <div class="modal-body position-relative">
+                        <button class="btn btn-primary position-absolute top-5 " style="right: 10px;" id="addUserBtn">
+                                    <i class="bi bi-person-plus"></i> Add New User
+                                </button>
+                            <div id="userListContainer" class="mt-5">
+                                <!-- Dynamically populated users will appear here -->
+                            </div>
+
+                            <!-- No Users Message -->
+                            <div id="noUsersMessage" class="text-center py-4 d-none">
+                                <p class="text-muted">No users assigned yet.</p>
+                                <button class="btn btn-primary" id="addUserBtn">
+                                    <i class="bi bi-person-plus"></i> Add New User
+                                </button>
+                            </div>
                         </div>
-                        <div class="modal-footer border-0">
+                        <!-- <div class="modal-footer border-0">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-primary" id="assignUserBtn">Assign User</button>
-                        </div>
+                            <button type="button" class="btn btn-primary" id="inviteUserBtn">Assign User</button>
+                        </div> -->
                     </div>
                 </div>
             </div>
-            <div class="modal fade" id="assignUserModal" tabindex="-1" aria-labelledby="assignUserModalLabel"
+            <!-- <div class="modal fade" id="assignUserModal" tabindex="-1" aria-labelledby="assignUserModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content border-0 shadow-lg rounded-lg">
@@ -3625,7 +3623,6 @@ function required_field()
                         </div>
                         <div class="modal-body">
                             <form id="assignUserForm">
-                                <!-- Select User Dropdown -->
                                 <div class="mb-3">
                                     <label for="userSelect" class="form-label">Select
                                         User<?php echo required_field(); ?></label>
@@ -3647,7 +3644,7 @@ function required_field()
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
 
 
@@ -3671,15 +3668,7 @@ function required_field()
                                         class="form-label">Email<?php echo required_field(); ?></label>
                                     <input type="email" class="form-control text-lowercase" id="newUserEmail" required>
                                 </div>
-                                <!-- <div class="mb-3">
-                                    <label for="newUserRole" class="form-label">Role</label>
-                                    <select class="form-select" id="newUserRole" required>
-                                        <option value="">Select Role</option>
-                                        <option value="admin">Admin</option>
-                                        <option value="manager">Manager</option>
-                                        <option value="member">Member</option>
-                                    </select>
-                                </div> -->
+                               
                                 <div class="mb-3">
                                     <label for="newUserRole" class="form-label">Role<?php echo required_field(); ?></label>
                                     <input type="text" class="form-control" id="newUserRole"
@@ -3689,7 +3678,7 @@ function required_field()
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary" id="saveUserBtn">Save User</button>
+                            <button type="button" class="btn btn-primary" id="addNewUserBtn">Save User</button>
                         </div>
                     </div>
                 </div>
@@ -3833,7 +3822,7 @@ function required_field()
 
 
         document.addEventListener('DOMContentLoaded', function () {
- 
+
             const currentProject = $('#myselectedcurrentProject').val();
             // console.log(currentProject)
             // alert(currentProject);
@@ -4570,54 +4559,57 @@ function required_field()
                 });
 
                 // Add event listener for "Assign User" button in the modal
-                const assignUserBtn = document.getElementById('assignUserBtn');
-                assignUserBtn.addEventListener('click', function () {
-                    // alert('assignUserBtn clicked');
-                    // return;
-                    const userSelect = document.getElementById('userSelect');
-                    const userId = userSelect.value;
-                    const userRole = document.getElementById('userRole').value.trim();
-                    if (!currentProject) {
-                        Toast('error', 'Error', 'Please select a project first', 'bottomCenter');
-                        return;
-                    }
-                    if (!userId || !userRole) {
-                        // alert('Please select a user and enter a role');
-                        Toast('error', 'Error', 'Please select a user and enter a role', 'bottomCenter');
-                        return;
-                    }
+                // const inviteUserBtn = document.getElementById('inviteUserBtn');
+                // inviteUserBtn.addEventListener('click', function () {
+                //     alert('inviteUserBtn clicked');
+                //     // alert('assignUserBtn clicked');
+                //     // return;
+                //     // const userSelect = document.getElementById('userSelect');
+                //     // const userId = userSelect.value;
+                //     // const userRole = document.getElementById('userRole').value.trim();
+                //     if (!currentProject) {
+                //         Toast('error', 'Error', 'Please select a project first', 'bottomCenter');
+                //         return;
+                //     }
+                //     // if (!userId || !userRole) {
+                //     //     // alert('Please select a user and enter a role');
+                //     //     Toast('error', 'Error', 'Please select a user and enter a role', 'bottomCenter');
+                //     //     return;
+                //     // }
 
-                    showLoading();
-                    fetch('?api=assign_user_to_project', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            project_id: currentProject,
-                            user_id: userId,
-                            role: userRole
-                        })
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                alert("User assigned successfully");
-                                bootstrap.Modal.getInstance(document.getElementById('assignUserModal')).hide();
-                                // Optionally clear the form fields
-                                document.getElementById('userSelect').value = '';
-                                document.getElementById('userRole').value = '';
-                                // You may want to refresh context or notify the user
-                            } else {
-                                throw new Error(data.message || 'Failed to assign user');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error assigning user:', error);
-                            alert('Failed to assign user. Please try again.');
-                        })
-                        .finally(hideLoading);
-                });
+
+                //     showLoading();
+                //     fetch('?api=assign_user_to_project', {
+                //         method: 'POST',
+                //         headers: { 'Content-Type': 'application/json' },
+                //         body: JSON.stringify({
+                //             project_id: currentProject,
+                //             user_id: userId,
+                //             role: userRole
+                //         })
+                //     })
+                //         .then(response => response.json())
+                //         .then(data => {
+                //             if (data.success) {
+                //                 alert("User assigned successfully");
+                //                 bootstrap.Modal.getInstance(document.getElementById('assignUserModal')).hide();
+                //                 // Optionally clear the form fields
+                //                 document.getElementById('userSelect').value = '';
+                //                 document.getElementById('userRole').value = '';
+                //                 // You may want to refresh context or notify the user
+                //             } else {
+                //                 throw new Error(data.message || 'Failed to assign user');
+                //             }
+                //         })
+                //         .catch(error => {
+                //             console.error('Error assigning user:', error);
+                //             alert('Failed to assign user. Please try again.');
+                //         })
+                //         .finally(hideLoading);
+                // });
 
                 // Populate the user dropdown when the "Assign User" modal is shown
+
                 const assignUserModal = document.getElementById('assignUserModal');
                 assignUserModal.addEventListener('shown.bs.modal', function () {
                     if (!currentProject) {
@@ -4629,7 +4621,6 @@ function required_field()
                         );
                         return;
                     }
-
                     showLoading();
                     fetch(`?api=get_all_project_users&project_id=${currentProject}`)
                         .then(async response => {
@@ -4642,18 +4633,59 @@ function required_field()
                                 throw new Error('Invalid server response');
                             }
                         })
+                        // mujtabatesting1
                         .then(data => {
                             if (data.success) {
-                                const userSelect = document.getElementById('userSelect');
-                                userSelect.innerHTML = '<option value="">Select a user</option>';
+                                const userListContainer = document.getElementById('userListContainer');
+                                const noUsersMessage = document.getElementById("noUsersMessage");
+                                userListContainer.innerHTML = '<h6 >Users</h6>';
+
+
+                                if (data.users.length === 0) {
+                                    noUsersMessage.classList.remove("d-none");
+                                    userListContainer.classList.add("d-none");
+                                } else {
+                                    noUsersMessage.classList.add("d-none");
+                                    userListContainer.classList.remove("d-none");
+
+                                    data.users.forEach((user) => {
+                                        const userCard = document.createElement("div");
+                                        userCard.className = "d-flex justify-content-between align-items-center p-2 mb-2 border rounded dark-primaryborder ";
+                                        let actionButtons = "";
+                                        actionButtons = `
+        <button class="btn btn-sm btn-outline-primary editUser" data-id="${user.id}">
+            <i class="bi bi-pencil"></i>
+        </button>
+
+    `;
+                                        if (user.role != "Creator") {
+                                            actionButtons += `
+           
+            <button class="btn btn-sm btn-outline-danger deleteUser" data-id="${user.id}">
+                <i class="bi bi-trash"></i>
+            </button>
+        `;
+                                        }
+
+                                        userCard.innerHTML = `
+                    <div>
+                        <strong>${user.username}</strong>
+                        <span class="text-muted">(${user.role})</span>
+                    </div>
+                    ${actionButtons}
+                `;
+
+                                        userListContainer.appendChild(userCard);
+                                    });
+                                }
 
                                 // Add project users
-                                data.users.forEach(user => {
-                                    userSelect.innerHTML += `<option value="${user.id}">${user.username} (${user.email}) - ${user.role}</option>`;
-                                });
+                                // data.users.forEach(user => {
+                                //     userSelect.innerHTML += `<option value="${user.id}">${user.username} (${user.email}) - ${user.role}</option>`;
+                                // });
 
-                                // Add "Add New User" option at the end
-                                userSelect.innerHTML += '<option value="new">+ Add New User</option>';
+                                // // Add "Add New User" option at the end
+                                // userSelect.innerHTML += '<option value="new">+ Add New User</option>';
                             } else {
                                 throw new Error(data.message || 'Failed to load users');
                             }
@@ -4669,30 +4701,48 @@ function required_field()
                         })
                         .finally(hideLoading);
                 });
+                userListContainer.addEventListener("click", function (e) {
+        if (e.target.closest(".deleteUser")) {
+            const userId = e.target.closest(".deleteUser").getAttribute("data-id");
+            users = users.filter((user) => user.id !== parseInt(userId));
+            renderUserList();
+        }
+    });
+
+    // Edit User (You can expand this to open an edit modal)
+    userListContainer.addEventListener("click", function (e) {
+        if (e.target.closest(".editUser")) {
+            const userId = e.target.closest(".editUser").getAttribute("data-id");
+            const user = users.find((u) => u.id === parseInt(userId));
+            alert(`Edit User: ${user.name}`); // Replace with actual edit functionality
+        }
+    });
                 // Handle "New User" selection
-                document.getElementById('userSelect').addEventListener('change', function () {
-                    if (this.value === 'new') {
-                        new bootstrap.Modal(document.getElementById('addUserModal')).show();
-                        this.value = ''; // Reset dropdown selection
-                    }
+                // document.getElementById('userSelect').addEventListener('change', function () {
+                //     if (this.value === 'new') {
+                //         new bootstrap.Modal(document.getElementById('addUserModal')).show();
+                //         this.value = ''; // Reset dropdown selection
+                //     }
+                // });
+                $('#addUserBtn').click(function () {
+                    $('#addUserModal').modal('show');
                 });
-                document.getElementById('saveUserBtn').addEventListener('click', function () {
+                document.getElementById('addNewUserBtn').addEventListener('click', function () {
                     const username = document.getElementById('newUserName').value.trim();
                     const email = document.getElementById('newUserEmail').value.trim();
                     const role = document.getElementById('newUserRole').value.trim();
-                    
+
                     if (!username || !email || !role) {
                         Toast('error', 'Error', 'Please fill in all fields', 'bottomCenter');
                         return;
                     }
-                    if(!email.includes('@')) {
+                    if (!email.includes('@')) {
                         Toast('error', 'Error', 'Please enter a valid email', 'bottomCenter');
 
                         return;
                     }
 
                     showLoading();
-
                     fetch('?api=create_or_assign_user', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -4703,59 +4753,59 @@ function required_field()
                             role: role
                         })
                     })
-                    .then(async response => {
-                        const text = await response.text();
-                        try {
-                            const data = JSON.parse(text);
-                            return data;
-                        } catch (e) {
-                            console.error('JSON parse error:', e);
-                            console.error('Raw response was:', text);
-                            throw new Error(`Server response error: ${text}`);
-                        }
-                    })
-                    .then(data => {
-                        if (data.success) {
-                            // Close the add user modal
-                            bootstrap.Modal.getInstance(document.getElementById('addUserModal')).hide();
-
-                            // Clear the form
-                            document.getElementById('newUserName').value = '';
-                            document.getElementById('newUserEmail').value = '';
-                            document.getElementById('newUserRole').value = '';
-
-                            // Refresh the user list in the assign user modal
-                            const userSelect = document.getElementById('userSelect');
-                            // Remove the existing "Add New User" option if it exists
-                            const addNewOption = Array.from(userSelect.options).find(option => option.value === 'new');
-                            if (addNewOption) {
-                                addNewOption.remove();
+                        .then(async response => {
+                            const text = await response.text();
+                            try {
+                                const data = JSON.parse(text);
+                                return data;
+                            } catch (e) {
+                                console.error('JSON parse error:', e);
+                                console.error('Raw response was:', text);
+                                throw new Error(`Server response error: ${text}`);
                             }
-                            
-                            // Add the new user option
-                            const newOption = new Option(
-                                `${username} (${email}) - ${role}`,
-                                data.data.user_id
-                            );
-                            userSelect.add(newOption);
-                            
-                            // Show different messages based on whether it's a new or existing user
-                            console.log(data)
-                            const successMessage = data.data.is_new_user 
-                                ? "User created and assigned successfully! An invite has been sent along with login credentials."
-                                : "User assigned to project successfully!";
-                                
-                            showToastAndHideModal('addUserModal', 'success', "Success", successMessage);
-                            bootstrap.Modal.getInstance(document.getElementById('assignUserModal')).hide();
-                        } else {
-                            throw new Error(data.message || 'Failed to create or assign user');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error creating/assigning user:', error);
-                        Toast('error', 'Error', `Error: ${error.message}`, 'bottomCenter');
-                    })
-                    .finally(hideLoading);
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                // Close the add user modal
+                                bootstrap.Modal.getInstance(document.getElementById('addUserModal')).hide();
+
+                                // Clear the form
+                                document.getElementById('newUserName').value = '';
+                                document.getElementById('newUserEmail').value = '';
+                                document.getElementById('newUserRole').value = '';
+
+                                // Refresh the user list in the assign user modal
+                                // const userSelect = document.getElementById('userSelect');
+                                // // Remove the existing "Add New User" option if it exists
+                                // const addNewOption = Array.from(userSelect.options).find(option => option.value === 'new');
+                                // if (addNewOption) {
+                                //     addNewOption.remove();
+                                // }
+
+                                // Add the new user option
+                                // const newOption = new Option(
+                                //     `${username} (${email}) - ${role}`,
+                                //     data.data.user_id
+                                // );
+                                // userSelect.add(newOption);
+
+                                // Show different messages based on whether it's a new or existing user
+                                console.log(data)
+                                const successMessage = data.data.is_new_user
+                                    ? "User created and assigned successfully! An invite has been sent along with login credentials."
+                                    : "User assigned to project successfully!";
+
+                                showToastAndHideModal('addUserModal', 'success', "Success", successMessage);
+                                bootstrap.Modal.getInstance(document.getElementById('assignUserModal')).hide();
+                            } else {
+                                throw new Error(data.message || 'Failed to create or assign user');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error creating/assigning user:', error);
+                            Toast('error', 'Error', `Error: ${error.message}`, 'bottomCenter');
+                        })
+                        .finally(hideLoading);
                 });
                 // Helper functions
                 function appendMessage(message, sender) {

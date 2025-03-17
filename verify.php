@@ -50,7 +50,7 @@ if (empty($token)) {
         body {
             font-family: Arial, sans-serif;
             background-color: #000;
-            color: #fff;
+            color: #fff!important;
             margin: 0;
             padding: 20px;
             font-family: 'Segoe UI', 'Georgia', 'Times New Roman', serif, 'Helvetica Neue';
@@ -75,10 +75,12 @@ if (empty($token)) {
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.9);
             text-align: center;
         }
-h2{
-    font-size: 1.8rem;
-margin-top: 0.6rem;
-}
+
+        h2 {
+            font-size: 1.8rem;
+            margin-top: 0.6rem;
+        }
+
         .verification-success {
             background: rgba(40, 167, 69, 0.15);
             border-color: rgba(40, 167, 69, 0.3);
@@ -114,10 +116,9 @@ margin-top: 0.6rem;
         class="verification-container <?php echo ($status === 'success') ? 'verification-success' : 'verification-error'; ?>">
         <?php if ($status === 'success'): ?>
             <i class="bi bi-check-circle-fill success-icon"></i>
-            <h2 class="mb-4">Email Verified!</h2>
+            <h2 class="mb-4">Email Verified!...</h2>
             <p class="text-success"><?php echo $message; ?></p>
-            <!-- <a href="login.php" class="btn btn-primary mt-3">Go to Login</a> -->
-            <a href="?page=login" class="btn mbtn-white mt-3 text-white">Go to Login</a>
+            <a href="/" class="btn mbtn-white mt-3 text-white">Go to Login</a>
 
         <?php else: ?>
             <i class="bi bi-x-circle-fill error-icon"></i>
