@@ -11,7 +11,6 @@ use Dotenv\Dotenv;
 // // Load environment variables
 $dotenv = Dotenv::createImmutable(__DIR__);
 
-
 // Added to persist the login cookie for one year
 session_set_cookie_params(60 * 60 * 24 * 365);
 ini_set('session.gc_maxlifetime', 60 * 60 * 24 * 365);
@@ -197,7 +196,7 @@ class Auth
             $password_hash = password_hash($password, PASSWORD_DEFAULT);
             $stmt = $this->db->prepare("INSERT INTO users (username, email, password_hash, fcm_token) VALUES (?, ?, ?, ?)");
             $stmt->execute([$username, $email, $password_hash, $fcm_token]);
-
+           
             return true;
         } catch (Exception $e) {
             error_log("Registration error: " . $e->getMessage());
@@ -1324,16 +1323,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         throw new Exception('All fields are required');
                     }
 
-                    $auth->register(
-                        $_POST['username'],
-                        $_POST['email'],
-                        $_POST['password'],
-                        $_POST['fcm_token']
-                    );
+                    // $auth->register(
+                    //     $_POST['username'],
+                    //     $_POST['email'],
+                    //     $_POST['password'],
+                    //     $_POST['fcm_token']
+                    // );
 
-                    // After successful registration, log the user in
-                    $auth->login($_POST['email'], $_POST['password']);
-                    header('Location: ?page=dashboard');
+                    $user= new UserManager();
+                    $user->sendWelcomeEmail("taimoorhamza1999@gmail.com", 'taimoorhamza1999', "1234567890", $_ENV['BASE_URL'],"testingtoken");                    // After successful registration, log the user in
+                    // $auth->login($_POST['email'], $_POST['password']);
+                    // header('Location: ?page=dashboard');
                     exit;
 
                 case 'login':
@@ -2361,7 +2361,7 @@ if (isset($_GET['api'])) {
         }
 
         body.dark-mode .navbar {
-            background-color: #242526 !important;
+            /* background-color: #242526 !important; */
             border-bottom: 1px solid #2f3031;
         }
 
@@ -2622,15 +2622,15 @@ if (isset($_GET['api'])) {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            background-color: #0d6efd;
+            /* background-color: #0d6efd; */
             border: none;
             transition: all 0.2s ease;
         }
 
         .nav-tabs .btn-primary:hover {
-            background-color: #0b5ed7;
+            /* background-color: #0b5ed7; */
             transform: translateY(-1px);
-            box-shadow: 0 2px 4px rgba(13, 110, 253, 0.2);
+            /* box-shadow: 0 2px 4px rgba(13, 110, 253, 0.2); */
         }
 
         .nav-tabs .btn-primary i {
@@ -3064,7 +3064,7 @@ function required_field()
                             <div class="dropdown-menu dropdown-menu-end" id="notificationDropdownMenu"
                                 aria-labelledby="notificationDropdown"
                                 style="min-width: 300px; max-height: 400px; overflow-y: auto;">
-                                <div class="dropdown-header border-bottom p-2 pb-3 pl-5">
+                                <div class="dropdown-header p-2 pb-3 pl-5">
                                     <strong class="mb-5">Notifications</strong>
                                 </div>
                                 <div class="notification-list">
@@ -3105,18 +3105,19 @@ function required_field()
 
         function include_login_page()
         {
-            global $error_message; // Add this line to access the error message
+            global $error_message; 
             ?>
-            <div class="d-flex justify-content-center align-items-center min-vh-100">
-                <div class="row justify-content-center w-100">
+            <div class="d-flex justify-content-center align-items-center min-vh-100 login-page ">
+                <div class="row justify-content-center w-100 position-relative">
+                <img src="assets/images/bossgptlogo.svg" alt="Logo" class="position-absolute top-0 start-50 translate-middle " style="margin-top: -100px; width: 15rem; height: 10rem;position: absolute;top: 50%;left: 50%;transform: translate(-50%,-50%);">
                     <div class="col-md-6 col-lg-4">
                         <div class="card">
                             <div class="card-body">
                                 <h2 class="card-title text-center mb-4">Login</h2>
-                                <?php if (isset($error_message)): ?>
-                                    <div class="alert alert-danger">
-                                        <?php echo htmlspecialchars($error_message); ?>
-                                    </div>
+                                <?php if (isset($error_message) && $_GET['page'] == 'login'): ?>
+                                    <script>
+                                        Toast("error", "Error", "<?php echo htmlspecialchars($error_message); ?>");
+                                    </script>
                                 <?php endif; ?>
                                 <form method="POST">
                                     <input type="hidden" name="action" value="login">
@@ -3133,6 +3134,7 @@ function required_field()
                                 <p class="text-center mt-3">
                                     <a href="?page=register">Need an account? Register</a>
                                 </p>
+                             
                             </div>
                         </div>
                     </div>
@@ -3144,16 +3146,17 @@ function required_field()
         {
             global $error_message; // Add this line to access the error message
             ?>
-            <div class="d-flex justify-content-center align-items-center min-vh-100">
-                <div class="row justify-content-center w-100">
-                    <div class="col-md-6 col-lg-4">
+            <div class="d-flex justify-content-center align-items-center min-vh-100 register-page">
+                <div class="row justify-content-center w-100 position-relative">
+                <img src="assets/images/bossgptlogo.svg" alt="Logo" class="position-absolute top-0 start-50 translate-middle " style="margin-top: -3rem; width: 15rem; height: 10rem;position: absolute;top: 50%;left: 50%;transform: translate(-50%,-50%);">
+                    <div class="col-md-6 col-lg-4 mt-5">
                         <div class="card">
                             <div class="card-body">
                                 <h2 class="card-title text-center mb-4">Register</h2>
-                                <?php if (isset($error_message)): ?>
-                                    <div class="alert alert-danger">
-                                        <?php echo htmlspecialchars($error_message); ?>
-                                    </div>
+                                <?php if (isset($error_message) && $_GET['page'] == 'register'): ?>
+                                    <script>
+                                        Toast("error", "Error", "<?php echo htmlspecialchars($error_message); ?>");
+                                    </script>
                                 <?php endif; ?>
                                 <form method="POST">
                                     <input type="hidden" name="action" value="register">
@@ -3462,7 +3465,7 @@ function required_field()
                                 <div class="mb-3">
                                     <label for="projectDescription"
                                         class="form-label">Description<?php echo required_field(); ?></label>
-                                    <textarea class="form-control" id="projectDescription" rows="3"
+                                    <textarea class="form-control" id="projectDescription" rows="8"
                                         placeholder="Define your project in few lines."></textarea>
                                 </div>
                             </form>

@@ -226,7 +226,7 @@ function initializeChatLoading() {
           width: 32px;
           height: 32px;
           border-radius: 50%;
-          background: var(--primary-color, #0d6efd);
+        //   background: var(--primary-color, #0d6efd);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -435,6 +435,9 @@ function updateNotificationDropdown(notifications) {
                 border-color: #2d2d2d;
                 color: #ffffff;
                 background-color: #1a1a1a !important;
+            }
+            .dropdown-header {
+               border-bottom: 0.3rem #d3d4d5 solid;
             }
             .dark-mode .notification-text {
                 color: #e1e1e1 !important;

@@ -162,10 +162,13 @@ class UserManager
         ];
         // return "shgfjs";
 
-        $command = "php sendEmail.php '$emailData' > /dev/null 2>&1 &";
+        $emailDataJson = escapeshellarg(json_encode($emailData)); // Convert array to JSON and escape it
+        $command = "php sendEmail.php $emailDataJson > /dev/null 2>&1 &";
         exec($command);
     
-        return "Welcome email is being processed asynchronously.";
+        // return "Welcome email is being processed asynchronously.";
+    //    return  sendTemplateEmail($emailData['email'], $emailData['subject'], $emailData['template'], $emailData['data']);
+
     }
 
     public function assignedUserEmailNotifer($newUser, $projectTilte, $newRole, $projectAllUsers)
