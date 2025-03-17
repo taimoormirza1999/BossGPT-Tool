@@ -39,7 +39,8 @@
         line-height: 1.6; 
         text-align: left; 
         padding: 20px 30px; 
-        background: #333; 
+        background: rgba(90, 90, 90, 0.3);
+    border: 1.6px solid rgba(151, 151, 151, 0.2);
         color: #eee; 
         border-radius: 8px; 
     }

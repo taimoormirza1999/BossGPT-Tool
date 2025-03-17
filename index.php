@@ -1331,7 +1331,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     );
 
                     $user= new UserManager();
-                    $user->sendWelcomeEmail("taimoorhamza199@gmail.com", 'taimoorhamza1999', "1234567890", $_ENV['BASE_URL'],"testingtoken");                    // After successful registration, log the user in
+                    $user->sendWelcomeEmail($_POST['email'],    $_POST['username'], $_ENV['BASE_URL']);                    // After successful registration, log the user in
                     $auth->login($_POST['email'], $_POST['password']);
                     header('Location: ?page=dashboard');
                     exit;

@@ -98,8 +98,8 @@ class UserManager
                 // Send welcome email with credentials
                 $this->sendWelcomeEmail($email, $username, $tempPassword, $BASE_URL, "testingtoken");
 
-                  // Execute email script in the background
-    
+                // Execute email script in the background
+
 
 
                 return [
@@ -140,7 +140,32 @@ class UserManager
         return $password;
     }
 
-    public function sendWelcomeEmail($email, $username, $tempPassword, $BASE_URL, $token)
+    public function sendWelcomeEmail($email, $username, $BASE_URL)
+    {
+        $subject = "BossGPT Welcomes You! Your AI-Powered Journey Starts Now!";
+        $template = 'welcome';
+
+        // Prepare data for email template
+        $emailData = [
+
+            'email' => $email,
+            'subject' => $subject,
+            'template' => $template,
+            'data' => [
+                'welcomeLink' => $BASE_URL,
+                'username' => $username,
+            ]
+        ];
+
+        $emailDataJson = escapeshellarg(json_encode($emailData)); // Convert array to JSON and escape it
+        $command = "php sendEmail.php $emailDataJson > /dev/null 2>&1 &";
+        exec($command);
+
+        // return "Welcome email is being processed asynchronously.";
+        //    return  sendTemplateEmail($emailData['email'], $emailData['subject'], $emailData['template'], $emailData['data']);
+
+    }
+    public function sendInviteUser($email, $username, $tempPassword, $BASE_URL, $token)
     {
 
         $verificationLink = $BASE_URL . "/verify.php?token=" . $token;
@@ -155,9 +180,9 @@ class UserManager
             'subject' => $subject,
             'template' => $template,
             'data' => [
-            'username' => $username,
-            'tempPassword' => $tempPassword,
-            'verificationLink' => $verificationLink
+                'username' => $username,
+                'tempPassword' => $tempPassword,
+                'verificationLink' => $verificationLink
             ]
         ];
         // return "shgfjs";
@@ -165,9 +190,9 @@ class UserManager
         $emailDataJson = escapeshellarg(json_encode($emailData)); // Convert array to JSON and escape it
         $command = "php sendEmail.php $emailDataJson > /dev/null 2>&1 &";
         exec($command);
-    
+
         // return "Welcome email is being processed asynchronously.";
-    //    return  sendTemplateEmail($emailData['email'], $emailData['subject'], $emailData['template'], $emailData['data']);
+        //    return  sendTemplateEmail($emailData['email'], $emailData['subject'], $emailData['template'], $emailData['data']);
 
     }
 
@@ -189,11 +214,11 @@ class UserManager
                     'username' => "",
                     'tempPassword' => "",
                     'verificationLink' => ""
-                    ]
-                ];
-                // sendTemplateEmail($user['email'], $subject, $template, $emailData);
-                $command = "php sendEmail.php '$emailData' > /dev/null 2>&1 &";
-                exec($command);
+                ]
+            ];
+            // sendTemplateEmail($user['email'], $subject, $template, $emailData);
+            $command = "php sendEmail.php '$emailData' > /dev/null 2>&1 &";
+            exec($command);
         }
         return $newUser . " has been added to the project: " . $projectTilte . " at new Role: " . $newRole . " project All Users: " . implode(", ", $allUsers);
     }
@@ -215,11 +240,11 @@ class UserManager
                     'username' => "",
                     'tempPassword' => "",
                     'verificationLink' => ""
-                    ]
-                ];
-                // sendTemplateEmail($user['email'], $subject, $template, $emailData);
-                $command = "php sendEmail.php '$emailData' > /dev/null 2>&1 &";
-                exec($command);
+                ]
+            ];
+            // sendTemplateEmail($user['email'], $subject, $template, $emailData);
+            $command = "php sendEmail.php '$emailData' > /dev/null 2>&1 &";
+            exec($command);
         }
         return $newUser . " has been added to the project: " . $projectTilte . " at new Role: " . $newRole . " project All Users: " . implode(", ", $allUsers);
     }
