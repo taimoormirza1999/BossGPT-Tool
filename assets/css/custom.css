@@ -108,8 +108,8 @@ a:hover{
 .dark-mode .chat-loading-avatar {
   background-color: var(--bs-primary-black) !important;
   /* opacity: 0.5 !important; */
- 
 }
+
 
 @font-face {
   font-family: "Geist";
