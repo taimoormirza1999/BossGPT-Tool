@@ -1,11 +1,16 @@
 <?php
-
+require './vendor/autoload.php';
 
 //Added to load the environment variables
-require_once 'env.php';
+// require_once 'env.php';
 require_once './classes/UserManager.php';
-require_once './classes/NotificationManager.php';
-loadEnv();
+require_once './classes/Notification.php';
+// loadEnv();
+use Dotenv\Dotenv;
+
+// // Load environment variables
+$dotenv = Dotenv::createImmutable(__DIR__);
+
 
 // Added to persist the login cookie for one year
 session_set_cookie_params(60 * 60 * 24 * 365);
@@ -13,19 +18,19 @@ ini_set('session.gc_maxlifetime', 60 * 60 * 24 * 365);
 
 session_start();
 error_reporting(E_ALL);
-ini_set('display_errors', getenv('DISPLAY_ERRORS'));
+ini_set('display_errors', $_ENV['DISPLAY_ERRORS']);
 ini_set('log_errors', 0);
 ini_set('error_log', 'error.log');
 error_reporting(E_ALL);
-define('TESTING_FEATURE', getenv('TESTING_FEATURE'));
+define('TESTING_FEATURE', $_ENV['TESTING_FEATURE']);
 // Database configuration
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
-define('DB_PASS', getenv('DB_PASS'));
+define('DB_PASS', $_ENV['DB_PASS']);
 define('DB_NAME', 'project_manager');
 
 // OpenAI API configuration
-define('OPENAI_API_KEY', getenv('OPENAI_API_KEY'));
+define('OPENAI_API_KEY', $_ENV['OPENAI_API_KEY']);
 ob_start();
 // Database Class
 class Database
@@ -316,6 +321,13 @@ class ProjectManager
                 'project_created',
                 "Created new project: $title"
             );
+
+            // Send notification to all users with pusher
+            Notification::send('project_'+$project_id, 'project_created', ['message' => 'New project created: ' . $title]);
+            // $pusher = new Pusher('83a162dc942242f89892', {
+            //     cluster: 'ap2'
+            // });
+            // $pusher->trigger('my-channel', 'my-event', ['message' => 'New project created: ' . $title]);
 
             return $project_id;
         } catch (Exception $e) {
@@ -807,6 +819,12 @@ class ProjectManager
             error_log("Error removing task picture: " . $e->getMessage());
             throw $e;
         }
+    }
+    public function getProjectName($project_id)
+    {
+        $stmt = $this->db->prepare("SELECT title FROM projects WHERE id = ?");
+        $stmt->execute([$project_id]);
+        return $stmt->fetch()['title'];
     }
 }
 
@@ -1485,37 +1503,45 @@ if (isset($_GET['api'])) {
                 break;
 
             case 'assign_user_to_project':
-                $data = json_decode(file_get_contents('php://input'), true);
+
+                $data = json_decode(file_get_contents('php://input'), 
+                true);
                 if (!isset($data['project_id']) || !isset($data['user_id']) || !isset($data['role'])) {
                     throw new Exception('Project ID, user ID, and role are required');
                 }
                 $project_manager->assignUserToProject($data['project_id'], $data['user_id'], $data['role']);
                 $response = ['success' => true];
                 break;
-            case 'create_user':
+            case 'create_or_assign_user':
                 header('Content-Type: application/json');
                 try {
                     // error_log("Received create user request");
-
                     $data = json_decode(file_get_contents('php://input'), true);
                     if (!$data) {
                         throw new Exception('Invalid request data');
                     }
-
+                  
+                    $project_manager = new ProjectManager();
+                    $projectTilte =  $project_manager->getProjectName($data['project_id']);
+                    $projectAllUsers =  $project_manager->getProjectUsers($data['project_id']);
                     $userManager = new UserManager();
-                    $result = $userManager->createUser(
-                        $data['username'],
-                        $data['email'],
-                        $data['project_id'] ?? null,
-                        $data['role'] ?? null,
-                        getenv('BASE_URL')
-                    );
+                    // $result = $userManager->createOrAssignUser(
+                    //     $data['username'],
+                    //     $data['email'],
+                    //     $data['project_id'] ?? null,
+                    //     $data['role'] ?? null,
+                    //     $_ENV['BASE_URL']
+                    // );
+
+                    $result = $userManager->assignedUserEmailNotifer( $data['username'], $projectTilte, $data['role'],$projectAllUsers);
+                    // return; 
 
                     echo json_encode([
                         'success' => true,
                         'message' => 'User created successfully',
                         'data' => $result
                     ]);
+             
                 } catch (Exception $e) {
                     error_log("Error in create_user: " . $e->getMessage());
                     http_response_code(400);
@@ -1748,8 +1774,8 @@ if (isset($_GET['api'])) {
             // Email
             case 'send_welcome_email':
                 $data = json_decode(file_get_contents('php://input'), true);
-                $BASE_URL = getenv('BASE_URL');
-        
+                $BASE_URL = $_ENV['BASE_URL'];
+
                 if (!isset($data['email']) || !isset($data['username']) || !isset($data['tempPassword'])) {
                     $response = [
                         'success' => false,
@@ -1758,7 +1784,7 @@ if (isset($_GET['api'])) {
                     echo json_encode($response);
                     exit;
                 }
-            
+
                 $userManager = new UserManager();
                 // Send email
                 $emailSent = $userManager->sendWelcomeEmail($data['email'], $data['username'], $data['tempPassword'], $BASE_URL);
@@ -1791,10 +1817,10 @@ if (isset($_GET['api'])) {
                 //         'message' => "Failed to send the invite."
                 //     ];
                 // }
-            
+
                 echo json_encode($response);
                 exit;
-            
+
 
             // Notification
             case 'send_notification_project':
@@ -1812,7 +1838,7 @@ if (isset($_GET['api'])) {
                 }
 
                 if (!isset($userManager)) {
-                   
+
                     $response = [
                         'success' => false,
                         'message' => "Error: UserManager (\$userManager) is not set."
@@ -1884,10 +1910,9 @@ if (isset($_GET['api'])) {
     <link rel="manifest" href="site.webmanifest">
     <!-- Custom css -->
     <link rel="stylesheet" href="./assets/css/custom.css">
-    
+
 
     <style>
-        
         .suggestion-item {
             border-radius: 16px !important;
             border-color: gray !important;
@@ -3191,8 +3216,7 @@ function required_field()
                                     </button>
 
                                     <?php if (TESTING_FEATURE == 1): ?>
-                                        <button type="button" class="btn btn-sm btn-info me-2"
-                                            onclick='sendWelcomeEmailTest()'>
+                                        <button type="button" class="btn btn-sm btn-info me-2" onclick='sendWelcomeEmailTest()'>
                                             <i class="bi bi-clock-history"></i> Testing Feature Button
                                         </button>
                                     <?php endif; ?>
@@ -3205,7 +3229,7 @@ function required_field()
                                     </button>
                                     <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="modal"
                                         data-bs-target="#assignUserModal">
-                                        <i class="bi bi-person-plus"></i> Assign User
+                                        <i class="bi bi-person-plus"></i> Invite User
                                     </button>
                                 </div>
                             </div>
@@ -3502,7 +3526,6 @@ function required_field()
                                     </button>
                                 </h6>
                                 <div id="subtasksList" class="mt-3">
-                                    <!-- Subtasks will be loaded here -->
                                 </div>
                             </div>
 
@@ -3573,6 +3596,40 @@ function required_field()
                                     </select>
                                 </div>
                                 <!-- Role in Project -->
+                                <div class="mb-3">
+                                    <label for="userRole" class="form-label">Role in
+                                        Project<?php echo required_field(); ?></label>
+                                    <input type="text" placeholder="Enter role (e.g., Developer, Designer, Manager)"
+                                        class="form-control" id="userRole" required>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer border-0">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-primary" id="assignUserBtn">Assign User</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="assignUserModal" tabindex="-1" aria-labelledby="assignUserModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow-lg rounded-lg">
+                        <div class="modal-header bg-primary text-white border-0 rounded-t-lg">
+                            <h5 class="modal-title" id="assignUserModalLabel">Assign User to Project</h5>
+                            <button type="button" class="btn-close text-white" data-bs-dismiss="modal"
+                                aria-label="Close "></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="assignUserForm">
+                                <!-- Select User Dropdown -->
+                                <div class="mb-3">
+                                    <label for="userSelect" class="form-label">Select
+                                        User<?php echo required_field(); ?></label>
+                                    <select class="form-select" id="userSelect" required>
+                                        <option value="">Select a user</option>
+                                    </select>
+                                </div>
                                 <div class="mb-3">
                                     <label for="userRole" class="form-label">Role in
                                         Project<?php echo required_field(); ?></label>
@@ -3773,6 +3830,11 @@ function required_field()
 
 
         document.addEventListener('DOMContentLoaded', function () {
+ 
+            const currentProject = $('#myselectedcurrentProject').val();
+            // console.log(currentProject)
+            // alert(currentProject);
+            // initPusher(currentProject);
             // First check if we're on the dashboard page
             const isDashboard = document.querySelector('.chat-container') !== null;
 
@@ -3893,7 +3955,7 @@ function required_field()
                 }
 
                 // Select project
-                function selectProject(projectId, selectedProjectTitle="") {
+                function selectProject(projectId, selectedProjectTitle = "") {
                     // currentProject = projectId;
                     projectId = parseInt(projectId);
                     currentProject = parseInt(projectId);
@@ -3906,13 +3968,14 @@ function required_field()
                     }
                     // console.log('Selecting project:', projectId);
                     currentProject = projectId;
-                  
+
                     document.querySelectorAll('.project-item').forEach(item => {
                         const itemId = parseInt(item.dataset.id);
                         item.classList.toggle('active', itemId === projectId);
                     });
                     loadTasks(projectId);
                     loadChatHistory(projectId);
+                    initPusher(projectId);
                 }
 
                 // Load chat history
@@ -3942,7 +4005,7 @@ function required_field()
                                 }
                                 // console.log("object "+data.history.length)
                                 const count = data.history.length;
-                                
+
                                 if (count === 0 && $('#chatMessages').is(':empty')) {
                                     setTimeout(() => {
                                         if ($('#chatMessages').is(':empty')) {
@@ -4506,15 +4569,18 @@ function required_field()
                 // Add event listener for "Assign User" button in the modal
                 const assignUserBtn = document.getElementById('assignUserBtn');
                 assignUserBtn.addEventListener('click', function () {
+                    // alert('assignUserBtn clicked');
+                    // return;
                     const userSelect = document.getElementById('userSelect');
                     const userId = userSelect.value;
                     const userRole = document.getElementById('userRole').value.trim();
                     if (!currentProject) {
-                        alert('Please select a project first');
+                        Toast('error', 'Error', 'Please select a project first', 'bottomCenter');
                         return;
                     }
                     if (!userId || !userRole) {
-                        alert('Please select a user and enter a role');
+                        // alert('Please select a user and enter a role');
+                        Toast('error', 'Error', 'Please select a user and enter a role', 'bottomCenter');
                         return;
                     }
 
@@ -4531,6 +4597,7 @@ function required_field()
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
+                                alert("User assigned successfully");
                                 bootstrap.Modal.getInstance(document.getElementById('assignUserModal')).hide();
                                 // Optionally clear the form fields
                                 document.getElementById('userSelect').value = '';
@@ -4610,16 +4677,20 @@ function required_field()
                     const username = document.getElementById('newUserName').value.trim();
                     const email = document.getElementById('newUserEmail').value.trim();
                     const role = document.getElementById('newUserRole').value.trim();
-
+                    
                     if (!username || !email || !role) {
-                        alert('Please fill in all fields');
+                        Toast('error', 'Error', 'Please fill in all fields', 'bottomCenter');
+                        return;
+                    }
+                    if(!email.includes('@')) {
+                        Toast('error', 'Error', 'Please enter a valid email', 'bottomCenter');
+
                         return;
                     }
 
                     showLoading();
 
-
-                    fetch('?api=create_user', {
+                    fetch('?api=create_or_assign_user', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -4629,57 +4700,59 @@ function required_field()
                             role: role
                         })
                     })
-                        .then(async response => {
-                            const text = await response.text();
-                            // console.log('Raw server response:', text); // Debug log
+                    .then(async response => {
+                        const text = await response.text();
+                        try {
+                            const data = JSON.parse(text);
+                            return data;
+                        } catch (e) {
+                            console.error('JSON parse error:', e);
+                            console.error('Raw response was:', text);
+                            throw new Error(`Server response error: ${text}`);
+                        }
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            // Close the add user modal
+                            bootstrap.Modal.getInstance(document.getElementById('addUserModal')).hide();
 
-                            try {
-                                const data = JSON.parse(text);
-                                // console.log('Parsed response:', data); // Debug log
-                                return data;
-                            } catch (e) {
-                                console.error('JSON parse error:', e);
-                                console.error('Raw response was:', text);
-                                throw new Error(`Server response error: ${text}`);
+                            // Clear the form
+                            document.getElementById('newUserName').value = '';
+                            document.getElementById('newUserEmail').value = '';
+                            document.getElementById('newUserRole').value = '';
+
+                            // Refresh the user list in the assign user modal
+                            const userSelect = document.getElementById('userSelect');
+                            // Remove the existing "Add New User" option if it exists
+                            const addNewOption = Array.from(userSelect.options).find(option => option.value === 'new');
+                            if (addNewOption) {
+                                addNewOption.remove();
                             }
-                        })
-                        .then(data => {
-                            if (data.success) {
-                                // Close the add user modal
-                                bootstrap.Modal.getInstance(document.getElementById('addUserModal')).hide();
-
-                                // Clear the form
-                                document.getElementById('newUserName').value = '';
-                                document.getElementById('newUserEmail').value = '';
-                                document.getElementById('newUserRole').value = '';
-
-                                // Refresh the user list in the assign user modal
-                                const userSelect = document.getElementById('userSelect');
-                                // Remove the existing "Add New User" option if it exists
-                                const addNewOption = Array.from(userSelect.options).find(option => option.value === 'new');
-                                if (addNewOption) {
-                                    addNewOption.remove();
-                                }
-                                // Add the new user option
-                                const newOption = new Option(
-                                    `${username} (${email}) - ${role}`,
-                                    data.data.user_id
-                                );
-                                userSelect.add(newOption);
-                                showToastAndHideModal('addUserModal', 'success', "Success", "User assigned successfully! An invite has been sent along with login credentials.")
-                                bootstrap.Modal.getInstance(document.getElementById('assignUserModal')).hide();
-                                // Show success message
-                                // Toast('success', "Success","User created successfully! An email has been sent with login details." )
-                                // alert('User created successfully! An email has been sent with login details.');
-                            } else {
-                                throw new Error(data.message || 'Failed to create user');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error creating user:', error);
-                            alert(`Error creating user ...: ${error.message}`);
-                        })
-                        .finally(hideLoading);
+                            
+                            // Add the new user option
+                            const newOption = new Option(
+                                `${username} (${email}) - ${role}`,
+                                data.data.user_id
+                            );
+                            userSelect.add(newOption);
+                            
+                            // Show different messages based on whether it's a new or existing user
+                            console.log(data)
+                            const successMessage = data.data.is_new_user 
+                                ? "User created and assigned successfully! An invite has been sent along with login credentials."
+                                : "User assigned to project successfully!";
+                                
+                            showToastAndHideModal('addUserModal', 'success', "Success", successMessage);
+                            bootstrap.Modal.getInstance(document.getElementById('assignUserModal')).hide();
+                        } else {
+                            throw new Error(data.message || 'Failed to create or assign user');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error creating/assigning user:', error);
+                        Toast('error', 'Error', `Error: ${error.message}`, 'bottomCenter');
+                    })
+                    .finally(hideLoading);
                 });
                 // Helper functions
                 function appendMessage(message, sender) {
@@ -5595,27 +5668,27 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                 });
         }
         function sendWelcomeEmailTest() {
-    fetch('?api=send_welcome_email', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            email: "taimoorhamza1999@gmail.com",
-            username: "User123",
-            tempPassword: "TempPass123"
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert(data.message);
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        alert("Failed to send email.");
-    });
-}
-        function sendNotificationTest(projectId=42, title="DFs Title", body="DFs Body") {
+            fetch('?api=send_welcome_email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: "taimoorhamza1999@gmail.com",
+                    username: "User123",
+                    tempPassword: "TempPass123"
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("Failed to send email.");
+                });
+        }
+        function sendNotificationTest(projectId = 42, title = "DFs Title", body = "DFs Body") {
             alert("Sending Notification Test");
             fetch('?api=send_notification_project', {
                 method: 'POST',
@@ -5641,6 +5714,7 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
         }
 
         initializeChatLoading();
+
     </script>
 
     <!-- Firebase -->
@@ -5692,6 +5766,112 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                 });
         </script>
     <?php endif; ?>
+    <!-- Pusher -->
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    <script>
+        // Enable pusher logging - don't include this in production
+        // Pusher.logToConsole = true;
+
+        // var pusher = new Pusher('83a162dc942242f89892', {
+        //   cluster: 'ap2'
+        // });
+
+        // channel is project id
+        // var channel = pusher.subscribe('my-channel');
+        // channel.bind('my-event', function(data) {
+        //     // Increment the notification count
+        //     const badge = document.getElementById('notificationBadge');
+        //     let currentCount = parseInt(badge.textContent) || 0;
+        //     badge.textContent = currentCount + 1;
+        //     badge.style.display = "inline-block";
+
+        //     // Append new notification to dropdown
+        //     appendNotification(data);
+
+        // });
+        // channel.bind('user_added', function(data) {
+        //     // alert("User Added"); 
+        //     // Toast("success", "Success", "New Notification received successfully",'topRight');
+
+        // });
+
+        // channel.bind('task_created', function (data) {
+        //     alert(data.message); // Show notification
+        // });
+
+        // channel.bind('task_updated', function (data) {
+        //     alert(data.message); // Show notification
+        // });
+
+        function appendNotification(notification) {
+            const notificationList = document.querySelector(".notification-list");
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            const actionType = getActionTypeDisplay(notification.action_type);
+            const timeAgo = formatTimeAgo(notification.created_at);
+            const icon = getNotificationIcon(notification.action_type);
+
+            const newNotification = `
+            <div class="dropdown-item border-bottom py-3">
+                <div class="d-flex align-items-start">
+                    <div class="notification-icon ${isDarkMode ? actionType.darkBgColor : actionType.bgColor} rounded-circle me-3"
+                        style="padding:0.6rem 0.8rem !important;">
+                        <i class="bi ${icon} ${actionType.textColor}"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="badge ${isDarkMode ? actionType.darkBgColor : actionType.bgColor} ${actionType.textColor} rounded-pill px-3 py-1">
+                                ${actionType.text}
+                            </span>
+                            <small class="text-muted" style="font-size: 0.75rem;">
+                                ${timeAgo}
+                            </small>
+                        </div>
+                        <div class="notification-text" style="font-size: 0.8rem;">
+                            ${notification.description}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+            // Prepend the new notification to the list
+            notificationList.insertAdjacentHTML('afterbegin', newNotification);
+            Toast("success", "Success", "New Notification received successfully", 'topRight');
+            console.log("Notification Data Logging... ");
+            console.log(notification);
+
+
+        }
+
+
+        function initPusher(currentProject) {
+            Pusher.logToConsole = true;
+
+            var pusher = new Pusher('83a162dc942242f89892', {
+                cluster: 'ap2'
+            });
+            // Enable pusher logging - don't include this in production
+
+            var channel = pusher.subscribe('project_' + currentProject);
+
+            channel.bind('project_created', function (data) {
+                appendNotification(data);
+                Toast("success", "Success", data.message, 'topRight');
+            });
+            channel.bind('user_assigned', function (data) {
+                appendNotification(data);
+                Toast("success", "Success", data.message, 'topRight');
+            });
+            channel.bind('task_created', function (data) {
+                appendNotification(data);
+                Toast("success", "Success", data.message, 'topRight');
+            });
+            channel.bind('task_updated', function (data) {
+                appendNotification(data);
+                Toast("success", "Success", data.message, 'topRight');
+            });
+        }
+    </script>
 
 </body>
 

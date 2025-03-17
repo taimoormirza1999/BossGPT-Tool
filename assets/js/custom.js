@@ -53,16 +53,16 @@ function fetchNotifications(project_id) {
 }
 
 // Initialize notification system when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    const notificationDropdown = document.getElementById('notificationDropdown');
-    if (notificationDropdown) {
-        notificationDropdown.addEventListener('click', fetchNotificationsAndOpen);
-        // Initial fetch
-        // fetchNotifications();
-        // Set up periodic refresh
-        setInterval(fetchNotifications, 30000); // Refresh every 30 seconds
-    }
-});
+// document.addEventListener('DOMContentLoaded', function() {
+//     const notificationDropdown = document.getElementById('notificationDropdown');
+//     if (notificationDropdown) {
+//         notificationDropdown.addEventListener('click', fetchNotificationsAndOpen);
+//         // Initial fetch
+//         // fetchNotifications();
+//         // Set up periodic refresh
+//         setInterval(fetchNotifications, 30000); // Refresh every 30 seconds
+//     }
+// });
 
 // Toasts iziToast Helper
 function Toast(type, title, message, positionToast) {
@@ -335,32 +335,32 @@ function getActionTypeDisplay(action_type) {
         'project_created': { 
             text: 'New Project Created', 
             bgColor: 'bg-success bg-opacity-10',
-            textColor: 'text-success-emphasis dark:text-white',
+            textColor: 'text-success-emphasis text-success-emphasis-light',
             darkBgColor: 'dark-mode-success'
         },
         'user_assigned': { 
             text: 'New User Added', 
             bgColor: 'bg-info bg-opacity-10',
-            textColor: 'text-info-emphasis dark:text-white',
+            textColor: 'text-info-emphasis text-success-emphasis-light',
             darkBgColor: 'dark-mode-info'
         },
         'task_created': { 
             text: 'New Task Created', 
             bgColor: 'bg-primary bg-opacity-10',
-            textColor: 'text-primary-emphasis dark:text-white',
+            textColor: 'text-primary-emphasis text-success-emphasis-light',
             darkBgColor: 'dark-mode-primary'
         },
         'task_status_updated': { 
             text: 'Task Status Updated', 
             bgColor: 'bg-warning bg-opacity-10',
-            textColor: 'text-warning-emphasis dark:text-white',
+            textColor: 'text-warning-emphasis text-success-emphasis-light',
             darkBgColor: 'dark-mode-warning'
         }
     };
     return actionTypes[action_type] || { 
         text: action_type, 
         bgColor: 'bg-secondary bg-opacity-10',
-        textColor: 'text-secondary-emphasis dark:text-white',
+        textColor: 'text-secondary-emphasis text-success-emphasis-light',
         darkBgColor: 'dark-mode-secondary'
     };
 }
@@ -415,6 +415,13 @@ function updateNotificationDropdown(notifications) {
             .dark-mode .notification-dropdown {
                 background-color: #1a1a1a !important;
                 border-color: #2d2d2d !important;
+              
+            }
+            .text-success-emphasis-light{
+                color: #212121 !important;
+            }
+            .dark-mode .text-success-emphasis-light{
+                color: #fff !important;
             }
             .dark-mode .dropdown-item {
                 color: #e1e1e1;
@@ -435,7 +442,7 @@ function updateNotificationDropdown(notifications) {
             .dark-mode .text-muted {
                 color: #a0a0a0 !important;
             }
-            .dark-mode-success { background-color: rgba(25, 135, 84, 0.35) !important; }
+            .dark-mode-success { background-color: rgba(25, 135, 84, 0.35) !important;  }
             .dark-mode-info { background-color: rgba(13, 202, 240, 0.35) !important; }
             .dark-mode-primary { background-color: rgba(13, 110, 253,.35) !important; }
             .dark-mode-warning { background-color: rgba(255, 193, 7, 0.35) !important; }
@@ -446,6 +453,17 @@ function updateNotificationDropdown(notifications) {
             .dark-mode .dropdown-menu {
                 background-color: #1a1a1a !important;
                 border-color: #2d2d2d !important;
+                border-width: 0.25rem !important;
+            }
+            #notificationDropdownMenu.dropdown-menu {
+                border-width: 0.25rem !important;
+                border-radius: 0.5rem !important;
+            }
+
+            #notificationDropdownMenu.dark-mode .dropdown-menu {
+                background-color: #1a1a1a !important;
+                border-color: #2d2d2d !important;
+                border-width: 0.25rem !important;
             }
             .dark-mode .dropdown-item:active,
             .dark-mode .dropdown-item:focus {
