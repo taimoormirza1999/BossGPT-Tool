@@ -1323,12 +1323,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         throw new Exception('All fields are required');
                     }
 
-                    // $auth->register(
-                    //     $_POST['username'],
-                    //     $_POST['email'],
-                    //     $_POST['password'],
-                    //     $_POST['fcm_token']
-                    // );
+                    $auth->register(
+                        $_POST['username'],
+                        $_POST['email'],
+                        $_POST['password'],
+                        $_POST['fcm_token']
+                    );
 
                     $user= new UserManager();
                     $user->sendWelcomeEmail("taimoorhamza199@gmail.com", 'taimoorhamza1999', "1234567890", $_ENV['BASE_URL'],"testingtoken");                    // After successful registration, log the user in
