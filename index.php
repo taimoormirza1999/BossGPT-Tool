@@ -1547,7 +1547,7 @@ if (isset($_GET['api'])) {
 
                     // Send Notification
                     $result = Notification::send('project_' . $data['project_id'], 'user_assigned', ['message' => 'New User ' . $data['username'] . ' joined as the ' . $data['role'] . 'in the project']);
-                    // Sending Email
+                    // Sending Email & Notification
                     try {
                         $emailSent = $userManager->projectUsersNewUserAddedEmail($data['username'], $projectTilte, $data['role'], $projectAllUsers, );
                         if ($emailSent) {
@@ -1791,14 +1791,14 @@ if (isset($_GET['api'])) {
                     $picture = $filePath;
                 }
                 $assignees = isset($data['assignees']) ? $data['assignees'] : [];
-                // $task_id = $project_manager->createTaskFromSuggestion(
-                //     $data['project_id'],
-                //     $data['title'],
-                //     $data['description'] ?? '',
-                //     $data['due_date'] ?? null,
-                //     $picture,
-                //     $assignees
-                // );
+                $task_id = $project_manager->createTaskFromSuggestion(
+                    $data['project_id'],
+                    $data['title'],
+                    $data['description'] ?? '',
+                    $data['due_date'] ?? null,
+                    $picture,
+                    $assignees
+                );
 
                 // Send Email and Notifications
                 $allAssignees = [];
@@ -1809,30 +1809,33 @@ if (isset($_GET['api'])) {
                         $allAssignees[] = $userDetails;
                     }
                 }
-                $allAssignees = [
-                        [
-                            "id" => 34,
-                            "username" => "taimoorhamza1999",
-                            "email" => "taimoorhamza1999@gmail.com",
-                            "role" => "Creator"
-                        ],
-                        [
-                            "id" => 35, // Changed to unique ID
-                            "username" => "taimoorhamza199",
-                            "email" => "taimoorhamza199@gmail.com",
-                            "role" => "Full Stack Developer"
-                        ],
-                    ];
+                // $allAssignees = [
+                //         [
+                //             "id" => 34,
+                //             "username" => "taimoorhamza1999",
+                //             "email" => "taimoorhamza1999@gmail.com",
+                //             "role" => "Creator"
+                //         ],
+                //         [
+                //             "id" => 35, // Changed to unique ID
+                //             "username" => "taimoorhamza199",
+                //             "email" => "taimoorhamza199@gmail.com",
+                //             "role" => "Full Stack Developer"
+                //         ],
+                //     ];
+                // Send Notification
+                $result = Notification::send('project_' . $data['project_id'], 'task_created', ['message' => 'New Task created ' . $data['title'] . ' and assigned ']);
+
                 // Sending Email
-                $Auth= new Auth();
-                $logedinUser=$Auth->getCurrentUser();
-                $projectTilte=$project_manager->getProjectName($data['project_id']);
+                $Auth = new Auth();
+                $logedinUser = $Auth->getCurrentUser();
+                $projectTilte = $project_manager->getProjectName($data['project_id']);
                 try {
                     $emailSent = $userManager->projectUsersTaskAssignedEmail($logedinUser['username'], $projectTilte, $data['title'], $allAssignees, );
                     if ($emailSent) {
                         echo json_encode($response = [
                             'success' => $emailSent,
-                            'message' => "An invite has been sent along with login credentials."
+                            'message' => "An invite has been sent to assignee"
                         ]);
                         exit;
                     } else {
@@ -1847,8 +1850,8 @@ if (isset($_GET['api'])) {
                         'message' => "Error: " . $e->getMessage()
                     ];
                 }
-                
-                $response = ['success' => true, 'assignees' =>$projectTilte ];
+
+                $response = ['success' => true, 'task_id' => $task_id];
                 break;
 
             case 'remove_task_picture':
@@ -1920,22 +1923,22 @@ if (isset($_GET['api'])) {
                 // Simulate getting project users (Example users)
                 $project_manager = new ProjectManager();
                 $projectTilte = $project_manager->getProjectName($data['projectId']);
-                // $projectAllUsers = $project_manager->getProjectUsers($data['projectId']);
+                $projectAllUsers = $project_manager->getProjectUsers($data['projectId']);
 
-                $projectAllUsers = [
-                    [
-                        "id" => 34,
-                        "username" => "taimoorhamza1999",
-                        "email" => "taimoorhamza1999@gmail.com",
-                        "role" => "Creator"
-                    ],
-                    [
-                        "id" => 35, // Changed to unique ID
-                        "username" => "taimoorhamza199",
-                        "email" => "taimoorhamza199@gmail.com",
-                        "role" => "Full Stack Developer"
-                    ],
-                ];
+                // $projectAllUsers = [
+                //     [
+                //         "id" => 34,
+                //         "username" => "taimoorhamza1999",
+                //         "email" => "taimoorhamza1999@gmail.com",
+                //         "role" => "Creator"
+                //     ],
+                //     [
+                //         "id" => 35, // Changed to unique ID
+                //         "username" => "taimoorhamza199",
+                //         "email" => "taimoorhamza199@gmail.com",
+                //         "role" => "Full Stack Developer"
+                //     ],
+                // ];
 
                 $userManager = new UserManager();
                 try {
@@ -4810,12 +4813,12 @@ function required_field()
                                         userCard.className = "d-flex justify-content-between align-items-center p-2 mb-2 border rounded dark-primaryborder ";
                                         let actionButtons = "<div>";
 
-                                        actionButtons += `
-        <button class="btn btn-sm btn-outline-primary editUser" data-id="${user.id}">
-            <i class="bi bi-pencil"></i>
-        </button>
+    //                                     actionButtons += `
+    //     <button class="btn btn-sm btn-outline-primary editUser" data-id="${user.id}">
+    //         <i class="bi bi-pencil"></i>
+    //     </button>
 
-    `;
+    // `;
                                         if (user.role != "Creator") {
                                             actionButtons += `
            
@@ -4908,19 +4911,19 @@ function required_field()
                         }
                     }
 
-                    if (editBtn) {
-                        const userId = editBtn.getAttribute("data-id");
-                        const username = editBtn.getAttribute("data-username");
-                        const email = editBtn.getAttribute("data-email");
-                        const role = editBtn.getAttribute("data-role");
-                        // Populate the Add/Edit Modal with User Data
-                        document.getElementById("newUserName").value = username;
-                        document.getElementById("newUserEmail").value = email;
-                        document.getElementById("newUserRole").value = role;
+                    // if (editBtn) {
+                    //     const userId = editBtn.getAttribute("data-id");
+                    //     const username = editBtn.getAttribute("data-username");
+                    //     const email = editBtn.getAttribute("data-email");
+                    //     const role = editBtn.getAttribute("data-role");
+                    //     // Populate the Add/Edit Modal with User Data
+                    //     document.getElementById("newUserName").value = username;
+                    //     document.getElementById("newUserEmail").value = email;
+                    //     document.getElementById("newUserRole").value = role;
 
-                        // Show the modal
-                        addUserModal.show();
-                    }
+                    //     // Show the modal
+                    //     addUserModal.show();
+                    // }
                 });
 
                 // Handle "New User" selection
@@ -6108,7 +6111,7 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
             });
             channel.bind('task_created', function (data) {
                 appendNotification(data);
-                Toast("success", "Success", data.message, 'topRight');
+                Toast("success", "Task Created", data.message, 'topRight');
             });
             channel.bind('task_updated', function (data) {
                 appendNotification(data);
