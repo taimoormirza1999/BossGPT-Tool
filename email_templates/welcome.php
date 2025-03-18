@@ -15,6 +15,14 @@
             font-family: 'Segoe UI', 'Georgia', 'Times New Roman', serif, 'Helvetica Neue';
         }
 
+        span.im {
+            color: #fff !important;
+        }
+
+        .ii a[href] {
+            color: #000 !important;
+        }
+
         .container {
             max-width: 600px;
             margin: auto;
@@ -45,7 +53,7 @@
             padding: 20px 30px;
             background: rgba(90, 90, 90, 0.3);
             border: 1.6px solid rgba(151, 151, 151, 0.2);
-            color: #eee!important;
+            color: #eee !important;
             border-radius: 8px;
         }
 
@@ -123,15 +131,15 @@
     <div class="container">
         <img src="https://bossgpt.com/boss-gpt.png" alt="BossGPT" class="logo" />
         <div class="header">Welcome to BossGPT!</div>
-<div class="content">
-    <p>Hi <strong><?php echo $data['username']; ?></strong>,</p>
-    <p>We’re excited to have you on board! 🎉 BossGPT is here to help you stay ahead and be more productive.</p>
-    <p>To get started, click the button below:</p>
-    <p><a href="<?php echo $data['welcomeLink']; ?>" class="button">Get Started</a></p>
+        <div class="content">
+            <p>Hi <strong><?php echo $data['username']; ?></strong>,</p>
+            <p>We’re excited to have you on board! 🎉 BossGPT is here to help you stay ahead and be more productive.</p>
+            <p>To get started, click the button below:</p>
+            <p><a href="<?php echo $data['welcomeLink']; ?>" class="button">Get Started</a></p>
 
-    <p>If you have any questions, feel free to reach out. We’re here to help!</p>
-</div>
-<div class="footer">
+            <p>If you have any questions, feel free to reach out. We’re here to help!</p>
+        </div>
+        <div class="footer">
             <p>&copy; <?php echo date('Y'); ?> BossGPT | Stay ahead, stay productive!</p>
         </div>
     </div>

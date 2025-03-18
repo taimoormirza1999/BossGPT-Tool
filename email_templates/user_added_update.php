@@ -14,6 +14,12 @@
             padding: 20px;
             font-family: 'Segoe UI', 'Georgia', 'Times New Roman', serif, 'Helvetica Neue';
         }
+        span.im {
+    color: #fff!important;
+}
+.ii a[href]{
+    color: #000!important;
+}
 
         .container {
             max-width: 600px;
@@ -95,7 +101,7 @@
         /* Mobile Responsiveness */
         @media (max-width: 600px) {
             .header {
-                font-size: 20px;
+                font-size: 1.5rem;
             }
 
             .content {
@@ -122,7 +128,7 @@
 <body>
     <div class="container">
         <img src="https://bossgpt.com/boss-gpt.png" alt="BossGPT" class="logo" />
-        <div class="header">Welcome to BossGPT!</div>
+        <div class="header">Project Update: New User Joined</div>
         <div class="content">
             <p>Dear <?php echo $data['username']; ?>,</p>
             <p>We wanted to inform you that a new user has been added to the project. Below are the details of the new
