@@ -5,11 +5,7 @@ use PHPMailer\PHPMailer\Exception;
 
 require 'vendor/autoload.php';
 
-function getProjectName($project_id)
-{
-    $project = Project::find($project_id);
-    return $project->name;
-}
+
 
 function sendTemplateEmail($to, $subject, $template, $data)
 {
@@ -43,45 +39,9 @@ function sendTemplateEmail($to, $subject, $template, $data)
     } catch (Exception $e) {
         error_log("Email Error: " . $e->getMessage());
         return $e->getMessage();
-    }
-    /**
-     * Send verification email to new users
-     */
-    function sendVerificationEmail($email, $username, $token)
-    {
-        $verificationLink = "http://localhost/bossgpt-tool/verify.php?token=" . $token; // Update with your actual domain
-
-        $subject = "Verify Your Account";
-        $template = 'verification';
-        $data = [
-            'username' => $username,
-            'verificationLink' => $verificationLink
-        ];
-
-        return sendTemplateEmail($email, $subject, $template, $data);
-    }
-}
-// **
-//  * Send project invitation email
-//  */
-function sendProjectInvitation($email, $username, $projectId, $role, $token)
-{
-    $invitationLink = "http://localhost/bossgpt-tool/accept-invitation.php?token=" . $token; // Update with your actual domain
-
-    $subject = "Project Invitation";
-    $template = 'project_invitation';
-    $data = [
-        'username' => $username,
-        'role' => $role,
-        'invitationLink' => $invitationLink
-    ];
-
-    return sendTemplateEmail($email, $subject, $template, $data);
+    }     
 }
 
-/**
- * Send task assignment notification
- */
 function sendTaskAssignmentEmail($email, $username, $taskTitle, $projectTitle)
 {
     $subject = "New Task Assignment";

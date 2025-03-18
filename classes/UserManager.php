@@ -9,6 +9,14 @@ class UserManager
     {
         $this->db = Database::getInstance()->getConnection();
     }
+
+    public function getUserDetails($id)
+    {
+        $stmt = $this->db->prepare('SELECT id, username, email FROM users WHERE id = ? ORDER BY username ASC');
+        $stmt->execute([$id]); // Execute the query with the provided ID
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     public function createOrAssignUser($username, $email, $projectId = null, $role = null, $BASE_URL)
     {
         try {
@@ -187,7 +195,7 @@ class UserManager
 
     public function projectUsersNewUserAddedEmail($newUserUsername, $projectTilte, $newRole, $projectAllUsers)
     {
-     
+
         $subject = "New User Added to Project " . $projectTilte;
         // $template = "new_user_added_to_project";
         foreach ($projectAllUsers as $user) {
@@ -201,7 +209,7 @@ class UserManager
                     'newusername' => $newUserUsername,
                     'username' => $user['username'],
                     'role' => $newRole,
-                    'date' => date('Y-m-d'),  
+                    'date' => date('Y-m-d'),
                     'time' => date('H:i:s')
                 ]
             ];
@@ -209,6 +217,32 @@ class UserManager
             $command = "php sendEmail.php '$emailData' > /dev/null 2>&1 &";
             exec($command);
         }
+        return $emailData;
+        // return $newUser . " has been added to the project: " . $projectTilte . " at new Role: " . $newRole . " project All Users: " . implode(", ", $allUsers);
+    }
+    public function projectUsersTaskAssignedEmail($taskAssigneeUsername, $projectTilte, $taskDescription, $assignedAllUsers)
+    {
+        $subject = "New Task Assigned to You for Project: " . $projectTilte;
+        // $template = "new_user_added_to_project";
+        foreach ($assignedAllUsers as $user) {
+            // $allUsers[] = $user['email'];
+            $template = 'task_assigned_update';
+            $emailData = [
+                'email' => $user['email'],
+                'subject' => $subject,
+                'template' => $template,
+                'data' => [
+                    'assignee_username' => $taskAssigneeUsername,
+                    'username' => $user['username'],
+                    'project_name' => $projectTilte,
+                    'task_details' => $taskDescription
+                ]
+            ];
+            // sendTemplateEmail($user['email'], $subject, $template, $emailData);
+            $command = "php sendEmail.php '$emailData' > /dev/null 2>&1 &";
+            exec($command);
+        }
+        return $emailData;
         // return $newUser . " has been added to the project: " . $projectTilte . " at new Role: " . $newRole . " project All Users: " . implode(", ", $allUsers);
     }
     public function newTaskAddedEmailNotifer($taskCreator, $projectTilte, $taksTitle, $projectAllUsers)

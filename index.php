@@ -1521,6 +1521,20 @@ if (isset($_GET['api'])) {
                     $project_manager = new ProjectManager();
                     $projectTilte = $project_manager->getProjectName($data['project_id']);
                     $projectAllUsers = $project_manager->getProjectUsers($data['project_id']);
+                    // $projectAllUsers = [
+                    //     [
+                    //         "id" => 34,
+                    //         "username" => "taimoorhamza1999",
+                    //         "email" => "taimoorhamza1999@gmail.com",
+                    //         "role" => "Creator"
+                    //     ],
+                    //     [
+                    //         "id" => 35, // Changed to unique ID
+                    //         "username" => "taimoorhamza199",
+                    //         "email" => "taimoorhamza199@gmail.com",
+                    //         "role" => "Full Stack Developer"
+                    //     ],
+                    // ];
                     $userManager = new UserManager();
                     $result = $userManager->createOrAssignUser(
                         $data['username'],
@@ -1530,8 +1544,31 @@ if (isset($_GET['api'])) {
                         $_ENV['BASE_URL']
                     );
 
-                    // $result = $userManager->assignedUserEmailNotifer($data['username'], $projectTilte, $data['role'], $projectAllUsers);
-                    // return; 
+
+                    // Send Notification
+                    $result = Notification::send('project_' . $data['project_id'], 'user_assigned', ['message' => 'New User ' . $data['username'] . ' joined as the ' . $data['role'] . 'in the project']);
+                    // Sending Email
+                    try {
+                        $emailSent = $userManager->projectUsersNewUserAddedEmail($data['username'], $projectTilte, $data['role'], $projectAllUsers, );
+                        if ($emailSent) {
+                            echo json_encode($response = [
+                                'success' => $emailSent,
+                                'message' => "An invite has been sent along with login credentials."
+                            ]);
+                            exit;
+                        } else {
+                            $response = [
+                                'success' => false,
+                                'message' => "Failed to send the invite."
+                            ];
+                        }
+                    } catch (Exception $e) {
+                        $response = [
+                            'success' => false,
+                            'message' => "Error: " . $e->getMessage()
+                        ];
+                    }
+
 
                     echo json_encode([
                         'success' => true,
@@ -1754,15 +1791,64 @@ if (isset($_GET['api'])) {
                     $picture = $filePath;
                 }
                 $assignees = isset($data['assignees']) ? $data['assignees'] : [];
-                $task_id = $project_manager->createTaskFromSuggestion(
-                    $data['project_id'],
-                    $data['title'],
-                    $data['description'] ?? '',
-                    $data['due_date'] ?? null,
-                    $picture,
-                    $assignees
-                );
-                $response = ['success' => true, 'task_id' => $task_id];
+                // $task_id = $project_manager->createTaskFromSuggestion(
+                //     $data['project_id'],
+                //     $data['title'],
+                //     $data['description'] ?? '',
+                //     $data['due_date'] ?? null,
+                //     $picture,
+                //     $assignees
+                // );
+
+                // Send Email and Notifications
+                $allAssignees = [];
+                $userManager = new UserManager();
+                foreach ($assignees as $assignee_id) {
+                    $userDetails = $userManager->getUserDetails($assignee_id);
+                    if ($userDetails) {
+                        $allAssignees[] = $userDetails;
+                    }
+                }
+                $allAssignees = [
+                        [
+                            "id" => 34,
+                            "username" => "taimoorhamza1999",
+                            "email" => "taimoorhamza1999@gmail.com",
+                            "role" => "Creator"
+                        ],
+                        [
+                            "id" => 35, // Changed to unique ID
+                            "username" => "taimoorhamza199",
+                            "email" => "taimoorhamza199@gmail.com",
+                            "role" => "Full Stack Developer"
+                        ],
+                    ];
+                // Sending Email
+                $Auth= new Auth();
+                $logedinUser=$Auth->getCurrentUser();
+                $projectTilte=$project_manager->getProjectName($data['project_id']);
+                try {
+                    $emailSent = $userManager->projectUsersTaskAssignedEmail($logedinUser['username'], $projectTilte, $data['title'], $allAssignees, );
+                    if ($emailSent) {
+                        echo json_encode($response = [
+                            'success' => $emailSent,
+                            'message' => "An invite has been sent along with login credentials."
+                        ]);
+                        exit;
+                    } else {
+                        $response = [
+                            'success' => false,
+                            'message' => "Failed to send the invite."
+                        ];
+                    }
+                } catch (Exception $e) {
+                    $response = [
+                        'success' => false,
+                        'message' => "Error: " . $e->getMessage()
+                    ];
+                }
+                
+                $response = ['success' => true, 'assignees' =>$projectTilte ];
                 break;
 
             case 'remove_task_picture':
@@ -1810,7 +1896,7 @@ if (isset($_GET['api'])) {
                 $response = ['success' => true];
                 break;
                 // Email
-// Enable error reporting for debugging
+                // Enable error reporting for debugging
                 ini_set('display_errors', 1);
                 error_reporting(E_ALL);
 
@@ -1849,27 +1935,11 @@ if (isset($_GET['api'])) {
                         "email" => "taimoorhamza199@gmail.com",
                         "role" => "Full Stack Developer"
                     ],
-                    // [
-                    //     "id" => 36, // Changed to unique ID
-                    //     "username" => "muhmmadashiq199",
-                    //     "email" => "muhmmadashiq199@gmail.com",
-                    //     "role" => "Designer"
-                    // ],
-                    // [
-                    //     "id" => 37, // Changed to unique ID
-                    //     "username" => "mirzaahmad7553",
-                    //     "email" => "mirzaahmad7553@gmail.com",
-                    //     "role" => "Developer"
-                    // ]
                 ];
 
                 $userManager = new UserManager();
                 try {
-                    // Example of sending email (replace with actual email logic)
-                    // $emailSent = $userManager->sendWelcomeEmail($data['email'], $data['username'], $data['tempPassword']);
                     $emailSent = $userManager->projectUsersNewUserAddedEmail("taimoorhamza1999", "Temp", "Developer", $projectAllUsers, );
-
-
                     if ($emailSent) {
                         $response = [
                             'success' => true,
@@ -3944,6 +4014,13 @@ function required_field()
                 }, 500); // 500ms debounce time
 
                 let currentProject = null;
+                // Load saved project from localStorage if available
+                const savedProject = localStorage.getItem('lastSelectedProject');
+                if (savedProject && savedProject !== 'null') {
+                    currentProject = parseInt(savedProject);
+                    $('#myselectedcurrentProject').val(currentProject);
+                }
+
                 const projectsList = document.getElementById('projectsList');
                 const chatMessages = document.getElementById('chatMessages');
                 const chatForm = document.getElementById('chatForm');
@@ -4028,6 +4105,10 @@ function required_field()
                     projectId = parseInt(projectId);
                     currentProject = parseInt(projectId);
                     $('#myselectedcurrentProject').val(currentProject);
+
+                    // Save current project to localStorage for persistence
+                    localStorage.setItem('lastSelectedProject', currentProject);
+
                     // call to fetch notifications
                     fetchNotificationsAndOpen(false);
                     if (isNaN(projectId)) {
@@ -5739,11 +5820,15 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
             const toggleDarkModeBtn = document.getElementById('toggleDarkModeBtn');
             if (toggleDarkModeBtn) {
                 // Check localStorage to apply dark mode preference on load
-                if (localStorage.getItem('preferredDarkMode') === 'true') {
+                if (localStorage.getItem('preferredDarkMode') === 'false') {
+                    // document.body.classList.add('dark-mode');
+                    // toggleDarkModeBtn.textContent = 'Light Mode';
+                    document.body.classList.remove('dark-mode');
+                    toggleDarkModeBtn.textContent = 'Dark Mode';
+                } else {
                     document.body.classList.add('dark-mode');
                     toggleDarkModeBtn.textContent = 'Light Mode';
-                } else {
-                    toggleDarkModeBtn.textContent = 'Dark Mode';
+                    // toggleDarkModeBtn.textContent = 'Dark Mode';
                 }
 
                 // Toggle dark mode when the button is clicked
@@ -5806,45 +5891,29 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                     })
                     .finally(hideLoading);
             });
+
+            // Auto-load the saved project if available
+            if (isDashboard) {
+                // Initialize projects
+                loadProjects();
+                // After projects are loaded, select the saved project if available
+                setTimeout(() => {
+                    const savedProject = localStorage.getItem('lastSelectedProject');
+                    if (savedProject && savedProject !== 'null' && savedProject !== '0') {
+                        const projectId = parseInt(savedProject);
+
+                        const savedProjectTab = document.querySelector(`.nav-link[data-id="${projectId}"]`);
+                        // alert("sdf"+projectId)
+                        if (savedProjectTab) {
+                            document.querySelectorAll('.nav-link').forEach(t => t.classList.remove('active'));
+                            savedProjectTab.classList.add('active');
+                            selectProject(projectId);
+                        }
+                    }
+                }, 500); // Small delay to ensure projects are loaded
+            }
         }); // End of DOMContentLoaded
 
-        function sendEmailBtn(templateType = "daily_report") {
-            fetch("sendmail.php", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    to: "taimoorhamza1999@gmail.com",
-                    template: templateType, // "daily_report" or "reminder"
-                    userName: "Taimoor", // Dynamic user name
-                    taskSummary: "Completed project setup, fixed login bug, and started UI design.",
-                    motivation: "Great job today! Keep up the momentum.",
-                    encouragement: "Let's stay on track and complete our goals!",
-                    deadlineNote: "Remember to finish the pending tasks by tomorrow."
-                })
-            })
-                .then(response => {
-                    return response.text(); // Read response as text first
-                })
-                .then(text => {
-                    try {
-                        let data = JSON.parse(text); // Try parsing JSON
-                        if (data.status === "success") {
-                            Toast("success", "Success", data.message);
-                        } else {
-                            Toast("error", "Error", data.message);
-                        }
-                    } catch (error) {
-                        console.error("JSON Parse Error:", error, text);
-                        Toast("error", "Error", "Invalid response format!");
-                    }
-                })
-                .catch(error => {
-                    Toast("error", "Error", "Something went wrong!");
-                    console.error("Fetch error:", error);
-                });
-        }
         function sendWelcomeEmailTest() {
 
             fetch('?api=send_welcome_email', {
@@ -6016,11 +6085,6 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
 
             // Prepend the new notification to the list
             notificationList.insertAdjacentHTML('afterbegin', newNotification);
-            Toast("success", "Success", "New Notification received successfully", 'topRight');
-            console.log("Notification Data Logging... ");
-            console.log(notification);
-
-
         }
 
 
@@ -6036,11 +6100,11 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
 
             channel.bind('project_created', function (data) {
                 appendNotification(data);
-                Toast("success", "Success", data.message, 'topRight');
+                Toast("success", "Project Created", data.message, 'topRight');
             });
             channel.bind('user_assigned', function (data) {
                 appendNotification(data);
-                Toast("success", "Success", data.message, 'topRight');
+                Toast("success", "User Joined", data.message, 'topRight');
             });
             channel.bind('task_created', function (data) {
                 appendNotification(data);
