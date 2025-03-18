@@ -351,11 +351,17 @@ function getActionTypeDisplay(action_type) {
             textColor: 'text-primary-emphasis text-success-emphasis-light',
             darkBgColor: 'dark-mode-primary'
         },
+        'user_removed': { 
+            text: 'User Removed', 
+            bgColor: 'bg-danger bg-opacity-10',
+            textColor: 'text-primary-emphasis text-success-emphasis-light',
+            darkBgColor: 'dark-mode-danger bg-danger bg-opacity-50'
+        },
         'task_status_updated': { 
             text: 'Task Status Updated', 
             bgColor: 'bg-warning bg-opacity-10',
             textColor: 'text-warning-emphasis text-success-emphasis-light',
-            darkBgColor: 'dark-mode-warning'
+            darkBgColor: 'dark-mode-primary'
         }
     };
     return actionTypes[action_type] || { 
@@ -394,6 +400,7 @@ function formatTimeAgo(dateString) {
 function getNotificationIcon(action_type) {
     const icons = {
         'project_created': 'bi-folder-plus',
+        'user_removed': 'bi-person-dash',
         'user_assigned': 'bi-person-plus',
         'task_created': 'bi-list-check',
         'task_status_updated': 'bi-arrow-repeat'

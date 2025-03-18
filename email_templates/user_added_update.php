@@ -45,7 +45,7 @@
             padding: 20px 30px;
             background: rgba(90, 90, 90, 0.3);
             border: 1.6px solid rgba(151, 151, 151, 0.2);
-            color: #eee!important;
+            color: #eee;
             border-radius: 8px;
         }
 
@@ -123,15 +123,20 @@
     <div class="container">
         <img src="https://bossgpt.com/boss-gpt.png" alt="BossGPT" class="logo" />
         <div class="header">Welcome to BossGPT!</div>
-<div class="content">
-    <p>Hi <strong><?php echo $data['username']; ?></strong>,</p>
-    <p>We’re excited to have you on board! 🎉 BossGPT is here to help you stay ahead and be more productive.</p>
-    <p>To get started, click the button below:</p>
-    <p><a href="<?php echo $data['welcomeLink']; ?>" class="button">Get Started</a></p>
-
-    <p>If you have any questions, feel free to reach out. We’re here to help!</p>
-</div>
-<div class="footer">
+        <div class="content">
+            <p>Dear <?php echo $data['username']; ?>,</p>
+            <p>We wanted to inform you that a new user has been added to the project. Below are the details of the new
+                user:</p>
+            <ul>
+                <li><strong>Username:</strong> <?php echo $data['newusername']; ?></li>
+                <li><strong>Role:</strong> <?php echo $data['role']; ?></li>
+                <li><strong>Date Added:</strong> <?php echo $data['date']; ?></li>
+                <li><strong>Time Added:</strong> <?php echo $data['time']; ?></li>
+            </ul>
+            <p>The new user is now part of the project, and we look forward to collaborating with them!</p>
+            <p>If you have any questions or need further information, feel free to reach out.</p>
+        </div>
+        <div class="footer">
             <p>&copy; <?php echo date('Y'); ?> BossGPT | Stay ahead, stay productive!</p>
         </div>
     </div>

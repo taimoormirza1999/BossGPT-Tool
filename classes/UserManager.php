@@ -153,6 +153,8 @@ class UserManager
         $emailDataJson = escapeshellarg(json_encode($emailData)); // Convert array to JSON and escape it
         $command = "php sendEmail.php $emailDataJson > /dev/null 2>&1 &";
         exec($command);
+        // return sendTemplateEmail($emailData['email'], $emailData['subject'], $emailData['template'], $emailData['data']);
+
 
     }
     public function sendInviteUserEmail($email, $username, $tempPassword, $BASE_URL, $token)
@@ -183,29 +185,31 @@ class UserManager
 
     }
 
-    public function assignedUserEmailNotifer($newUser, $projectTilte, $newRole, $projectAllUsers)
+    public function projectUsersNewUserAddedEmail($newUserUsername, $projectTilte, $newRole, $projectAllUsers)
     {
-        $allUsers = [];
+     
         $subject = "New User Added to Project " . $projectTilte;
         // $template = "new_user_added_to_project";
         foreach ($projectAllUsers as $user) {
-            $allUsers[] = $user['email'];
-            $template = 'welcome_email';
+            // $allUsers[] = $user['email'];
+            $template = 'user_added_update';
             $emailData = [
                 'email' => $user['email'],
                 'subject' => $subject,
                 'template' => $template,
                 'data' => [
-                    'username' => "",
-                    'tempPassword' => "",
-                    'verificationLink' => ""
+                    'newusername' => $newUserUsername,
+                    'username' => $user['username'],
+                    'role' => $newRole,
+                    'date' => date('Y-m-d'),  
+                    'time' => date('H:i:s')
                 ]
             ];
             // sendTemplateEmail($user['email'], $subject, $template, $emailData);
             $command = "php sendEmail.php '$emailData' > /dev/null 2>&1 &";
             exec($command);
         }
-        return $newUser . " has been added to the project: " . $projectTilte . " at new Role: " . $newRole . " project All Users: " . implode(", ", $allUsers);
+        // return $newUser . " has been added to the project: " . $projectTilte . " at new Role: " . $newRole . " project All Users: " . implode(", ", $allUsers);
     }
     public function newTaskAddedEmailNotifer($taskCreator, $projectTilte, $taksTitle, $projectAllUsers)
     {

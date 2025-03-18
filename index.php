@@ -1553,7 +1553,48 @@ if (isset($_GET['api'])) {
                 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 $response = ['success' => true, 'users' => $users];
                 break;
+            case 'delete_user':
+                if (!isset($_GET['user_id']) || !isset($_GET['project_id']) || !isset($_GET['user_name'])) {
+                    $response = ['success' => false, 'message' => 'User ID, Project ID, and User Name are required'];
+                    break;
+                }
 
+
+                $user_id = $_GET['user_id'];
+                $project_id = $_GET['project_id'];
+                $user_name = $_GET['user_name'];
+                // Check if user exists
+                // $stmt = $db->prepare("SELECT id FROM users WHERE id = ?");
+                // $stmt->execute([$user_id]);
+                // $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                // if (!$user) {
+                //     $response = ['success' => false, 'message' => 'User not found'];
+                //     break;
+                // }
+
+                // Delete user
+                $stmt = $db->prepare("DELETE FROM project_users WHERE user_id = ?");
+                $success = $stmt->execute([$user_id]);
+
+
+
+                if ($success) {
+                    $stmt = $db->prepare("
+            INSERT INTO activity_log (project_id, user_id, action_type, description) 
+            VALUES (?, ?, ?, ?)
+        ");
+                    $stmt->execute([
+                        $project_id,
+                        $user_id,
+                        'user_removed',
+                        "User {$user_name} has been removed from project {$project_id}"
+                    ]);
+                    $response = ['success' => true, 'message' => `$user_name removed successfully`];
+                } else {
+                    $response = ['success' => false, 'message' => 'Failed to remove user'];
+                }
+                break;
             case 'get_task_assignees':
                 $data = json_decode(file_get_contents('php://input'), true);
                 if (!isset($data['task_id'])) {
@@ -1768,55 +1809,90 @@ if (isset($_GET['api'])) {
                 $stmt->execute([$data['due_date'], $data['subtask_id']]);
                 $response = ['success' => true];
                 break;
-            // Email
+                // Email
+// Enable error reporting for debugging
+                ini_set('display_errors', 1);
+                error_reporting(E_ALL);
+
+            // The case for sending welcome email
             case 'send_welcome_email':
                 $data = json_decode(file_get_contents('php://input'), true);
                 $BASE_URL = $_ENV['BASE_URL'];
 
+                // Validate input
                 if (!isset($data['email']) || !isset($data['username']) || !isset($data['tempPassword'])) {
                     $response = [
                         'success' => false,
                         'message' => "Error: Missing required fields (email, username, tempPassword)."
                     ];
+                    // Set the Content-Type header to application/json
+                    header('Content-Type: application/json');
                     echo json_encode($response);
                     exit;
                 }
 
+                // Simulate getting project users (Example users)
+                $project_manager = new ProjectManager();
+                $projectTilte = $project_manager->getProjectName($data['projectId']);
+                // $projectAllUsers = $project_manager->getProjectUsers($data['projectId']);
+
+                $projectAllUsers = [
+                    [
+                        "id" => 34,
+                        "username" => "taimoorhamza1999",
+                        "email" => "taimoorhamza1999@gmail.com",
+                        "role" => "Creator"
+                    ],
+                    [
+                        "id" => 35, // Changed to unique ID
+                        "username" => "taimoorhamza199",
+                        "email" => "taimoorhamza199@gmail.com",
+                        "role" => "Full Stack Developer"
+                    ],
+                    // [
+                    //     "id" => 36, // Changed to unique ID
+                    //     "username" => "muhmmadashiq199",
+                    //     "email" => "muhmmadashiq199@gmail.com",
+                    //     "role" => "Designer"
+                    // ],
+                    // [
+                    //     "id" => 37, // Changed to unique ID
+                    //     "username" => "mirzaahmad7553",
+                    //     "email" => "mirzaahmad7553@gmail.com",
+                    //     "role" => "Developer"
+                    // ]
+                ];
+
                 $userManager = new UserManager();
-                // Send email
-                $emailSent = $userManager->sendWelcomeEmail($data['email'], $data['username'], $data['tempPassword'], $BASE_URL);
-                if ($emailSent) {
-                    $response = [
-                        'success' => true,
-                        'message' => "An invite has been sent along with login credentials."
-                    ];
-                } else {
+                try {
+                    // Example of sending email (replace with actual email logic)
+                    // $emailSent = $userManager->sendWelcomeEmail($data['email'], $data['username'], $data['tempPassword']);
+                    $emailSent = $userManager->projectUsersNewUserAddedEmail("taimoorhamza1999", "Temp", "Developer", $projectAllUsers, );
+
+
+                    if ($emailSent) {
+                        $response = [
+                            'success' => true,
+                            'message' => "An invite has been sent along with login credentials."
+                        ];
+                    } else {
+                        $response = [
+                            'success' => false,
+                            'message' => "Failed to send the invite."
+                        ];
+                    }
+                } catch (Exception $e) {
                     $response = [
                         'success' => false,
-                        'message' => $userManager->sendWelcomeEmail($data['email'], $data['username'], $data['tempPassword'])
+                        'message' => "Error: " . $e->getMessage()
                     ];
                 }
-                // $emailSent = $userManager->sendWelcomeEmail($data['email'], $data['username'], $data['tempPassword']);
-                // $response = [
-                //     'success' => false,
-                //     'message' => "Error: Database connection (\b) is not set."
-                // ];
-                echo json_encode($response);
-                exit;
-                // if ($emailSent) {
-                //     $response = [
-                //         'success' => true,
-                //         'message' => "An invite has been sent along with login credentials."
-                //     ];
-                // } else {
-                //     $response = [
-                //         'success' => false,
-                //         'message' => "Failed to send the invite."
-                //     ];
-                // }
 
-                echo json_encode($response);
+                // Set the Content-Type header to application/json
+                header('Content-Type: application/json');
+                echo json_encode($response);  // Ensure JSON is properly returned
                 exit;
+
 
 
             // Notification
@@ -3590,9 +3666,9 @@ function required_field()
                                 aria-label="Close "></button>
                         </div>
                         <div class="modal-body position-relative">
-                        <button class="btn btn-primary position-absolute top-5 " style="right: 10px;" id="addUserBtn">
-                                    <i class="bi bi-person-plus"></i> Add New User
-                                </button>
+                            <button class="btn btn-primary position-absolute top-5 " style="right: 10px;" id="addUserBtn">
+                                <i class="bi bi-person-plus"></i> Add New User
+                            </button>
                             <div id="userListContainer" class="mt-5">
                                 <!-- Dynamically populated users will appear here -->
                             </div>
@@ -3668,7 +3744,7 @@ function required_field()
                                         class="form-label">Email<?php echo required_field(); ?></label>
                                     <input type="email" class="form-control text-lowercase" id="newUserEmail" required>
                                 </div>
-                               
+
                                 <div class="mb-3">
                                     <label for="newUserRole" class="form-label">Role<?php echo required_field(); ?></label>
                                     <input type="text" class="form-control" id="newUserRole"
@@ -4651,8 +4727,9 @@ function required_field()
                                     data.users.forEach((user) => {
                                         const userCard = document.createElement("div");
                                         userCard.className = "d-flex justify-content-between align-items-center p-2 mb-2 border rounded dark-primaryborder ";
-                                        let actionButtons = "";
-                                        actionButtons = `
+                                        let actionButtons = "<div>";
+
+                                        actionButtons += `
         <button class="btn btn-sm btn-outline-primary editUser" data-id="${user.id}">
             <i class="bi bi-pencil"></i>
         </button>
@@ -4666,7 +4743,7 @@ function required_field()
             </button>
         `;
                                         }
-
+                                        actionButtons += "</div>";
                                         userCard.innerHTML = `
                     <div>
                         <strong>${user.username}</strong>
@@ -4701,22 +4778,70 @@ function required_field()
                         })
                         .finally(hideLoading);
                 });
-                userListContainer.addEventListener("click", function (e) {
-        if (e.target.closest(".deleteUser")) {
-            const userId = e.target.closest(".deleteUser").getAttribute("data-id");
-            users = users.filter((user) => user.id !== parseInt(userId));
-            renderUserList();
-        }
-    });
+                // userListContainer.addEventListener("click", function (e) {
+                //     if (e.target.closest(".deleteUser")) {
+                //         const userId = e.target.closest(".deleteUser").getAttribute("data-id");
+                //         // users = users.filter((user) => user.id !== parseInt(userId));
+                //         // renderUserList();
+                //     }
+                // });
 
-    // Edit User (You can expand this to open an edit modal)
-    userListContainer.addEventListener("click", function (e) {
-        if (e.target.closest(".editUser")) {
-            const userId = e.target.closest(".editUser").getAttribute("data-id");
-            const user = users.find((u) => u.id === parseInt(userId));
-            alert(`Edit User: ${user.name}`); // Replace with actual edit functionality
-        }
-    });
+                // Edit User (You can expand this to open an edit modal)
+                // userListContainer.addEventListener("click", function (e) {
+                //     if (e.target.closest(".editUser")) {
+                //         const userId = e.target.closest(".editUser").getAttribute("data-id");
+                //         // const user = users.find((u) => u.id === parseInt(userId));
+                //         // renderUserList();
+                //         // alert(`Edit User: ${user.name}`); // Replace with actual edit functionality
+                //     }
+                // });
+
+
+                userListContainer.addEventListener("click", function (e) {
+                    const deleteBtn = e.target.closest(".deleteUser");
+                    const editBtn = e.target.closest(".editUser");
+                    const addUserModal = new bootstrap.Modal(document.getElementById('addUserModal'));
+
+                    if (deleteBtn) {
+                        const userId = deleteBtn.getAttribute("data-id");
+                        const projectId = currentProject;
+                        const userDiv = deleteBtn.closest(".d-flex");
+                        if (!userDiv) return;
+                        // Extract username from the <strong> tag
+                        const userName = userDiv.querySelector("strong")?.textContent.trim() || "Unknown User";
+                        if (confirm(`Are you sure you want to remove ${userName} ?`)) {
+                            fetch(`?api=delete_user&user_id=${userId}&project_id=${projectId}&user_name=${encodeURIComponent(userName)}`, {
+                                method: "DELETE"
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        userDiv.remove();
+                                        // showToast('success', 'User deleted successfully');
+                                        Toast('success', 'Success', 'User deleted successfully');
+                                    } else {
+                                        Toast('error', 'Error', 'Failed to delete user');
+                                    }
+                                })
+                                .catch(error => console.error("Error deleting user:", error));
+                        }
+                    }
+
+                    if (editBtn) {
+                        const userId = editBtn.getAttribute("data-id");
+                        const username = editBtn.getAttribute("data-username");
+                        const email = editBtn.getAttribute("data-email");
+                        const role = editBtn.getAttribute("data-role");
+                        // Populate the Add/Edit Modal with User Data
+                        document.getElementById("newUserName").value = username;
+                        document.getElementById("newUserEmail").value = email;
+                        document.getElementById("newUserRole").value = role;
+
+                        // Show the modal
+                        addUserModal.show();
+                    }
+                });
+
                 // Handle "New User" selection
                 // document.getElementById('userSelect').addEventListener('change', function () {
                 //     if (this.value === 'new') {
@@ -5721,6 +5846,7 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                 });
         }
         function sendWelcomeEmailTest() {
+
             fetch('?api=send_welcome_email', {
                 method: 'POST',
                 headers: {
@@ -5729,7 +5855,8 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                 body: JSON.stringify({
                     email: "taimoorhamza1999@gmail.com",
                     username: "User123",
-                    tempPassword: "TempPass123"
+                    tempPassword: "TempPass123",
+                    projectId: 48
                 })
             })
                 .then(response => response.json())
@@ -5737,7 +5864,7 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                     alert(data.message);
                 })
                 .catch(error => {
-                    console.error("Error:", error);
+                    console.error("Error:", error.message);
                     alert("Failed to send email.");
                 });
         }
