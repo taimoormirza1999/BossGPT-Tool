@@ -185,7 +185,8 @@ class UserManager
         ];
 
         // $emailDataJson = escapeshellarg(json_encode($emailData)); // Convert array to JSON and escape it
-        $command = "php sendEmail.php $$emailData > /dev/null 2>&1 &";
+        $emailDataJson = escapeshellarg(json_encode($emailData));
+        $command = "php sendEmail.php $emailDataJson > /dev/null 2>&1 &";
         exec($command);
 
         // return "Welcome email is being processed asynchronously.";
@@ -214,7 +215,8 @@ class UserManager
                 ]
             ];
             // sendTemplateEmail($user['email'], $subject, $template, $emailData);
-            $command = "php sendEmail.php '$emailData' > /dev/null 2>&1 &";
+            $emailDataJson = escapeshellarg(json_encode($emailData));
+            $command = "php sendEmail.php $emailDataJson > /dev/null 2>&1 &";
             exec($command);
         }
         return $emailData;
@@ -238,8 +240,9 @@ class UserManager
                     'task_details' => $taskDescription
                 ]
             ];
-            // sendTemplateEmail($user['email'], $subject, $template, $emailData);
-            $command = "php sendEmail.php '$emailData' > /dev/null 2>&1 &";
+            // sendTemplateEmail($user['email'], $subject, $template, $emailData['data']);
+            $emailDataJson = escapeshellarg(json_encode($emailData));
+            $command = "php sendEmail.php $emailDataJson > /dev/null 2>&1 &";
             exec($command);
         }
         return $emailData;
@@ -264,10 +267,11 @@ class UserManager
                 ]
             ];
             // sendTemplateEmail($user['email'], $subject, $template, $emailData);
-            $command = "php sendEmail.php '$emailData' > /dev/null 2>&1 &";
+            $emailDataJson = escapeshellarg(json_encode($emailData));
+            $command = "php sendEmail.php $emailDataJson > /dev/null 2>&1 &";
             exec($command);
         }
-        return $newUser . " has been added to the project: " . $projectTilte . " at new Role: " . $newRole . " project All Users: " . implode(", ", $allUsers);
+        return true;
     }
 
 
