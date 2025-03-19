@@ -4,9 +4,6 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 require 'vendor/autoload.php';
-
-
-
 function sendTemplateEmail($to, $subject, $template, $data)
 {
     try {
@@ -41,7 +38,6 @@ function sendTemplateEmail($to, $subject, $template, $data)
         return $e->getMessage();
     }     
 }
-
 function sendTaskAssignmentEmail($email, $username, $taskTitle, $projectTitle)
 {
     $subject = "New Task Assignment";

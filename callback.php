@@ -1,0 +1,69 @@
+<?php
+// Start the session
+session_start();
+
+// Include required files
+require_once 'config.php';
+
+// Make sure Database class is available (index.php contains the Database class)
+if (!class_exists('Database')) {
+    require_once __DIR__ . '/index.php';
+}
+
+// Include the GoogleAuth class
+require_once 'classes/GoogleAuth.php';
+
+// Enable error reporting for debugging
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
+try {
+    if (isset($_GET['code'])) {
+        $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
+        $client->setAccessToken($token);
+
+        // Get user info from Google
+        $google_oauth = new Google_Service_Oauth2($client);
+        $google_account_info = $google_oauth->userinfo->get();
+        $email = $google_account_info->email;
+        $name = $google_account_info->name;
+
+        // Initialize our Google Auth handler
+        $googleAuth = new GoogleAuth();
+  
+        // Register or login user
+        $result = $googleAuth->registerWithGoogle($email, $name);
+    
+        // Set a welcome or return message based on whether this is a new user
+        if ($result['is_new_user']) {
+            $paymentLink = $_ENV['STRIPE_PAYMENT_LINK'];
+            header("Location: $paymentLink");
+            exit;
+            $_SESSION['welcome_message'] = "Welcome to BossGPT! Your account has been created.";
+        } else {
+            if ($result['is_pro_member'] == 0) {
+                $paymentLink = $_ENV['STRIPE_PAYMENT_LINK'];
+                header("Location: $paymentLink");
+                exit;
+            }
+            $_SESSION['welcome_message'] = "Welcome back!";
+        }
+    
+        // Redirect to dashboard
+        header('Location: index.php?page=dashboard');
+        exit;
+    } else {
+        // No code received, redirect to login
+        $_SESSION['error_message'] = "Google authentication failed. No authorization code received.";
+        header('Location: index.php?page=login&error=no_code');
+        exit;
+    }
+} catch (Exception $e) {
+    // Log the error
+    error_log("Google Auth Error: " . $e->getMessage());
+    
+    // Handle errors
+    $_SESSION['error_message'] = "Authentication error: " . $e->getMessage();
+    header('Location: index.php?page=login&error=google_auth');
+    exit;
+}

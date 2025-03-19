@@ -176,7 +176,7 @@ class Auth
         $this->db = Database::getInstance()->getConnection();
     }
 
-    public function register($username, $email, $password, $fcm_token)
+        public function register($username, $email, $password, $fcm_token)
     {
         try {
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -194,8 +194,8 @@ class Auth
             }
 
             $password_hash = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $this->db->prepare("INSERT INTO users (username, email, password_hash, fcm_token) VALUES (?, ?, ?, ?)");
-            $stmt->execute([$username, $email, $password_hash, $fcm_token]);
+            $stmt = $this->db->prepare("INSERT INTO users (username, email, password_hash, fcm_token,pro_plan) VALUES (?, ?, ?, ?,?)");
+            $stmt->execute([$username, $email, $password_hash, $fcm_token, 0]);
 
             return true;
         } catch (Exception $e) {
@@ -250,6 +250,12 @@ class Auth
             error_log("Error getting current user: " . $e->getMessage());
             return null;
         }
+    }
+    public function updateProStatus($userId)
+    {
+        $stmt = $this->db->prepare("UPDATE users SET pro_plan = 1 WHERE id = ?");
+        $stmt->execute([$userId]);
+        return $stmt->rowCount() > 0;
     }
 }
 
@@ -1327,8 +1333,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // After successful registration, log the user in
                     $user->sendWelcomeEmail($_POST['email'], $_POST['username'], $_ENV['BASE_URL']);                    // After successful registration, log the user in
                     $auth->login($_POST['email'], $_POST['password']);
-                    header('Location: ?page=dashboard');
 
+                    $paymentLink = $_ENV['STRIPE_PAYMENT_LINK'];
+                    header("Location: $paymentLink");
                     exit;
 
                 case 'login':
@@ -1368,6 +1375,23 @@ if (isset($_GET['api'])) {
         $ai_assistant = new AIAssistant();
 
         switch ($_GET['api']) {
+
+            case 'update_pro_status':
+                if (!isset($_SESSION['user_id'])) {
+                    return json_encode(['success' => false, 'message' => 'User not logged in']);
+                    exit;
+                }
+
+                try {
+                    $auth = new Auth();
+                    $result = $auth->updateProStatus($_SESSION['user_id']);
+                    return json_encode(['success' => true, 'message' => 'Pro status updated successfully']);
+                    exit;
+                } catch (Exception $e) {
+                    return json_encode(['success' => false, 'message' => $e->getMessage()]);
+                    exit;
+                }
+                exit;
             case 'get_chat_history':
                 $data = json_decode(file_get_contents('php://input'), true);
                 if (!isset($data['project_id'])) {
@@ -2032,10 +2056,14 @@ if (isset($_GET['api'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-signin-client_id"
+        content="949298386531-pbk4td6p6ga18e6diee9rifskto0ou0v.apps.googleusercontent.com.apps.googleusercontent.com">
+
     <title>Project Manager AI</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
     <!-- iziToast CSS & JS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/izitoast/dist/css/iziToast.min.css">
     <script src="https://cdn.jsdelivr.net/npm/izitoast/dist/js/iziToast.min.js"></script>
@@ -3325,6 +3353,30 @@ function required_field()
                                     </div>
                                     <button type="submit" class="btn btn-primary w-100">Register</button>
                                 </form>
+                                <?php
+                                if (!isset($_SESSION['access_token'])) 
+                                {
+                                    $client = new Google_Client();
+$client->setClientId('949298386531-pbk4td6p6ga18e6diee9rifskto0ou0v.apps.googleusercontent.com');
+$client->setClientSecret('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');
+$client->setRedirectUri('http://localhost/bossgpt-tool/callback.php');
+$client->addScope("email");
+$client->addScope("profile");
+                                    $authUrl = $client->createAuthUrl();
+                                    echo "<a href='$authUrl' class='btn btn-primary mt-2 w-100 d-flex align-items-center justify-content-center' style='gap: 8px;'>
+                                    <svg width='17' height='18' viewBox='0 0 16 17' fill='none' xmlns='http://www.w3.org/2000/svg'>
+                                      <path d='M13.8824 7.41113H8.11768V9.72516H11.4231C11.3564 10.0945 11.2134 10.4465 11.0029 10.7595C10.7925 11.0726 10.5191 11.34 10.1995 11.5454V13.051H12.1665C12.7703 12.4802 13.2452 11.7912 13.5605 11.0286C14.0327 9.88636 14.0878 8.62111 13.8824 7.41113Z' fill='#4285F4'></path>
+                                      <path d='M8.11765 14.4996C9.76488 14.4996 11.1599 13.9718 12.1665 13.0506L10.1995 11.545C9.58012 11.9375 8.85452 12.1373 8.11765 12.1181C7.35471 12.1088 6.61379 11.8656 5.99848 11.4224C5.38317 10.9793 4.92424 10.3584 4.68585 9.64648H2.65015V11.1856C3.15915 12.1814 3.94 13.0187 4.9055 13.604C5.87099 14.1892 6.98311 14.4992 8.11765 14.4996Z' fill='#34A853'></path>
+                                      <path d='M4.68589 9.64706C4.42873 8.90009 4.42873 8.09081 4.68589 7.34384V5.79395H2.65019C2.22264 6.63065 2 7.55387 2 8.49004C2 9.42621 2.22264 10.3494 2.65019 11.1861L4.68589 9.64706Z' fill='#FBBC04'></path>
+                                      <path d='M8.11765 4.87211C8.98898 4.85751 9.83116 5.18027 10.4621 5.77064L12.2126 4.05185C11.5147 3.43218 10.6808 2.9789 9.77551 2.72723C8.87026 2.47556 7.91812 2.43227 6.99307 2.60073C6.06803 2.76919 5.19498 3.14487 4.44177 3.69857C3.68856 4.25226 3.07548 4.96907 2.65015 5.7933L4.68585 7.34371C4.92424 6.63182 5.38317 6.0109 5.99848 5.56776C6.61379 5.12461 7.35471 4.8814 8.11765 4.87211Z' fill='#EA4335'></path>
+                                    </svg>
+                                    Sign in with Google
+                                  </a>";
+                                  } else {
+                                    echo "<a href='logout.php'>Logout</a>";
+                                  }
+                                ?>
+                                <!-- <button type="" class="btn btn-primary w-100">Sign in with Google</button> -->
                                 <p class="text-center mt-3">
                                     <a href="?page=login">Already have an account? Login</a>
                                 </p>
@@ -3340,6 +3392,16 @@ function required_field()
             ?>
             <?php $projectManager = new ProjectManager();
             $projects = $projectManager->getProjects($_SESSION['user_id']);
+            
+            // Display welcome message if set
+            if (isset($_SESSION['welcome_message'])) {
+                echo "<script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        Toast('success', 'Welcome', '".htmlspecialchars($_SESSION['welcome_message'])."');
+                    });
+                </script>";
+                unset($_SESSION['welcome_message']); // Clear the message after displaying
+            }
             ?>
             <!-- Replace the existing row div with this new layout -->
             <div class="container-fluid">
@@ -3415,7 +3477,7 @@ function required_field()
                     <div class="col-md-3">
                         <div class="card">
                             <div class="card-header">
-                                <h5 class="mb-0">AI Project Manager <svg stroke="currentColor" fill="currentColor"
+                                <h5 class="mb-0">BossGPT Assistant <svg stroke="currentColor" fill="currentColor"
                                         stroke-width="0" viewBox="0 0 640 512" class="text-5xl" height="1.6em" width="1.6em"
                                         xmlns="http://www.w3.org/2000/svg">
                                         <path
@@ -3980,6 +4042,27 @@ function required_field()
             const isDashboard = document.querySelector('.chat-container') !== null;
 
             if (isDashboard) {
+
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.has('pro-member') && urlParams.get('pro-member') === 'true') {
+                    // Call API to update pro status
+                    // alert('pro-member');
+                    // return;
+                    fetch('?api=update_pro_status')
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                console.log('Pro status updated successfully');
+                                Toast('success', 'Upgrade Complete', 'Your account has been upgraded to Pro!');
+                                // Remove the parameter from URL without page reload
+                                const newUrl = window.location.pathname + window.location.search.replace(/[?&]pro-member=true/, '');
+                                window.history.replaceState({}, document.title, newUrl);
+                            } else {
+                                console.error('Failed to update pro status:', data.message);
+                            }
+                        })
+                        .catch(error => console.error('Error updating pro status:', error));
+                }
                 // Add debounce function at the start
                 function debounce(func, wait) {
                     let timeout;
@@ -4813,12 +4896,12 @@ function required_field()
                                         userCard.className = "d-flex justify-content-between align-items-center p-2 mb-2 border rounded dark-primaryborder ";
                                         let actionButtons = "<div>";
 
-    //                                     actionButtons += `
-    //     <button class="btn btn-sm btn-outline-primary editUser" data-id="${user.id}">
-    //         <i class="bi bi-pencil"></i>
-    //     </button>
+                                        //                                     actionButtons += `
+                                        //     <button class="btn btn-sm btn-outline-primary editUser" data-id="${user.id}">
+                                        //         <i class="bi bi-pencil"></i>
+                                        //     </button>
 
-    // `;
+                                        // `;
                                         if (user.role != "Creator") {
                                             actionButtons += `
            
