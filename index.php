@@ -3185,7 +3185,7 @@ function required_field()
     $auth = new Auth();
     $page = $_GET['page'] ?? ($auth->isLoggedIn() ? 'dashboard' : 'login');
 
-    if (!$auth->isLoggedIn() && !in_array($page, ['login', 'register'])) {
+    if (!$auth->isLoggedIn() && !in_array($page, ['login'])) {
         header('Location: ?page=login');
         exit;
     }
