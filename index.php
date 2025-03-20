@@ -2025,25 +2025,7 @@ if (isset($_GET['api'])) {
                         'message' => "Error: UserManager (\$userManager) is not set."
                     ];
                 }
-                // try {
-                //     $notificationManager = new NotificationManager($db, $userManager);
-                //     $response_data = $notificationManager->sendProjectNotification($data['project_id'], $data['title'], $data['body']);
-                //     $response = [
-                //         'success' => true,
-                //         'message' => $response_data
-                //     ];
-                // } catch (Exception $e) {
-                //     // error_log("API Error: " . $e->getMessage());
-                //     $response = [
-                //         'success' => false,
-                //         'message' => "Error: " . $e->getMessage()
-                //     ];
-                //     // http_response_code(500);
-                // }
-                // Print the response for debugging
-                // $response_data=$notificationManager->sendProjectNotificatio($data['project_id'], $data['title'], $data['body']);
-                // $response = ['success' => true, 'message' => "$response_data"];
-                break;
+                
                 
             // Check if user is a pro member
             case 'check_pro_status':
@@ -4110,15 +4092,15 @@ function displayGoogleLoginBtn()
             if (isDashboard) {
 
                 // Check if user is a pro member and redirect if necessary
-                fetch('?api=check_pro_status')
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success && !data.is_pro) {
-                            console.log('User is not a pro member, redirecting to payment page');
-                            window.location.href = data.payment_link;
-                        }
-                    })
-                    .catch(error => console.error('Error checking pro status:', error));
+                // fetch('?api=check_pro_status')
+                //     .then(response => response.json())
+                //     .then(data => {
+                //         if (data.success && !data.is_pro) {
+                //             console.log('User is not a pro member, redirecting to payment page');
+                //             window.location.href = data.payment_link;
+                //         }
+                //     })
+                //     .catch(error => console.error('Error checking pro status:', error));
                
                 // check if user is pro member
                 // if no then redirect to stripe page simply
