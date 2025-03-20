@@ -1,11 +1,9 @@
 <?php
 require './vendor/autoload.php';
-
 //Added to load the environment variables
 // require_once 'env.php';
 require_once './classes/UserManager.php';
 require_once './classes/Notification.php';
-// loadEnv();
 use Dotenv\Dotenv;
 
 // // Load environment variables
@@ -176,7 +174,7 @@ class Auth
         $this->db = Database::getInstance()->getConnection();
     }
 
-        public function register($username, $email, $password, $fcm_token)
+    public function register($username, $email, $password, $fcm_token)
     {
         try {
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -227,6 +225,9 @@ class Auth
 
     public function logout()
     {
+        session_destroy();
+        session_start();
+        session_unset();
         session_destroy();
         return true;
     }
@@ -1349,6 +1350,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 case 'logout':
                     $auth->logout();
+                    session_start();
+                    session_unset();
+                    session_destroy();
                     header('Location: ?page=login');
                     exit;
             }
@@ -3178,6 +3182,38 @@ function required_field()
 {
     return '<span class="required-asterisk">*</span>';
 }
+function displayGoogleLoginBtn()
+{
+    // If the user is NOT logged in (no access token in session):
+    if (!isset($_SESSION['access_token'])) {
+        $client = new Google_Client();
+        $client->setClientId($_ENV['GOOGLE_CLIENT_ID']);
+        $client->setClientSecret($_ENV['GOOGLE_CLIENT_SECRET']);
+        $client->setRedirectUri(  'http://localhost/bossgpt-tool/callback.php');
+        $client->addScope("email");
+        $client->addScope("profile");
+
+        $authUrl = $client->createAuthUrl();
+        // Show the "Sign in with Google" button
+        echo "
+         <div class='text-center mt-2'>
+                                    <p class='text-muted mb-1'>OR</p>
+                                </div>
+        <a href='$authUrl' class='btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center text-white' style='gap: 8px;'>
+                <svg width='18' height='19' viewBox='0 0 16 17' fill='none' xmlns='http://www.w3.org/2000/svg'>
+                  <path d='M13.8824 7.41113H8.11768V9.72516H11.4231C11.3564 10.0945 11.2134 10.4465 11.0029 10.7595C10.7925 11.0726 10.5191 11.34 10.1995 11.5454V13.051H12.1665C12.7703 12.4802 13.2452 11.7912 13.5605 11.0286C14.0327 9.88636 14.0878 8.62111 13.8824 7.41113Z' fill='#4285F4'></path>
+                  <path d='M8.11765 14.4996C9.76488 14.4996 11.1599 13.9718 12.1665 13.0506L10.1995 11.545C9.58012 11.9375 8.85452 12.1373 8.11765 12.1181C7.35471 12.1088 6.61379 11.8656 5.99848 11.4224C5.38317 10.9793 4.92424 10.3584 4.68585 9.64648H2.65015V11.1856C3.15915 12.1814 3.94 13.0187 4.9055 13.604C5.87099 14.1892 6.98311 14.4992 8.11765 14.4996Z' fill='#34A853'></path>
+                  <path d='M4.68589 9.64706C4.42873 8.90009 4.42873 8.09081 4.68589 7.34384V5.79395H2.65019C2.22264 6.63065 2 7.55387 2 8.49004C2 9.42621 2.22264 10.3494 2.65019 11.1861L4.68589 9.64706Z' fill='#FBBC04'></path>
+                  <path d='M8.11765 4.87211C8.98898 4.85751 9.83116 5.18027 10.4621 5.77064L12.2126 4.05185C11.5147 3.43218 10.6808 2.9789 9.77551 2.72723C8.87026 2.47556 7.91812 2.43227 6.99307 2.60073C6.06803 2.76919 5.19498 3.14487 4.44177 3.69857C3.68856 4.25226 3.07548 4.96907 2.65015 5.7933L4.68585 7.34371C4.92424 6.63182 5.38317 6.0109 5.99848 5.56776C6.61379 5.12461 7.35471 4.8814 8.11765 4.87211Z' fill='#EA4335'></path>
+                </svg>
+                Sign in with Google
+              </a>";
+    }
+    // Otherwise, the user IS logged in:
+    else {
+        echo "<a href='logout.php'>Logout</a>";
+    }
+}
 ?>
 
 <body>
@@ -3307,6 +3343,9 @@ function required_field()
                                     </div>
                                     <button type="submit" class="btn btn-primary w-100">Login</button>
                                 </form>
+                                <?php
+                                displayGoogleLoginBtn();
+                                ?>
                                 <p class="text-center mt-3">
                                     <a href="?page=register">Need an account? Register</a>
                                 </p>
@@ -3326,7 +3365,7 @@ function required_field()
                 <div class="row justify-content-center w-100 position-relative">
                     <img src="assets/images/bossgptlogo.svg" alt="Logo"
                         class="position-absolute top-0 start-50 translate-middle "
-                        style="margin-top: -3rem; width: 15rem; height: 10rem;position: absolute;top: 50%;left: 50%;transform: translate(-50%,-50%);">
+                        style="margin-top: -1rem; width: 15rem; height: 10rem;position: absolute;top: 50%;left: 50%;transform: translate(-50%,-50%);">
                     <div class="col-md-6 col-lg-4 mt-5">
                         <div class="card">
                             <div class="card-body">
@@ -3340,43 +3379,23 @@ function required_field()
                                     <input type="hidden" name="action" value="register">
                                     <input type="hidden" name="fcm_token" value="0" id="fcm_token">
                                     <div class="mb-3">
-                                        <label for="username" class="form-label">Username</label>
+                                        <label for="username" class="form-label" autocomplete="off">Username</label>
                                         <input type="text" class="form-control" id="username" name="username" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="email" class="form-label">Email</label>
+                                        <label for="email" class="form-label"  autocomplete="off">Email</label>
                                         <input type="email" class="form-control" id="email" name="email" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="password" class="form-label">Password</label>
+                                        <label for="password" class="form-label"  autocomplete="off">Password</label>
                                         <input type="password" class="form-control" id="password" name="password" required>
                                     </div>
                                     <button type="submit" class="btn btn-primary w-100">Register</button>
                                 </form>
+                               
                                 <?php
-                                if (!isset($_SESSION['access_token'])) 
-                                {
-                                    $client = new Google_Client();
-                                    $client->setClientId($_ENV['GOOGLE_CLIENT_ID']);
-                                    $client->setClientSecret($_ENV['GOOGLE_CLIENT_SECRET']);
-                                    $client->setRedirectUri($_ENV['BASE_URL'].'/callback.php');
-$client->addScope("email");
-$client->addScope("profile");
-                                    $authUrl = $client->createAuthUrl();
-                                    echo "<a href='$authUrl' class='btn btn-primary mt-2 w-100 d-flex align-items-center justify-content-center' style='gap: 8px;'>
-                                    <svg width='17' height='18' viewBox='0 0 16 17' fill='none' xmlns='http://www.w3.org/2000/svg'>
-                                      <path d='M13.8824 7.41113H8.11768V9.72516H11.4231C11.3564 10.0945 11.2134 10.4465 11.0029 10.7595C10.7925 11.0726 10.5191 11.34 10.1995 11.5454V13.051H12.1665C12.7703 12.4802 13.2452 11.7912 13.5605 11.0286C14.0327 9.88636 14.0878 8.62111 13.8824 7.41113Z' fill='#4285F4'></path>
-                                      <path d='M8.11765 14.4996C9.76488 14.4996 11.1599 13.9718 12.1665 13.0506L10.1995 11.545C9.58012 11.9375 8.85452 12.1373 8.11765 12.1181C7.35471 12.1088 6.61379 11.8656 5.99848 11.4224C5.38317 10.9793 4.92424 10.3584 4.68585 9.64648H2.65015V11.1856C3.15915 12.1814 3.94 13.0187 4.9055 13.604C5.87099 14.1892 6.98311 14.4992 8.11765 14.4996Z' fill='#34A853'></path>
-                                      <path d='M4.68589 9.64706C4.42873 8.90009 4.42873 8.09081 4.68589 7.34384V5.79395H2.65019C2.22264 6.63065 2 7.55387 2 8.49004C2 9.42621 2.22264 10.3494 2.65019 11.1861L4.68589 9.64706Z' fill='#FBBC04'></path>
-                                      <path d='M8.11765 4.87211C8.98898 4.85751 9.83116 5.18027 10.4621 5.77064L12.2126 4.05185C11.5147 3.43218 10.6808 2.9789 9.77551 2.72723C8.87026 2.47556 7.91812 2.43227 6.99307 2.60073C6.06803 2.76919 5.19498 3.14487 4.44177 3.69857C3.68856 4.25226 3.07548 4.96907 2.65015 5.7933L4.68585 7.34371C4.92424 6.63182 5.38317 6.0109 5.99848 5.56776C6.61379 5.12461 7.35471 4.8814 8.11765 4.87211Z' fill='#EA4335'></path>
-                                    </svg>
-                                    Sign in with Google
-                                  </a>";
-                                  } else {
-                                    echo "<a href='logout.php'>Logout</a>";
-                                  }
+                                displayGoogleLoginBtn();
                                 ?>
-                                <!-- <button type="" class="btn btn-primary w-100">Sign in with Google</button> -->
                                 <p class="text-center mt-3">
                                     <a href="?page=login">Already have an account? Login</a>
                                 </p>
@@ -3392,12 +3411,12 @@ $client->addScope("profile");
             ?>
             <?php $projectManager = new ProjectManager();
             $projects = $projectManager->getProjects($_SESSION['user_id']);
-            
+
             // Display welcome message if set
             if (isset($_SESSION['welcome_message'])) {
                 echo "<script>
                     document.addEventListener('DOMContentLoaded', function() {
-                        Toast('success', 'Welcome', '".htmlspecialchars($_SESSION['welcome_message'])."');
+                        Toast('success', 'Welcome', '" . htmlspecialchars($_SESSION['welcome_message']) . "');
                     });
                 </script>";
                 unset($_SESSION['welcome_message']); // Clear the message after displaying

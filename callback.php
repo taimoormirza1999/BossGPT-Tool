@@ -14,14 +14,14 @@ if (!class_exists('Database')) {
 require_once 'classes/GoogleAuth.php';
 
 // Enable error reporting for debugging
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
+// ini_set('display_errors', 1);
+// error_reporting(E_ALL);
+session_start();
 try {
     if (isset($_GET['code'])) {
         $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
         $client->setAccessToken($token);
-
+        $_SESSION['access_token'] = $token;
         // Get user info from Google
         $google_oauth = new Google_Service_Oauth2($client);
         $google_account_info = $google_oauth->userinfo->get();
@@ -33,7 +33,8 @@ try {
   
         // Register or login user
         $result = $googleAuth->registerWithGoogle($email, $name);
-    
+        $_SESSION['user_email'] = $email;
+        $_SESSION['user_name']  = $name;
         // Set a welcome or return message based on whether this is a new user
         if ($result['is_new_user']) {
             $paymentLink = $_ENV['STRIPE_PAYMENT_LINK'];

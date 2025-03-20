@@ -1,4 +1,6 @@
 <?php
+require_once 'env.php';
+loadEnv();
 
 require_once 'vendor/autoload.php';
 

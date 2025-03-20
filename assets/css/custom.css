@@ -101,11 +101,12 @@ body.dark-mode .navbar,
 }
 a {
   color: var(--bs-primary-white);
-  transition: all 0.5s ease;
+  transition: all 0.8s ease!important;
+  filter: brightness(0.8) !important;
 }
 a:hover {
   color: var(--bs-primary-white);
-  filter: brightness(0.7) !important;
+  filter: brightness(1) !important;
 }
 button#addUserBtn:not(.dark-mode #addUserBtn) {
   background: #18191c;
@@ -164,6 +165,14 @@ button.btn.btn-sm.btn-outline-primary.editUser:hover {
   background-color: var(--bs-primary-black) !important;
   /* opacity: 0.5 !important; */
 }
+.btn-outline-secondary{
+  border-color: var(--bs-primary-white) !important;
+  color: var(--bs-primary-white) !important;
+}
+.btn-outline-secondary:hover{
+  background-color: var(--bs-primary-white) !important;
+  color: var(--bs-primary-black) !important;
+}
 
 @font-face {
   font-family: "Geist";
@@ -207,6 +216,7 @@ button.btn.btn-sm.btn-outline-primary.editUser:hover {
   font-style: normal;
 }
 body {
+  background: #000;
   font-family: "Geist", sans-serif !important;
 }
 .z-index-1000 {
