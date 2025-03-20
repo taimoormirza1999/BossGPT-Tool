@@ -101,7 +101,7 @@ body.dark-mode .navbar,
 }
 a {
   color: var(--bs-primary-white);
-  transition: all 0.8s ease!important;
+  transition: all 0.6s ease-in-out !important;
   filter: brightness(0.8) !important;
 }
 a:hover {
@@ -169,10 +169,11 @@ button.btn.btn-sm.btn-outline-primary.editUser:hover {
   border-color: var(--bs-primary-white) !important;
   color: var(--bs-primary-white) !important;
 }
-.btn-outline-secondary:hover{
+.btn-outline-secondary:hover, .btn-outline-secondary:focus{
   background-color: var(--bs-primary-white) !important;
   color: var(--bs-primary-black) !important;
 }
+
 
 @font-face {
   font-family: "Geist";

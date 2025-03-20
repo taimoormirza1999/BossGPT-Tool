@@ -3219,9 +3219,15 @@ function displayGoogleLoginBtn()
 <body>
     <?php
     $auth = new Auth();
-    $page = $_GET['page'] ?? ($auth->isLoggedIn() ? 'dashboard' : 'login');
+    
+    // Check if the page parameter is set in the URL
+    if (isset($_GET['page']) && $_GET['page'] === 'register') {
+        $page = 'register';
+    } else {
+        $page = $_GET['page'] ?? ($auth->isLoggedIn() ? 'dashboard' : 'login');
+    }
 
-    if (!$auth->isLoggedIn() && !in_array($page, ['login'])) {
+    if (!$auth->isLoggedIn() && !in_array($page, ['login', 'register'])) {
         header('Location: ?page=login');
         exit;
     }
