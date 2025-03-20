@@ -165,11 +165,12 @@ button.btn.btn-sm.btn-outline-primary.editUser:hover {
   background-color: var(--bs-primary-black) !important;
   /* opacity: 0.5 !important; */
 }
-.btn-outline-secondary{
+.btn-outline-secondary, .btn-outline-link{
   border-color: var(--bs-primary-white) !important;
   color: var(--bs-primary-white) !important;
+  font-weight: 500;
 }
-.btn-outline-secondary:hover, .btn-outline-secondary:focus{
+.btn-outline-secondary:hover, .btn-outline-link:hover, .btn-outline-secondary:focus, .btn-outline-link:focus{
   background-color: var(--bs-primary-white) !important;
   color: var(--bs-primary-black) !important;
 }

@@ -8,7 +8,7 @@ use Dotenv\Dotenv;
 
 // // Load environment variables
 $dotenv = Dotenv::createImmutable(__DIR__);
-
+session_start();
 // Added to persist the login cookie for one year
 session_set_cookie_params(60 * 60 * 24 * 365);
 ini_set('session.gc_maxlifetime', 60 * 60 * 24 * 365);
@@ -215,6 +215,13 @@ class Auth
 
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
+            $_SESSION['pro_member'] = $user['pro_member'];
+
+            if ($user['pro_member'] == 0) {
+                header("Location: " .$_ENV['STRIPE_PAYMENT_LINK']);
+                exit;
+            }
+            // $_SESSION['pro_member'] = $user['pro_member'];
 
             return true;
         } catch (Exception $e) {
@@ -244,7 +251,7 @@ class Auth
         }
 
         try {
-            $stmt = $this->db->prepare("SELECT id, username, email FROM users WHERE id = ?");
+            $stmt = $this->db->prepare("SELECT id, username, email, pro_plan as pro_member FROM users WHERE id = ?");
             $stmt->execute([$_SESSION['user_id']]);
             return $stmt->fetch();
         } catch (Exception $e) {
@@ -2037,6 +2044,28 @@ if (isset($_GET['api'])) {
                 // $response_data=$notificationManager->sendProjectNotificatio($data['project_id'], $data['title'], $data['body']);
                 // $response = ['success' => true, 'message' => "$response_data"];
                 break;
+                
+            // Check if user is a pro member
+            case 'check_pro_status':
+                $auth = new Auth();
+                $user = $auth->getCurrentUser();
+                
+                if (!$user) {
+                    $response = [
+                        'success' => false,
+                        'is_pro' => false,
+                        'message' => 'User not logged in'
+                    ];
+                } else {
+                    $is_pro = isset($user['pro_member']) && $user['pro_member'] == 1;
+                    $response = [
+                        'success' => true,
+                        'is_pro' => $is_pro,
+                        'payment_link' => $_ENV['STRIPE_PAYMENT_LINK']
+                    ];
+                }
+                break;
+                
             default:
                 throw new Exception('Invalid API endpoint');
         }
@@ -2053,7 +2082,19 @@ if (isset($_GET['api'])) {
     exit;
 }
 
-?>
+
+// if (!isset($_SESSION["pro_member"])) {
+//     header("Location: " . $_ENV['STRIPE_PAYMENT_LINK']);
+//     // exit;
+// }
+    // echo $_SESSION;
+    // echo "dfdsf";
+    // echo "<pre>";
+    // print_r($_SESSION);
+    // echo "</pre><br/>";
+   
+    ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -3197,9 +3238,9 @@ function displayGoogleLoginBtn()
         // Show the "Sign in with Google" button
         echo "
          <div class='text-center mt-2'>
-                                    <p class='text-muted mb-1'>OR".$_ENV['BASE_URL'] . '/callback.php'."</p>
+                                    <p class='text-muted mb-1'>OR</p>
                                 </div>
-        <a href='$authUrl' class='btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center text-white' style='gap: 8px;'>
+        <a href='$authUrl' class='btn btn-outline-link  w-100 d-flex align-items-center justify-content-center' style='gap: 8px;'>
                 <svg width='18' height='19' viewBox='0 0 16 17' fill='none' xmlns='http://www.w3.org/2000/svg'>
                   <path d='M13.8824 7.41113H8.11768V9.72516H11.4231C11.3564 10.0945 11.2134 10.4465 11.0029 10.7595C10.7925 11.0726 10.5191 11.34 10.1995 11.5454V13.051H12.1665C12.7703 12.4802 13.2452 11.7912 13.5605 11.0286C14.0327 9.88636 14.0878 8.62111 13.8824 7.41113Z' fill='#4285F4'></path>
                   <path d='M8.11765 14.4996C9.76488 14.4996 11.1599 13.9718 12.1665 13.0506L10.1995 11.545C9.58012 11.9375 8.85452 12.1373 8.11765 12.1181C7.35471 12.1088 6.61379 11.8656 5.99848 11.4224C5.38317 10.9793 4.92424 10.3584 4.68585 9.64648H2.65015V11.1856C3.15915 12.1814 3.94 13.0187 4.9055 13.604C5.87099 14.1892 6.98311 14.4992 8.11765 14.4996Z' fill='#34A853'></path>
@@ -3353,7 +3394,7 @@ function displayGoogleLoginBtn()
                                 displayGoogleLoginBtn();
                                 ?>
                                 <p class="text-center mt-3">
-                                    <a href="?page=register">Need an account? Register</a>
+                                    <a href="?page=register">Don't have an account? Sign Up  </a>
                                 </p>
 
                             </div>
@@ -4068,6 +4109,19 @@ function displayGoogleLoginBtn()
 
             if (isDashboard) {
 
+                // Check if user is a pro member and redirect if necessary
+                fetch('?api=check_pro_status')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && !data.is_pro) {
+                            console.log('User is not a pro member, redirecting to payment page');
+                            window.location.href = data.payment_link;
+                        }
+                    })
+                    .catch(error => console.error('Error checking pro status:', error));
+               
+                // check if user is pro member
+                // if no then redirect to stripe page simply
                 const urlParams = new URLSearchParams(window.location.search);
                 if (urlParams.has('pro-member') && urlParams.get('pro-member') === 'true') {
                     // Call API to update pro status
