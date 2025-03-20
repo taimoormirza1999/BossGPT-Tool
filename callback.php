@@ -37,14 +37,11 @@ try {
         $_SESSION['user_name']  = $name;
         // Set a welcome or return message based on whether this is a new user
         $paymentLink = $_ENV['STRIPE_PAYMENT_LINK'];
-        if ($result['is_new_user']) {
+        if ($result['is_new_user'] || $result['is_pro_member'] == 0) {
             header("Location: $paymentLink");
             $_SESSION['welcome_message'] = "Welcome to BossGPT! Your account has been created.";
         } else {
-            if ($result['is_pro_member'] == 0) {
-                // header("Location: $paymentLink");
-                // exit;
-            }
+            
             $_SESSION['result'] = $result;
             // exit;
             $_SESSION['welcome_message'] = "Welcome back!";
