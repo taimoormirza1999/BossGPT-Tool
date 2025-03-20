@@ -3205,7 +3205,7 @@ function required_field()
 {
     return '<span class="required-asterisk">*</span>';
 }
-function displayGoogleLoginBtn()
+function displayGoogleLoginBtn($text = "Sign in with Google")
 {
     // If the user is NOT logged in (no access token in session):
     if (!isset($_SESSION['access_token'])) {
@@ -3229,12 +3229,12 @@ function displayGoogleLoginBtn()
                   <path d='M4.68589 9.64706C4.42873 8.90009 4.42873 8.09081 4.68589 7.34384V5.79395H2.65019C2.22264 6.63065 2 7.55387 2 8.49004C2 9.42621 2.22264 10.3494 2.65019 11.1861L4.68589 9.64706Z' fill='#FBBC04'></path>
                   <path d='M8.11765 4.87211C8.98898 4.85751 9.83116 5.18027 10.4621 5.77064L12.2126 4.05185C11.5147 3.43218 10.6808 2.9789 9.77551 2.72723C8.87026 2.47556 7.91812 2.43227 6.99307 2.60073C6.06803 2.76919 5.19498 3.14487 4.44177 3.69857C3.68856 4.25226 3.07548 4.96907 2.65015 5.7933L4.68585 7.34371C4.92424 6.63182 5.38317 6.0109 5.99848 5.56776C6.61379 5.12461 7.35471 4.8814 8.11765 4.87211Z' fill='#EA4335'></path>
                 </svg>
-                Sign in with Google
+               ".$text."
               </a>";
     }
     // Otherwise, the user IS logged in:
     else {
-        echo "<a href='logout.php'>Logout</a>";
+        echo "<a onclick='logout()' >Logout</a>";
     }
 }
 ?>
@@ -3242,14 +3242,17 @@ function displayGoogleLoginBtn()
 <body>
     <?php
     $auth = new Auth();
-    
+    if($auth->isLoggedIn() && $_GET['page'] && in_array($_GET['page'], ['login', 'register'])){
+      header('Location: ?page=dashboard');
+      exit;
+    }
     // Check if the page parameter is set in the URL
     if (isset($_GET['page']) && $_GET['page'] === 'register') {
         $page = 'register';
     } else {
         $page = $_GET['page'] ?? ($auth->isLoggedIn() ? 'dashboard' : 'login');
     }
-
+    
     if (!$auth->isLoggedIn() && !in_array($page, ['login', 'register'])) {
         header('Location: ?page=login');
         exit;
@@ -3423,7 +3426,7 @@ function displayGoogleLoginBtn()
                                 </form>
                                
                                 <?php
-                                displayGoogleLoginBtn();
+                                displayGoogleLoginBtn("Sign up with Google");
                                 ?>
                                 <p class="text-center mt-3">
                                     <a href="?page=login">Already have an account? Login</a>

@@ -1,5 +1,4 @@
 <?php
-
 // Start the session
 session_start();
 // Include required files
@@ -10,10 +9,8 @@ loadEnv();
 if (!class_exists('Database')) {
     require_once __DIR__ . '/index.php';
 }
-
 // Include the GoogleAuth class
 require_once 'classes/GoogleAuth.php';
-
 // Enable error reporting for debugging
 // ini_set('display_errors', 1);
 // error_reporting(E_ALL);
@@ -28,10 +25,8 @@ try {
         $google_account_info = $google_oauth->userinfo->get();
         $email = $google_account_info->email;
         $name = $google_account_info->name;
-
         // Initialize our Google Auth handler
         $googleAuth = new GoogleAuth();
-
         // Register or login user
         $result = $googleAuth->registerWithGoogle($email, $name);
         $_SESSION['user_email'] = $email;
@@ -44,13 +39,11 @@ try {
             header("Location: " . $_ENV['STRIPE_PAYMENT_LINK']);
             exit;
         }
-
         if ($result['is_pro_member'] != 1) {
             $_SESSION['welcome_message'] = "Welcome back....!" . $_ENV['STRIPE_PAYMENT_LINK'];
             header("Location: " . $_ENV['STRIPE_PAYMENT_LINK']);
             exit;
         }
-
         // Redirect to dashboard
         header('Location: index.php?page=dashboard');
         exit;
@@ -63,7 +56,6 @@ try {
 } catch (Exception $e) {
     // Log the error
     error_log("Google Auth Error: " . $e->getMessage());
-
     // Handle errors
     $_SESSION['error_message'] = "Authentication error: " . $e->getMessage();
     header('Location: index.php?page=login&error=google_auth');
