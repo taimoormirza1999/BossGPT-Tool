@@ -218,7 +218,7 @@ class Auth
             $_SESSION['pro_member'] = $user['pro_member'];
 
             if ($user['pro_member'] != 1) {
-                header("Location: " .$_ENV['STRIPE_PAYMENT_LINK']);
+                header("Location: " . $_ENV['STRIPE_PAYMENT_LINK']);
                 exit;
             }
             // $_SESSION['pro_member'] = $user['pro_member'];
@@ -1556,20 +1556,7 @@ if (isset($_GET['api'])) {
                     $project_manager = new ProjectManager();
                     $projectTilte = $project_manager->getProjectName($data['project_id']);
                     $projectAllUsers = $project_manager->getProjectUsers($data['project_id']);
-                    // $projectAllUsers = [
-                    //     [
-                    //         "id" => 34,
-                    //         "username" => "taimoorhamza1999",
-                    //         "email" => "taimoorhamza1999@gmail.com",
-                    //         "role" => "Creator"
-                    //     ],
-                    //     [
-                    //         "id" => 35, // Changed to unique ID
-                    //         "username" => "taimoorhamza199",
-                    //         "email" => "taimoorhamza199@gmail.com",
-                    //         "role" => "Full Stack Developer"
-                    //     ],
-                    // ];
+                    
                     $userManager = new UserManager();
                     $result = $userManager->createOrAssignUser(
                         $data['username'],
@@ -2025,13 +2012,13 @@ if (isset($_GET['api'])) {
                         'message' => "Error: UserManager (\$userManager) is not set."
                     ];
                 }
-                
-                
+
+
             // Check if user is a pro member
             case 'check_pro_status':
                 $auth = new Auth();
                 $user = $auth->getCurrentUser();
-                
+
                 if (!$user) {
                     $response = [
                         'success' => false,
@@ -2047,7 +2034,7 @@ if (isset($_GET['api'])) {
                     ];
                 }
                 break;
-                
+
             default:
                 throw new Exception('Invalid API endpoint');
         }
@@ -2069,13 +2056,13 @@ if (isset($_GET['api'])) {
 //     header("Location: " . $_ENV['STRIPE_PAYMENT_LINK']);
 //     // exit;
 // }
-    // echo $_SESSION;
-    // echo "dfdsf";
-    // echo "<pre>";
-    // print_r($_SESSION);
-    // echo "</pre><br/>";
-   
-    ?>
+// echo $_SESSION;
+// echo "dfdsf";
+// echo "<pre>";
+// print_r($_SESSION);
+// echo "</pre><br/>";
+
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -3111,6 +3098,7 @@ if (isset($_GET['api'])) {
             padding: 0.5rem 1rem !important;
             font-size: 1rem !important;
             border-radius: 10px !important;
+            border: 0.5px solid !important;
         }
 
         .required-asterisk {
@@ -3212,7 +3200,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
         $client = new Google_Client();
         $client->setClientId($_ENV['GOOGLE_CLIENT_ID']);
         $client->setClientSecret($_ENV['GOOGLE_CLIENT_SECRET']);
-        $client->setRedirectUri(  $_ENV['BASE_URL'] . '/callback.php');
+        $client->setRedirectUri($_ENV['BASE_URL'] . '/callback.php');
         $client->addScope("email");
         $client->addScope("profile");
 
@@ -3229,7 +3217,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                   <path d='M4.68589 9.64706C4.42873 8.90009 4.42873 8.09081 4.68589 7.34384V5.79395H2.65019C2.22264 6.63065 2 7.55387 2 8.49004C2 9.42621 2.22264 10.3494 2.65019 11.1861L4.68589 9.64706Z' fill='#FBBC04'></path>
                   <path d='M8.11765 4.87211C8.98898 4.85751 9.83116 5.18027 10.4621 5.77064L12.2126 4.05185C11.5147 3.43218 10.6808 2.9789 9.77551 2.72723C8.87026 2.47556 7.91812 2.43227 6.99307 2.60073C6.06803 2.76919 5.19498 3.14487 4.44177 3.69857C3.68856 4.25226 3.07548 4.96907 2.65015 5.7933L4.68585 7.34371C4.92424 6.63182 5.38317 6.0109 5.99848 5.56776C6.61379 5.12461 7.35471 4.8814 8.11765 4.87211Z' fill='#EA4335'></path>
                 </svg>
-               ".$text."
+               " . $text . "
               </a>";
     }
     // Otherwise, the user IS logged in:
@@ -3242,9 +3230,9 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 <body>
     <?php
     $auth = new Auth();
-    if($auth->isLoggedIn() && $_GET['page'] && in_array($_GET['page'], ['login', 'register'])){
-      header('Location: ?page=dashboard');
-      exit;
+    if ($auth->isLoggedIn() && $_GET['page'] && in_array($_GET['page'], ['login', 'register'])) {
+        header('Location: ?page=dashboard');
+        exit;
     }
     // Check if the page parameter is set in the URL
     if (isset($_GET['page']) && $_GET['page'] === 'register') {
@@ -3252,7 +3240,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
     } else {
         $page = $_GET['page'] ?? ($auth->isLoggedIn() ? 'dashboard' : 'login');
     }
-    
+
     if (!$auth->isLoggedIn() && !in_array($page, ['login', 'register'])) {
         header('Location: ?page=login');
         exit;
@@ -3331,7 +3319,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 
     <div class="container-fluid mt-4">
         <?php
-        
+
         switch ($page) {
             case 'login':
                 include_login_page();
@@ -3379,7 +3367,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                 displayGoogleLoginBtn();
                                 ?>
                                 <p class="text-center mt-3">
-                                    <a href="?page=register">Don't have an account? Sign Up  </a>
+                                    <a href="?page=register">Don't have an account? Sign Up </a>
                                 </p>
 
                             </div>
@@ -3415,16 +3403,16 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                         <input type="text" class="form-control" id="username" name="username" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="email" class="form-label"  autocomplete="off">Email</label>
+                                        <label for="email" class="form-label" autocomplete="off">Email</label>
                                         <input type="email" class="form-control" id="email" name="email" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="password" class="form-label"  autocomplete="off">Password</label>
+                                        <label for="password" class="form-label" autocomplete="off">Password</label>
                                         <input type="password" class="form-control" id="password" name="password" required>
                                     </div>
                                     <button type="submit" class="btn btn-primary w-100">Register</button>
                                 </form>
-                               
+
                                 <?php
                                 displayGoogleLoginBtn("Sign up with Google");
                                 ?>
@@ -3668,7 +3656,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 
                                                         content += '</div>';
                                                         messageDiv.innerHTML = content;
-                                                        welcomeThread.appendChild(messageDiv);
+                                                        welcomeThread?.appendChild(messageDiv);
 
                                                         // Apply fade-in effect
                                                         setTimeout(() => {
@@ -3851,8 +3839,9 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                             <button type="button" class="btn-close text-white" data-bs-dismiss="modal"
                                 aria-label="Close "></button>
                         </div>
+
                         <div class="modal-body position-relative">
-                            <button class="btn btn-primary position-absolute top-5 " style="right: 10px;" id="addUserBtn">
+                            <button class="btn btn-primary position-absolute top-5 add-user-btn-top-right" style="right: 10px;" id="addUserBtn">
                                 <i class="bi bi-person-plus"></i> Add New User
                             </button>
                             <div id="userListContainer" class="mt-5">
@@ -3860,17 +3849,14 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                             </div>
 
                             <!-- No Users Message -->
-                            <div id="noUsersMessage" class="text-center py-4 d-none">
+                            <div id="noUsersMessage" class="text-center py-2 d-none">
                                 <p class="text-muted">No users assigned yet.</p>
                                 <button class="btn btn-primary" id="addUserBtn">
                                     <i class="bi bi-person-plus"></i> Add New User
                                 </button>
                             </div>
                         </div>
-                        <!-- <div class="modal-footer border-0">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-primary" id="inviteUserBtn">Assign User</button>
-                        </div> -->
+
                     </div>
                 </div>
             </div>
@@ -3939,8 +3925,8 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary" id="addNewUserBtn">Save User</button>
+                            <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> -->
+                            <button type="button" class="btn btn-primary" id="addNewUserBtn"><i class="bi bi-send"></i>&nbsp;Send Invite</button>
                         </div>
                     </div>
                 </div>
@@ -4104,7 +4090,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                 //         }
                 //     })
                 //     .catch(error => console.error('Error checking pro status:', error));
-               
+
                 // check if user is pro member
                 // if no then redirect to stripe page simply
                 const urlParams = new URLSearchParams(window.location.search);
@@ -4945,12 +4931,14 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                             if (data.success) {
                                 const userListContainer = document.getElementById('userListContainer');
                                 const noUsersMessage = document.getElementById("noUsersMessage");
+                                const addUserBtnTopRight = document.getElementById("add-user-btn-top-right");
                                 userListContainer.innerHTML = '<h6 >Users</h6>';
 
 
                                 if (data.users.length === 0) {
                                     noUsersMessage.classList.remove("d-none");
                                     userListContainer.classList.add("d-none");
+                                    // addUserBtnTopRight.classList.add("d-none");
                                 } else {
                                     noUsersMessage.classList.add("d-none");
                                     userListContainer.classList.remove("d-none");
@@ -4986,14 +4974,6 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                         userListContainer.appendChild(userCard);
                                     });
                                 }
-
-                                // Add project users
-                                // data.users.forEach(user => {
-                                //     userSelect.innerHTML += `<option value="${user.id}">${user.username} (${user.email}) - ${user.role}</option>`;
-                                // });
-
-                                // // Add "Add New User" option at the end
-                                // userSelect.innerHTML += '<option value="new">+ Add New User</option>';
                             } else {
                                 throw new Error(data.message || 'Failed to load users');
                             }
@@ -5009,24 +4989,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                         })
                         .finally(hideLoading);
                 });
-                // userListContainer.addEventListener("click", function (e) {
-                //     if (e.target.closest(".deleteUser")) {
-                //         const userId = e.target.closest(".deleteUser").getAttribute("data-id");
-                //         // users = users.filter((user) => user.id !== parseInt(userId));
-                //         // renderUserList();
-                //     }
-                // });
-
-                // Edit User (You can expand this to open an edit modal)
-                // userListContainer.addEventListener("click", function (e) {
-                //     if (e.target.closest(".editUser")) {
-                //         const userId = e.target.closest(".editUser").getAttribute("data-id");
-                //         // const user = users.find((u) => u.id === parseInt(userId));
-                //         // renderUserList();
-                //         // alert(`Edit User: ${user.name}`); // Replace with actual edit functionality
-                //     }
-                // });
-
+           
 
                 userListContainer.addEventListener("click", function (e) {
                     const deleteBtn = e.target.closest(".deleteUser");
@@ -5049,7 +5012,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                     if (data.success) {
                                         userDiv.remove();
                                         // showToast('success', 'User deleted successfully');
-                                        Toast('success', 'Success', 'User deleted successfully');
+                                        Toast('success', 'Success', userName+' removed successfully!');
                                     } else {
                                         Toast('error', 'Error', 'Failed to delete user');
                                     }
@@ -5147,7 +5110,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 
                                 // Show different messages based on whether it's a new or existing user
                                 console.log(data)
-                                const successMessage = data.data.is_new_user
+                                const successMessage = data.data?.is_new_user
                                     ? "User created and assigned successfully! An invite has been sent along with login credentials."
                                     : "User assigned to project successfully!";
 

@@ -281,7 +281,9 @@ function openNewProjectModal() {
   modal.show();
 }
 function scrollToBottom() {
-  welcomeThread.scrollTop = welcomeThread.scrollHeight;
+    if(welcomeThread){
+        welcomeThread.scrollTop = welcomeThread.scrollHeight;
+    }
 }
 
 
