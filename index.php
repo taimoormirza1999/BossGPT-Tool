@@ -205,7 +205,7 @@ class Auth
     public function login($email, $password)
     {
         try {
-            $stmt = $this->db->prepare("SELECT id, username, password_hash FROM users WHERE email = ?");
+            $stmt = $this->db->prepare("SELECT id, username, password_hash, pro_plan as pro_member FROM users WHERE email = ?");
             $stmt->execute([$email]);
             $user = $stmt->fetch();
 
@@ -217,7 +217,7 @@ class Auth
             $_SESSION['username'] = $user['username'];
             $_SESSION['pro_member'] = $user['pro_member'];
 
-            if ($user['pro_member'] == 0) {
+            if ($user['pro_member'] != 1) {
                 header("Location: " .$_ENV['STRIPE_PAYMENT_LINK']);
                 exit;
             }
@@ -3328,6 +3328,7 @@ function displayGoogleLoginBtn()
 
     <div class="container-fluid mt-4">
         <?php
+        
         switch ($page) {
             case 'login':
                 include_login_page();
@@ -3341,7 +3342,6 @@ function displayGoogleLoginBtn()
             default:
                 echo "<h1>404 - Page Not Found</h1>";
         }
-
         function include_login_page()
         {
             global $error_message;

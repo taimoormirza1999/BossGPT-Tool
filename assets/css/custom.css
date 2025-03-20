@@ -218,9 +218,9 @@ button.btn.btn-sm.btn-outline-primary.editUser:hover {
   font-style: normal;
 }
 body {
-  background: #000;
   font-family: "Geist", sans-serif !important;
 }
+
 .z-index-1000 {
   z-index: 1050 !important;
 }
