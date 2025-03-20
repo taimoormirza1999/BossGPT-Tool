@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../functions.php';
-
+require_once __DIR__ . '/../env.php';
+loadEnv();
 // Make sure the Database class is available
 if (!class_exists('Database')) {
     require_once __DIR__ . '/../index.php';
@@ -63,10 +64,10 @@ class GoogleAuth
                 $_SESSION['username'] = $username;
                 
                 // Send welcome email (if you have this functionality)
-                if (function_exists('sendWelcomeEmail')) {
-                    $user = new UserManager();
-                    $user->sendWelcomeEmail($email, $username, $_ENV['BASE_URL'] ?? 'https://bossgpt.com');
-                }
+                // if (function_exists('sendWelcomeEmail')) {
+                //     $user = new UserManager();
+                //     $user->sendWelcomeEmail($email, $username, $_ENV['BASE_URL'] ?? 'https://bossgpt.com');
+                // }
                 
                 return [
                     'success' => true,
