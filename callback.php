@@ -36,22 +36,26 @@ try {
         $_SESSION['user_email'] = $email;
         $_SESSION['user_name']  = $name;
         // Set a welcome or return message based on whether this is a new user
+        $paymentLink = $_ENV['STRIPE_PAYMENT_LINK'];
         if ($result['is_new_user']) {
-            $paymentLink = $_ENV['STRIPE_PAYMENT_LINK'];
-            header("Location: $paymentLink");
-            exit;
+            // header("Location: $paymentLink");
+            // exit;
             $_SESSION['welcome_message'] = "Welcome to BossGPT! Your account has been created.";
         } else {
             if ($result['is_pro_member'] == 0) {
-                $paymentLink = $_ENV['STRIPE_PAYMENT_LINK'];
-                header("Location: $paymentLink");
-                exit;
+                // header("Location: $paymentLink");
+                // exit;
             }
+            echo "<pre>";
+            print_r($result);
+            echo "</pre>";
+            $_SESSION['result'] = $result;
+            // exit;
             $_SESSION['welcome_message'] = "Welcome back!";
         }
     
         // Redirect to dashboard
-        header('Location: index.php?page=dashboard');
+        // header('Location: index.php?page=dashboard');
         exit;
     } else {
         // No code received, redirect to login

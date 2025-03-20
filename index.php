@@ -3189,7 +3189,7 @@ function displayGoogleLoginBtn()
         $client = new Google_Client();
         $client->setClientId($_ENV['GOOGLE_CLIENT_ID']);
         $client->setClientSecret($_ENV['GOOGLE_CLIENT_SECRET']);
-        $client->setRedirectUri(  'http://localhost/bossgpt-tool/callback.php');
+        $client->setRedirectUri(  $_ENV['BASE_URL'] . '/callback.php');
         $client->addScope("email");
         $client->addScope("profile");
 
@@ -3197,7 +3197,7 @@ function displayGoogleLoginBtn()
         // Show the "Sign in with Google" button
         echo "
          <div class='text-center mt-2'>
-                                    <p class='text-muted mb-1'>OR</p>
+                                    <p class='text-muted mb-1'>OR".$_ENV['BASE_URL'] . '/callback.php'."</p>
                                 </div>
         <a href='$authUrl' class='btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center text-white' style='gap: 8px;'>
                 <svg width='18' height='19' viewBox='0 0 16 17' fill='none' xmlns='http://www.w3.org/2000/svg'>
