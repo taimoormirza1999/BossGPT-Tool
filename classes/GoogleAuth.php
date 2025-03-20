@@ -73,7 +73,8 @@ class GoogleAuth
                     'success' => true,
                     'user_id' => $userId,
                     'message' => 'New user created successfully',
-                    'is_new_user' => true
+                    'is_new_user' => true,
+                    'is_pro_member' => 0
                 ];
             }
         } catch (Exception $e) {

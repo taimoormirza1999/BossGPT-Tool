@@ -6,7 +6,7 @@
 // echo "<script>alert('Notification Sent');</script>";
 session_start();
 echo "<pre>";
-print_r($_SESSION);
+print_r(value: $_SESSION['result']);
 echo "</pre>";
 ?>
 

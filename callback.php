@@ -1,10 +1,11 @@
 <?php
+
 // Start the session
 session_start();
-
 // Include required files
 require_once 'config.php';
-
+require_once 'env.php';
+loadEnv();
 // Make sure Database class is available (index.php contains the Database class)
 if (!class_exists('Database')) {
     require_once __DIR__ . '/index.php';
@@ -35,17 +36,19 @@ try {
         $result = $googleAuth->registerWithGoogle($email, $name);
         $_SESSION['user_email'] = $email;
         $_SESSION['user_name']  = $name;
+        $_SESSION['result11']=$result;
+        $_SESSION['result'] = $result;
         // Set a welcome or return message based on whether this is a new user
-        $paymentLink = $_ENV['STRIPE_PAYMENT_LINK'];
-        if ($result['is_new_user'] || $result['is_pro_member'] == 0) {
-            header("Location: $paymentLink");
+        if ($result['is_new_user'] && $result['is_pro_member'] == 0) {
             $_SESSION['welcome_message'] = "Welcome to BossGPT! Your account has been created.";
-        } else {
-            
-            $_SESSION['result'] = $result;
-            // exit;
-            $_SESSION['welcome_message'] = "Welcome back!";
-        }
+            header("Location: ".$_ENV['STRIPE_PAYMENT_LINK']);
+        } 
+           
+            if($result['is_pro_member'] != 1){
+                $_SESSION['welcome_message'] = "Welcome back!";
+                header("Location: ".$_ENV['STRIPE_PAYMENT_LINK']);
+            }
+        
     
         // Redirect to dashboard
         header('Location: index.php?page=dashboard');
