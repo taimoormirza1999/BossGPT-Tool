@@ -31,25 +31,26 @@ try {
 
         // Initialize our Google Auth handler
         $googleAuth = new GoogleAuth();
-  
+
         // Register or login user
         $result = $googleAuth->registerWithGoogle($email, $name);
         $_SESSION['user_email'] = $email;
-        $_SESSION['user_name']  = $name;
-        $_SESSION['result11']=$result;
+        $_SESSION['user_name'] = $name;
+        $_SESSION['result11'] = $result;
         $_SESSION['result'] = $result;
         // Set a welcome or return message based on whether this is a new user
         if ($result['is_new_user'] && $result['is_pro_member'] == 0) {
             $_SESSION['welcome_message'] = "Welcome to BossGPT! Your account has been created.";
-            header("Location: ".$_ENV['STRIPE_PAYMENT_LINK']);
-        } 
-           
-            if($result['is_pro_member'] != 1){
-                $_SESSION['welcome_message'] = "Welcome back!";
-                header("Location: ".$_ENV['STRIPE_PAYMENT_LINK']);
-            }
-        
-    
+            header("Location: " . $_ENV['STRIPE_PAYMENT_LINK']);
+            exit;
+        }
+
+        if ($result['is_pro_member'] != 1) {
+            $_SESSION['welcome_message'] = "Welcome back....!" . $_ENV['STRIPE_PAYMENT_LINK'];
+            header("Location: " . $_ENV['STRIPE_PAYMENT_LINK']);
+            exit;
+        }
+
         // Redirect to dashboard
         header('Location: index.php?page=dashboard');
         exit;
@@ -62,7 +63,7 @@ try {
 } catch (Exception $e) {
     // Log the error
     error_log("Google Auth Error: " . $e->getMessage());
-    
+
     // Handle errors
     $_SESSION['error_message'] = "Authentication error: " . $e->getMessage();
     header('Location: index.php?page=login&error=google_auth');
