@@ -7,12 +7,12 @@
   --bs-primary-rgb: 255, 255, 255;
 }
 ::selection {
-  background-color: var(--bs-primary-dark);
-  color: var(--bs-primary-white);
+  background-color: var(--bs-primary-dark)!important;
+  color: var(--bs-primary-white)!important;
 }
 body.dark-mode ::selection {
-  background-color: var(--bs-primary-white);
-  color: var(--bs-primary-black);
+  background-color: var(--bs-primary-white)!important;
+  color: var(--bs-primary-black)!important;
 }
 
 .nav-tabs .btn-primary {
