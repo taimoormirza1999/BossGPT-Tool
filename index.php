@@ -3227,7 +3227,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 }
 ?>
 
-<body>
+<body style="background-color:<?php echo $_GET['page'] == 'login' || $_GET['page'] == 'register' ? '#000' : ''; ?>">
     <?php
     $auth = new Auth();
     if ($auth->isLoggedIn() && $_GET['page'] && in_array($_GET['page'], ['login', 'register'])) {
@@ -3255,7 +3255,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container-fluid" style="width: 98%; overflow: visible;">
                 <a class="navbar-brand" href="?page=dashboard">
-                    <img src="assets/images/bossgptlogo.svg" alt="Logo" style="width: 150px; height: 60px;">
+                    <?php echo getLogoImage(  $bottomMargin='0.4rem',      $topMargin="0.4rem",$width="10rem", $height="auto",$positionClass=" ",$positionStyle=" ", $src="https://res.cloudinary.com/da6qujoed/image/upload/v1742546475/bossgpt/leopyvcgbiyotpwrayha.png" ); ?>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
@@ -3339,10 +3339,11 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
             ?>
             <div class="d-flex justify-content-center align-items-center min-vh-100 login-page ">
                 <div class="row justify-content-center w-100 position-relative">
-                    <img src="assets/images/bossgptlogo.svg" alt="Logo"
+                    <!-- <img src="assets/images/bossgptlogo.svg" alt="Logo"
                         class="position-absolute top-0 start-50 translate-middle "
-                        style="margin-top: -100px; width: 15rem; height: 10rem;position: absolute;top: 50%;left: 50%;transform: translate(-50%,-50%);">
-                    <div class="col-md-6 col-lg-4">
+                        style="margin-top: -100px; width: 15rem; height: 10rem;position: absolute;top: 50%;left: 50%;transform: translate(-50%,-50%);"> -->
+                    <?php echo getLogoImage("","-70px"); ?>
+                        <div class="col-md-6 col-lg-4">
                         <div class="card">
                             <div class="card-body">
                                 <h2 class="card-title text-center mb-4">Login</h2>
@@ -3383,10 +3384,11 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
             ?>
             <div class="d-flex justify-content-center align-items-center min-vh-100 register-page">
                 <div class="row justify-content-center w-100 position-relative">
-                    <img src="assets/images/bossgptlogo.svg" alt="Logo"
+                    <!-- <img src="assets/images/bossgptlogo.svg" alt="Logo"
                         class="position-absolute top-0 start-50 translate-middle "
-                        style="margin-top: -1rem; width: 15rem; height: 10rem;position: absolute;top: 50%;left: 50%;transform: translate(-50%,-50%);">
-                    <div class="col-md-6 col-lg-4 mt-5">
+                        style="margin-top: -1rem; width: 15rem; height: 10rem;position: absolute;top: 50%;left: 50%;transform: translate(-50%,-50%);"> -->
+                        <?php echo getLogoImage(); ?>
+                        <div class="col-md-6 col-lg-4 mt-5">
                         <div class="card">
                             <div class="card-body">
                                 <h2 class="card-title text-center mb-4">Register</h2>
