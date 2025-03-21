@@ -6,6 +6,15 @@
   --bs-primary: #fff;
   --bs-primary-rgb: 255, 255, 255;
 }
+::selection {
+  background-color: var(--bs-primary-dark);
+  color: var(--bs-primary-white);
+}
+body.dark-mode ::selection {
+  background-color: var(--bs-primary-white);
+  color: var(--bs-primary-black);
+}
+
 .nav-tabs .btn-primary {
   color: var(--bs-primary-white);
   background: #18191c;
