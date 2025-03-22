@@ -56,7 +56,7 @@ class GoogleAuth
                 $randomPassword = bin2hex(random_bytes(16));
                 $hashedPassword = password_hash($randomPassword, PASSWORD_DEFAULT);
                 
-                $stmt->execute([$username, $email, $hashedPassword, '0', 0]);
+                $stmt->execute([$username, $email, $hashedPassword, $_SESSION['fcm_token'], 0]);
                 $userId = $this->db->lastInsertId();
                 
                 // Set session variables

@@ -4,6 +4,7 @@ require './vendor/autoload.php';
 // require_once 'env.php';
 require_once './classes/UserManager.php';
 require_once './classes/Notification.php';
+require_once './classes/NotificationManager.php';
 use Dotenv\Dotenv;
 
 // // Load environment variables
@@ -1556,7 +1557,7 @@ if (isset($_GET['api'])) {
                     $project_manager = new ProjectManager();
                     $projectTilte = $project_manager->getProjectName($data['project_id']);
                     $projectAllUsers = $project_manager->getProjectUsers($data['project_id']);
-                    
+
                     $userManager = new UserManager();
                     $result = $userManager->createOrAssignUser(
                         $data['username'],
@@ -1607,6 +1608,8 @@ if (isset($_GET['api'])) {
                     ]);
                 }
                 exit;
+     
+
             case 'get_users':
                 $stmt = $db->query("SELECT id, username, email FROM users ORDER BY username ASC");
                 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -1622,16 +1625,6 @@ if (isset($_GET['api'])) {
                 $user_id = $_GET['user_id'];
                 $project_id = $_GET['project_id'];
                 $user_name = $_GET['user_name'];
-                // Check if user exists
-                // $stmt = $db->prepare("SELECT id FROM users WHERE id = ?");
-                // $stmt->execute([$user_id]);
-                // $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-                // if (!$user) {
-                //     $response = ['success' => false, 'message' => 'User not found'];
-                //     break;
-                // }
-
                 // Delete user
                 $stmt = $db->prepare("DELETE FROM project_users WHERE user_id = ?");
                 $success = $stmt->execute([$user_id]);
@@ -1931,51 +1924,40 @@ if (isset($_GET['api'])) {
                 $BASE_URL = $_ENV['BASE_URL'];
 
                 // Validate input
-                if (!isset($data['email']) || !isset($data['username']) || !isset($data['tempPassword'])) {
-                    $response = [
-                        'success' => false,
-                        'message' => "Error: Missing required fields (email, username, tempPassword)."
-                    ];
-                    // Set the Content-Type header to application/json
-                    header('Content-Type: application/json');
-                    echo json_encode($response);
-                    exit;
-                }
-
+                // if (!isset($data['email']) || !isset($data['username']) || !isset($data['tempPassword'])) {
+                //     $response = [
+                //         'success' => false,
+                //         'message' => "Error: Missing required fields (email, username, tempPassword)."
+                //     ];
+                //     // Set the Content-Type header to application/json
+                //     header('Content-Type: application/json');
+                //     echo json_encode($response);
+                //     exit;
+                // }
+                error_reporting(E_ALL);
+                ini_set('display_errors', 1);
                 // Simulate getting project users (Example users)
-                $project_manager = new ProjectManager();
-                $projectTilte = $project_manager->getProjectName($data['projectId']);
-                $projectAllUsers = $project_manager->getProjectUsers($data['projectId']);
-
-                // $projectAllUsers = [
-                //     [
-                //         "id" => 34,
-                //         "username" => "taimoorhamza1999",
-                //         "email" => "taimoorhamza1999@gmail.com",
-                //         "role" => "Creator"
-                //     ],
-                //     [
-                //         "id" => 35, // Changed to unique ID
-                //         "username" => "taimoorhamza199",
-                //         "email" => "taimoorhamza199@gmail.com",
-                //         "role" => "Full Stack Developer"
-                //     ],
-                // ];
 
                 $userManager = new UserManager();
                 try {
-                    $emailSent = $userManager->projectUsersNewUserAddedEmail("taimoorhamza1999", "Temp", "Developer", $projectAllUsers, );
-                    if ($emailSent) {
-                        $response = [
-                            'success' => true,
-                            'message' => "An invite has been sent along with login credentials."
-                        ];
-                    } else {
-                        $response = [
-                            'success' => false,
-                            'message' => "Failed to send the invite."
-                        ];
-                    }
+                    $notificationManager = new NotificationManager($userManager);
+                    $response = $notificationManager->sendProjectNotification(42, "New User Added", "New User Added successfully");
+                    $response = [
+                        'success' => true,
+                        'message' => $response
+                    ];
+                    // exit;
+                    // if ($emailSent) {
+                    //     $response = [
+                    //         'success' => true,
+                    //         'message' => "An invite has been sent along with login credentials."
+                    //     ];
+                    // } else {
+                    //     $response = [
+                    //         'success' => false,
+                    //         'message' => "Failed to send the invite."
+                    //     ];
+                    // }
                 } catch (Exception $e) {
                     $response = [
                         'success' => false,
@@ -2072,6 +2054,7 @@ if (isset($_GET['api'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-signin-client_id"
         content="949298386531-pbk4td6p6ga18e6diee9rifskto0ou0v.apps.googleusercontent.com.apps.googleusercontent.com">
+    <meta name="fcm_token_value" content="0" id="fcm_token_value">
 
     <title>Project Manager AI</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -2098,8 +2081,6 @@ if (isset($_GET['api'])) {
     <link rel="manifest" href="site.webmanifest">
     <!-- Custom css -->
     <link rel="stylesheet" href="./assets/css/custom.css">
-
-
     <style>
         .suggestion-item {
             border-radius: 16px !important;
@@ -3187,7 +3168,6 @@ if (isset($_GET['api'])) {
     </style>
 </head>
 <!-- Reuseable Stuff -->
-
 <?php
 function required_field()
 {
@@ -3227,9 +3207,15 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 }
 ?>
 
-<body style="background-color:<?php echo $_GET['page'] == 'login' || $_GET['page'] == 'register' ? '#000' : ''; ?>">
+<body
+    style="background-color:<?php echo isset($_GET['page']) && ($_GET['page'] == 'login' || $_GET['page'] == 'register') ? '#000' : ''; ?>">
     <?php
     $auth = new Auth();
+    // if (!isset($_GET['page'])) {
+    //     header('Location: index.php?page=login');
+    //     exit;
+    // }
+
     if ($auth->isLoggedIn() && $_GET['page'] && in_array($_GET['page'], ['login', 'register'])) {
         header('Location: ?page=dashboard');
         exit;
@@ -3255,7 +3241,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container-fluid" style="width: 98%; overflow: visible;">
                 <a class="navbar-brand" href="?page=dashboard">
-                    <?php echo getLogoImage(  $bottomMargin='0.4rem',      $topMargin="0.4rem",$width="10rem", $height="auto",$positionClass=" ",$positionStyle=" ", $src="https://res.cloudinary.com/da6qujoed/image/upload/v1742546475/bossgpt/leopyvcgbiyotpwrayha.png" ); ?>
+                    <?php echo getLogoImage($bottomMargin = '0.4rem', $topMargin = "0.4rem", $width = "10rem", $height = "auto", $positionClass = " ", $positionStyle = " ", $src = "https://res.cloudinary.com/da6qujoed/image/upload/v1742546475/bossgpt/leopyvcgbiyotpwrayha.png"); ?>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
@@ -3342,8 +3328,8 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                     <!-- <img src="assets/images/bossgptlogo.svg" alt="Logo"
                         class="position-absolute top-0 start-50 translate-middle "
                         style="margin-top: -100px; width: 15rem; height: 10rem;position: absolute;top: 50%;left: 50%;transform: translate(-50%,-50%);"> -->
-                    <?php echo getLogoImage("","-70px"); ?>
-                        <div class="col-md-6 col-lg-4">
+                    <?php echo getLogoImage("", "-70px"); ?>
+                    <div class="col-md-6 col-lg-4">
                         <div class="card">
                             <div class="card-body">
                                 <h2 class="card-title text-center mb-4">Login</h2>
@@ -3387,8 +3373,8 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                     <!-- <img src="assets/images/bossgptlogo.svg" alt="Logo"
                         class="position-absolute top-0 start-50 translate-middle "
                         style="margin-top: -1rem; width: 15rem; height: 10rem;position: absolute;top: 50%;left: 50%;transform: translate(-50%,-50%);"> -->
-                        <?php echo getLogoImage(); ?>
-                        <div class="col-md-6 col-lg-4 mt-5">
+                    <?php echo getLogoImage(); ?>
+                    <div class="col-md-6 col-lg-4 mt-5">
                         <div class="card">
                             <div class="card-body">
                                 <h2 class="card-title text-center mb-4">Register</h2>
@@ -3843,7 +3829,8 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                         </div>
 
                         <div class="modal-body position-relative">
-                            <button class="btn btn-primary position-absolute top-5 add-user-btn-top-right" style="right: 10px;" id="addUserBtn">
+                            <button class="btn btn-primary position-absolute top-5 add-user-btn-top-right"
+                                style="right: 10px;" id="addUserBtn">
                                 <i class="bi bi-person-plus"></i> Add New User
                             </button>
                             <div id="userListContainer" class="mt-5">
@@ -3928,7 +3915,8 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                         </div>
                         <div class="modal-footer">
                             <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> -->
-                            <button type="button" class="btn btn-primary" id="addNewUserBtn"><i class="bi bi-send"></i>&nbsp;Send Invite</button>
+                            <button type="button" class="btn btn-primary" id="addNewUserBtn"><i
+                                    class="bi bi-send"></i>&nbsp;Send Invite</button>
                         </div>
                     </div>
                 </div>
@@ -4991,7 +4979,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                         })
                         .finally(hideLoading);
                 });
-           
+
 
                 userListContainer.addEventListener("click", function (e) {
                     const deleteBtn = e.target.closest(".deleteUser");
@@ -5014,7 +5002,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                     if (data.success) {
                                         userDiv.remove();
                                         // showToast('success', 'User deleted successfully');
-                                        Toast('success', 'Success', userName+' removed successfully!');
+                                        Toast('success', 'Success', userName + ' removed successfully!');
                                     } else {
                                         Toast('error', 'Error', 'Failed to delete user');
                                     }
@@ -6081,8 +6069,9 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
 
     </script>
 
+
     <!-- Firebase -->
-    <?php if (isset($page) && $page === 'register'): ?>
+    <?php if (isset($page) && ($page === 'register' || $page === 'login' || $page === 'dashboard')): ?>
         <script type="module">
             // Import the functions you need from the SDKs you need
             import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
@@ -6119,7 +6108,25 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                     if (currentToken) {
                         console.log("FCM Token:", currentToken);
                         // Set the token in the hidden input
-                        document.getElementById('fcm_token').value = currentToken;                        // Here you can send the token to your server
+                        $('#fcm_token_value').attr('content', currentToken);
+                        $('#fcm_token').val(currentToken);
+                        fetch('requests.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ 
+                                requestType:'storeFCMSession',
+                                fcm_token: currentToken })
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log("Token stored in session:", data);
+                            })
+                            .catch(error => {
+                                console.error("Error storing token:", error);
+                            });
+
                     } else {
                         console.log('No FCM token available. Request permission to generate one.');
                         // You might want to request permission here

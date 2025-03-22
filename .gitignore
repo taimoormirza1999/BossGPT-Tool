@@ -2,3 +2,5 @@
 error.log
 vendor 
 config/bossgpt-367ab-firebase-adminsdk-fbsvc-fdd178828e.json
+.DS_Store
+composer.lock

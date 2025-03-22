@@ -40,7 +40,7 @@ try {
             exit;
         }
         if ($result['is_pro_member'] != 1) {
-            $_SESSION['welcome_message'] = "Welcome back....!" . $_ENV['STRIPE_PAYMENT_LINK'];
+            $_SESSION['welcome_message'] = "Welcome back! " .$name;
             header("Location: " . $_ENV['STRIPE_PAYMENT_LINK']);
             exit;
         }

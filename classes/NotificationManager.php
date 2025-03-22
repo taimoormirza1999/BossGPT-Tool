@@ -6,34 +6,11 @@ use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\Notification;
 class NotificationManager
 {
-    private $db;
     private $userManager;
-
-    public function __construct($db, $userManager)
+    public function __construct($userManager)
     {
-        $this->db = $db;
         $this->userManager = $userManager;
     }
-
-    public function storeNotification($userId, $title, $projectId = null)
-    {
-        try {
-            $stmt = $this->db->prepare(
-                "INSERT INTO notifications (user_id, title, message, project_id) 
-                 VALUES (:user_id, :title, :message, :project_id)"
-            );
-            $stmt->execute([
-                'user_id' => $userId,
-                'title' => $title,
-                'message' => $message,
-                'project_id' => $projectId
-            ]);
-        } catch (Exception $e) {
-            error_log("Error storing notification: " . $e->getMessage());
-            throw $e;
-        }
-    }
-
     public function sendProjectNotification($projectId = 42, $title = "DFs Title", $body = "DFs Body")
     {
 
@@ -55,17 +32,23 @@ class NotificationManager
             }
 
             // Create notification 
-            $notification = Notification::create($title, $body);
+            $notification = Notification::create($title, $body)
+            ->withImageUrl('https://bossgpt.com/tool/v1/apple-touch-icon.png');
+          
 
             // Store notification in database
             // $this->storeNotification($user['id'], $title, $body, $projectId);
 
             // Create Cloud Message 
             $message = CloudMessage::withTarget('token', $deviceToken)
-                ->withNotification($notification);
+                ->withNotification($notification)
+                ->withData([
+                    'click_action' => 'https://bossgpt.com/notifications'
+                ]);
+                
             $factory = (new Factory())
                 // ->withServiceAccount(__DIR__ . '/config/bossgpt-367ab-firebase-adminsdk-fbsvc-fdd178828e.json'  ); 
-                ->withServiceAccount('./config/bossgpt-367ab-firebase-adminsdk-fbsvc-fdd178828e.json');
+                ->withServiceAccount('./config/bossgpt-367ab-firebase-adminsdk-fbsvc-363f3ef6b7.json');
             $messaging = $factory->createMessaging();
             try {
                 $messaging->send($message);
@@ -79,20 +62,6 @@ class NotificationManager
             }
         }
         return $response_data;
-    }
-
-    public function getUserNotifications($userId)
-    {
-        try {
-            $stmt = $this->db->prepare(
-                "SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC"
-            );
-            $stmt->execute([$userId]);
-            return $stmt->fetchAll();
-        } catch (Exception $e) {
-            error_log("Error retrieving notifications: " . $e->getMessage());
-            throw $e;
-        }
     }
 
 }
