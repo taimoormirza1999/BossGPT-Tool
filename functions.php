@@ -67,7 +67,7 @@ function sendProjectUpdateEmail($email, $username, $projectTitle, $updateMessage
     return sendTemplateEmail($email, $subject, $template, $data);
 }
 
-function getLogoImage($bottomMargin = "0", $topMargin = "-1rem", $width = "15rem", $height = "auto", $positionClass = "position-absolute top-0 start-50 translate-middle", $positionStyle = "position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);", $src="https://res.cloudinary.com/da6qujoed/image/upload/v1742545331/bossgpt/njecw0vci7l9wya2yu4e.png")
+function getLogoImage($bottomMargin = "0", $topMargin = "-1rem", $width = "15rem", $height = "auto", $positionClass = "position-absolute top-0 start-50 translate-middle", $positionStyle = "position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);", $src="https://res.cloudinary.com/da6qujoed/image/upload/v1742824680/boss-gptold_zti8gh.png")
 {
     return '<img src=' . $src . ' alt="Logo"
             class="' . $positionClass . '" 
