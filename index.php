@@ -233,6 +233,9 @@ class Auth
 
     public function logout()
     {
+        echo "<script>
+            localStorage.removeItem('lastSelectedProject');
+    </script>";
         session_destroy();
         session_start();
         session_unset();
@@ -1608,7 +1611,7 @@ if (isset($_GET['api'])) {
                     ]);
                 }
                 exit;
-     
+
 
             case 'get_users':
                 $stmt = $db->query("SELECT id, username, email FROM users ORDER BY username ASC");
@@ -3215,7 +3218,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
     //     header('Location: index.php?page=login');
     //     exit;
     // }
-
+    
     if ($auth->isLoggedIn() && $_GET['page'] && in_array($_GET['page'], ['login', 'register'])) {
         header('Location: ?page=dashboard');
         exit;
@@ -3525,7 +3528,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                             <script>
                                                 // Immediately invoke function to initialize welcome messages
                                                 (function initializeWelcomeMessages() {
-                                                    console.log('Initializing welcome messages...'); // Debug log
+                                                    // console.log('Initializing welcome messages...'); // Debug log
 
                                                     const welcomeThread = document.getElementById('welcomeThread');
                                                     const chatMessages = document.getElementById('chatMessages');
@@ -3592,7 +3595,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                                     ];
 
                                                     async function showMessage(message) {
-                                                        console.log('Showing message:', message.title); // Debug log
+                                                        // console.log('Showing message:', message.title); // Debug log
 
                                                         // Show loading animation first
                                                         showChatLoading();
@@ -4057,7 +4060,13 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
-
+        var userId = null;
+function getLastSelectedProject() {
+    if (userId) { // Check if userId is available
+        return localStorage.getItem(`lastSelectedProject_${userId}`);
+    }
+    return null; // No user logged in or session expired
+}
 
         document.addEventListener('DOMContentLoaded', function () {
 
@@ -4141,7 +4150,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 
                 let currentProject = null;
                 // Load saved project from localStorage if available
-                const savedProject = localStorage.getItem('lastSelectedProject');
+                const savedProject = getLastSelectedProject();
                 if (savedProject && savedProject !== 'null') {
                     currentProject = parseInt(savedProject);
                     $('#myselectedcurrentProject').val(currentProject);
@@ -4233,7 +4242,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                     $('#myselectedcurrentProject').val(currentProject);
 
                     // Save current project to localStorage for persistence
-                    localStorage.setItem('lastSelectedProject', currentProject);
+                    localStorage.setItem(`lastSelectedProject_${userId}`, currentProject);
 
                     // call to fetch notifications
                     fetchNotificationsAndOpen(false);
@@ -5997,11 +6006,17 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
 
             // Auto-load the saved project if available
             if (isDashboard) {
+                // var userId = null;
                 // Initialize projects
                 loadProjects();
+                <?php
+                if (isset($_SESSION['user_id'])) {
+                    echo "userId = " . json_encode($_SESSION['user_id']) . ";";
+                }
+                ?>
                 // After projects are loaded, select the saved project if available
                 setTimeout(() => {
-                    const savedProject = localStorage.getItem('lastSelectedProject');
+                    const savedProject = getLastSelectedProject();
                     if (savedProject && savedProject !== 'null' && savedProject !== '0') {
                         const projectId = parseInt(savedProject);
 
@@ -6115,9 +6130,10 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                             headers: {
                                 'Content-Type': 'application/json'
                             },
-                            body: JSON.stringify({ 
-                                requestType:'storeFCMSession',
-                                fcm_token: currentToken })
+                            body: JSON.stringify({
+                                requestType: 'storeFCMSession',
+                                fcm_token: currentToken
+                            })
                         })
                             .then(response => response.json())
                             .then(data => {
