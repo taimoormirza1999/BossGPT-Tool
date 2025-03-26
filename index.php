@@ -1629,59 +1629,56 @@ if (isset($_GET['api'])) {
                 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 $response = ['success' => true, 'users' => $users];
                 break;
-            case 'delete_user':
-                if (!isset($_GET['user_id']) || !isset($_GET['project_id']) || !isset($_GET['user_name'])) {
-                    $response = ['success' => false, 'message' => 'User ID, Project ID, and User Name are required'];
+                case 'delete_user':
+                    if (!isset($_POST['user_id']) || !isset($_POST['project_id']) || !isset($_POST['user_name'])) {
+                        $response = ['success' => false, 'message' => 'User ID, Project ID, and User Name are required'];
+                        break;
+                    }
+                
+                    $user_id = $_POST['user_id'];
+                    $project_id = $_POST['project_id'];
+                    $user_name = $_POST['user_name'];
+                
+                    // Delete user
+                    $stmt = $db->prepare("DELETE FROM project_users WHERE user_id = ?");
+                    $success = $stmt->execute([$user_id]);
+                
+                    // Nullify invited_by references if necessary
+                    $stmt = $db->prepare("UPDATE users SET invited_by = NULL WHERE id = ?");
+                    $stmt->execute([$user_id]);
+                
+                    if ($success) {
+                        $stmt = $db->prepare("
+                            INSERT INTO activity_log (project_id, user_id, action_type, description) 
+                            VALUES (?, ?, ?, ?)
+                        ");
+                        $stmt->execute([
+                            $project_id,
+                            $user_id,
+                            'user_removed',
+                            "User {$user_name} has been removed from project {$project_id}"
+                        ]);
+                
+                        // Send Notification
+                        $notificationResult = Notification::send('project_' . $project_id, 'user_removed', [
+                            'message' => $user_name . ' has been removed from the project',
+                            'action_type' => 'user_removed',
+                            'description' => $user_name . ' has been removed from the project',
+                            'created_at' => date('Y-m-d H:i:s')
+                        ]);
+                
+                        $response = [
+                            'success' => true, 
+                            'message' => $user_name . ' removed successfully',
+                            'notification' => $notificationResult
+                        ];
+                
+                        error_log("Notification Result: " . json_encode($notificationResult));
+                    } else {
+                        $response = ['success' => false, 'message' => 'Failed to remove user'];
+                    }
                     break;
-                }
-
-
-                $user_id = $_GET['user_id'];
-                $project_id = $_GET['project_id'];
-                $user_name = $_GET['user_name'];
-                // Delete user
-                $stmt = $db->prepare("DELETE FROM project_users WHERE user_id = ?");
-                $success = $stmt->execute([$user_id]);
-                // Delete user from project_users and nullify invited_by references if necessary
-                $stmt = $db->prepare("UPDATE users SET invited_by = NULL WHERE id = ?");
-                $stmt->execute([$user_id]);
-
-
-
-                if ($success) {
-                    $stmt = $db->prepare("
-                        INSERT INTO activity_log (project_id, user_id, action_type, description) 
-                        VALUES (?, ?, ?, ?)
-                    ");
-                    $stmt->execute([
-                        $project_id,
-                        $user_id,
-                        'user_removed',
-                        "User {$user_name} has been removed from project {$project_id}"
-                    ]);
-                    
-                    // date_default_timezone_set('Asia/Manila'); // Adjust this to your timezone
-                    
-                    // Send Notification
-                    $notificationResult = Notification::send('project_' . $project_id, 'user_removed', [
-                        'message' => $user_name . ' has been removed from the project',
-                        'action_type' => 'user_removed',
-                        'description' => $user_name . ' has been removed from the project',
-                        'created_at' => date('Y-m-d H:i:s')
-                    ]);
-
-                    $response = [
-                        'success' => true, 
-                        'message' => $user_name . ' removed successfully',
-                        'notification' => $notificationResult
-                    ];
-                    
-                    // Log the notification result for debugging
-                    error_log("Notification Result: " . json_encode($notificationResult));
-                } else {
-                    $response = ['success' => false, 'message' => 'Failed to remove user'];
-                }
-                break;
+                
             case 'get_task_assignees':
                 $data = json_decode(file_get_contents('php://input'), true);
                 if (!isset($data['task_id'])) {
@@ -5029,9 +5026,17 @@ function getLastSelectedProject() {
                         // Extract username from the <strong> tag
                         const userName = userDiv.querySelector("strong")?.textContent.trim() || "Unknown User";
                         if (confirm(`Are you sure you want to remove ${userName} ?`)) {
-                            fetch(`?api=delete_user&user_id=${userId}&project_id=${projectId}&user_name=${encodeURIComponent(userName)}`, {
-                                method: "DELETE"
-                            })
+                            fetch(`?api=delete_user`, {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: new URLSearchParams({
+        user_id: userId,
+        project_id: projectId,
+        user_name: userName
+    })
+})
                                 .then(response => response.json())
                                 .then(data => {
                                     if (data.success) {
