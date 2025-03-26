@@ -214,6 +214,9 @@ class Auth
                 throw new Exception("Invalid credentials");
             }
 
+                 // Update the last_login timestamp
+        $stmt = $this->db->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
+        $stmt->execute([$user['id']]);
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['pro_member'] = $user['pro_member'];
