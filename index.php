@@ -206,7 +206,7 @@ class Auth
     public function login($email, $password)
     {
         try {
-            $stmt = $this->db->prepare("SELECT id, username, password_hash, pro_plan as pro_member FROM users WHERE email = ?");
+            $stmt = $this->db->prepare("SELECT id, username, password_hash, pro_plan as pro_member, invited_by FROM users WHERE email = ?");
             $stmt->execute([$email]);
             $user = $stmt->fetch();
 
@@ -219,8 +219,10 @@ class Auth
             $_SESSION['pro_member'] = $user['pro_member'];
 
             if ($user['pro_member'] != 1) {
-                header("Location: " . $_ENV['STRIPE_PAYMENT_LINK']);
-                exit;
+                if ($user['invited_by'] === null) {
+                    header("Location: " . $_ENV['STRIPE_PAYMENT_LINK']);
+                    exit;  // Make sure the script stops here after the redirect
+                }
             }
             // $_SESSION['pro_member'] = $user['pro_member'];
 
@@ -255,7 +257,7 @@ class Auth
         }
 
         try {
-            $stmt = $this->db->prepare("SELECT id, username, email, pro_plan as pro_member FROM users WHERE id = ?");
+            $stmt = $this->db->prepare("SELECT id, username, email, pro_plan as pro_member, invited_by FROM users WHERE id = ?");
             $stmt->execute([$_SESSION['user_id']]);
             return $stmt->fetch();
         } catch (Exception $e) {
@@ -1563,16 +1565,22 @@ if (isset($_GET['api'])) {
 
                     $userManager = new UserManager();
                     $result = $userManager->createOrAssignUser(
-                        $data['username'],
                         $data['email'],
                         $data['project_id'] ?? null,
                         $data['role'] ?? null,
                         $_ENV['BASE_URL']
                     );
 
-
+                    // Set timezone to match your server/application timezone
+                    date_default_timezone_set('Asia/Manila'); // Adjust this to your timezone
+                    
                     // Send Notification
-                    $result = Notification::send('project_' . $data['project_id'], 'user_assigned', ['message' => 'New User ' . $data['username'] . ' joined as the ' . $data['role'] . 'in the project']);
+                    $result = Notification::send('project_' . $data['project_id'], 'user_assigned', [
+                        'message' => 'New User joined as the ' . $data['role'] . ' in the project',
+                        'action_type' => 'user_assigned',
+                        'description' => 'New User joined as the ' . $data['role'] . ' in the project',
+                        'created_at' => date('Y-m-d H:i:s')
+                    ]);
                     // Sending Email & Notification
                     try {
                         $emailSent = $userManager->projectUsersNewUserAddedEmail($data['username'], $projectTilte, $data['role'], $projectAllUsers, );
@@ -1631,21 +1639,42 @@ if (isset($_GET['api'])) {
                 // Delete user
                 $stmt = $db->prepare("DELETE FROM project_users WHERE user_id = ?");
                 $success = $stmt->execute([$user_id]);
+                // Delete user from project_users and nullify invited_by references if necessary
+                $stmt = $db->prepare("UPDATE users SET invited_by = NULL WHERE id = ?");
+                $stmt->execute([$user_id]);
 
 
 
                 if ($success) {
                     $stmt = $db->prepare("
-            INSERT INTO activity_log (project_id, user_id, action_type, description) 
-            VALUES (?, ?, ?, ?)
-        ");
+                        INSERT INTO activity_log (project_id, user_id, action_type, description) 
+                        VALUES (?, ?, ?, ?)
+                    ");
                     $stmt->execute([
                         $project_id,
                         $user_id,
                         'user_removed',
                         "User {$user_name} has been removed from project {$project_id}"
                     ]);
-                    $response = ['success' => true, 'message' => `$user_name removed successfully`];
+                    
+                    date_default_timezone_set('Asia/Manila'); // Adjust this to your timezone
+                    
+                    // Send Notification
+                    $notificationResult = Notification::send('project_' . $project_id, 'user_removed', [
+                        'message' => $user_name . ' has been removed from the project',
+                        'action_type' => 'user_removed',
+                        'description' => $user_name . ' has been removed from the project',
+                        'created_at' => date('Y-m-d H:i:s')
+                    ]);
+
+                    $response = [
+                        'success' => true, 
+                        'message' => $user_name . ' removed successfully',
+                        'notification' => $notificationResult
+                    ];
+                    
+                    // Log the notification result for debugging
+                    error_log("Notification Result: " . json_encode($notificationResult));
                 } else {
                     $response = ['success' => false, 'message' => 'Failed to remove user'];
                 }
@@ -1974,7 +2003,6 @@ if (isset($_GET['api'])) {
                 exit;
 
 
-
             // Notification
             case 'send_notification_project':
                 $data = json_decode(file_get_contents('php://input'), true);
@@ -2015,7 +2043,8 @@ if (isset($_GET['api'])) {
                     $response = [
                         'success' => true,
                         'is_pro' => $is_pro,
-                        'payment_link' => $_ENV['STRIPE_PAYMENT_LINK']
+                        'payment_link' => $_ENV['STRIPE_PAYMENT_LINK'],
+                        'invited_by' => $user['invited_by']
                     ];
                 }
                 break;
@@ -3899,16 +3928,9 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                         <div class="modal-body">
                             <form id="addUserForm">
                                 <div class="mb-3">
-                                    <label for="newUserName" class="form-label">User
-                                        Name<?php echo required_field(); ?></label>
-                                    <input type="text" class="form-control text-lowercase" id="newUserName" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="newUserEmail"
-                                        class="form-label">Email<?php echo required_field(); ?></label>
+                                    <label for="newUserEmail" class="form-label">Email<?php echo required_field(); ?></label>
                                     <input type="email" class="form-control text-lowercase" id="newUserEmail" required>
                                 </div>
-
                                 <div class="mb-3">
                                     <label for="newUserRole" class="form-label">Role<?php echo required_field(); ?></label>
                                     <input type="text" class="form-control" id="newUserRole"
@@ -3917,7 +3939,6 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> -->
                             <button type="button" class="btn btn-primary" id="addNewUserBtn"><i
                                     class="bi bi-send"></i>&nbsp;Send Invite</button>
                         </div>
@@ -4080,15 +4101,17 @@ function getLastSelectedProject() {
             if (isDashboard) {
 
                 // Check if user is a pro member and redirect if necessary
-                // fetch('?api=check_pro_status')
-                //     .then(response => response.json())
-                //     .then(data => {
-                //         if (data.success && !data.is_pro) {
-                //             console.log('User is not a pro member, redirecting to payment page');
-                //             window.location.href = data.payment_link;
-                //         }
-                //     })
-                //     .catch(error => console.error('Error checking pro status:', error));
+                fetch('?api=check_pro_status')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && (!data.is_pro)) {
+                           
+                            if (data.invited_by == null) {
+                                window.location.href = data.payment_link;
+                            }
+                        }
+                    })
+                    .catch(error => console.error('Error checking pro status:', error));
 
                 // check if user is pro member
                 // if no then redirect to stripe page simply
@@ -5046,17 +5069,15 @@ function getLastSelectedProject() {
                     $('#addUserModal').modal('show');
                 });
                 document.getElementById('addNewUserBtn').addEventListener('click', function () {
-                    const username = document.getElementById('newUserName').value.trim();
                     const email = document.getElementById('newUserEmail').value.trim();
                     const role = document.getElementById('newUserRole').value.trim();
 
-                    if (!username || !email || !role) {
+                    if (!email || !role) {
                         Toast('error', 'Error', 'Please fill in all fields', 'bottomCenter');
                         return;
                     }
                     if (!email.includes('@')) {
                         Toast('error', 'Error', 'Please enter a valid email', 'bottomCenter');
-
                         return;
                     }
 
@@ -5065,7 +5086,6 @@ function getLastSelectedProject() {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            username: username,
                             email: email,
                             project_id: currentProject,
                             role: role
@@ -5088,27 +5108,9 @@ function getLastSelectedProject() {
                                 bootstrap.Modal.getInstance(document.getElementById('addUserModal')).hide();
 
                                 // Clear the form
-                                document.getElementById('newUserName').value = '';
                                 document.getElementById('newUserEmail').value = '';
                                 document.getElementById('newUserRole').value = '';
 
-                                // Refresh the user list in the assign user modal
-                                // const userSelect = document.getElementById('userSelect');
-                                // // Remove the existing "Add New User" option if it exists
-                                // const addNewOption = Array.from(userSelect.options).find(option => option.value === 'new');
-                                // if (addNewOption) {
-                                //     addNewOption.remove();
-                                // }
-
-                                // Add the new user option
-                                // const newOption = new Option(
-                                //     `${username} (${email}) - ${role}`,
-                                //     data.data.user_id
-                                // );
-                                // userSelect.add(newOption);
-
-                                // Show different messages based on whether it's a new or existing user
-                                console.log(data)
                                 const successMessage = data.data?.is_new_user
                                     ? "User created and assigned successfully! An invite has been sent along with login credentials."
                                     : "User assigned to project successfully!";

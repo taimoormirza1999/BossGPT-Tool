@@ -17,13 +17,13 @@ class UserManager
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function createOrAssignUser($username, $email, $projectId = null, $role = null, $BASE_URL)
+    public function createOrAssignUser($email, $projectId = null, $role = null, $BASE_URL, $invited_by = null)
     {
         try {
             $this->db->beginTransaction();
 
             // Check if user exists by email
-            $stmt = $this->db->prepare("SELECT id, username FROM users WHERE email = ?");
+            $stmt = $this->db->prepare("SELECT id, username, invited_by FROM users WHERE email = ?");
             $stmt->execute([$email]);
             $existingUser = $stmt->fetch();
 
@@ -31,6 +31,7 @@ class UserManager
                 // User exists, just assign to project if needed
                 $userId = $existingUser['id'];
                 $existingUsername = $existingUser['username'];
+                $invitedBy = $existingUser['invited_by'];
 
                 // Check if user is already assigned to this project
                 if ($projectId && $role) {
@@ -58,6 +59,12 @@ class UserManager
                         ]);
                     }
                 }
+                // Update the invited_by field with the current user when assigned to a project
+                if ($invited_by === null && $projectId) {
+                    // If invited_by is null (user hasn't been invited yet), set invited_by
+                    $stmt = $this->db->prepare("UPDATE users SET invited_by = ? WHERE id = ?");
+                    $stmt->execute([$_SESSION['user_id'], $userId]);  // Set the inviter to the logged-in user
+                }
 
                 $this->db->commit();
 
@@ -70,14 +77,25 @@ class UserManager
             } else {
                 // Create new user
                 $tempPassword = $this->generateTempPassword();
+                
+                // Generate username from email
+                $username = explode('@', $email)[0];
+                $baseUsername = $username;
+                $counter = 1;
+                
+                // Check if username exists and append number if needed
+                while ($this->usernameExists($username)) {
+                    $username = $baseUsername . $counter;
+                    $counter++;
+                }
 
                 // Create user
                 $stmt = $this->db->prepare(
-                    "INSERT INTO users (username, email, password_hash) 
-                     VALUES (?, ?, ?)"
+                    "INSERT INTO users (username, email, password_hash, invited_by) 
+                     VALUES (?, ?, ?, ?)"
                 );
                 $hashedPassword = password_hash($tempPassword, PASSWORD_DEFAULT);
-                $stmt->execute([$username, $email, $hashedPassword]);
+                $stmt->execute([$username, $email, $hashedPassword, $_SESSION['user_id']]);
                 $userId = $this->db->lastInsertId();
 
                 // If projectId and role are provided, add user to project
@@ -102,7 +120,7 @@ class UserManager
                 $this->db->commit();
                 // Send welcome email with credentials
                 $this->sendInviteUserEmail($email, $username, $tempPassword, $BASE_URL, "testingtoken");
-                // Execute email script in the background
+                
                 return [
                     'success' => true,
                     'user_id' => $userId,
@@ -115,6 +133,13 @@ class UserManager
             throw $e;
         }
     }
+
+    private function usernameExists($username) {
+        $stmt = $this->db->prepare("SELECT 1 FROM users WHERE username = ?");
+        $stmt->execute([$username]);
+        return (bool) $stmt->fetch();
+    }
+
     public function getProjectUsers($project_id)
     {
         try {
