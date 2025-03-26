@@ -1572,7 +1572,7 @@ if (isset($_GET['api'])) {
                     );
 
                     // Set timezone to match your server/application timezone
-                    date_default_timezone_set('Asia/Manila'); // Adjust this to your timezone
+                    // date_default_timezone_set('Asia/Manila'); // Adjust this to your timezone
                     
                     // Send Notification
                     $result = Notification::send('project_' . $data['project_id'], 'user_assigned', [
@@ -1657,7 +1657,7 @@ if (isset($_GET['api'])) {
                         "User {$user_name} has been removed from project {$project_id}"
                     ]);
                     
-                    date_default_timezone_set('Asia/Manila'); // Adjust this to your timezone
+                    // date_default_timezone_set('Asia/Manila'); // Adjust this to your timezone
                     
                     // Send Notification
                     $notificationResult = Notification::send('project_' . $project_id, 'user_removed', [
