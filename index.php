@@ -214,9 +214,9 @@ class Auth
                 throw new Exception("Invalid credentials");
             }
 
-                 // Update the last_login timestamp
-        $stmt = $this->db->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
-        $stmt->execute([$user['id']]);
+            // Update the last_login timestamp
+            $stmt = $this->db->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
+            $stmt->execute([$user['id']]);
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['pro_member'] = $user['pro_member'];
@@ -1576,7 +1576,7 @@ if (isset($_GET['api'])) {
 
                     // Set timezone to match your server/application timezone
                     // date_default_timezone_set('Asia/Manila'); // Adjust this to your timezone
-                    
+
                     // Send Notification
                     $result = Notification::send('project_' . $data['project_id'], 'user_assigned', [
                         'message' => 'New User joined as the ' . $data['role'] . ' in the project',
@@ -1629,56 +1629,56 @@ if (isset($_GET['api'])) {
                 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 $response = ['success' => true, 'users' => $users];
                 break;
-                case 'delete_user':
-                    if (!isset($_POST['user_id']) || !isset($_POST['project_id']) || !isset($_POST['user_name'])) {
-                        $response = ['success' => false, 'message' => 'User ID, Project ID, and User Name are required'];
-                        break;
-                    }
-                
-                    $user_id = $_POST['user_id'];
-                    $project_id = $_POST['project_id'];
-                    $user_name = $_POST['user_name'];
-                
-                    // Delete user
-                    $stmt = $db->prepare("DELETE FROM project_users WHERE user_id = ?");
-                    $success = $stmt->execute([$user_id]);
-                
-                    // Nullify invited_by references if necessary
-                    $stmt = $db->prepare("UPDATE users SET invited_by = NULL WHERE id = ?");
-                    $stmt->execute([$user_id]);
-                
-                    if ($success) {
-                        $stmt = $db->prepare("
+            case 'delete_user':
+                if (!isset($_POST['user_id']) || !isset($_POST['project_id']) || !isset($_POST['user_name'])) {
+                    $response = ['success' => false, 'message' => 'User ID, Project ID, and User Name are required'];
+                    break;
+                }
+
+                $user_id = $_POST['user_id'];
+                $project_id = $_POST['project_id'];
+                $user_name = $_POST['user_name'];
+
+                // Delete user
+                $stmt = $db->prepare("DELETE FROM project_users WHERE user_id = ?");
+                $success = $stmt->execute([$user_id]);
+
+                // Nullify invited_by references if necessary
+                $stmt = $db->prepare("UPDATE users SET invited_by = NULL WHERE id = ?");
+                $stmt->execute([$user_id]);
+
+                if ($success) {
+                    $stmt = $db->prepare("
                             INSERT INTO activity_log (project_id, user_id, action_type, description) 
                             VALUES (?, ?, ?, ?)
                         ");
-                        $stmt->execute([
-                            $project_id,
-                            $user_id,
-                            'user_removed',
-                            "User {$user_name} has been removed from project {$project_id}"
-                        ]);
-                
-                        // Send Notification
-                        $notificationResult = Notification::send('project_' . $project_id, 'user_removed', [
-                            'message' => $user_name . ' has been removed from the project',
-                            'action_type' => 'user_removed',
-                            'description' => $user_name . ' has been removed from the project',
-                            'created_at' => date('Y-m-d H:i:s')
-                        ]);
-                
-                        $response = [
-                            'success' => true, 
-                            'message' => $user_name . ' removed successfully',
-                            'notification' => $notificationResult
-                        ];
-                
-                        error_log("Notification Result: " . json_encode($notificationResult));
-                    } else {
-                        $response = ['success' => false, 'message' => 'Failed to remove user'];
-                    }
-                    break;
-                
+                    $stmt->execute([
+                        $project_id,
+                        $user_id,
+                        'user_removed',
+                        "User {$user_name} has been removed from project {$project_id}"
+                    ]);
+
+                    // Send Notification
+                    $notificationResult = Notification::send('project_' . $project_id, 'user_removed', [
+                        'message' => $user_name . ' has been removed from the project',
+                        'action_type' => 'user_removed',
+                        'description' => $user_name . ' has been removed from the project',
+                        'created_at' => date('Y-m-d H:i:s')
+                    ]);
+
+                    $response = [
+                        'success' => true,
+                        'message' => $user_name . ' removed successfully',
+                        'notification' => $notificationResult
+                    ];
+
+                    error_log("Notification Result: " . json_encode($notificationResult));
+                } else {
+                    $response = ['success' => false, 'message' => 'Failed to remove user'];
+                }
+                break;
+
             case 'get_task_assignees':
                 $data = json_decode(file_get_contents('php://input'), true);
                 if (!isset($data['task_id'])) {
@@ -2098,6 +2098,11 @@ if (isset($_GET['api'])) {
     <script src="https://cdn.jsdelivr.net/npm/izitoast/dist/js/iziToast.min.js"></script>
     <!-- Tailwind CSS -->
     <!-- <script src="https://unpkg.com/@tailwindcss/browser@4"></script> -->
+    <!-- Initialize user ID for project management -->
+    <script>
+        window.userId = <?php echo isset($_SESSION['user_id']) ? json_encode($_SESSION['user_id']) : 'null'; ?>;
+        console.log('User ID initialized:', window.userId);
+    </script>
     <!-- Custom js -->
     <script src="./assets/js/custom.js"></script>
     <!-- Favicon links -->
@@ -2135,18 +2140,34 @@ if (isset($_GET['api'])) {
         }
 
         .chat-input {
-            padding: 1rem;
+            padding: 0.7rem 0.8rem;
             border-top: 1px solid #dee2e6;
             background: white;
         }
 
         .task-column {
             /* min-height: 60vh; */
-            min-height: calc(100vh - 300px);
-            background: #f8f9fa;
+            min-height: calc(100vh - 330px);
+            /* background: #f8f9fa; */
             border-radius: 12px;
             padding: 1rem;
             overflow-y: auto;
+        }
+
+        body.dark-mode .task-column {
+            background: rgba(76, 76, 76, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+        }
+
+        body.dark-mode .task-column_header {
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: large;
+            font-weight: 800;
         }
 
         .task-card {
@@ -2243,8 +2264,12 @@ if (isset($_GET['api'])) {
             word-wrap: break-word;
         }
 
+        .dark-mode .message.user {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
         .message.user {
-            background: #007bff;
+            /* background: #007bff; */
             color: white;
             margin-left: auto;
         }
@@ -2435,8 +2460,8 @@ if (isset($_GET['api'])) {
         }
 
         .task-column.drag-over {
-            background-color: rgba(0, 123, 255, 0.1);
-            border: 2px dashed #007bff;
+            background-color: var(--bs-primary-white10percent);
+            border: 2px dashed var(--bs-primary-stroke50percent);
         }
 
         .task-card {
@@ -2486,18 +2511,26 @@ if (isset($_GET['api'])) {
         }
 
         /* Update these styles */
+        .dark-mode .add-subtask-btn,
+        .dark-mode .ai-add-subtask-btn {
+            color: #fff !important;
+            text-decoration: none !important;
+        }
+
         .add-subtask-btn,
         .ai-add-subtask-btn {
             font-size: 0.9em;
             color: #0d6efd;
             padding: 0;
+            opacity: 0;
             display: none;
             transition: opacity 0.3s;
         }
 
         .task-card:hover .add-subtask-btn,
         .task-card:hover .ai-add-subtask-btn {
-            display: inline-block;
+            /* display: inline-block; */
+            opacity: 1;
         }
 
         /* Add this new code to handle image clicks (add it where other event listeners are defined) */
@@ -2556,22 +2589,34 @@ if (isset($_GET['api'])) {
         }
 
         body.dark-mode .card {
-            background-color: #242526;
+            /* background-color: #242526;
             border-color: #2f3031;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); */
+            border-color: var(--bs-primary-stroke50percent);
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            background-color: var(--bs-primary-dark50percent);
+        }
+
+        body.dark-mode .projects_card {
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(211, 211, 211, 0.5);
+            backdrop-filter: blur(7.199999809265137px)
         }
 
         body.dark-mode .navbar {
-            /* background-color: #242526 !important; */
+            background: rgba(131, 131, 131, 0.3);
+            box-shadow: 0px 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(8px);
             border-bottom: 1px solid #2f3031;
         }
 
-        body.dark-mode .task-column {
+        /* body.dark-mode .task-column {
             background-color: #18191c;
             border: 1px solid #2f3031;
             border-radius: 12px;
             box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
+        } */
 
         body.dark-mode .project-item {
             border-color: #2f3031;
@@ -2588,16 +2633,16 @@ if (isset($_GET['api'])) {
         }
 
         body.dark-mode .task-card {
-            background-color: #242526;
-            border: 1px solid #2f3031;
-            border-radius: 12px;
+            background-color: #101204;
+            border: 1px solid rgb(89 89 91 / 48%);
+            border-radius: 16px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
         }
 
         body.dark-mode .task-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
-            background-color: #2c2d2e;
+            box-shadow: 0 3px 6px var(--bs-primary-stroke50percent);
+            background-color: rgba(53, 53, 53, 1) !important;
         }
 
         body.dark-mode .task-description {
@@ -2613,31 +2658,49 @@ if (isset($_GET['api'])) {
         }
 
         body.dark-mode .message {
-            border: 1px solid #2f3031;
+            border: 1px solid rgba(211, 211, 211, 0.5);
             border-radius: 16px;
+            margin: auto auto;
+            margin-bottom: 1rem;
+            backdrop-filter: blur(8px);
         }
 
         body.dark-mode .message.ai {
-            background-color: #242526;
+            margin-left: 0.5rem;
+            background: rgba(194, 194, 194, 0.2);
+            border: 1px solid rgba(211, 211, 211, 0.5);
+            border-radius: 16px;
+            backdrop-filter: blur(8px);
             color: #e4e6eb;
+            padding: 1rem;
+            margin-bottom: 1rem;
         }
 
         body.dark-mode .chat-messages {
-            background-color: #18191c;
-            border: 1px solid #2f3031;
+            background-color: var(--bs-primary-white10percent);
+            /* border: 1px solid var(--bs-primary-white50percent); */
+            border-top: 0px;
+            backdrop-filter: blur(10px);
         }
 
         body.dark-mode .chat-input {
-            background-color: #242526;
-            border-top: 1px solid #2f3031;
+
+            border-bottom-left-radius: 1rem;
+            border-bottom-right-radius: 1rem;
+            background: rgba(24, 25, 28, 0.2);
+            border-top: 0.666667px solid rgba(211, 211, 211, 0.5);
         }
 
         body.dark-mode .form-control,
         body.dark-mode .form-select,
         body.dark-mode textarea {
-            background-color: #3a3b3c;
-            border-color: #2f3031;
+            /* background-color: #3a3b3c; */
+            border-color: #fff;
             color: #e4e6eb;
+            background: rgba(12, 1, 17, 0.5);
+border: 1px solid #585858;
+border-radius: 12px;
+            backdrop-filter: blur(4px);
         }
 
         body.dark-mode .form-control:focus,
@@ -2650,8 +2713,9 @@ if (isset($_GET['api'])) {
         }
 
         body.dark-mode .modal-content {
-            background-color: #242526;
-            border: 1px solid #2f3031;
+            background: rgba(33, 33, 33, 0.5);
+            backdrop-filter: blur(6.35px);
+            border-radius: 16px;
         }
 
         body.dark-mode .modal-header,
@@ -2692,13 +2756,17 @@ if (isset($_GET['api'])) {
 
         /* Select2 Dark Mode */
         body.dark-mode .select2-container--default .select2-selection--multiple {
-            background-color: #3a3b3c;
-            border-color: #2f3031;
+            background: rgba(12, 1, 17, 0.5);
+border: 1px solid #585858;
+border-radius: 12px;
+            backdrop-filter: blur(4px);
         }
 
         body.dark-mode .select2-container--default .select2-selection--multiple .select2-selection__choice {
-            background-color: #242526;
-            border-color: #2f3031;
+            background: rgba(12, 1, 17, 0.5);
+border: 1px solid #585858;
+border-radius: 12px;
+            backdrop-filter: blur(4px);
             color: #e4e6eb;
         }
 
@@ -2730,7 +2798,9 @@ if (isset($_GET['api'])) {
 
         /* Buttons in Dark Mode */
         body.dark-mode .btn-link {
-            color: #2374e1;
+            /* color: #2374e1; */
+            color: #fff;
+            text-decoration: none !important;
         }
 
         body.dark-mode .btn-link:hover {
@@ -2763,17 +2833,16 @@ if (isset($_GET['api'])) {
 
         /* Card headers */
         body.dark-mode .card-header {
-            background-color: #242526;
-            border-bottom: 1px solid #2f3031;
+            background-color: rgba(36, 37, 38, 0.5) !important;
         }
 
         /* Add or update these styles in your <style> section */
 
         /* Tab Navigation Styles */
         .nav-tabs {
-            border-bottom: 2px solid #e9ecef;
+            border-bottom: 0px;
             padding: 0.75rem 1rem;
-            background-color: #f8f9fa;
+            /* background-color: #f8f9fa; */
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -2840,8 +2909,8 @@ if (isset($_GET['api'])) {
 
         /* Dark mode styles */
         body.dark-mode .nav-tabs {
-            border-bottom-color: #2f3031;
-            background-color: #242526;
+            /* border-bottom-color: #2f3031; */
+            /* background-color: var(--bs-primary-dark); */
         }
 
         body.dark-mode .nav-tabs .nav-link {
@@ -3035,6 +3104,56 @@ if (isset($_GET['api'])) {
             position: relative;
             padding-bottom: 0.5rem;
         }
+
+        /* Show buttons when nav container is hovered and has overflow */
+        .nav-container:hover .nav-scroll-btn.show {
+            display: flex;
+        }
+
+        /* Custom dropdown toggle icon */
+        #projectDropdownButton.dropdown-toggle::after {
+            display: none !important;
+
+            /* Remove default caret */
+        }
+
+        #projectDropdownButton.dropdown-toggle {
+            display: inline-flex;
+            align-items: center;
+            font-size: 1.3rem !important;
+            text-transform: capitalize;
+            color: white !important;
+        }
+
+        #projectDropdownButton.dropdown-toggle svg {
+            margin-left: 5px;
+            width: 1.5rem;
+            height: 1.5rem;
+            transition: transform 0.2s;
+        }
+
+        #projectDropdownButton.dropdown-toggle[aria-expanded="true"] svg {
+            transform: rotate(180deg);
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+
+        /* Add this to manually add the chevron icon to dropdown toggles that don't have it */
+        #projectDropdownButton.dropdown-toggle:not(:has(svg))::after {
+            content: '';
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            margin-left: 5px;
+            background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 6L8 10L12 6' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+            transition: transform 0.2s;
+        }
+
+        #projectDropdownButton.dropdown-toggle[aria-expanded="true"]:not(:has(svg))::after {
+            transform: rotate(180deg);
+        }
     </style>
     <style>
         /* Updated border radius styles */
@@ -3108,10 +3227,47 @@ if (isset($_GET['api'])) {
         /* Unified Button Size and Corner Radius */
         .btn,
         .btn-sm {
-            padding: 0.5rem 1rem !important;
+            padding: 7px 16px;
             font-size: 1rem !important;
             border-radius: 10px !important;
-            border: 0.5px solid !important;
+            border: 1px solid var(--bs-secondary-stroke50percent) !important;
+            transition: all 0.5s ease-in-out !important;
+        }
+
+        button#notificationDropdown,
+        button#toggleDarkModeBtn {
+            padding: 7px 10px !important;
+        }
+
+        button#notificationDropdown:focus,
+        button#toggleDarkModeBtn:focus,
+        button#notificationDropdown:active,
+        button#toggleDarkModeBtn:active {
+            background: var(--bs-primary-white10percent) !important;
+            color: var(--bs-primary-white) !important;
+            box-shadow: none !important;
+        }
+
+        .btn .btn-icon-only:hover {
+            background: var(--bs-primary-white10percent) !important;
+        }
+
+        .btn-icon-only:hover,
+        .btn-icon-only:focus,
+        .btn-icon-only:active,
+        .btn:hover,
+        .btn:focus,
+        :not(.btn-primary):focus {
+            background: var(--bs-primary-white10percent) !important;
+            color: var(--bs-primary-white) !important;
+            box-shadow: none !important;
+        }
+
+        button.btn.btn-primary:hover {
+            background-color: var(--bs-primary-white) !important;
+            color: var(--bs-primary-black) !important;
+            border-color: var(--bs-primary-white) !important;
+            transform: translateY(-0.2rem);
         }
 
         .required-asterisk {
@@ -3240,16 +3396,14 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 ?>
 
 <body
-    style="background-color:<?php echo isset($_GET['page']) && ($_GET['page'] == 'login' || $_GET['page'] == 'register') ? '#000' : ''; ?>">
+    style="background-image: url('https://trello-backgrounds.s3.amazonaws.com/53baf533e697a982248cd73f/2048x2048/22ec03aab9d36ea49139c569a62bb079/shutterstock_134707556.jpg'); background-size: cover; background-position: center; background-color:<?php echo isset($_GET['page']) && ($_GET['page'] == 'login' || $_GET['page'] == 'register') ? '#000' : ''; ?> ">
     <?php
     $auth = new Auth();
-    // if (!isset($_GET['page'])) {
-    //     header('Location: index.php?page=login');
-    //     exit;
-    // }
+
+    $currentUrl = "https://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]"; // Get full current URL
     
-    if ($auth->isLoggedIn() && $_GET['page'] && in_array($_GET['page'], ['login', 'register'])) {
-        header('Location: ?page=dashboard');
+    if (!isset($_GET['page']) && strpos($currentUrl, $_ENV['STRIPE_PAYMENT_LINK']) == true) {
+        header('Location: index.php?page=login');
         exit;
     }
     // Check if the page parameter is set in the URL
@@ -3271,22 +3425,22 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
     if ($auth->isLoggedIn()):
         ?>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <div class="container-fluid" style="width: 98%; overflow: visible;">
+            <div class="container-fluid sides-padding" style="overflow: visible;">
                 <a class="navbar-brand" href="?page=dashboard">
-                    <?php echo getLogoImage($bottomMargin = '0.4rem', $topMargin = "0.4rem", $width = "10rem", $height = "auto", $positionClass = " ", $positionStyle = " ", $src = "https://res.cloudinary.com/da6qujoed/image/upload/v1742546475/bossgpt/leopyvcgbiyotpwrayha.png"); ?>
+                    <?php echo getLogoImage($bottomMargin = '0.4rem', $topMargin = "0.4rem", $width = "11rem", $height = "auto", $positionClass = " ", $positionStyle = " ", $src = "https://res.cloudinary.com/da6qujoed/image/upload/v1742651528/bossgpt-transparent_n4axv7.png"); ?>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <a class="nav-link <?= $page === 'dashboard' ? 'active' : '' ?>"
                                 href="?page=dashboard">Dashboard</a>
-                        </li>
+                        </li> -->
                     </ul>
                     <div class="d-flex align-items-center">
-                        <span class="navbar-text me-4">Welcome, <?= htmlspecialchars($_SESSION['username']) ?></span>
+                        <!-- <span class="navbar-text me-4">Welcome, <?= htmlspecialchars($_SESSION['username']) ?></span> -->
 
                         <div class="d-flex align-items-center me-4">
                             <label for="fontSizeRange" class="text-light me-2 mb-0">Font Size:</label>
@@ -3302,9 +3456,19 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                         ?>
                         <div class="dropdown">
                             <input type="hidden" id="myselectedcurrentProject" value="0">
-                            <button class="btn btn-outline-light position-relative" id="notificationDropdown"
+                            <button class="btn btn-icon-only position-relative " id="notificationDropdown"
                                 data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-bell"></i>
+                                <svg width="24" height="24" viewBox="0 0 24 24" class="" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 6.43994V9.76994" stroke="white" stroke-width="1.5" stroke-miterlimit="10"
+                                        stroke-linecap="round" />
+                                    <path
+                                        d="M12.0199 2C8.3399 2 5.3599 4.98 5.3599 8.66V10.76C5.3599 11.44 5.0799 12.46 4.7299 13.04L3.4599 15.16C2.6799 16.47 3.2199 17.93 4.6599 18.41C9.4399 20 14.6099 20 19.3899 18.41C20.7399 17.96 21.3199 16.38 20.5899 15.16L19.3199 13.04C18.9699 12.46 18.6899 11.43 18.6899 10.76V8.66C18.6799 5 15.6799 2 12.0199 2Z"
+                                        stroke="white" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" />
+                                    <path
+                                        d="M15.3299 18.8199C15.3299 20.6499 13.8299 22.1499 11.9999 22.1499C11.0899 22.1499 10.2499 21.7699 9.64992 21.1699C9.04992 20.5699 8.66992 19.7299 8.66992 18.8199"
+                                        stroke="white" stroke-width="1.5" stroke-miterlimit="10" />
+                                </svg>
                                 <span
                                     class="badge rounded-pill bg-danger position-absolute top-0 start-100 translate-middle"
                                     id="notificationBadge" style="display: none;">0</span>
@@ -3322,8 +3486,27 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                         </div>
 
                         <!-- Dark Mode Toggle Button -->
-                        <button id="toggleDarkModeBtn" class="btn btn-outline-light mx-2">Dark Mode</button>
+                        <!-- <button id="toggleDarkModeBtn" class="btn btn-outline-light mx-2">Dark Mode</button> -->
+                        <button id="toggleDarkModeBtn" class="btn btn-icon-only mx-2">
+                            <svg width="24" id="light-icon" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M12 18.5C15.5899 18.5 18.5 15.5899 18.5 12C18.5 8.41015 15.5899 5.5 12 5.5C8.41015 5.5 5.5 8.41015 5.5 12C5.5 15.5899 8.41015 18.5 12 18.5Z"
+                                    stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <path
+                                    d="M19.14 19.14L19.01 19.01M19.01 4.99L19.14 4.86L19.01 4.99ZM4.86 19.14L4.99 19.01L4.86 19.14ZM12 2.08V2V2.08ZM12 22V21.92V22ZM2.08 12H2H2.08ZM22 12H21.92H22ZM4.99 4.99L4.86 4.86L4.99 4.99Z"
+                                    stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
 
+                            <svg id="dark-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                fill="currentColor" viewBox="0 0 28 30">
+                                <path d="
+            M 23, 5
+            A 12 12 0 1 0 23, 25
+            A 12 12 0 0 1 23, 5
+        "></path>
+                            </svg>
+                        </button>
                         <!-- Logout Form -->
                         <form method="POST" class="d-inline">
                             <input type="hidden" name="action" value="logout">
@@ -3357,9 +3540,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
             ?>
             <div class="d-flex justify-content-center align-items-center min-vh-100 login-page ">
                 <div class="row justify-content-center w-100 position-relative">
-                    <!-- <img src="assets/images/bossgptlogo.svg" alt="Logo"
-                        class="position-absolute top-0 start-50 translate-middle "
-                        style="margin-top: -100px; width: 15rem; height: 10rem;position: absolute;top: 50%;left: 50%;transform: translate(-50%,-50%);"> -->
+
                     <?php echo getLogoImage("", "-70px"); ?>
                     <div class="col-md-6 col-lg-4">
                         <div class="card">
@@ -3463,12 +3644,40 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
             }
             ?>
             <!-- Replace the existing row div with this new layout -->
-            <div class="container-fluid">
+            <div class="container-fluid pb-5">
                 <!-- New Tab Navigation -->
-                <div class="nav-container">
-                    <ul class="nav nav-tabs mb-3" id="projectTabs">
+                <div class="nav-container row justify-content-between nav-background"
+                    style="background-color: var(--bs-primary-dark60percent); ">
+                    <div class="col-md-6 d-flex justify-content-between align-items-center self-center">
+                        <h4 class="text-capitalize font-weight-normal d-flex align-items-center" style="font-size: 1.4rem;">
+                            <span style="color: var(--bs-primary-white55percent);">Welcome,</span> <span
+                                class=" text-capitalize" style="color: var(--bs-primary-white)">
+                                &nbsp;<?php echo $_SESSION['username']; ?>&nbsp;</span>&nbsp;👋</h4>
+                    </div>
+                    <ul class="col-md-6 nav nav-tabs mb-0 d-flex justify-content-end align-items-center" id="projectTabs"
+                        style="width: auto; ">
                         <li class="nav-item">
-                            <button type="button" class="btn btn-primary ms-2" data-bs-toggle="modal"
+                            <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="modal"
+                                data-bs-target="#assignUserModal">
+                                <i class="bi bi-person-plus"></i> Invite User
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button type="button" class="btn btn-sm btn-secondary " data-bs-toggle="modal"
+                                data-bs-target="#activityLogModal">
+                                <i class="bi bi-clock-history"></i> Activity Log
+                            </button>
+                        </li>
+                        <?php if (TESTING_FEATURE == 1): ?>
+                            <li class="nav-item">
+
+                                <button type="button" class="btn btn-sm btn-info" onclick='sendWelcomeEmailTest()'>
+                                    <i class="bi bi-clock-history"></i> Testing Feature
+                                </button>
+                            </li>
+                        <?php endif; ?>
+                        <li class="nav-item">
+                            <button type="button" class="btn btn-primary " data-bs-toggle="modal"
                                 data-bs-target="#newProjectModal">
                                 <i class="bi bi-plus"></i> New Project
                             </button>
@@ -3477,54 +3686,57 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                 </div>
 
                 <!-- Main Content Area -->
-                <div class="row">
+                <div class="row sides-padding " style="width: 100%!important;">
                     <!-- Tasks Panel (Board) - now spans 9 columns -->
                     <div class="col-md-9">
-                        <div class="card h-100">
+                        <div class="card h-100 projects_card">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0">Task Board</h5>
-                                <div>
-                                    <button type="button" class="btn btn-sm btn-info me-2" data-bs-toggle="modal"
-                                        data-bs-target="#activityLogModal">
-                                        <i class="bi bi-clock-history"></i> Activity Log
+                                <div class="dropdown">
+                                    <button class="btn btn-link dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                                        aria-expanded="false" id="projectDropdownButton">
+                                        Select Project
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
                                     </button>
-
-                                    <?php if (TESTING_FEATURE == 1): ?>
-                                        <button type="button" class="btn btn-sm btn-info me-2" onclick='sendWelcomeEmailTest()'>
-                                            <i class="bi bi-clock-history"></i> Testing Feature Button
-                                        </button>
-                                    <?php endif; ?>
-                                    <!-- <button type="button" class="btn btn-sm btn-info me-2" onclick='sendEmailBtn()'>
-                                        <i class="bi bi-clock-history"></i> Testing Feature Button
-                                    </button> -->
-                                    <button type="button" class="btn btn-sm btn-primary me-2" data-bs-toggle="modal"
-                                        data-bs-target="#newTaskModal">
-                                        <i class="bi bi-plus"></i> New Task
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="modal"
-                                        data-bs-target="#assignUserModal">
-                                        <i class="bi bi-person-plus"></i> Invite User
-                                    </button>
+                                    <ul class="dropdown-menu" id="projectDropdown">
+                                        <!-- Dynamically loaded items will be appended here -->
+                                    </ul>
                                 </div>
+
+
+                                <button type="button" class="btn btn-sm btn-primary me-2" data-bs-toggle="modal"
+                                    data-bs-target="#newTaskModal">
+                                    <i class="bi bi-plus"></i> Create New Task
+                                </button>
+
                             </div>
-                            <div class="card-body">
+                            <div class="card-body pb-0">
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <h6 class="text-center">To Do</h6>
-                                        <div class="task-column" id="todoTasks" data-status="todo">
-                                            <!-- Todo tasks will be loaded here -->
+                                        <div class="task-column_section ">
+                                            <h6 class="text-center task-column_header column_todo">To Do</h6>
+                                            <div class="task-column" id="todoTasks" data-status="todo">
+                                                <!-- Todo tasks will be loaded here -->
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
-                                        <h6 class="text-center">In Progress</h6>
-                                        <div class="task-column" id="inProgressTasks" data-status="in_progress">
-                                            <!-- In progress tasks will be loaded here -->
+                                        <div class="task-column_section">
+                                            <h6 class="text-center task-column_header column_in_progress">In Progress</h6>
+                                            <div class="task-column" id="inProgressTasks" data-status="in_progress">
+                                                <!-- In progress tasks will be loaded here -->
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
-                                        <h6 class="text-center">Done</h6>
-                                        <div class="task-column" id="doneTasks" data-status="done">
-                                            <!-- Completed tasks will be loaded here -->
+                                        <div class="task-column_section">
+                                            <h6 class="text-center task-column_header column_done">Done</h6>
+                                            <div class="task-column" id="doneTasks" data-status="done">
+                                                <!-- Completed tasks will be loaded here -->
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -3534,15 +3746,18 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 
                     <!-- Chat Panel - now spans 3 columns -->
                     <div class="col-md-3">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0">BossGPT Assistant <svg stroke="currentColor" fill="currentColor"
-                                        stroke-width="0" viewBox="0 0 640 512" class="text-5xl" height="1.6em" width="1.6em"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            d="M32,224H64V416H32A31.96166,31.96166,0,0,1,0,384V256A31.96166,31.96166,0,0,1,32,224Zm512-48V448a64.06328,64.06328,0,0,1-64,64H160a64.06328,64.06328,0,0,1-64-64V176a79.974,79.974,0,0,1,80-80H288V32a32,32,0,0,1,64,0V96H464A79.974,79.974,0,0,1,544,176ZM264,256a40,40,0,1,0-40,40A39.997,39.997,0,0,0,264,256Zm-8,128H192v32h64Zm96,0H288v32h64ZM456,256a40,40,0,1,0-40,40A39.997,39.997,0,0,0,456,256Zm-8,128H384v32h64ZM640,256V384a31.96166,31.96166,0,0,1-32,32H576V224h32A31.96166,31.96166,0,0,1,640,256Z">
-                                        </path>
-                                    </svg></h5>
+                        <div class="card" style="background-color: transparent!important;">
+                            <div class="card-header" style="
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* align-items: center; */
+    padding: 12px 13px;
+    gap: 10px;
+    border-bottom: 0.5px solid;
+">
+                                <h5 class="mb-0"><?php echo getIconImage(0, 0, "2.5rem"); ?> &nbsp; Boss<span
+                                        style="font-weight: 700;">GPT</span> Assistant </h5>
                             </div>
                             <div class="card-body p-0">
                                 <div class="chat-container">
@@ -3624,7 +3839,6 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                                     ];
 
                                                     async function showMessage(message) {
-                                                        // console.log('Showing message:', message.title); // Debug log
 
                                                         // Show loading animation first
                                                         showChatLoading();
@@ -3644,9 +3858,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                                         let content = `
         <div class="ai-avatar">
             <div class="chat-loading-avatar">
-                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 640 512" height="1.5em" width="1.5em" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M32,224H64V416H32A31.96166,31.96166,0,0,1,0,384V256A31.96166,31.96166,0,0,1,32,224Zm512-48V448a64.06328,64.06328,0,0,1-64,64H160a64.06328,64.06328,0,0,1-64-64V176a79.974,79.974,0,0,1,80-80H288V32a32,32,0,0,1,64,0V96H464A79.974,79.974,0,0,1,544,176ZM264,256a40,40,0,1,0-40,40A39.997,39.997,0,0,0,264,256Zm-8,128H192v32h64Zm96,0H288v32h64ZM456,256a40,40,0,1,0-40,40A39.997,39.997,0,0,0,456,256Zm-8,128H384v32h64ZM640,256V384a31.96166,31.96166,0,0,1-32,32H576V224h32A31.96166,31.96166,0,0,1,640,256Z"></path>
-                </svg>
+            <?php echo getIconImage(0, 0, "1.5rem"); ?>
             </div>
         </div>
         <div class="message ai text-center mt-3">
@@ -3706,7 +3918,9 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                         <form id="chatForm" class="d-flex">
                                             <input type="text" class="form-control me-2" id="messageInput"
                                                 placeholder="Type your message...">
-                                            <button type="submit" class="btn btn-primary">Send</button>
+                                            <button type="submit"
+                                                class="btn btn-primary"><?php echo file_get_contents("assets/icons/send.svg"); ?>
+                                            </button>
                                         </form>
                                     </div>
                                 </div>
@@ -3720,7 +3934,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
             <div class="modal fade" id="newProjectModal" tabindex="-1">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content border-0 shadow-lg rounded-lg">
-                        <div class="modal-header bg-primary text-white border-0 rounded-t-lg">
+                        <div class="modal-header text-white border-0 rounded-t-lg">
                             <h5 class="modal-title">Create New Project</h5>
                             <button type="button" class="btn-close text-white" data-bs-dismiss="modal"
                                 aria-label="Close "></button>
@@ -3854,7 +4068,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                 aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content border-0 shadow-lg rounded-lg">
-                        <div class="modal-header bg-primary text-white border-0 rounded-t-lg">
+                        <div class="modal-header text-white border-0 rounded-t-lg">
                             <h5 class="modal-title" id="assignUserModalLabel">Invite User to Project</h5>
                             <button type="button" class="btn-close text-white" data-bs-dismiss="modal"
                                 aria-label="Close "></button>
@@ -3921,14 +4135,15 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
             <div class="modal fade" id="addUserModal" tabindex="-1">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
-                        <div class="modal-header bg-primary text-white border-0 rounded-t-lg">
+                        <div class="modal-header text-white border-0 rounded-t-lg">
                             <h5 class="modal-title">Add New User</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body">
                             <form id="addUserForm">
                                 <div class="mb-3">
-                                    <label for="newUserEmail" class="form-label">Email<?php echo required_field(); ?></label>
+                                    <label for="newUserEmail"
+                                        class="form-label">Email<?php echo required_field(); ?></label>
                                     <input type="email" class="form-control text-lowercase" id="newUserEmail" required>
                                 </div>
                                 <div class="mb-3">
@@ -3949,7 +4164,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
             <div class="modal fade" id="newTaskModal" tabindex="-1">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
-                        <div class="modal-header bg-primary text-white border-0 rounded-t-lg">
+                        <div class="modal-header text-white border-0 rounded-t-lg">
                             <h5 class="modal-title">Create New Task</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
@@ -4031,7 +4246,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
             <div class="modal fade" id="activityLogModal" tabindex="-1">
                 <div class="modal-dialog modal-lg modal-dialog-centered ">
                     <div class="modal-content">
-                        <div class="modal-header bg-primary text-white border-0 rounded-t-lg">
+                        <div class="modal-header text-white border-0 rounded-t-lg">
                             <h5 class="modal-title">Project Activity Log</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
@@ -4082,12 +4297,12 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         var userId = null;
-function getLastSelectedProject() {
-    if (userId) { // Check if userId is available
-        return localStorage.getItem(`lastSelectedProject_${userId}`);
-    }
-    return null; // No user logged in or session expired
-}
+        function getLastSelectedProject() {
+            if (userId) { // Check if userId is available
+                return localStorage.getItem(`lastSelectedProject_${userId}`);
+            }
+            return null; // No user logged in or session expired
+        }
 
         document.addEventListener('DOMContentLoaded', function () {
 
@@ -4105,7 +4320,7 @@ function getLastSelectedProject() {
                     .then(response => response.json())
                     .then(data => {
                         if (data.success && (!data.is_pro)) {
-                           
+
                             if (data.invited_by == null) {
                                 window.location.href = data.payment_link;
                             }
@@ -4196,14 +4411,14 @@ function getLastSelectedProject() {
                 }
 
                 // Load projects
-                function loadProjects() {
+                function loadProjectsOld() {
                     showLoading();
                     fetch('?api=get_projects')
                         .then(response => response.json())
                         .then(data => {
                             console.log("Loaded projects: ", data.projects);
                             if (data.success) {
-                                const projectTabs = document.getElementById('projectTabs');
+                                // const projectTabs = document.getElementById('projectTabs');
                                 // Keep the "New Project" button as the first item
                                 const newProjectBtn = projectTabs.firstElementChild;
                                 projectTabs.innerHTML = '';
@@ -4256,9 +4471,104 @@ function getLastSelectedProject() {
                         })
                         .finally(hideLoading);
                 }
+                function loadProjects() {
+                    showLoading();
+                    fetch('?api=get_projects')
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log("Loaded projects: ", data.projects);
+                            if (data.success) {
+                                const projectDropdown = document.getElementById('projectDropdown');
+                                // Clear the dropdown menu
+                                projectDropdown.innerHTML = '';
 
+                                if (!data.projects || data.projects.length === 0) {
+                                    // If no projects exist, display a placeholder item
+                                    const placeholder = document.createElement('li');
+                                    placeholder.className = 'dropdown-item disabled';
+                                    placeholder.textContent = 'No projects found';
+                                    projectDropdown.appendChild(placeholder);
+                                } else {
+                                    // Loop through the projects and create dropdown items
+                                    data.projects.forEach(project => {
+                                        const li = document.createElement('li');
+                                        li.className = 'dropdown-item';
+                                        li.innerHTML = `
+                            <button class="dropdown-item" type="button" data-id="${project.id}" title="${escapeHtml(project.title)}">
+                                ${escapeHtml(project.title)}
+                            </button>
+                        `;
+                                        projectDropdown.appendChild(li);
+                                    });
+                                }
+
+                                // // Add click handler for project selection
+                                // document.querySelectorAll('.dropdown-item[data-id]').forEach(item => {
+                                //     item.addEventListener('click', (e) => {
+                                //         e.preventDefault();
+                                //         // const projectTitle = item.querySelector('button').getAttribute('title');
+                                //         // selectProject(item.dataset.id, projectTitle);
+                                //         console.log(item.dataset)
+                                //     });
+                                // });
+                                document.querySelectorAll('.dropdown-item').forEach(item => {
+                                    item.addEventListener('click', (e) => {
+                                        e.preventDefault();
+
+                                        // Select the <button> inside the dropdown item
+                                        const button = item.querySelector('button');
+
+                                        if (button) {
+                                            // Get the data-id and title attributes from the button
+                                            const projectId = button.dataset.id; // 'data-id' from button
+                                            const projectTitle = button.getAttribute('title'); // 'title' attribute from button
+
+                                            console.log(projectId, projectTitle); // Check the output
+
+                                            // Call the selectProject function with both the ID and title
+                                            selectProject(projectId, projectTitle);
+                                        }
+                                    });
+                                });
+
+                                return 2;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error loading projects:', error);
+                            const projectDropdown = document.getElementById('projectDropdown');
+                            projectDropdown.innerHTML = `
+                <li class="dropdown-item">
+                    <div class="alert alert-danger">
+                        Unable to load projects. Please try again later.
+                    </div>
+                </li>
+            `;
+                        })
+                        .finally(hideLoading);
+                }
                 // Select project
                 function selectProject(projectId, selectedProjectTitle = "") {
+                    // Create a temporary div to store the SVG
+                    const $button = $('#projectDropdownButton');
+
+                    // Get the current SVG if it exists
+                    const $svg = $button.find('svg').clone();
+
+                    // Clear the button text
+                    $button.text(selectedProjectTitle);
+
+                    // Add the SVG back if it exists
+                    if ($svg.length > 0) {
+                        $button.append($svg);
+                    } else {
+                        // If SVG doesn't exist, add a new one
+                        $button.append(`
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        `);
+                    }
                     // currentProject = projectId;
                     projectId = parseInt(projectId);
                     currentProject = parseInt(projectId);
@@ -4275,6 +4585,11 @@ function getLastSelectedProject() {
                     }
                     // console.log('Selecting project:', projectId);
                     currentProject = projectId;
+                    // Mark the selected item in the dropdown
+                    $('#projectDropdown button').attr('data-selected', false);
+                    $('#projectDropdown button').removeClass('active');
+                    $(`#projectDropdown button[data-id="${projectId}"]`).attr('data-selected', true);
+                    $(`#projectDropdown button[data-id="${projectId}"]`).addClass('active');
 
                     document.querySelectorAll('.project-item').forEach(item => {
                         const itemId = parseInt(item.dataset.id);
@@ -4482,6 +4797,12 @@ function getLastSelectedProject() {
 
                     // Updated innerHTML now includes the due date in the task-meta section
                     div.innerHTML = `
+                    <div class="task-card-labels mb-2">
+                            ${task.status === 'todo' ? '<span class="task-label label-red"></span>' : ''}
+                            ${task.status === 'in_progress' ? '<span class="task-label label-orange"></span>' : ''}
+                            ${task.status === 'done' ? '<span class="task-label label-green"></span>' : ''}
+                            <span class="task-label label-blue"></span>
+                        </div>
                         <div class="d-flex justify-content-between align-items-start mb-2">
                             <h6 class="mb-0">${escapeHtml(task.title)}</h6>
                             <button class="btn btn-sm btn-danger delete-task-btn" data-id="${task.id}">
@@ -4494,11 +4815,20 @@ function getLastSelectedProject() {
                             ${dueDateHtml}
                             ${task.assigned_users ? `
                                 <div class="task-assignees d-flex gap-1 border-0 m-0 p-0">
-                                    ${Object.entries(task.assigned_users).map(([id, username]) => `
-                                        <span class="task-assignee">
-                                            <i class="bi bi-person-fill"></i> ${escapeHtml(username)}
+                                    ${Object.entries(task.assigned_users).map(([id, username]) => {
+                        // Generate background color based on user ID
+                        // First user gets rgba(61, 127, 41, 1), others get varied hues
+                        const hues = [61, 200, 0, 280, 30, 320, 170, 60, 340, 250]; // Green, blue, red, purple, orange, etc.
+                        const index = parseInt(id) % hues.length;
+                        const hue = hues[index];
+                        const bgColor = `hsl(${hue}, 50%, 40%)`; // Consistent saturation and lightness
+
+                        return `
+                                        <span class="task-assignee text-capitalize" style="background-color: ${bgColor}; color: white;">
+                                            ${escapeHtml(username[0].charAt(0).toUpperCase() + username[1].charAt(0).toUpperCase())}
                                         </span>
-                                    `).join('')}
+                                        `;
+                    }).join('')}
                                 </div>
                             ` : ''}
                         </div>
@@ -5027,16 +5357,16 @@ function getLastSelectedProject() {
                         const userName = userDiv.querySelector("strong")?.textContent.trim() || "Unknown User";
                         if (confirm(`Are you sure you want to remove ${userName} ?`)) {
                             fetch(`?api=delete_user`, {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-    },
-    body: new URLSearchParams({
-        user_id: userId,
-        project_id: projectId,
-        user_name: userName
-    })
-})
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/x-www-form-urlencoded"
+                                },
+                                body: new URLSearchParams({
+                                    user_id: userId,
+                                    project_id: projectId,
+                                    user_name: userName
+                                })
+                            })
                                 .then(response => response.json())
                                 .then(data => {
                                     if (data.success) {
@@ -5138,8 +5468,33 @@ function getLastSelectedProject() {
                 // Helper functions
                 function appendMessage(message, sender) {
                     const div = document.createElement('div');
-                    div.className = `message ${sender}`;
-                    div.textContent = message;
+                    div.className = sender === 'user' ? 'user-message d-flex align-items-start justify-content-end' : 'ai-message d-flex align-items-start';
+
+                    if (sender === 'user') {
+                        // Get username from session
+                        const username = '<?php echo $_SESSION["username"]; ?>';
+                        const initials = username.split(' ').map(word => word[0].toUpperCase()).join('').slice(0, 2);
+
+                        div.innerHTML = `
+                            <div class="message user me-2">${message}</div>
+                            <div class="user-avatar">
+                                <div class="chat-loading-avatar d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #44125c 0%, #713e7f 100%);">
+                                    ${initials}
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        div.innerHTML = `
+                            <div class="ai-avatar">
+                                <div class="chat-loading-avatar">
+                                    <img src='https://res.cloudinary.com/da6qujoed/image/upload/v1742656707/logoIcon_pspxgh.png' alt="Logo"
+                                    class="logo-icon" style="margin-top: 0; margin-bottom: 0; width: 1.5rem; height:auto">
+                                </div>
+                            </div>
+                            <div class="message ai">${message}</div>
+                        `;
+                    }
+
                     chatMessages.appendChild(div);
                     chatMessages.scrollTop = chatMessages.scrollHeight;
                 }
@@ -5210,7 +5565,7 @@ function getLastSelectedProject() {
                             'Error',
                             'Please select a project first'
                         );
-                        // bootstrap.Modal.getInstance(newTaskModal).hide();
+                        bootstrap.Modal.getInstance(newTaskModal).hide();
                         return;
                     }
 
@@ -5902,7 +6257,25 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                         cursor: not-allowed;
                     }
                 `;
+                // Add event delegation for the add-subtask-btn
+                document.addEventListener('click', function (e) {
+                    if (e.target.closest('.add-subtask-btn')) {
+                        e.stopPropagation(); // Prevent task card click event
+                        const taskId = e.target.closest('.add-subtask-btn').dataset.taskId;
+                        openAddSubtaskModal(taskId);
+                    }
+                });
 
+                // Add this event delegation handler before the closing of isDashboard block
+                document.addEventListener('click', function (e) {
+                    if (e.target.closest('.delete-task-btn')) {
+                        e.stopPropagation(); // Prevent task card click event
+                        const taskId = e.target.closest('.delete-task-btn').dataset.id;
+                        if (confirm('Are you sure you want to delete this task?')) {
+                            deleteTask(taskId);
+                        }
+                    }
+                });
             } else {
                 // We're on the login or register page
                 // Only initialize necessary elements
@@ -5943,14 +6316,9 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
             if (toggleDarkModeBtn) {
                 // Check localStorage to apply dark mode preference on load
                 if (localStorage.getItem('preferredDarkMode') === 'false') {
-                    // document.body.classList.add('dark-mode');
-                    // toggleDarkModeBtn.textContent = 'Light Mode';
                     document.body.classList.remove('dark-mode');
-                    toggleDarkModeBtn.textContent = 'Dark Mode';
                 } else {
                     document.body.classList.add('dark-mode');
-                    toggleDarkModeBtn.textContent = 'Light Mode';
-                    // toggleDarkModeBtn.textContent = 'Dark Mode';
                 }
 
                 // Toggle dark mode when the button is clicked
@@ -5958,10 +6326,8 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                     document.body.classList.toggle('dark-mode');
                     if (document.body.classList.contains('dark-mode')) {
                         localStorage.setItem('preferredDarkMode', 'true');
-                        toggleDarkModeBtn.textContent = 'Light Mode';
                     } else {
                         localStorage.setItem('preferredDarkMode', 'false');
-                        toggleDarkModeBtn.textContent = 'Dark Mode';
                     }
                 });
             }

@@ -1,55 +1,78 @@
+// Initial Loader
+document.addEventListener('DOMContentLoaded', function() {
+    // Create and append loader
+    const loader = document.createElement('div');
+    loader.className = 'initial-loader';
+    loader.innerHTML = `
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <div class="loader-text">Loading BossGPT...</div>
+        </div>
+    `;
+    document.body.appendChild(loader);
+
+    // Remove loader after 3 seconds
+    setTimeout(() => {
+        loader.classList.add('fade-out');
+        setTimeout(() => {
+            loader.remove();
+        }, 500);
+    }, 3000);
+});
+
 // Notification System
 let isFetchingNotifications = false;
 let isDropdownOpen = false;
 
 function fetchNotificationsAndOpen(showDropdown = true) {
-    if (isFetchingNotifications) return;
-    isFetchingNotifications = true;
-    isDropdownOpen = true;
+  if (isFetchingNotifications) return;
+  isFetchingNotifications = true;
+  isDropdownOpen = true;
 
-    const dropdown = new bootstrap.Dropdown(document.getElementById('notificationDropdown'));
-    const currentProject = $('#myselectedcurrentProject').val();
+  const dropdown = new bootstrap.Dropdown(
+    document.getElementById("notificationDropdown")
+  );
+  const currentProject = $("#myselectedcurrentProject").val();
 
-    if (!currentProject || currentProject == undefined) {
-        Toast("error", "Error", "Please select a project first");
-        isFetchingNotifications = false;
-        return;
-    }
-    
+  if (!currentProject || currentProject == undefined) {
+    Toast("error", "Error", "Please select a project first");
+    isFetchingNotifications = false;
+    return;
+  }
 
-    fetchNotifications(currentProject)
-        .then(() => {
-            if (showDropdown && !isDropdownOpen) {
-                dropdown.show(); //toggle dropdown
-            }else if (!isDropdownOpen){
-                dropdown.hide(); //hide dropdown
-            }
-            isFetchingNotifications = false;
-        })
-        .catch(error => {
-            console.error("Error fetching notifications:", error);
-            isFetchingNotifications = false;
-        });
+  fetchNotifications(currentProject)
+    .then(() => {
+      if (showDropdown && !isDropdownOpen) {
+        dropdown.show(); //toggle dropdown
+      } else if (!isDropdownOpen) {
+        dropdown.hide(); //hide dropdown
+      }
+      isFetchingNotifications = false;
+    })
+    .catch((error) => {
+      console.error("Error fetching notifications:", error);
+      isFetchingNotifications = false;
+    });
 }
 
 function fetchNotifications(project_id) {
-    return new Promise((resolve, reject) => {
-        fetch('?api=get_unreadnotifications&project_id='+project_id)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    updateNotificationDropdown(data.logs || []);
-                    resolve();
-                } else {
-                    console.error("Error fetching notifications:", data.message);
-                    reject(new Error(data.message));
-                }
-            })
-            .catch(error => {
-                console.error("Request failed:", error);
-                reject(error);
-            });
-    });
+  return new Promise((resolve, reject) => {
+    fetch("?api=get_unreadnotifications&project_id=" + project_id)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          updateNotificationDropdown(data.logs || []);
+          resolve();
+        } else {
+          console.error("Error fetching notifications:", data.message);
+          reject(new Error(data.message));
+        }
+      })
+      .catch((error) => {
+        console.error("Request failed:", error);
+        reject(error);
+      });
+  });
 }
 
 // Initialize notification system when DOM is loaded
@@ -69,7 +92,7 @@ function Toast(type, title, message, positionToast) {
   const toastOptions = {
     title: title,
     message: message,
-    position: positionToast?positionToast:"bottomCenter",
+    position: positionToast ? positionToast : "bottomCenter",
   };
   switch (type) {
     case "info":
@@ -116,26 +139,32 @@ function Toast(type, title, message, positionToast) {
 
 function hideModalWithDelay(modalId, delay = 1500) {
   setTimeout(() => {
-      // Try both jQuery and Bootstrap methods for maximum compatibility
-      try {
-          // Using jQuery if available
-          if (typeof $ !== 'undefined') {
-              $(`#${modalId}`).modal('hide');
-          } else {
-              // Using Bootstrap native
-              const modalElement = document.getElementById(modalId);
-              const modalInstance = bootstrap.Modal.getInstance(modalElement);
-              if (modalInstance) {
-                  modalInstance.hide();
-              }
-          }
-      } catch (error) {
-          console.error('Error hiding modal:', error);
+    // Try both jQuery and Bootstrap methods for maximum compatibility
+    try {
+      // Using jQuery if available
+      if (typeof $ !== "undefined") {
+        $(`#${modalId}`).modal("hide");
+      } else {
+        // Using Bootstrap native
+        const modalElement = document.getElementById(modalId);
+        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+        if (modalInstance) {
+          modalInstance.hide();
+        }
       }
+    } catch (error) {
+      console.error("Error hiding modal:", error);
+    }
   }, delay);
 }
 
-function showToastAndHideModal(modalId, toastType, toastTitle, toastMessage, delay = 1500) {
+function showToastAndHideModal(
+  modalId,
+  toastType,
+  toastTitle,
+  toastMessage,
+  delay = 1500
+) {
   // Show toast first
   Toast(toastType, toastTitle, toastMessage);
   // Hide modal with delay
@@ -145,7 +174,7 @@ function showToastAndHideModal(modalId, toastType, toastTitle, toastMessage, del
 // Chat Loading Animation
 function initializeChatLoading() {
   // Add the CSS for loading animation
-  const style = document.createElement('style');
+  const style = document.createElement("style");
   style.textContent = `
       .chat-loading {
           display: flex;
@@ -237,7 +266,8 @@ function initializeChatLoading() {
       }
 
       body.dark-mode .chat-loading-avatar {
-          background: rgba(255,255,255,0.4);
+       background-color: rgba(194, 194, 194, 0.2);
+backdrop-filter: blur(8px);
           color: #fff;
           
       }
@@ -247,14 +277,18 @@ function initializeChatLoading() {
 
 // Show Chat Loading Animation
 function showChatLoading() {
-  const chatMessages = document.querySelector('.chat-messages');
+  const chatMessages = document.querySelector(".chat-messages");
   if (!chatMessages) return;
 
-  const loadingElement = document.createElement('div');
-  loadingElement.className = 'chat-loading';
+  const loadingElement = document.createElement("div");
+  loadingElement.className = "chat-loading";
   loadingElement.innerHTML = `
       <div class="chat-loading-container">
-          <div class="chat-loading-avatar"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 640 512" class="text-5xl" height="1.5em" width="1.5em" xmlns="http://www.w3.org/2000/svg"><path d="M32,224H64V416H32A31.96166,31.96166,0,0,1,0,384V256A31.96166,31.96166,0,0,1,32,224Zm512-48V448a64.06328,64.06328,0,0,1-64,64H160a64.06328,64.06328,0,0,1-64-64V176a79.974,79.974,0,0,1,80-80H288V32a32,32,0,0,1,64,0V96H464A79.974,79.974,0,0,1,544,176ZM264,256a40,40,0,1,0-40,40A39.997,39.997,0,0,0,264,256Zm-8,128H192v32h64Zm96,0H288v32h64ZM456,256a40,40,0,1,0-40,40A39.997,39.997,0,0,0,456,256Zm-8,128H384v32h64ZM640,256V384a31.96166,31.96166,0,0,1-32,32H576V224h32A31.96166,31.96166,0,0,1,640,256Z"></path></svg></div>
+        <div class="chat-loading-avatar">
+         <img src='https://res.cloudinary.com/da6qujoed/image/upload/v1742656707/logoIcon_pspxgh.png' alt="Logo"
+            class="logo-icon"
+            style="margin-top: 0; margin-bottom: 0; width: 1.5rem; height:auto">
+          </div>
           <div class="dots">
               <div class="dot"></div>
               <div class="dot"></div>
@@ -268,165 +302,166 @@ function showChatLoading() {
 
 // Hide Chat Loading Animation
 function hideChatLoading() {
-  const loadingElement = document.querySelector('.chat-loading');
+  const loadingElement = document.querySelector(".chat-loading");
   if (loadingElement) {
-      loadingElement.remove();
+    loadingElement.remove();
   }
 }
 
-
 function openNewProjectModal() {
   // Get your existing new project modal
-  const modal = new bootstrap.Modal(document.getElementById('newProjectModal'));
+  const modal = new bootstrap.Modal(document.getElementById("newProjectModal"));
   modal.show();
 }
 function scrollToBottom() {
-    if(welcomeThread){
-        welcomeThread.scrollTop = welcomeThread.scrollHeight;
-    }
+  if (welcomeThread) {
+    welcomeThread.scrollTop = welcomeThread.scrollHeight;
+  }
 }
 
-
-// Welcome AI Messages 
+// Welcome AI Messages
 function displayProjectCreationWelcomeMessages(title) {
-  const chatMessages = document.getElementById('chatMessages');
+  const chatMessages = document.getElementById("chatMessages");
   if (!chatMessages) return;
 
-  chatMessages.innerHTML = '';
+  chatMessages.innerHTML = "";
 
   const welcomeMessages = [
-      {
-          message: `👋 Hi! I'm here to help you with your project`,
-          delay: 1000
-      },
-      {
-          message: "You can ask me to:\n• Create new tasks of your project\n• Assign or subTasks\n• Get project insights\n• Manage team assignments",
-          delay: 2500
-      }
+    {
+      message: `👋 Hi! I'm here to help you with your project`,
+      delay: 1000,
+    },
+    {
+      message:
+        "You can ask me to:\n• Create new tasks of your project\n• Assign or subTasks\n• Get project insights\n• Manage team assignments",
+      delay: 2500,
+    },
   ];
 
   showChatLoading(); // Show loading animation
 
   welcomeMessages.forEach((msg, index) => {
-      setTimeout(() => {
-          if (index === welcomeMessages.length - 1) {
-              hideChatLoading(); // Hide loading animation when last message is displayed
-          }
+    setTimeout(() => {
+      if (index === welcomeMessages.length - 1) {
+        hideChatLoading(); // Hide loading animation when last message is displayed
+      }
 
-          const messageDiv = document.createElement('div');
-          messageDiv.className = 'ai-message';
-          messageDiv.innerHTML = `
+      const messageDiv = document.createElement("div");
+      messageDiv.className = "ai-message";
+      messageDiv.innerHTML = `
               <div class="ai-avatar">
                   <div class="chat-loading-avatar">
-                      <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 640 512" height="1.5em" width="1.5em" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M32,224H64V416H32A31.96166,31.96166,0,0,1,0,384V256A31.96166,31.96166,0,0,1,32,224Zm512-48V448a64.06328,64.06328,0,0,1-64,64H160a64.06328,64.06328,0,0,1-64-64V176a79.974,79.974,0,0,1,80-80H288V32a32,32,0,0,1,64,0V96H464A79.974,79.974,0,0,1,544,176ZM264,256a40,40,0,1,0-40,40A39.997,39.997,0,0,0,264,256Zm-8,128H192v32h64Zm96,0H288v32h64ZM456,256a40,40,0,1,0-40,40A39.997,39.997,0,0,0,456,256Zm-8,128H384v32h64ZM640,256V384a31.96166,31.96166,0,0,1-32,32H576V224h32A31.96166,31.96166,0,0,1,640,256Z"></path>
-                      </svg>
+                     <img src='https://res.cloudinary.com/da6qujoed/image/upload/v1742656707/logoIcon_pspxgh.png' alt="Logo"
+            class="logo-icon"
+            style="margin-top: 0; margin-bottom: 0; width: 1.5rem; height:auto">
                   </div>
               </div>
               <div class="message ai">
-                  <p>${msg.message.replace(/\n/g, '<br>')}</p>
+                  <p>${msg.message.replace(/\n/g, "<br>")}</p>
               </div>
           `;
-          chatMessages.appendChild(messageDiv);
-          scrollToBottom();
-      }, msg.delay);
+      chatMessages.appendChild(messageDiv);
+      scrollToBottom();
+    }, msg.delay);
   });
 }
 
 function getActionTypeDisplay(action_type) {
-    const actionTypes = {
-        'project_created': { 
-            text: 'New Project Created', 
-            bgColor: 'bg-success bg-opacity-10',
-            textColor: 'text-success-emphasis text-success-emphasis-light',
-            darkBgColor: 'dark-mode-success'
-        },
-        'user_assigned': { 
-            text: 'New User Added', 
-            bgColor: 'bg-info bg-opacity-10',
-            textColor: 'text-info-emphasis text-success-emphasis-light',
-            darkBgColor: 'dark-mode-info'
-        },
-        'task_created': { 
-            text: 'New Task Created', 
-            bgColor: 'bg-primary bg-opacity-10',
-            textColor: 'text-primary-emphasis text-success-emphasis-light',
-            darkBgColor: 'dark-mode-primary'
-        },
-        'user_removed': { 
-            text: 'User Removed', 
-            bgColor: 'bg-danger bg-opacity-10',
-            textColor: 'text-primary-emphasis text-success-emphasis-light',
-            darkBgColor: 'dark-mode-danger bg-danger bg-opacity-50'
-        },
-        'task_status_updated': { 
-            text: 'Task Status Updated', 
-            bgColor: 'bg-warning bg-opacity-10',
-            textColor: 'text-warning-emphasis text-success-emphasis-light',
-            darkBgColor: 'dark-mode-primary'
-        }
-    };
-    return actionTypes[action_type] || { 
-        text: action_type, 
-        bgColor: 'bg-secondary bg-opacity-10',
-        textColor: 'text-secondary-emphasis text-success-emphasis-light',
-        darkBgColor: 'dark-mode-secondary'
-    };
+  const actionTypes = {
+    project_created: {
+      text: "New Project Created",
+      bgColor: "bg-success bg-opacity-10",
+      textColor: "text-success-emphasis text-success-emphasis-light",
+      darkBgColor: "dark-mode-success",
+    },
+    user_assigned: {
+      text: "New User Added",
+      bgColor: "bg-info bg-opacity-10",
+      textColor: "text-info-emphasis text-success-emphasis-light",
+      darkBgColor: "dark-mode-info",
+    },
+    task_created: {
+      text: "New Task Created",
+      bgColor: "bg-primary bg-opacity-10",
+      textColor: "text-primary-emphasis text-success-emphasis-light",
+      darkBgColor: "dark-mode-primary",
+    },
+    user_removed: {
+      text: "User Removed",
+      bgColor: "bg-danger bg-opacity-10",
+      textColor: "text-primary-emphasis text-success-emphasis-light",
+      darkBgColor: "dark-mode-danger bg-danger bg-opacity-50",
+    },
+    task_status_updated: {
+      text: "Task Status Updated",
+      bgColor: "bg-warning bg-opacity-10",
+      textColor: "text-warning-emphasis text-success-emphasis-light",
+      darkBgColor: "dark-mode-primary",
+    },
+  };
+  return (
+    actionTypes[action_type] || {
+      text: action_type,
+      bgColor: "bg-secondary bg-opacity-10",
+      textColor: "text-secondary-emphasis text-success-emphasis-light",
+      darkBgColor: "dark-mode-secondary",
+    }
+  );
 }
 
 function formatTimeAgo(dateString) {
-    // Create date objects
-    const date = new Date(dateString + ' UTC'); // Treat the server time as UTC
-    const now = new Date();
-    
-    // Calculate time differences
-    const diffInMs = now - date;
-    const diffInSeconds = Math.floor(diffInMs / 1000);
-    const diffInMinutes = Math.floor(diffInSeconds / 60);
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    const diffInDays = Math.floor(diffInHours / 24);
+  // Create date objects
+  const date = new Date(dateString + " UTC"); // Treat the server time as UTC
+  const now = new Date();
 
-    // Return appropriate time format
-    if (diffInDays > 0) {
-        if (diffInDays === 1) return 'yesterday';
-        if (diffInDays <= 7) return `${diffInDays} days ago`;
-        return date.toLocaleDateString('en-US', { 
-            month: 'short', 
-            day: 'numeric',
-            year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
-        });
-    } else if (diffInHours > 0) {
-        return `${diffInHours} ${diffInHours === 1 ? 'hour' : 'hours'} ago`;
-    } else if (diffInMinutes > 0) {
-        return `${diffInMinutes} ${diffInMinutes === 1 ? 'minute' : 'minutes'} ago`;
-    } else {
-        return 'just now';
-    }
+  // Calculate time differences
+  const diffInMs = now - date;
+  const diffInSeconds = Math.floor(diffInMs / 1000);
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  const diffInDays = Math.floor(diffInHours / 24);
+
+  // Return appropriate time format
+  if (diffInDays > 0) {
+    if (diffInDays === 1) return "yesterday";
+    if (diffInDays <= 7) return `${diffInDays} days ago`;
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: date.getFullYear() !== now.getFullYear() ? "numeric" : undefined,
+    });
+  } else if (diffInHours > 0) {
+    return `${diffInHours} ${diffInHours === 1 ? "hour" : "hours"} ago`;
+  } else if (diffInMinutes > 0) {
+    return `${diffInMinutes} ${diffInMinutes === 1 ? "minute" : "minutes"} ago`;
+  } else {
+    return "just now";
+  }
 }
 
 function getNotificationIcon(action_type) {
-    const icons = {
-        'project_created': 'bi-folder-plus',
-        'user_removed': 'bi-person-dash',
-        'user_assigned': 'bi-person-plus',
-        'task_created': 'bi-list-check',
-        'task_status_updated': 'bi-arrow-repeat'
-    };
-    return icons[action_type] || 'bi-bell';
+  const icons = {
+    project_created: "bi-folder-plus",
+    user_removed: "bi-person-dash",
+    user_assigned: "bi-person-plus",
+    task_created: "bi-list-check",
+    task_status_updated: "bi-arrow-repeat",
+  };
+  return icons[action_type] || "bi-bell";
 }
 
 function updateNotificationDropdown(notifications) {
-    const notificationList = document.querySelector(".notification-list");
-    const badge = document.getElementById('notificationBadge');
-    const isDarkMode = document.body.classList.contains('dark-mode');
-    
-    if (!notificationList || !badge) return;
+  const notificationList = document.querySelector(".notification-list");
+  const badge = document.getElementById("notificationBadge");
+  const isDarkMode = document.body.classList.contains("dark-mode");
 
-    // Add styles for dark mode if not already added
-    if (!document.getElementById('notification-dark-mode-styles')) {
-        const styleSheet = document.createElement('style');
-        styleSheet.id = 'notification-dark-mode-styles';
-        styleSheet.textContent = `
+  if (!notificationList || !badge) return;
+
+  // Add styles for dark mode if not already added
+  if (!document.getElementById("notification-dark-mode-styles")) {
+    const styleSheet = document.createElement("style");
+    styleSheet.id = "notification-dark-mode-styles";
+    styleSheet.textContent = `
             .dark-mode .notification-dropdown {
                 background-color: #1a1a1a !important;
                 border-color: #2d2d2d !important;
@@ -440,11 +475,11 @@ function updateNotificationDropdown(notifications) {
             }
             .dark-mode .dropdown-item {
                 color: #e1e1e1;
-                border-color: #2d2d2d !important;
-                background-color: #1a1a1a !important;
+                // border-color: #2d2d2d !important;
+                // background-color: #1a1a1a !important;
             }
             .dark-mode .dropdown-item:hover {
-                background-color: #2d2d2d !important;
+                // background-color: #2d2d2d !important;
             }
             .dark-mode .dropdown-header {
                 border-color: #2d2d2d;
@@ -469,54 +504,69 @@ function updateNotificationDropdown(notifications) {
                 background-color: rgba(255, 255, 255, 0.15) !important;
             }
             .dark-mode .dropdown-menu {
-                background-color: #1a1a1a !important;
-                border-color: #2d2d2d !important;
-                border-width: 0.25rem !important;
+                // background-color: #1a1a1a !important;
+                // border-color: #2d2d2d !important;
+                // border-width: 0.25rem !important;
             }
             #notificationDropdownMenu.dropdown-menu {
                 border-width: 0.25rem !important;
                 border-radius: 0.5rem !important;
+                background: rgba(255, 255, 255, 0.1);
+border: 1px solid rgba(211, 211, 211, 0.5);
+backdrop-filter: blur(14.3px);
+                
             }
 
             #notificationDropdownMenu.dark-mode .dropdown-menu {
-                background-color: #1a1a1a !important;
-                border-color: #2d2d2d !important;
+                // background-color: #1a1a1a !important;
+                // border-color: #2d2d2d !important;
                 border-width: 0.25rem !important;
             }
             .dark-mode .dropdown-item:active,
             .dark-mode .dropdown-item:focus {
-                background-color: #2d2d2d !important;
+                // background-color: #2d2d2d !important;
             }
         `;
-        document.head.appendChild(styleSheet);
-    }
+    document.head.appendChild(styleSheet);
+  }
 
-    // Update badge
-    if (notifications.length > 0) {
-        badge.textContent = notifications.length;
-        badge.style.display = "inline-block";
-    } else {
-        badge.style.display = "none";
-    }
+  // Update badge
+  if (notifications.length > 0) {
+    badge.textContent = notifications.length;
+    badge.style.display = "inline-block";
+  } else {
+    badge.style.display = "none";
+  }
 
-    // Update notification list
-    if (notifications.length > 0) {
-        notificationList.innerHTML = notifications.map(notification => {
-            const actionType = getActionTypeDisplay(notification.action_type);
-            const timeAgo = formatTimeAgo(notification.created_at);
-            const icon = getNotificationIcon(notification.action_type);
-            
-            return `
+  // Update notification list
+  if (notifications.length > 0) {
+    notificationList.innerHTML = notifications
+      .map((notification) => {
+        const actionType = getActionTypeDisplay(notification.action_type);
+        const timeAgo = formatTimeAgo(notification.created_at);
+        const icon = getNotificationIcon(notification.action_type);
+
+        return `
                 <div class="dropdown-item border-bottom py-3">
                     <div class="d-flex align-items-start">
-                        <div class="notification-icon ${isDarkMode ? actionType.darkBgColor : actionType.bgColor} rounded-circle  me-3"
+                        <div class="notification-icon ${
+                          isDarkMode
+                            ? actionType.darkBgColor
+                            : actionType.bgColor
+                        } rounded-circle  me-3"
                         style="padding:0.6rem 0.8rem !important;"
                         >
                             <i class="bi ${icon} ${actionType.textColor}"></i>
                         </div>
                         <div class="flex-grow-1">
                             <div class="d-flex justify-content-between align-items-center mb-1">
-                                <span class="badge ${isDarkMode ? actionType.darkBgColor : actionType.bgColor} ${actionType.textColor} rounded-pill px-3 py-1" >
+                                <span class="badge ${
+                                  isDarkMode
+                                    ? actionType.darkBgColor
+                                    : actionType.bgColor
+                                } ${
+          actionType.textColor
+        } rounded-pill px-3 py-1" >
                                     ${actionType.text}
                                 </span>
                                 <small class="text-muted" style="font-size: 0.75rem;">
@@ -530,42 +580,176 @@ function updateNotificationDropdown(notifications) {
                     </div>
                 </div>
             `;
-        }).join('');
-    } else {
-        notificationList.innerHTML = `
+      })
+      .join("");
+  } else {
+    notificationList.innerHTML = `
             <div class="dropdown-item text-center py-4">
                 <i class="bi bi-bell text-muted mb-2 d-block" style="font-size: 1.5rem;"></i>
                 <p class="text-muted mb-0">No new notifications</p>
             </div>`;
-    }
+  }
 }
 
 function sendNotificationTest(projectId, title, body) {
-    fetch('?api=send_notification_test', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            project_id: projectId,
-            title: title,
-            body: body
-        })
+  fetch("?api=send_notification_test", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      project_id: projectId,
+      title: title,
+      body: body,
+    }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        Toast("success", "Success", "Notification sent successfully");
+        // Refresh notifications after sending
+        fetchNotifications();
+      } else {
+        Toast("error", "Error", data.message || "Failed to send notification");
+      }
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            Toast("success", "Success", "Notification sent successfully");
-            // Refresh notifications after sending
-            fetchNotifications();
-        } else {
-            Toast("error", "Error", data.message || "Failed to send notification");
-        }
-    })
-    .catch(error => {
-        console.error("Request failed:", error);
-        Toast("error", "Error", "Failed to send notification");
+    .catch((error) => {
+      console.error("Request failed:", error);
+      Toast("error", "Error", "Failed to send notification");
     });
 }
 
+document.addEventListener('DOMContentLoaded', function () {
+    const isDashboard = document.querySelector('.chat-container') !== null;
+    
+    if (isDashboard) {
+        // Function to get last selected project
+        function getLastSelectedProject() {
+            // window.userId should be set in the PHP file before this script loads
+            if (!window.userId) {
+                console.error('User ID not found');
+                return null;
+            }
+            const savedProject = localStorage.getItem(`lastSelectedProject_${window.userId}`);
+            console.log('Retrieved from localStorage:', savedProject);
+            return savedProject;
+        }
 
+        // Load projects and initialize
+        function initializeProjects() {
+            showLoading();
+            fetch('?api=get_projects')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const projectDropdown = document.getElementById('projectDropdown');
+                        projectDropdown.innerHTML = '';
+
+                        if (!data.projects || data.projects.length === 0) {
+                            const placeholder = document.createElement('li');
+                            placeholder.className = 'dropdown-item disabled';
+                            placeholder.textContent = 'No projects found';
+                            projectDropdown.appendChild(placeholder);
+                        } else {
+                            data.projects.forEach(project => {
+                                const li = document.createElement('li');
+                                li.className = 'dropdown-item';
+                                li.innerHTML = `
+                                    <button class="dropdown-item" 
+                                            type="button" 
+                                            data-id="${project.id}" 
+                                            title="${escapeHtml(project.title)}">
+                                        ${escapeHtml(project.title)}
+                                    </button>
+                                `;
+                                projectDropdown.appendChild(li);
+                            });
+
+                            // After adding all projects, try to select the last selected project
+                            const savedProject = getLastSelectedProject();
+                            console.log('Attempting to select project:', savedProject);
+                            
+                            if (savedProject && savedProject !== 'null' && savedProject !== '0') {
+                                const projectId = parseInt(savedProject);
+                                const projectButton = projectDropdown.querySelector(`button[data-id="${projectId}"]`);
+                                if (projectButton) {
+                                    const projectTitle = projectButton.getAttribute('title');
+                                    console.log('Found saved project, selecting:', projectTitle);
+                                    selectProject(projectId, projectTitle);
+                                }
+                            }
+                        }
+
+                        // Add click handlers for project selection
+                        document.querySelectorAll('.dropdown-item').forEach(item => {
+                            item.addEventListener('click', (e) => {
+                                e.preventDefault();
+                                const button = item.querySelector('button');
+                                if (button) {
+                                    const projectId = button.dataset.id;
+                                    const projectTitle = button.getAttribute('title');
+                                    selectProject(projectId, projectTitle);
+                                }
+                            });
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading projects:', error);
+                    const projectDropdown = document.getElementById('projectDropdown');
+                    projectDropdown.innerHTML = `
+                        <li class="dropdown-item">
+                            <div class="alert alert-danger">
+                                Unable to load projects. Please try again later.
+                            </div>
+                        </li>
+                    `;
+                })
+                .finally(hideLoading);
+        }
+
+        // Update selectProject function
+        function selectProject(projectId, selectedProjectTitle = "") {
+            if (!projectId) return;
+            
+            console.log('Selecting project:', projectId, selectedProjectTitle);
+            
+            const $button = $('#projectDropdownButton');
+            const $svg = $button.find('svg').clone();
+            
+            $button.text(selectedProjectTitle || 'Select Project');
+            if ($svg.length > 0) {
+                $button.append($svg);
+            } else {
+                $button.append(`
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                `);
+            }
+
+            projectId = parseInt(projectId);
+            currentProject = projectId;
+            $('#myselectedcurrentProject').val(currentProject);
+
+            // Save to localStorage
+            if (window.userId) {
+                console.log('Saving to localStorage:', `lastSelectedProject_${window.userId}`, projectId);
+                localStorage.setItem(`lastSelectedProject_${window.userId}`, projectId);
+            }
+
+            // Update UI
+            $('#projectDropdown button').removeClass('active');
+            $(`#projectDropdown button[data-id="${projectId}"]`).addClass('active');
+
+            // Load project data
+            fetchNotificationsAndOpen(false);
+            loadTasks(projectId);
+            loadChatHistory(projectId);
+            initPusher(projectId);
+        }
+
+        // Initialize projects
+        initializeProjects();
+    }
+});

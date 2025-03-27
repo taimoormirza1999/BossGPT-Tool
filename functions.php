@@ -67,9 +67,15 @@ function sendProjectUpdateEmail($email, $username, $projectTitle, $updateMessage
     return sendTemplateEmail($email, $subject, $template, $data);
 }
 
-function getLogoImage($bottomMargin = "0", $topMargin = "-1rem", $width = "15rem", $height = "auto", $positionClass = "position-absolute top-0 start-50 translate-middle", $positionStyle = "position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);", $src="https://res.cloudinary.com/da6qujoed/image/upload/v1742824680/boss-gptold_zti8gh.png")
-{
-    return '<img src=' . $src . ' alt="Logo"
-            class="' . $positionClass . '" 
-            style="margin-top: ' . $topMargin . '; margin-bottom: ' . $bottomMargin . '; width: ' . $width . '; height: ' . $height . '; position: ' . $positionStyle . '">';
-}
+function getLogoImage($bottomMargin = "0", $topMargin = "-1rem", $width = "15rem", $height = "auto", $positionClass = "position-absolute top-0 start-50 translate-middle", $positionStyle = "position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);", $src="https://res.cloudinary.com/da6qujoed/image/upload/v1742651528/bossgpt-transparent_n4axv7.png")
+    {
+        return '<img src=' . $src . ' alt="Logo"
+                class="' . $positionClass . '" 
+                style="margin-top: ' . $topMargin . '; margin-bottom: ' . $bottomMargin . '; width: ' . $width . '; height: ' . $height . '; position: ' . $positionStyle . '">';
+    }
+    function getIconImage($bottomMargin = "0", $topMargin = "0", $width = "3.4rem", $height = "auto", $src="https://res.cloudinary.com/da6qujoed/image/upload/v1742656707/logoIcon_pspxgh.png")
+    {
+        return '<img src=' . $src . ' alt="Logo"
+                class="logo-icon"
+                style="margin-top: ' . $topMargin . '; margin-bottom: ' . $bottomMargin . '; width: ' . $width . '; height: ' . $height . '">';
+    }
