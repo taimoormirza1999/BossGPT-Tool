@@ -2698,8 +2698,8 @@ if (isset($_GET['api'])) {
             border-color: #fff;
             color: #e4e6eb;
             background: rgba(12, 1, 17, 0.5);
-border: 1px solid #585858;
-border-radius: 12px;
+            border: 1px solid #585858;
+            border-radius: 12px;
             backdrop-filter: blur(4px);
         }
 
@@ -2757,15 +2757,15 @@ border-radius: 12px;
         /* Select2 Dark Mode */
         body.dark-mode .select2-container--default .select2-selection--multiple {
             background: rgba(12, 1, 17, 0.5);
-border: 1px solid #585858;
-border-radius: 12px;
+            border: 1px solid #585858;
+            border-radius: 12px;
             backdrop-filter: blur(4px);
         }
 
         body.dark-mode .select2-container--default .select2-selection--multiple .select2-selection__choice {
             background: rgba(12, 1, 17, 0.5);
-border: 1px solid #585858;
-border-radius: 12px;
+            border: 1px solid #585858;
+            border-radius: 12px;
             backdrop-filter: blur(4px);
             color: #e4e6eb;
         }
@@ -3649,21 +3649,22 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                 <div class="nav-container row justify-content-between nav-background"
                     style="background-color: var(--bs-primary-dark60percent); ">
                     <div class="col-md-6 d-flex justify-content-between align-items-center self-center">
-                        <h4 class="text-capitalize font-weight-normal d-flex align-items-center" style="font-size: 1.4rem;">
-                            <span style="color: var(--bs-primary-white55percent);">Welcome,</span> <span
-                                class=" text-capitalize" style="color: var(--bs-primary-white)">
-                                &nbsp;<?php echo $_SESSION['username']; ?>&nbsp;</span>&nbsp;👋</h4>
+                        <h4 class="text-capitalize font-weight-normal d-flex align-items-center" style="font-size: 1.83rem;">
+                            <span style="color: var(--bs-primary-white55percent);">Welcome, <?php echo getCalendarIcon();?></span> <span
+                                class=" text-capitalize" style="color: var(--bs-primary-white); font-size: 1.43rem;">
+                                &nbsp;<?php echo $_SESSION['username']; ?>&nbsp;</span>&nbsp;👋
+                        </h4>
                     </div>
                     <ul class="col-md-6 nav nav-tabs mb-0 d-flex justify-content-end align-items-center" id="projectTabs"
                         style="width: auto; ">
                         <li class="nav-item">
-                            <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="modal"
+                            <button type="button" class="btn btn-sm btn-main-primary" data-bs-toggle="modal"
                                 data-bs-target="#assignUserModal">
                                 <i class="bi bi-person-plus"></i> Invite User
                             </button>
                         </li>
                         <li class="nav-item">
-                            <button type="button" class="btn btn-sm btn-secondary " data-bs-toggle="modal"
+                            <button type="button" class="btn btn-sm btn-main-primary" data-bs-toggle="modal"
                                 data-bs-target="#activityLogModal">
                                 <i class="bi bi-clock-history"></i> Activity Log
                             </button>
@@ -3677,7 +3678,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                             </li>
                         <?php endif; ?>
                         <li class="nav-item">
-                            <button type="button" class="btn btn-primary " data-bs-toggle="modal"
+                            <button type="button" class="btn btn-main-primary" data-bs-toggle="modal"
                                 data-bs-target="#newProjectModal">
                                 <i class="bi bi-plus"></i> New Project
                             </button>
@@ -3707,7 +3708,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                 </div>
 
 
-                                <button type="button" class="btn btn-sm btn-primary me-2" data-bs-toggle="modal"
+                                <button type="button" class="btn btn-sm btn-main-primary me-2" data-bs-toggle="modal"
                                     data-bs-target="#newTaskModal">
                                     <i class="bi bi-plus"></i> Create New Task
                                 </button>
@@ -3858,7 +3859,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                                         let content = `
         <div class="ai-avatar">
             <div class="chat-loading-avatar">
-            <?php echo getIconImage(0, 0, "1.5rem"); ?>
+            <?php echo getIconImage(0, 0, "1.8rem"); ?>
             </div>
         </div>
         <div class="message ai text-center mt-3">
@@ -4744,7 +4745,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                                         <div class="flex-grow-1">
                                                             <div class="subtask-title ${subtask.status === 'done' ? 'text-decoration-line-through' : ''}">${escapeHtml(subtask.title)}</div>
                                                             ${subtask.due_date ? `
-                                                                <small class="text-muted due-date ${isOverdue ? 'overdue' : ''}">
+                                                                <small class="text-muted due-date ${isOverdue ? 'overdue' : ''}">dgdfgdg
                                                                     <i class="bi bi-calendar-event"></i>
                                                                     ${subtask.due_date}
                                                                 </small>
@@ -5488,7 +5489,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                             <div class="ai-avatar">
                                 <div class="chat-loading-avatar">
                                     <img src='https://res.cloudinary.com/da6qujoed/image/upload/v1742656707/logoIcon_pspxgh.png' alt="Logo"
-                                    class="logo-icon" style="margin-top: 0; margin-bottom: 0; width: 1.5rem; height:auto">
+                                    class="logo-icon" style="margin-top: 0; margin-bottom: 0; width: 1.8rem; height:auto">
                                 </div>
                             </div>
                             <div class="message ai">${message}</div>

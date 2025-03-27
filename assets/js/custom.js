@@ -248,8 +248,10 @@ function initializeChatLoading() {
       }
 
       body.dark-mode .chat-loading-container {
-          background: #3a3b3c;
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+         background: rgba(194, 194, 194, 0.2);
+    border: 1px solid rgba(211, 211, 211, 0.5);
+    border-radius: 16px;
+    backdrop-filter: blur(8px);
       }
 
       .chat-loading-avatar {
@@ -267,7 +269,7 @@ function initializeChatLoading() {
 
       body.dark-mode .chat-loading-avatar {
        background-color: rgba(194, 194, 194, 0.2);
-backdrop-filter: blur(8px);
+border: 1px solid rgba(211, 211, 211, 0.5) !important;
           color: #fff;
           
       }
@@ -287,7 +289,7 @@ function showChatLoading() {
         <div class="chat-loading-avatar">
          <img src='https://res.cloudinary.com/da6qujoed/image/upload/v1742656707/logoIcon_pspxgh.png' alt="Logo"
             class="logo-icon"
-            style="margin-top: 0; margin-bottom: 0; width: 1.5rem; height:auto">
+            style="margin-top: 0; margin-bottom: 0; width: 1.8rem; height:auto">
           </div>
           <div class="dots">
               <div class="dot"></div>
@@ -347,13 +349,13 @@ function displayProjectCreationWelcomeMessages(title) {
       }
 
       const messageDiv = document.createElement("div");
-      messageDiv.className = "ai-message";
+      messageDiv.className = "ai-message d-flex intro_messages";
       messageDiv.innerHTML = `
               <div class="ai-avatar">
                   <div class="chat-loading-avatar">
                      <img src='https://res.cloudinary.com/da6qujoed/image/upload/v1742656707/logoIcon_pspxgh.png' alt="Logo"
             class="logo-icon"
-            style="margin-top: 0; margin-bottom: 0; width: 1.5rem; height:auto">
+            style="margin-top: 0; margin-bottom: 0; width: 1.8rem; height:auto">
                   </div>
               </div>
               <div class="message ai">
