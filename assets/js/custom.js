@@ -1,3 +1,68 @@
+// Notification System
+let isFetchingNotifications = false;
+let isDropdownOpen = false;
+
+function fetchNotificationsAndOpen(showDropdown = true) {
+    if (isFetchingNotifications) return;
+    isFetchingNotifications = true;
+    isDropdownOpen = true;
+
+    const dropdown = new bootstrap.Dropdown(document.getElementById('notificationDropdown'));
+    const currentProject = $('#myselectedcurrentProject').val();
+
+    if (!currentProject || currentProject == undefined) {
+        Toast("error", "Error", "Please select a project first");
+        isFetchingNotifications = false;
+        return;
+    }
+    
+
+    fetchNotifications(currentProject)
+        .then(() => {
+            if (showDropdown && !isDropdownOpen) {
+                dropdown.show(); //toggle dropdown
+            }else if (!isDropdownOpen){
+                dropdown.hide(); //hide dropdown
+            }
+            isFetchingNotifications = false;
+        })
+        .catch(error => {
+            console.error("Error fetching notifications:", error);
+            isFetchingNotifications = false;
+        });
+}
+
+function fetchNotifications(project_id) {
+    return new Promise((resolve, reject) => {
+        fetch('?api=get_unreadnotifications&project_id='+project_id)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateNotificationDropdown(data.logs || []);
+                    resolve();
+                } else {
+                    console.error("Error fetching notifications:", data.message);
+                    reject(new Error(data.message));
+                }
+            })
+            .catch(error => {
+                console.error("Request failed:", error);
+                reject(error);
+            });
+    });
+}
+
+// Initialize notification system when DOM is loaded
+// document.addEventListener('DOMContentLoaded', function() {
+//     const notificationDropdown = document.getElementById('notificationDropdown');
+//     if (notificationDropdown) {
+//         notificationDropdown.addEventListener('click', fetchNotificationsAndOpen);
+//         // Initial fetch
+//         // fetchNotifications();
+//         // Set up periodic refresh
+//         setInterval(fetchNotifications, 30000); // Refresh every 30 seconds
+//     }
+// });
 
 // Toasts iziToast Helper
 function Toast(type, title, message, positionToast) {
@@ -100,7 +165,8 @@ function initializeChatLoading() {
           width: 8px;
           height: 8px;
           border-radius: 50%;
-          background-color: var(--primary-color, #0d6efd);
+        //   background-color: var(--primary-color, #0d6efd);
+         background: #3a3b3c;
           opacity: 0.6;
       }
 
@@ -161,7 +227,7 @@ function initializeChatLoading() {
           width: 32px;
           height: 32px;
           border-radius: 50%;
-          background: var(--primary-color, #0d6efd);
+        //   background: var(--primary-color, #0d6efd);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -215,7 +281,9 @@ function openNewProjectModal() {
   modal.show();
 }
 function scrollToBottom() {
-  welcomeThread.scrollTop = welcomeThread.scrollHeight;
+    if(welcomeThread){
+        welcomeThread.scrollTop = welcomeThread.scrollHeight;
+    }
 }
 
 
@@ -224,16 +292,16 @@ function displayProjectCreationWelcomeMessages(title) {
   const chatMessages = document.getElementById('chatMessages');
   if (!chatMessages) return;
 
-  chatMessages.innerHTML = ''; // Clear previous messages
+  chatMessages.innerHTML = '';
 
   const welcomeMessages = [
       {
-          message: `👋 Hi! I'm here to help you with your project "${title}"`,
+          message: `👋 Hi! I'm here to help you with your project`,
           delay: 1000
       },
       {
           message: "You can ask me to:\n• Create new tasks of your project\n• Assign or subTasks\n• Get project insights\n• Manage team assignments",
-          delay: 1500
+          delay: 2500
       }
   ];
 
@@ -260,7 +328,244 @@ function displayProjectCreationWelcomeMessages(title) {
               </div>
           `;
           chatMessages.appendChild(messageDiv);
-          scrollToBottom(); // Ensure chat scrolls to the latest message
+          scrollToBottom();
       }, msg.delay);
   });
 }
+
+function getActionTypeDisplay(action_type) {
+    const actionTypes = {
+        'project_created': { 
+            text: 'New Project Created', 
+            bgColor: 'bg-success bg-opacity-10',
+            textColor: 'text-success-emphasis text-success-emphasis-light',
+            darkBgColor: 'dark-mode-success'
+        },
+        'user_assigned': { 
+            text: 'New User Added', 
+            bgColor: 'bg-info bg-opacity-10',
+            textColor: 'text-info-emphasis text-success-emphasis-light',
+            darkBgColor: 'dark-mode-info'
+        },
+        'task_created': { 
+            text: 'New Task Created', 
+            bgColor: 'bg-primary bg-opacity-10',
+            textColor: 'text-primary-emphasis text-success-emphasis-light',
+            darkBgColor: 'dark-mode-primary'
+        },
+        'user_removed': { 
+            text: 'User Removed', 
+            bgColor: 'bg-danger bg-opacity-10',
+            textColor: 'text-primary-emphasis text-success-emphasis-light',
+            darkBgColor: 'dark-mode-danger bg-danger bg-opacity-50'
+        },
+        'task_status_updated': { 
+            text: 'Task Status Updated', 
+            bgColor: 'bg-warning bg-opacity-10',
+            textColor: 'text-warning-emphasis text-success-emphasis-light',
+            darkBgColor: 'dark-mode-primary'
+        }
+    };
+    return actionTypes[action_type] || { 
+        text: action_type, 
+        bgColor: 'bg-secondary bg-opacity-10',
+        textColor: 'text-secondary-emphasis text-success-emphasis-light',
+        darkBgColor: 'dark-mode-secondary'
+    };
+}
+
+function formatTimeAgo(dateString) {
+    // Create date objects
+    const date = new Date(dateString + ' UTC'); // Treat the server time as UTC
+    const now = new Date();
+    
+    // Calculate time differences
+    const diffInMs = now - date;
+    const diffInSeconds = Math.floor(diffInMs / 1000);
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    const diffInDays = Math.floor(diffInHours / 24);
+
+    // Return appropriate time format
+    if (diffInDays > 0) {
+        if (diffInDays === 1) return 'yesterday';
+        if (diffInDays <= 7) return `${diffInDays} days ago`;
+        return date.toLocaleDateString('en-US', { 
+            month: 'short', 
+            day: 'numeric',
+            year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
+        });
+    } else if (diffInHours > 0) {
+        return `${diffInHours} ${diffInHours === 1 ? 'hour' : 'hours'} ago`;
+    } else if (diffInMinutes > 0) {
+        return `${diffInMinutes} ${diffInMinutes === 1 ? 'minute' : 'minutes'} ago`;
+    } else {
+        return 'just now';
+    }
+}
+
+function getNotificationIcon(action_type) {
+    const icons = {
+        'project_created': 'bi-folder-plus',
+        'user_removed': 'bi-person-dash',
+        'user_assigned': 'bi-person-plus',
+        'task_created': 'bi-list-check',
+        'task_status_updated': 'bi-arrow-repeat'
+    };
+    return icons[action_type] || 'bi-bell';
+}
+
+function updateNotificationDropdown(notifications) {
+    const notificationList = document.querySelector(".notification-list");
+    const badge = document.getElementById('notificationBadge');
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    
+    if (!notificationList || !badge) return;
+
+    // Add styles for dark mode if not already added
+    if (!document.getElementById('notification-dark-mode-styles')) {
+        const styleSheet = document.createElement('style');
+        styleSheet.id = 'notification-dark-mode-styles';
+        styleSheet.textContent = `
+            .dark-mode .notification-dropdown {
+                background-color: #1a1a1a !important;
+                border-color: #2d2d2d !important;
+              
+            }
+            .text-success-emphasis-light{
+                color: #212121 !important;
+            }
+            .dark-mode .text-success-emphasis-light{
+                color: #fff !important;
+            }
+            .dark-mode .dropdown-item {
+                color: #e1e1e1;
+                border-color: #2d2d2d !important;
+                background-color: #1a1a1a !important;
+            }
+            .dark-mode .dropdown-item:hover {
+                background-color: #2d2d2d !important;
+            }
+            .dark-mode .dropdown-header {
+                border-color: #2d2d2d;
+                color: #ffffff;
+                background-color: #1a1a1a !important;
+            }
+            .dropdown-header {
+               border-bottom: 0.3rem #d3d4d5 solid;
+            }
+            .dark-mode .notification-text {
+                color: #e1e1e1 !important;
+            }
+            .dark-mode .text-muted {
+                color: #a0a0a0 !important;
+            }
+            .dark-mode-success { background-color: rgba(25, 135, 84, 0.35) !important;  }
+            .dark-mode-info { background-color: rgba(13, 202, 240, 0.35) !important; }
+            .dark-mode-primary { background-color: rgba(13, 110, 253,.35) !important; }
+            .dark-mode-warning { background-color: rgba(255, 193, 7, 0.35) !important; }
+            .dark-mode-secondary { background-color: rgba(108, 117, 125, 0.35) !important; }
+            .dark-mode .notification-icon {
+                background-color: rgba(255, 255, 255, 0.15) !important;
+            }
+            .dark-mode .dropdown-menu {
+                background-color: #1a1a1a !important;
+                border-color: #2d2d2d !important;
+                border-width: 0.25rem !important;
+            }
+            #notificationDropdownMenu.dropdown-menu {
+                border-width: 0.25rem !important;
+                border-radius: 0.5rem !important;
+            }
+
+            #notificationDropdownMenu.dark-mode .dropdown-menu {
+                background-color: #1a1a1a !important;
+                border-color: #2d2d2d !important;
+                border-width: 0.25rem !important;
+            }
+            .dark-mode .dropdown-item:active,
+            .dark-mode .dropdown-item:focus {
+                background-color: #2d2d2d !important;
+            }
+        `;
+        document.head.appendChild(styleSheet);
+    }
+
+    // Update badge
+    if (notifications.length > 0) {
+        badge.textContent = notifications.length;
+        badge.style.display = "inline-block";
+    } else {
+        badge.style.display = "none";
+    }
+
+    // Update notification list
+    if (notifications.length > 0) {
+        notificationList.innerHTML = notifications.map(notification => {
+            const actionType = getActionTypeDisplay(notification.action_type);
+            const timeAgo = formatTimeAgo(notification.created_at);
+            const icon = getNotificationIcon(notification.action_type);
+            
+            return `
+                <div class="dropdown-item border-bottom py-3">
+                    <div class="d-flex align-items-start">
+                        <div class="notification-icon ${isDarkMode ? actionType.darkBgColor : actionType.bgColor} rounded-circle  me-3"
+                        style="padding:0.6rem 0.8rem !important;"
+                        >
+                            <i class="bi ${icon} ${actionType.textColor}"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="badge ${isDarkMode ? actionType.darkBgColor : actionType.bgColor} ${actionType.textColor} rounded-pill px-3 py-1" >
+                                    ${actionType.text}
+                                </span>
+                                <small class="text-muted" style="font-size: 0.75rem;">
+                                    ${timeAgo}
+                                </small>
+                            </div>
+                            <div class="notification-text" style="font-size: 0.8rem;">
+                                ${notification.description}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } else {
+        notificationList.innerHTML = `
+            <div class="dropdown-item text-center py-4">
+                <i class="bi bi-bell text-muted mb-2 d-block" style="font-size: 1.5rem;"></i>
+                <p class="text-muted mb-0">No new notifications</p>
+            </div>`;
+    }
+}
+
+function sendNotificationTest(projectId, title, body) {
+    fetch('?api=send_notification_test', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            project_id: projectId,
+            title: title,
+            body: body
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Toast("success", "Success", "Notification sent successfully");
+            // Refresh notifications after sending
+            fetchNotifications();
+        } else {
+            Toast("error", "Error", data.message || "Failed to send notification");
+        }
+    })
+    .catch(error => {
+        console.error("Request failed:", error);
+        Toast("error", "Error", "Failed to send notification");
+    });
+}
+
+

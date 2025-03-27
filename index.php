@@ -1,29 +1,34 @@
 <?php
+require './vendor/autoload.php';
 //Added to load the environment variables
-require_once 'env.php';
+// require_once 'env.php';
 require_once './classes/UserManager.php';
-loadEnv();
+require_once './classes/Notification.php';
+require_once './classes/NotificationManager.php';
+use Dotenv\Dotenv;
 
-
+// // Load environment variables
+$dotenv = Dotenv::createImmutable(__DIR__);
+session_start();
 // Added to persist the login cookie for one year
 session_set_cookie_params(60 * 60 * 24 * 365);
 ini_set('session.gc_maxlifetime', 60 * 60 * 24 * 365);
 
 session_start();
 error_reporting(E_ALL);
-ini_set('display_errors', getenv('DISPLAY_ERRORS'));
+ini_set('display_errors', $_ENV['DISPLAY_ERRORS']);
 ini_set('log_errors', 0);
 ini_set('error_log', 'error.log');
 error_reporting(E_ALL);
-define('TESTING_FEATURE', getenv('TESTING_FEATURE'));
+define('TESTING_FEATURE', $_ENV['TESTING_FEATURE']);
 // Database configuration
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
-define('DB_PASS', getenv('DB_PASS'));
+define('DB_PASS', $_ENV['DB_PASS']);
 define('DB_NAME', 'project_manager');
 
 // OpenAI API configuration
-define('OPENAI_API_KEY', getenv('OPENAI_API_KEY'));
+define('OPENAI_API_KEY', $_ENV['OPENAI_API_KEY']);
 ob_start();
 // Database Class
 class Database
@@ -69,7 +74,7 @@ class Database
             "CREATE TABLE IF NOT EXISTS users (
                 id INT PRIMARY KEY AUTO_INCREMENT,
                 username VARCHAR(50) UNIQUE NOT NULL,
-                email VARCHAR(100) UNIQUE NOT NULL,
+                email VARCHAR(100) NOT NULL,
                 password_hash VARCHAR(255) NOT NULL,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )",
@@ -170,7 +175,7 @@ class Auth
         $this->db = Database::getInstance()->getConnection();
     }
 
-    public function register($username, $email, $password)
+    public function register($username, $email, $password, $fcm_token)
     {
         try {
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -188,8 +193,8 @@ class Auth
             }
 
             $password_hash = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $this->db->prepare("INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)");
-            $stmt->execute([$username, $email, $password_hash]);
+            $stmt = $this->db->prepare("INSERT INTO users (username, email, password_hash, fcm_token,pro_plan) VALUES (?, ?, ?, ?,?)");
+            $stmt->execute([$username, $email, $password_hash, $fcm_token, 0]);
 
             return true;
         } catch (Exception $e) {
@@ -201,7 +206,7 @@ class Auth
     public function login($email, $password)
     {
         try {
-            $stmt = $this->db->prepare("SELECT id, username, password_hash FROM users WHERE email = ?");
+            $stmt = $this->db->prepare("SELECT id, username, password_hash, pro_plan as pro_member, invited_by FROM users WHERE email = ?");
             $stmt->execute([$email]);
             $user = $stmt->fetch();
 
@@ -209,8 +214,20 @@ class Auth
                 throw new Exception("Invalid credentials");
             }
 
+                 // Update the last_login timestamp
+        $stmt = $this->db->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
+        $stmt->execute([$user['id']]);
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
+            $_SESSION['pro_member'] = $user['pro_member'];
+
+            if ($user['pro_member'] != 1) {
+                if ($user['invited_by'] === null) {
+                    header("Location: " . $_ENV['STRIPE_PAYMENT_LINK']);
+                    exit;  // Make sure the script stops here after the redirect
+                }
+            }
+            // $_SESSION['pro_member'] = $user['pro_member'];
 
             return true;
         } catch (Exception $e) {
@@ -221,6 +238,12 @@ class Auth
 
     public function logout()
     {
+        echo "<script>
+            localStorage.removeItem('lastSelectedProject');
+    </script>";
+        session_destroy();
+        session_start();
+        session_unset();
         session_destroy();
         return true;
     }
@@ -237,13 +260,19 @@ class Auth
         }
 
         try {
-            $stmt = $this->db->prepare("SELECT id, username, email FROM users WHERE id = ?");
+            $stmt = $this->db->prepare("SELECT id, username, email, pro_plan as pro_member, invited_by FROM users WHERE id = ?");
             $stmt->execute([$_SESSION['user_id']]);
             return $stmt->fetch();
         } catch (Exception $e) {
             error_log("Error getting current user: " . $e->getMessage());
             return null;
         }
+    }
+    public function updateProStatus($userId)
+    {
+        $stmt = $this->db->prepare("UPDATE users SET pro_plan = 1 WHERE id = ?");
+        $stmt->execute([$userId]);
+        return $stmt->rowCount() > 0;
     }
 }
 
@@ -306,6 +335,7 @@ class ProjectManager
             );
             $stmt->execute([$title, $description, $user_id]);
             $project_id = $this->db->lastInsertId();
+            $this->assignUserToProject($project_id, $user_id, "Creator");
 
             // Log the activity
             $this->logActivity(
@@ -804,6 +834,12 @@ class ProjectManager
             error_log("Error removing task picture: " . $e->getMessage());
             throw $e;
         }
+    }
+    public function getProjectName($project_id)
+    {
+        $stmt = $this->db->prepare("SELECT title FROM projects WHERE id = ?");
+        $stmt->execute([$project_id]);
+        return $stmt->fetch()['title'];
     }
 }
 
@@ -1306,12 +1342,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $auth->register(
                         $_POST['username'],
                         $_POST['email'],
-                        $_POST['password']
+                        $_POST['password'],
+                        $_POST['fcm_token']
                     );
 
+                    $user = new UserManager();
                     // After successful registration, log the user in
+                    $user->sendWelcomeEmail($_POST['email'], $_POST['username'], $_ENV['BASE_URL']);                    // After successful registration, log the user in
                     $auth->login($_POST['email'], $_POST['password']);
-                    header('Location: ?page=dashboard');
+
+                    $paymentLink = $_ENV['STRIPE_PAYMENT_LINK'];
+                    header("Location: $paymentLink");
                     exit;
 
                 case 'login':
@@ -1325,6 +1366,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 case 'logout':
                     $auth->logout();
+                    session_start();
+                    session_unset();
+                    session_destroy();
                     header('Location: ?page=login');
                     exit;
             }
@@ -1351,6 +1395,23 @@ if (isset($_GET['api'])) {
         $ai_assistant = new AIAssistant();
 
         switch ($_GET['api']) {
+
+            case 'update_pro_status':
+                if (!isset($_SESSION['user_id'])) {
+                    return json_encode(['success' => false, 'message' => 'User not logged in']);
+                    exit;
+                }
+
+                try {
+                    $auth = new Auth();
+                    $result = $auth->updateProStatus($_SESSION['user_id']);
+                    return json_encode(['success' => true, 'message' => 'Pro status updated successfully']);
+                    exit;
+                } catch (Exception $e) {
+                    return json_encode(['success' => false, 'message' => $e->getMessage()]);
+                    exit;
+                }
+                exit;
             case 'get_chat_history':
                 $data = json_decode(file_get_contents('php://input'), true);
                 if (!isset($data['project_id'])) {
@@ -1385,33 +1446,11 @@ if (isset($_GET['api'])) {
                 break;
             case 'get_all_project_users':
                 header('Content-Type: application/json');
-                try {
-                    if (!isset($_GET['project_id'])) {
-                        throw new Exception('Project ID is required');
-                    }
-
-                    // $projectManager = new ProjectManager();
-                    // $users = $project_manager->getProjectUsers($data['project_id']);
-                    $stmt = $db->prepare("
-                    SELECT u.id, u.username, u.email, pu.role 
-                    FROM users u 
-                    LEFT JOIN project_users pu ON u.id = pu.user_id 
-                    WHERE pu.project_id = ?
-                ");
-
-                    $stmt->execute([$_GET['project_id']]);
-                    $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                    echo json_encode([
-                        'success' => true,
-                        'users' => $users
-                    ]);
-                } catch (Exception $e) {
-                    // http_response_code(400);
-                    echo json_encode([
-                        'success' => false,
-                        'message' => $e->getMessage()
-                    ]);
-                }
+                $users = $project_manager->getProjectUsers($_GET['project_id']);
+                echo json_encode([
+                    'success' => true,
+                    'users' => $users
+                ]);
                 exit;
 
             case 'send_message':
@@ -1503,36 +1542,77 @@ if (isset($_GET['api'])) {
                 break;
 
             case 'assign_user_to_project':
-                $data = json_decode(file_get_contents('php://input'), true);
+
+                $data = json_decode(
+                    file_get_contents('php://input'),
+                    true
+                );
                 if (!isset($data['project_id']) || !isset($data['user_id']) || !isset($data['role'])) {
                     throw new Exception('Project ID, user ID, and role are required');
                 }
                 $project_manager->assignUserToProject($data['project_id'], $data['user_id'], $data['role']);
                 $response = ['success' => true];
                 break;
-            case 'create_user':
+            case 'create_or_assign_user':
                 header('Content-Type: application/json');
                 try {
-                    error_log("Received create user request");
-
+                    // error_log("Received create user request");
                     $data = json_decode(file_get_contents('php://input'), true);
                     if (!$data) {
                         throw new Exception('Invalid request data');
                     }
 
+                    $project_manager = new ProjectManager();
+                    $projectTilte = $project_manager->getProjectName($data['project_id']);
+                    $projectAllUsers = $project_manager->getProjectUsers($data['project_id']);
+
                     $userManager = new UserManager();
-                    $result = $userManager->createUser(
-                        $data['username'],
+                    $result = $userManager->createOrAssignUser(
                         $data['email'],
                         $data['project_id'] ?? null,
-                        $data['role'] ?? null
+                        $data['role'] ?? null,
+                        $_ENV['BASE_URL']
                     );
+
+                    // Set timezone to match your server/application timezone
+                    // date_default_timezone_set('Asia/Manila'); // Adjust this to your timezone
+                    
+                    // Send Notification
+                    $result = Notification::send('project_' . $data['project_id'], 'user_assigned', [
+                        'message' => 'New User joined as the ' . $data['role'] . ' in the project',
+                        'action_type' => 'user_assigned',
+                        'description' => 'New User joined as the ' . $data['role'] . ' in the project',
+                        'created_at' => date('Y-m-d H:i:s')
+                    ]);
+                    // Sending Email & Notification
+                    try {
+                        $emailSent = $userManager->projectUsersNewUserAddedEmail($data['username'], $projectTilte, $data['role'], $projectAllUsers, );
+                        if ($emailSent) {
+                            echo json_encode($response = [
+                                'success' => $emailSent,
+                                'message' => "An invite has been sent along with login credentials."
+                            ]);
+                            exit;
+                        } else {
+                            $response = [
+                                'success' => false,
+                                'message' => "Failed to send the invite."
+                            ];
+                        }
+                    } catch (Exception $e) {
+                        $response = [
+                            'success' => false,
+                            'message' => "Error: " . $e->getMessage()
+                        ];
+                    }
+
 
                     echo json_encode([
                         'success' => true,
                         'message' => 'User created successfully',
                         'data' => $result
                     ]);
+
                 } catch (Exception $e) {
                     error_log("Error in create_user: " . $e->getMessage());
                     http_response_code(400);
@@ -1542,12 +1622,63 @@ if (isset($_GET['api'])) {
                     ]);
                 }
                 exit;
+
+
             case 'get_users':
                 $stmt = $db->query("SELECT id, username, email FROM users ORDER BY username ASC");
                 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 $response = ['success' => true, 'users' => $users];
                 break;
-
+                case 'delete_user':
+                    if (!isset($_POST['user_id']) || !isset($_POST['project_id']) || !isset($_POST['user_name'])) {
+                        $response = ['success' => false, 'message' => 'User ID, Project ID, and User Name are required'];
+                        break;
+                    }
+                
+                    $user_id = $_POST['user_id'];
+                    $project_id = $_POST['project_id'];
+                    $user_name = $_POST['user_name'];
+                
+                    // Delete user
+                    $stmt = $db->prepare("DELETE FROM project_users WHERE user_id = ?");
+                    $success = $stmt->execute([$user_id]);
+                
+                    // Nullify invited_by references if necessary
+                    $stmt = $db->prepare("UPDATE users SET invited_by = NULL WHERE id = ?");
+                    $stmt->execute([$user_id]);
+                
+                    if ($success) {
+                        $stmt = $db->prepare("
+                            INSERT INTO activity_log (project_id, user_id, action_type, description) 
+                            VALUES (?, ?, ?, ?)
+                        ");
+                        $stmt->execute([
+                            $project_id,
+                            $user_id,
+                            'user_removed',
+                            "User {$user_name} has been removed from project {$project_id}"
+                        ]);
+                
+                        // Send Notification
+                        $notificationResult = Notification::send('project_' . $project_id, 'user_removed', [
+                            'message' => $user_name . ' has been removed from the project',
+                            'action_type' => 'user_removed',
+                            'description' => $user_name . ' has been removed from the project',
+                            'created_at' => date('Y-m-d H:i:s')
+                        ]);
+                
+                        $response = [
+                            'success' => true, 
+                            'message' => $user_name . ' removed successfully',
+                            'notification' => $notificationResult
+                        ];
+                
+                        error_log("Notification Result: " . json_encode($notificationResult));
+                    } else {
+                        $response = ['success' => false, 'message' => 'Failed to remove user'];
+                    }
+                    break;
+                
             case 'get_task_assignees':
                 $data = json_decode(file_get_contents('php://input'), true);
                 if (!isset($data['task_id'])) {
@@ -1610,6 +1741,30 @@ if (isset($_GET['api'])) {
                     LIMIT 100
                 ");
                 $stmt->execute([$data['project_id']]);
+                $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                $response = ['success' => true, 'logs' => $logs];
+                break;
+            case 'get_unreadnotifications':
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (!isset($_GET['project_id'])) {
+                    throw new Exception('Project ID is required');
+                }
+
+                $stmt = $db->prepare("
+                    SELECT 
+                        al.action_type,
+                        al.description,
+                        al.created_at,
+                        u.username,
+                        al.status as notification_status
+                    FROM activity_log al
+                    LEFT JOIN users u ON al.user_id = u.id
+                    WHERE al.project_id = ? AND al.status = 'unread'
+                    ORDER BY al.created_at DESC
+                    LIMIT 100
+                ");
+                $stmt->execute([$_GET['project_id']]);
                 $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 $response = ['success' => true, 'logs' => $logs];
@@ -1691,6 +1846,58 @@ if (isset($_GET['api'])) {
                     $picture,
                     $assignees
                 );
+
+                // Send Email and Notifications
+                $allAssignees = [];
+                $userManager = new UserManager();
+                foreach ($assignees as $assignee_id) {
+                    $userDetails = $userManager->getUserDetails($assignee_id);
+                    if ($userDetails) {
+                        $allAssignees[] = $userDetails;
+                    }
+                }
+                // $allAssignees = [
+                //         [
+                //             "id" => 34,
+                //             "username" => "taimoorhamza1999",
+                //             "email" => "taimoorhamza1999@gmail.com",
+                //             "role" => "Creator"
+                //         ],
+                //         [
+                //             "id" => 35, // Changed to unique ID
+                //             "username" => "taimoorhamza199",
+                //             "email" => "taimoorhamza199@gmail.com",
+                //             "role" => "Full Stack Developer"
+                //         ],
+                //     ];
+                // Send Notification
+                $result = Notification::send('project_' . $data['project_id'], 'task_created', ['message' => 'New Task created ' . $data['title'] . ' and assigned ']);
+
+                // Sending Email
+                $Auth = new Auth();
+                $logedinUser = $Auth->getCurrentUser();
+                $projectTilte = $project_manager->getProjectName($data['project_id']);
+                try {
+                    $emailSent = $userManager->projectUsersTaskAssignedEmail($logedinUser['username'], $projectTilte, $data['title'], $allAssignees, );
+                    if ($emailSent) {
+                        echo json_encode($response = [
+                            'success' => $emailSent,
+                            'message' => "An invite has been sent to assignee"
+                        ]);
+                        exit;
+                    } else {
+                        $response = [
+                            'success' => false,
+                            'message' => "Failed to send the invite."
+                        ];
+                    }
+                } catch (Exception $e) {
+                    $response = [
+                        'success' => false,
+                        'message' => "Error: " . $e->getMessage()
+                    ];
+                }
+
                 $response = ['success' => true, 'task_id' => $task_id];
                 break;
 
@@ -1738,6 +1945,109 @@ if (isset($_GET['api'])) {
                 $stmt->execute([$data['due_date'], $data['subtask_id']]);
                 $response = ['success' => true];
                 break;
+                // Email
+                // Enable error reporting for debugging
+                ini_set('display_errors', 1);
+                error_reporting(E_ALL);
+
+            // The case for sending welcome email
+            case 'send_welcome_email':
+                $data = json_decode(file_get_contents('php://input'), true);
+                $BASE_URL = $_ENV['BASE_URL'];
+
+                // Validate input
+                // if (!isset($data['email']) || !isset($data['username']) || !isset($data['tempPassword'])) {
+                //     $response = [
+                //         'success' => false,
+                //         'message' => "Error: Missing required fields (email, username, tempPassword)."
+                //     ];
+                //     // Set the Content-Type header to application/json
+                //     header('Content-Type: application/json');
+                //     echo json_encode($response);
+                //     exit;
+                // }
+                error_reporting(E_ALL);
+                ini_set('display_errors', 1);
+                // Simulate getting project users (Example users)
+
+                $userManager = new UserManager();
+                try {
+                    $notificationManager = new NotificationManager($userManager);
+                    $response = $notificationManager->sendProjectNotification(42, "New User Added", "New User Added successfully");
+                    $response = [
+                        'success' => true,
+                        'message' => $response
+                    ];
+                    // exit;
+                    // if ($emailSent) {
+                    //     $response = [
+                    //         'success' => true,
+                    //         'message' => "An invite has been sent along with login credentials."
+                    //     ];
+                    // } else {
+                    //     $response = [
+                    //         'success' => false,
+                    //         'message' => "Failed to send the invite."
+                    //     ];
+                    // }
+                } catch (Exception $e) {
+                    $response = [
+                        'success' => false,
+                        'message' => "Error: " . $e->getMessage()
+                    ];
+                }
+
+                // Set the Content-Type header to application/json
+                header('Content-Type: application/json');
+                echo json_encode($response);  // Ensure JSON is properly returned
+                exit;
+
+
+            // Notification
+            case 'send_notification_project':
+                $data = json_decode(file_get_contents('php://input'), true);
+                // if (!isset($data['task_id'])) {
+                //     throw new Exception('Task ID is required');
+                // }
+                $userManager = new UserManager();
+                if (!isset($db)) {
+                    $response = [
+                        'success' => false,
+                        'message' => "Error: Database connection (\$db) is not set."
+                    ];
+
+                }
+
+                if (!isset($userManager)) {
+
+                    $response = [
+                        'success' => false,
+                        'message' => "Error: UserManager (\$userManager) is not set."
+                    ];
+                }
+
+
+            // Check if user is a pro member
+            case 'check_pro_status':
+                $auth = new Auth();
+                $user = $auth->getCurrentUser();
+
+                if (!$user) {
+                    $response = [
+                        'success' => false,
+                        'is_pro' => false,
+                        'message' => 'User not logged in'
+                    ];
+                } else {
+                    $is_pro = isset($user['pro_member']) && $user['pro_member'] == 1;
+                    $response = [
+                        'success' => true,
+                        'is_pro' => $is_pro,
+                        'payment_link' => $_ENV['STRIPE_PAYMENT_LINK'],
+                        'invited_by' => $user['invited_by']
+                    ];
+                }
+                break;
 
             default:
                 throw new Exception('Invalid API endpoint');
@@ -1755,22 +2065,41 @@ if (isset($_GET['api'])) {
     exit;
 }
 
+
+// if (!isset($_SESSION["pro_member"])) {
+//     header("Location: " . $_ENV['STRIPE_PAYMENT_LINK']);
+//     // exit;
+// }
+// echo $_SESSION;
+// echo "dfdsf";
+// echo "<pre>";
+// print_r($_SESSION);
+// echo "</pre><br/>";
+
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-signin-client_id"
+        content="949298386531-pbk4td6p6ga18e6diee9rifskto0ou0v.apps.googleusercontent.com.apps.googleusercontent.com">
+    <meta name="fcm_token_value" content="0" id="fcm_token_value">
+
     <title>Project Manager AI</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
     <!-- iziToast CSS & JS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/izitoast/dist/css/iziToast.min.css">
     <script src="https://cdn.jsdelivr.net/npm/izitoast/dist/js/iziToast.min.js"></script>
     <!-- Tailwind CSS -->
     <!-- <script src="https://unpkg.com/@tailwindcss/browser@4"></script> -->
+    <!-- Custom js -->
+    <script src="./assets/js/custom.js"></script>
     <!-- Favicon links -->
     <!-- <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
@@ -1783,9 +2112,7 @@ if (isset($_GET['api'])) {
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     <link rel="manifest" href="site.webmanifest">
     <!-- Custom css -->
-    <!-- <link rel="stylesheet" href="custom.css"> -->
-    <!-- Custom js -->
-    <script src="./assets/js/custom.js"></script>
+    <link rel="stylesheet" href="./assets/css/custom.css">
     <style>
         .suggestion-item {
             border-radius: 16px !important;
@@ -1793,7 +2120,8 @@ if (isset($_GET['api'])) {
         }
 
         .chat-container {
-            height: calc(100vh - 200px);
+            height: calc(100vh - 230px);
+            /* height: 80vh; */
             display: flex;
             flex-direction: column;
         }
@@ -1802,6 +2130,7 @@ if (isset($_GET['api'])) {
             flex-grow: 1;
             overflow-y: auto;
             padding: 1rem;
+            /* max-height: 60vh; */
             max-height: calc(100vh - 300px);
         }
 
@@ -1812,6 +2141,7 @@ if (isset($_GET['api'])) {
         }
 
         .task-column {
+            /* min-height: 60vh; */
             min-height: calc(100vh - 300px);
             background: #f8f9fa;
             border-radius: 12px;
@@ -2232,7 +2562,7 @@ if (isset($_GET['api'])) {
         }
 
         body.dark-mode .navbar {
-            background-color: #242526 !important;
+            /* background-color: #242526 !important; */
             border-bottom: 1px solid #2f3031;
         }
 
@@ -2493,15 +2823,15 @@ if (isset($_GET['api'])) {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            background-color: #0d6efd;
+            /* background-color: #0d6efd; */
             border: none;
             transition: all 0.2s ease;
         }
 
         .nav-tabs .btn-primary:hover {
-            background-color: #0b5ed7;
+            /* background-color: #0b5ed7; */
             transform: translateY(-1px);
-            box-shadow: 0 2px 4px rgba(13, 110, 253, 0.2);
+            /* box-shadow: 0 2px 4px rgba(13, 110, 253, 0.2); */
         }
 
         .nav-tabs .btn-primary i {
@@ -2516,6 +2846,7 @@ if (isset($_GET['api'])) {
 
         body.dark-mode .nav-tabs .nav-link {
             color: #b0b3b8;
+            /* font-weight:700; */
         }
 
         body.dark-mode .nav-tabs .nav-link:hover:not(.active) {
@@ -2524,9 +2855,9 @@ if (isset($_GET['api'])) {
         }
 
         body.dark-mode .nav-tabs .nav-link.active {
-            color: #2374e1;
+            /* color: #2374e1; */
             background-color: #18191a;
-            border-bottom-color: #2374e1;
+            /* border-bottom-color: #2374e1; */
         }
 
         /* Responsive adjustments */
@@ -2591,6 +2922,7 @@ if (isset($_GET['api'])) {
             max-width: 100vw;
             /* Ensure container doesn't exceed viewport width */
             overflow-x: hidden;
+
             /* Prevent horizontal scrolling */
         }
 
@@ -2605,9 +2937,7 @@ if (isset($_GET['api'])) {
         }
 
         /* Find the existing .task-card style and update/add these styles */
-        .task-card {
-            /* ... existing styles ... */
-        }
+
 
         .task-card h6 {
             font-size: 1.1em;
@@ -2647,6 +2977,63 @@ if (isset($_GET['api'])) {
         .ai-add-subtask-btn {
             font-size: 0.9em;
             /* Make button text relative to base font size */
+        }
+
+        /* Scrollable Navigation Bar */
+        .nav-tabs {
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            -ms-overflow-style: -ms-autohiding-scrollbar;
+            white-space: nowrap;
+            scrollbar-width: thin;
+            padding-bottom: 5px;
+            /* Prevent scrollbar from covering content */
+        }
+
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .nav-tabs::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        /* Handle for Chrome, Safari and Opera */
+        .nav-tabs::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+
+        /* Handle on hover */
+        .nav-tabs::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        /* Track */
+        .nav-tabs::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 4px;
+        }
+
+        /* Dark mode scrollbar */
+        body.dark-mode .nav-tabs::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        body.dark-mode .nav-tabs::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Prevent tab items from wrapping */
+        .nav-tabs .nav-item {
+            float: none;
+            display: inline-block;
+            margin-bottom: 0;
+        }
+
+        /* Container adjustments */
+        #projectTabs {
+            position: relative;
+            padding-bottom: 0.5rem;
         }
     </style>
     <style>
@@ -2724,6 +3111,7 @@ if (isset($_GET['api'])) {
             padding: 0.5rem 1rem !important;
             font-size: 1rem !important;
             border-radius: 10px !important;
+            border: 0.5px solid !important;
         }
 
         .required-asterisk {
@@ -2732,20 +3120,144 @@ if (isset($_GET['api'])) {
             font-weight: bold;
         }
     </style>
+    <style>
+        /* Nav container with position relative for absolute positioning of buttons */
+        .nav-container {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        /* Scrollable Navigation Bar */
+        .nav-tabs {
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            -ms-overflow-style: -ms-autohiding-scrollbar;
+            white-space: nowrap;
+            scrollbar-width: none;
+            /* Firefox */
+            -ms-overflow-style: none;
+            /* IE and Edge */
+            position: relative;
+            padding: 0 40px;
+            /* Make room for scroll buttons */
+            padding-top: 0.5rem;
+        }
+
+        /* Hide scrollbar completely */
+        .nav-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Scroll Buttons */
+        .nav-scroll-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #dee2e6;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-scroll-btn:hover {
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-scroll-btn.left {
+            left: 0;
+        }
+
+        .nav-scroll-btn.right {
+            right: 0;
+        }
+
+        /* Dark mode styles for scroll buttons */
+        body.dark-mode .nav-scroll-btn {
+            background: rgba(54, 55, 56, 0.9);
+            border-color: #2f3031;
+            color: #e4e6eb;
+        }
+
+        body.dark-mode .nav-scroll-btn:hover {
+            background: #3a3b3c;
+        }
+
+        /* Show buttons when nav container is hovered and has overflow */
+        .nav-container:hover .nav-scroll-btn.show {
+            display: flex;
+        }
+    </style>
 </head>
 <!-- Reuseable Stuff -->
-
 <?php
 function required_field()
 {
     return '<span class="required-asterisk">*</span>';
 }
+function displayGoogleLoginBtn($text = "Sign in with Google")
+{
+    // If the user is NOT logged in (no access token in session):
+    if (!isset($_SESSION['access_token'])) {
+        $client = new Google_Client();
+        $client->setClientId($_ENV['GOOGLE_CLIENT_ID']);
+        $client->setClientSecret($_ENV['GOOGLE_CLIENT_SECRET']);
+        $client->setRedirectUri($_ENV['BASE_URL'] . '/callback.php');
+        $client->addScope("email");
+        $client->addScope("profile");
+
+        $authUrl = $client->createAuthUrl();
+        // Show the "Sign in with Google" button
+        echo "
+         <div class='text-center mt-2'>
+                                    <p class='text-muted mb-1'>OR</p>
+                                </div>
+        <a href='$authUrl' class='btn btn-outline-link  w-100 d-flex align-items-center justify-content-center' style='gap: 8px;'>
+                <svg width='18' height='19' viewBox='0 0 16 17' fill='none' xmlns='http://www.w3.org/2000/svg'>
+                  <path d='M13.8824 7.41113H8.11768V9.72516H11.4231C11.3564 10.0945 11.2134 10.4465 11.0029 10.7595C10.7925 11.0726 10.5191 11.34 10.1995 11.5454V13.051H12.1665C12.7703 12.4802 13.2452 11.7912 13.5605 11.0286C14.0327 9.88636 14.0878 8.62111 13.8824 7.41113Z' fill='#4285F4'></path>
+                  <path d='M8.11765 14.4996C9.76488 14.4996 11.1599 13.9718 12.1665 13.0506L10.1995 11.545C9.58012 11.9375 8.85452 12.1373 8.11765 12.1181C7.35471 12.1088 6.61379 11.8656 5.99848 11.4224C5.38317 10.9793 4.92424 10.3584 4.68585 9.64648H2.65015V11.1856C3.15915 12.1814 3.94 13.0187 4.9055 13.604C5.87099 14.1892 6.98311 14.4992 8.11765 14.4996Z' fill='#34A853'></path>
+                  <path d='M4.68589 9.64706C4.42873 8.90009 4.42873 8.09081 4.68589 7.34384V5.79395H2.65019C2.22264 6.63065 2 7.55387 2 8.49004C2 9.42621 2.22264 10.3494 2.65019 11.1861L4.68589 9.64706Z' fill='#FBBC04'></path>
+                  <path d='M8.11765 4.87211C8.98898 4.85751 9.83116 5.18027 10.4621 5.77064L12.2126 4.05185C11.5147 3.43218 10.6808 2.9789 9.77551 2.72723C8.87026 2.47556 7.91812 2.43227 6.99307 2.60073C6.06803 2.76919 5.19498 3.14487 4.44177 3.69857C3.68856 4.25226 3.07548 4.96907 2.65015 5.7933L4.68585 7.34371C4.92424 6.63182 5.38317 6.0109 5.99848 5.56776C6.61379 5.12461 7.35471 4.8814 8.11765 4.87211Z' fill='#EA4335'></path>
+                </svg>
+               " . $text . "
+              </a>";
+    }
+    // Otherwise, the user IS logged in:
+    else {
+        echo "<a onclick='logout()' >Logout</a>";
+    }
+}
 ?>
 
-<body>
+<body
+    style="background-color:<?php echo isset($_GET['page']) && ($_GET['page'] == 'login' || $_GET['page'] == 'register') ? '#000' : ''; ?>">
     <?php
     $auth = new Auth();
-    $page = $_GET['page'] ?? ($auth->isLoggedIn() ? 'dashboard' : 'login');
+    // if (!isset($_GET['page'])) {
+    //     header('Location: index.php?page=login');
+    //     exit;
+    // }
+    
+    if ($auth->isLoggedIn() && $_GET['page'] && in_array($_GET['page'], ['login', 'register'])) {
+        header('Location: ?page=dashboard');
+        exit;
+    }
+    // Check if the page parameter is set in the URL
+    if (isset($_GET['page']) && $_GET['page'] === 'register') {
+        $page = 'register';
+    } else {
+        $page = $_GET['page'] ?? ($auth->isLoggedIn() ? 'dashboard' : 'login');
+    }
 
     if (!$auth->isLoggedIn() && !in_array($page, ['login', 'register'])) {
         header('Location: ?page=login');
@@ -2759,10 +3271,10 @@ function required_field()
     if ($auth->isLoggedIn()):
         ?>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <div class="container-fluid " style="width: 95%;">
-                <!-- <a class="navbar-brand" href="?page=dashboard">Project Manager AI</a> -->
-                <a class="navbar-brand" href="?page=dashboard"><img src="assets/images/bossgptlogo.svg" alt="Logo"
-                        style="width: 150px; height: 60px;"></a>
+            <div class="container-fluid" style="width: 98%; overflow: visible;">
+                <a class="navbar-brand" href="?page=dashboard">
+                    <?php echo getLogoImage($bottomMargin = '0.4rem', $topMargin = "0.4rem", $width = "10rem", $height = "auto", $positionClass = " ", $positionStyle = " ", $src = "https://res.cloudinary.com/da6qujoed/image/upload/v1742546475/bossgpt/leopyvcgbiyotpwrayha.png"); ?>
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -2774,17 +3286,45 @@ function required_field()
                         </li>
                     </ul>
                     <div class="d-flex align-items-center">
-                        <span class="navbar-text me-4">
-                            Welcome, <?= htmlspecialchars($_SESSION['username']) ?>
-                        </span>
+                        <span class="navbar-text me-4">Welcome, <?= htmlspecialchars($_SESSION['username']) ?></span>
+
                         <div class="d-flex align-items-center me-4">
                             <label for="fontSizeRange" class="text-light me-2 mb-0">Font Size:</label>
                             <input type="range" class="form-range" id="fontSizeRange" min="12" max="24" step="1"
                                 style="width: 100px;">
                             <span id="fontSizeValue" class="text-light ms-2" style="min-width: 45px;">16px</span>
                         </div>
-                        <!-- Added Dark Mode Toggle Button -->
-                        <button id="toggleDarkModeBtn" class="btn btn-outline-light me-2">Dark Mode</button>
+
+                        <!-- Notification Icon with Red Badge -->
+                        <?php
+                        $unreadNotifications = 0;
+                        $notifications = [];
+                        ?>
+                        <div class="dropdown">
+                            <input type="hidden" id="myselectedcurrentProject" value="0">
+                            <button class="btn btn-outline-light position-relative" id="notificationDropdown"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-bell"></i>
+                                <span
+                                    class="badge rounded-pill bg-danger position-absolute top-0 start-100 translate-middle"
+                                    id="notificationBadge" style="display: none;">0</span>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end" id="notificationDropdownMenu"
+                                aria-labelledby="notificationDropdown"
+                                style="min-width: 300px; max-height: 400px; overflow-y: auto;">
+                                <div class="dropdown-header p-2 pb-3 pl-5">
+                                    <strong class="mb-5">Notifications</strong>
+                                </div>
+                                <div class="notification-list">
+                                    <div class="dropdown-item text-center">Loading notifications...</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dark Mode Toggle Button -->
+                        <button id="toggleDarkModeBtn" class="btn btn-outline-light mx-2">Dark Mode</button>
+
+                        <!-- Logout Form -->
                         <form method="POST" class="d-inline">
                             <input type="hidden" name="action" value="logout">
                             <button type="submit" class="btn btn-outline-light">Logout</button>
@@ -2797,6 +3337,7 @@ function required_field()
 
     <div class="container-fluid mt-4">
         <?php
+
         switch ($page) {
             case 'login':
                 include_login_page();
@@ -2810,21 +3351,24 @@ function required_field()
             default:
                 echo "<h1>404 - Page Not Found</h1>";
         }
-
         function include_login_page()
         {
-            global $error_message; // Add this line to access the error message
+            global $error_message;
             ?>
-            <div class="d-flex justify-content-center align-items-center min-vh-100">
-                <div class="row justify-content-center w-100">
+            <div class="d-flex justify-content-center align-items-center min-vh-100 login-page ">
+                <div class="row justify-content-center w-100 position-relative">
+                    <!-- <img src="assets/images/bossgptlogo.svg" alt="Logo"
+                        class="position-absolute top-0 start-50 translate-middle "
+                        style="margin-top: -100px; width: 15rem; height: 10rem;position: absolute;top: 50%;left: 50%;transform: translate(-50%,-50%);"> -->
+                    <?php echo getLogoImage("", "-70px"); ?>
                     <div class="col-md-6 col-lg-4">
                         <div class="card">
                             <div class="card-body">
                                 <h2 class="card-title text-center mb-4">Login</h2>
-                                <?php if (isset($error_message)): ?>
-                                    <div class="alert alert-danger">
-                                        <?php echo htmlspecialchars($error_message); ?>
-                                    </div>
+                                <?php if (isset($error_message) && $_GET['page'] == 'login'): ?>
+                                    <script>
+                                        Toast("error", "Error", "<?php echo htmlspecialchars($error_message); ?>");
+                                    </script>
                                 <?php endif; ?>
                                 <form method="POST">
                                     <input type="hidden" name="action" value="login">
@@ -2838,9 +3382,13 @@ function required_field()
                                     </div>
                                     <button type="submit" class="btn btn-primary w-100">Login</button>
                                 </form>
+                                <?php
+                                displayGoogleLoginBtn();
+                                ?>
                                 <p class="text-center mt-3">
-                                    <a href="?page=register">Need an account? Register</a>
+                                    <a href="?page=register">Don't have an account? Sign Up </a>
                                 </p>
+
                             </div>
                         </div>
                     </div>
@@ -2852,33 +3400,42 @@ function required_field()
         {
             global $error_message; // Add this line to access the error message
             ?>
-            <div class="d-flex justify-content-center align-items-center min-vh-100">
-                <div class="row justify-content-center w-100">
-                    <div class="col-md-6 col-lg-4">
+            <div class="d-flex justify-content-center align-items-center min-vh-100 register-page">
+                <div class="row justify-content-center w-100 position-relative">
+                    <!-- <img src="assets/images/bossgptlogo.svg" alt="Logo"
+                        class="position-absolute top-0 start-50 translate-middle "
+                        style="margin-top: -1rem; width: 15rem; height: 10rem;position: absolute;top: 50%;left: 50%;transform: translate(-50%,-50%);"> -->
+                    <?php echo getLogoImage(); ?>
+                    <div class="col-md-6 col-lg-4 mt-5">
                         <div class="card">
                             <div class="card-body">
                                 <h2 class="card-title text-center mb-4">Register</h2>
-                                <?php if (isset($error_message)): ?>
-                                    <div class="alert alert-danger">
-                                        <?php echo htmlspecialchars($error_message); ?>
-                                    </div>
+                                <?php if (isset($error_message) && $_GET['page'] == 'register'): ?>
+                                    <script>
+                                        Toast("error", "Error", "<?php echo htmlspecialchars($error_message); ?>");
+                                    </script>
                                 <?php endif; ?>
                                 <form method="POST">
                                     <input type="hidden" name="action" value="register">
+                                    <input type="hidden" name="fcm_token" value="0" id="fcm_token">
                                     <div class="mb-3">
-                                        <label for="username" class="form-label">Username</label>
+                                        <label for="username" class="form-label" autocomplete="off">Username</label>
                                         <input type="text" class="form-control" id="username" name="username" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="email" class="form-label">Email</label>
+                                        <label for="email" class="form-label" autocomplete="off">Email</label>
                                         <input type="email" class="form-control" id="email" name="email" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="password" class="form-label">Password</label>
+                                        <label for="password" class="form-label" autocomplete="off">Password</label>
                                         <input type="password" class="form-control" id="password" name="password" required>
                                     </div>
                                     <button type="submit" class="btn btn-primary w-100">Register</button>
                                 </form>
+
+                                <?php
+                                displayGoogleLoginBtn("Sign up with Google");
+                                ?>
                                 <p class="text-center mt-3">
                                     <a href="?page=login">Already have an account? Login</a>
                                 </p>
@@ -2894,18 +3451,30 @@ function required_field()
             ?>
             <?php $projectManager = new ProjectManager();
             $projects = $projectManager->getProjects($_SESSION['user_id']);
+
+            // Display welcome message if set
+            if (isset($_SESSION['welcome_message'])) {
+                echo "<script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        Toast('success', 'Welcome', '" . htmlspecialchars($_SESSION['welcome_message']) . "');
+                    });
+                </script>";
+                unset($_SESSION['welcome_message']); // Clear the message after displaying
+            }
             ?>
             <!-- Replace the existing row div with this new layout -->
             <div class="container-fluid">
                 <!-- New Tab Navigation -->
-                <ul class="nav nav-tabs mb-3" id="projectTabs">
-                    <li class="nav-item">
-                        <button type="button" class="btn btn-primary ms-2" data-bs-toggle="modal"
-                            data-bs-target="#newProjectModal">
-                            <i class="bi bi-plus"></i> New Project
-                        </button>
-                    </li>
-                </ul>
+                <div class="nav-container">
+                    <ul class="nav nav-tabs mb-3" id="projectTabs">
+                        <li class="nav-item">
+                            <button type="button" class="btn btn-primary ms-2" data-bs-toggle="modal"
+                                data-bs-target="#newProjectModal">
+                                <i class="bi bi-plus"></i> New Project
+                            </button>
+                        </li>
+                    </ul>
+                </div>
 
                 <!-- Main Content Area -->
                 <div class="row">
@@ -2921,7 +3490,7 @@ function required_field()
                                     </button>
 
                                     <?php if (TESTING_FEATURE == 1): ?>
-                                        <button type="button" class="btn btn-sm btn-info me-2" onclick=' showChatLoading()'>
+                                        <button type="button" class="btn btn-sm btn-info me-2" onclick='sendWelcomeEmailTest()'>
                                             <i class="bi bi-clock-history"></i> Testing Feature Button
                                         </button>
                                     <?php endif; ?>
@@ -2934,7 +3503,7 @@ function required_field()
                                     </button>
                                     <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="modal"
                                         data-bs-target="#assignUserModal">
-                                        <i class="bi bi-person-plus"></i> Assign User
+                                        <i class="bi bi-person-plus"></i> Invite User
                                     </button>
                                 </div>
                             </div>
@@ -2967,7 +3536,7 @@ function required_field()
                     <div class="col-md-3">
                         <div class="card">
                             <div class="card-header">
-                                <h5 class="mb-0">AI Project Manager <svg stroke="currentColor" fill="currentColor"
+                                <h5 class="mb-0">BossGPT Assistant <svg stroke="currentColor" fill="currentColor"
                                         stroke-width="0" viewBox="0 0 640 512" class="text-5xl" height="1.6em" width="1.6em"
                                         xmlns="http://www.w3.org/2000/svg">
                                         <path
@@ -2988,7 +3557,7 @@ function required_field()
                                             <script>
                                                 // Immediately invoke function to initialize welcome messages
                                                 (function initializeWelcomeMessages() {
-                                                    console.log('Initializing welcome messages...'); // Debug log
+                                                    // console.log('Initializing welcome messages...'); // Debug log
 
                                                     const welcomeThread = document.getElementById('welcomeThread');
                                                     const chatMessages = document.getElementById('chatMessages');
@@ -3055,7 +3624,7 @@ function required_field()
                                                     ];
 
                                                     async function showMessage(message) {
-                                                        console.log('Showing message:', message.title); // Debug log
+                                                        // console.log('Showing message:', message.title); // Debug log
 
                                                         // Show loading animation first
                                                         showChatLoading();
@@ -3107,7 +3676,7 @@ function required_field()
 
                                                         content += '</div>';
                                                         messageDiv.innerHTML = content;
-                                                        welcomeThread.appendChild(messageDiv);
+                                                        welcomeThread?.appendChild(messageDiv);
 
                                                         // Apply fade-in effect
                                                         setTimeout(() => {
@@ -3167,7 +3736,7 @@ function required_field()
                                 <div class="mb-3">
                                     <label for="projectDescription"
                                         class="form-label">Description<?php echo required_field(); ?></label>
-                                    <textarea class="form-control" id="projectDescription" rows="3"
+                                    <textarea class="form-control" id="projectDescription" rows="8"
                                         placeholder="Define your project in few lines."></textarea>
                                 </div>
                             </form>
@@ -3231,7 +3800,6 @@ function required_field()
                                     </button>
                                 </h6>
                                 <div id="subtasksList" class="mt-3">
-                                    <!-- Subtasks will be loaded here -->
                                 </div>
                             </div>
 
@@ -3287,13 +3855,43 @@ function required_field()
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content border-0 shadow-lg rounded-lg">
                         <div class="modal-header bg-primary text-white border-0 rounded-t-lg">
+                            <h5 class="modal-title" id="assignUserModalLabel">Invite User to Project</h5>
+                            <button type="button" class="btn-close text-white" data-bs-dismiss="modal"
+                                aria-label="Close "></button>
+                        </div>
+
+                        <div class="modal-body position-relative">
+                            <button class="btn btn-primary position-absolute top-5 add-user-btn-top-right"
+                                style="right: 10px;" id="addUserBtn">
+                                <i class="bi bi-person-plus"></i> Add New User
+                            </button>
+                            <div id="userListContainer" class="mt-5">
+                                <!-- Dynamically populated users will appear here -->
+                            </div>
+
+                            <!-- No Users Message -->
+                            <div id="noUsersMessage" class="text-center py-2 d-none">
+                                <p class="text-muted">No users assigned yet.</p>
+                                <button class="btn btn-primary" id="addUserBtn">
+                                    <i class="bi bi-person-plus"></i> Add New User
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="modal fade" id="assignUserModal" tabindex="-1" aria-labelledby="assignUserModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow-lg rounded-lg">
+                        <div class="modal-header bg-primary text-white border-0 rounded-t-lg">
                             <h5 class="modal-title" id="assignUserModalLabel">Assign User to Project</h5>
                             <button type="button" class="btn-close text-white" data-bs-dismiss="modal"
                                 aria-label="Close "></button>
                         </div>
                         <div class="modal-body">
                             <form id="assignUserForm">
-                                <!-- Select User Dropdown -->
                                 <div class="mb-3">
                                     <label for="userSelect" class="form-label">Select
                                         User<?php echo required_field(); ?></label>
@@ -3301,7 +3899,6 @@ function required_field()
                                         <option value="">Select a user</option>
                                     </select>
                                 </div>
-                                <!-- Role in Project -->
                                 <div class="mb-3">
                                     <label for="userRole" class="form-label">Role in
                                         Project<?php echo required_field(); ?></label>
@@ -3316,7 +3913,7 @@ function required_field()
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
 
 
@@ -3331,24 +3928,9 @@ function required_field()
                         <div class="modal-body">
                             <form id="addUserForm">
                                 <div class="mb-3">
-                                    <label for="newUserName" class="form-label">User
-                                        Name<?php echo required_field(); ?></label>
-                                    <input type="text" class="form-control" id="newUserName" required>
+                                    <label for="newUserEmail" class="form-label">Email<?php echo required_field(); ?></label>
+                                    <input type="email" class="form-control text-lowercase" id="newUserEmail" required>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="newUserEmail"
-                                        class="form-label">Email<?php echo required_field(); ?></label>
-                                    <input type="email" class="form-control" id="newUserEmail" required>
-                                </div>
-                                <!-- <div class="mb-3">
-                                    <label for="newUserRole" class="form-label">Role</label>
-                                    <select class="form-select" id="newUserRole" required>
-                                        <option value="">Select Role</option>
-                                        <option value="admin">Admin</option>
-                                        <option value="manager">Manager</option>
-                                        <option value="member">Member</option>
-                                    </select>
-                                </div> -->
                                 <div class="mb-3">
                                     <label for="newUserRole" class="form-label">Role<?php echo required_field(); ?></label>
                                     <input type="text" class="form-control" id="newUserRole"
@@ -3357,8 +3939,8 @@ function required_field()
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary" id="saveUserBtn">Save User</button>
+                            <button type="button" class="btn btn-primary" id="addNewUserBtn"><i
+                                    class="bi bi-send"></i>&nbsp;Send Invite</button>
                         </div>
                     </div>
                 </div>
@@ -3499,13 +4081,60 @@ function required_field()
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
-
+        var userId = null;
+function getLastSelectedProject() {
+    if (userId) { // Check if userId is available
+        return localStorage.getItem(`lastSelectedProject_${userId}`);
+    }
+    return null; // No user logged in or session expired
+}
 
         document.addEventListener('DOMContentLoaded', function () {
+
+            const currentProject = $('#myselectedcurrentProject').val();
+            // console.log(currentProject)
+            // alert(currentProject);
+            // initPusher(currentProject);
             // First check if we're on the dashboard page
             const isDashboard = document.querySelector('.chat-container') !== null;
 
             if (isDashboard) {
+
+                // Check if user is a pro member and redirect if necessary
+                fetch('?api=check_pro_status')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && (!data.is_pro)) {
+                           
+                            if (data.invited_by == null) {
+                                window.location.href = data.payment_link;
+                            }
+                        }
+                    })
+                    .catch(error => console.error('Error checking pro status:', error));
+
+                // check if user is pro member
+                // if no then redirect to stripe page simply
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.has('pro-member') && urlParams.get('pro-member') === 'true') {
+                    // Call API to update pro status
+                    // alert('pro-member');
+                    // return;
+                    fetch('?api=update_pro_status')
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                console.log('Pro status updated successfully');
+                                Toast('success', 'Upgrade Complete', 'Your account has been upgraded to Pro!');
+                                // Remove the parameter from URL without page reload
+                                const newUrl = window.location.pathname + window.location.search.replace(/[?&]pro-member=true/, '');
+                                window.history.replaceState({}, document.title, newUrl);
+                            } else {
+                                console.error('Failed to update pro status:', data.message);
+                            }
+                        })
+                        .catch(error => console.error('Error updating pro status:', error));
+                }
                 // Add debounce function at the start
                 function debounce(func, wait) {
                     let timeout;
@@ -3517,6 +4146,8 @@ function required_field()
                         clearTimeout(timeout);
                         timeout = setTimeout(later, wait);
                     };
+
+
                 }
 
                 // Create the debounced update function
@@ -3541,6 +4172,13 @@ function required_field()
                 }, 500); // 500ms debounce time
 
                 let currentProject = null;
+                // Load saved project from localStorage if available
+                const savedProject = getLastSelectedProject();
+                if (savedProject && savedProject !== 'null') {
+                    currentProject = parseInt(savedProject);
+                    $('#myselectedcurrentProject').val(currentProject);
+                }
+
                 const projectsList = document.getElementById('projectsList');
                 const chatMessages = document.getElementById('chatMessages');
                 const chatForm = document.getElementById('chatForm');
@@ -3620,25 +4258,31 @@ function required_field()
                 }
 
                 // Select project
-                function selectProject(projectId) {
+                function selectProject(projectId, selectedProjectTitle = "") {
                     // currentProject = projectId;
                     projectId = parseInt(projectId);
                     currentProject = parseInt(projectId);
+                    $('#myselectedcurrentProject').val(currentProject);
+
+                    // Save current project to localStorage for persistence
+                    localStorage.setItem(`lastSelectedProject_${userId}`, currentProject);
+
+                    // call to fetch notifications
+                    fetchNotificationsAndOpen(false);
                     if (isNaN(projectId)) {
                         console.error('Invalid project ID:', projectId);
                         return;
                     }
-                    console.log('Selecting project:', projectId);
+                    // console.log('Selecting project:', projectId);
                     currentProject = projectId;
-                    // document.querySelectorAll('.project-item').forEach(item => {
-                    //     item.classList.toggle('active', item.dataset.id === projectId);
-                    // });
+
                     document.querySelectorAll('.project-item').forEach(item => {
                         const itemId = parseInt(item.dataset.id);
                         item.classList.toggle('active', itemId === projectId);
                     });
                     loadTasks(projectId);
                     loadChatHistory(projectId);
+                    initPusher(projectId);
                 }
 
                 // Load chat history
@@ -3665,6 +4309,16 @@ function required_field()
                                     data.history.forEach(msg => {
                                         appendMessage(msg.message, msg.sender);
                                     });
+                                }
+                                // console.log("object "+data.history.length)
+                                const count = data.history.length;
+
+                                if (count === 0 && $('#chatMessages').is(':empty')) {
+                                    setTimeout(() => {
+                                        if ($('#chatMessages').is(':empty')) {
+                                            displayProjectCreationWelcomeMessages("title");
+                                        }
+                                    }, 2000);
                                 }
                             } else {
                                 throw new Error(data.message || 'Failed to load chat history');
@@ -4009,11 +4663,8 @@ function required_field()
                                 document.getElementById('projectTitle').value = '';
                                 document.getElementById('projectDescription').value = '';
                                 Toast("success", "Success", "Project created successfully", "bottomCenter");
-                               
+
                                 selectProject(data.project_id);
-                                setTimeout(() => {
-                                    displayProjectCreationWelcomeMessages(title);
-                                }, 5000);
                             }
                         })
                         .catch(error => console.error('Error creating project:', error))
@@ -4223,50 +4874,57 @@ function required_field()
                 });
 
                 // Add event listener for "Assign User" button in the modal
-                const assignUserBtn = document.getElementById('assignUserBtn');
-                assignUserBtn.addEventListener('click', function () {
-                    const userSelect = document.getElementById('userSelect');
-                    const userId = userSelect.value;
-                    const userRole = document.getElementById('userRole').value.trim();
-                    if (!currentProject) {
-                        alert('Please select a project first');
-                        return;
-                    }
-                    if (!userId || !userRole) {
-                        alert('Please select a user and enter a role');
-                        return;
-                    }
+                // const inviteUserBtn = document.getElementById('inviteUserBtn');
+                // inviteUserBtn.addEventListener('click', function () {
+                //     alert('inviteUserBtn clicked');
+                //     // alert('assignUserBtn clicked');
+                //     // return;
+                //     // const userSelect = document.getElementById('userSelect');
+                //     // const userId = userSelect.value;
+                //     // const userRole = document.getElementById('userRole').value.trim();
+                //     if (!currentProject) {
+                //         Toast('error', 'Error', 'Please select a project first', 'bottomCenter');
+                //         return;
+                //     }
+                //     // if (!userId || !userRole) {
+                //     //     // alert('Please select a user and enter a role');
+                //     //     Toast('error', 'Error', 'Please select a user and enter a role', 'bottomCenter');
+                //     //     return;
+                //     // }
 
-                    showLoading();
-                    fetch('?api=assign_user_to_project', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            project_id: currentProject,
-                            user_id: userId,
-                            role: userRole
-                        })
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                bootstrap.Modal.getInstance(document.getElementById('assignUserModal')).hide();
-                                // Optionally clear the form fields
-                                document.getElementById('userSelect').value = '';
-                                document.getElementById('userRole').value = '';
-                                // You may want to refresh context or notify the user
-                            } else {
-                                throw new Error(data.message || 'Failed to assign user');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error assigning user:', error);
-                            alert('Failed to assign user. Please try again.');
-                        })
-                        .finally(hideLoading);
-                });
+
+                //     showLoading();
+                //     fetch('?api=assign_user_to_project', {
+                //         method: 'POST',
+                //         headers: { 'Content-Type': 'application/json' },
+                //         body: JSON.stringify({
+                //             project_id: currentProject,
+                //             user_id: userId,
+                //             role: userRole
+                //         })
+                //     })
+                //         .then(response => response.json())
+                //         .then(data => {
+                //             if (data.success) {
+                //                 alert("User assigned successfully");
+                //                 bootstrap.Modal.getInstance(document.getElementById('assignUserModal')).hide();
+                //                 // Optionally clear the form fields
+                //                 document.getElementById('userSelect').value = '';
+                //                 document.getElementById('userRole').value = '';
+                //                 // You may want to refresh context or notify the user
+                //             } else {
+                //                 throw new Error(data.message || 'Failed to assign user');
+                //             }
+                //         })
+                //         .catch(error => {
+                //             console.error('Error assigning user:', error);
+                //             alert('Failed to assign user. Please try again.');
+                //         })
+                //         .finally(hideLoading);
+                // });
 
                 // Populate the user dropdown when the "Assign User" modal is shown
+
                 const assignUserModal = document.getElementById('assignUserModal');
                 assignUserModal.addEventListener('shown.bs.modal', function () {
                     if (!currentProject) {
@@ -4278,7 +4936,6 @@ function required_field()
                         );
                         return;
                     }
-
                     showLoading();
                     fetch(`?api=get_all_project_users&project_id=${currentProject}`)
                         .then(async response => {
@@ -4291,18 +4948,54 @@ function required_field()
                                 throw new Error('Invalid server response');
                             }
                         })
+                        // mujtabatesting1
                         .then(data => {
                             if (data.success) {
-                                const userSelect = document.getElementById('userSelect');
-                                userSelect.innerHTML = '<option value="">Select a user</option>';
+                                const userListContainer = document.getElementById('userListContainer');
+                                const noUsersMessage = document.getElementById("noUsersMessage");
+                                const addUserBtnTopRight = document.getElementById("add-user-btn-top-right");
+                                userListContainer.innerHTML = '<h6 >Users</h6>';
 
-                                // Add project users
-                                data.users.forEach(user => {
-                                    userSelect.innerHTML += `<option value="${user.id}">${user.username} (${user.email}) - ${user.role}</option>`;
-                                });
 
-                                // Add "Add New User" option at the end
-                                userSelect.innerHTML += '<option value="new">+ Add New User</option>';
+                                if (data.users.length === 0) {
+                                    noUsersMessage.classList.remove("d-none");
+                                    userListContainer.classList.add("d-none");
+                                    // addUserBtnTopRight.classList.add("d-none");
+                                } else {
+                                    noUsersMessage.classList.add("d-none");
+                                    userListContainer.classList.remove("d-none");
+
+                                    data.users.forEach((user) => {
+                                        const userCard = document.createElement("div");
+                                        userCard.className = "d-flex justify-content-between align-items-center p-2 mb-2 border rounded dark-primaryborder ";
+                                        let actionButtons = "<div>";
+
+                                        //                                     actionButtons += `
+                                        //     <button class="btn btn-sm btn-outline-primary editUser" data-id="${user.id}">
+                                        //         <i class="bi bi-pencil"></i>
+                                        //     </button>
+
+                                        // `;
+                                        if (user.role != "Creator") {
+                                            actionButtons += `
+           
+            <button class="btn btn-sm btn-outline-danger deleteUser" data-id="${user.id}">
+                <i class="bi bi-trash"></i>
+            </button>
+        `;
+                                        }
+                                        actionButtons += "</div>";
+                                        userCard.innerHTML = `
+                    <div>
+                        <strong>${user.username}</strong>
+                        <span class="text-muted">(${user.role})</span>
+                    </div>
+                    ${actionButtons}
+                `;
+
+                                        userListContainer.appendChild(userCard);
+                                    });
+                                }
                             } else {
                                 throw new Error(data.message || 'Failed to load users');
                             }
@@ -4318,31 +5011,89 @@ function required_field()
                         })
                         .finally(hideLoading);
                 });
-                // Handle "New User" selection
-                document.getElementById('userSelect').addEventListener('change', function () {
-                    if (this.value === 'new') {
-                        new bootstrap.Modal(document.getElementById('addUserModal')).show();
-                        this.value = ''; // Reset dropdown selection
+
+
+                userListContainer.addEventListener("click", function (e) {
+                    const deleteBtn = e.target.closest(".deleteUser");
+                    const editBtn = e.target.closest(".editUser");
+                    const addUserModal = new bootstrap.Modal(document.getElementById('addUserModal'));
+
+                    if (deleteBtn) {
+                        const userId = deleteBtn.getAttribute("data-id");
+                        const projectId = currentProject;
+                        const userDiv = deleteBtn.closest(".d-flex");
+                        if (!userDiv) return;
+                        // Extract username from the <strong> tag
+                        const userName = userDiv.querySelector("strong")?.textContent.trim() || "Unknown User";
+                        if (confirm(`Are you sure you want to remove ${userName} ?`)) {
+                            fetch(`?api=delete_user`, {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: new URLSearchParams({
+        user_id: userId,
+        project_id: projectId,
+        user_name: userName
+    })
+})
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        userDiv.remove();
+                                        // showToast('success', 'User deleted successfully');
+                                        Toast('success', 'Success', userName + ' removed successfully!');
+                                    } else {
+                                        Toast('error', 'Error', 'Failed to delete user');
+                                    }
+                                })
+                                .catch(error => console.error("Error deleting user:", error));
+                        }
                     }
+
+                    // if (editBtn) {
+                    //     const userId = editBtn.getAttribute("data-id");
+                    //     const username = editBtn.getAttribute("data-username");
+                    //     const email = editBtn.getAttribute("data-email");
+                    //     const role = editBtn.getAttribute("data-role");
+                    //     // Populate the Add/Edit Modal with User Data
+                    //     document.getElementById("newUserName").value = username;
+                    //     document.getElementById("newUserEmail").value = email;
+                    //     document.getElementById("newUserRole").value = role;
+
+                    //     // Show the modal
+                    //     addUserModal.show();
+                    // }
                 });
-                document.getElementById('saveUserBtn').addEventListener('click', function () {
-                    const username = document.getElementById('newUserName').value.trim();
+
+                // Handle "New User" selection
+                // document.getElementById('userSelect').addEventListener('change', function () {
+                //     if (this.value === 'new') {
+                //         new bootstrap.Modal(document.getElementById('addUserModal')).show();
+                //         this.value = ''; // Reset dropdown selection
+                //     }
+                // });
+                $('#addUserBtn').click(function () {
+                    $('#addUserModal').modal('show');
+                });
+                document.getElementById('addNewUserBtn').addEventListener('click', function () {
                     const email = document.getElementById('newUserEmail').value.trim();
                     const role = document.getElementById('newUserRole').value.trim();
 
-                    if (!username || !email || !role) {
-                        alert('Please fill in all fields');
+                    if (!email || !role) {
+                        Toast('error', 'Error', 'Please fill in all fields', 'bottomCenter');
+                        return;
+                    }
+                    if (!email.includes('@')) {
+                        Toast('error', 'Error', 'Please enter a valid email', 'bottomCenter');
                         return;
                     }
 
                     showLoading();
-
-
-                    fetch('?api=create_user', {
+                    fetch('?api=create_or_assign_user', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            username: username,
                             email: email,
                             project_id: currentProject,
                             role: role
@@ -4350,11 +5101,8 @@ function required_field()
                     })
                         .then(async response => {
                             const text = await response.text();
-                            // console.log('Raw server response:', text); // Debug log
-
                             try {
                                 const data = JSON.parse(text);
-                                // console.log('Parsed response:', data); // Debug log
                                 return data;
                             } catch (e) {
                                 console.error('JSON parse error:', e);
@@ -4368,35 +5116,22 @@ function required_field()
                                 bootstrap.Modal.getInstance(document.getElementById('addUserModal')).hide();
 
                                 // Clear the form
-                                document.getElementById('newUserName').value = '';
                                 document.getElementById('newUserEmail').value = '';
                                 document.getElementById('newUserRole').value = '';
 
-                                // Refresh the user list in the assign user modal
-                                const userSelect = document.getElementById('userSelect');
-                                // Remove the existing "Add New User" option if it exists
-                                const addNewOption = Array.from(userSelect.options).find(option => option.value === 'new');
-                                if (addNewOption) {
-                                    addNewOption.remove();
-                                }
-                                // Add the new user option
-                                const newOption = new Option(
-                                    `${username} (${email}) - ${role}`,
-                                    data.data.user_id
-                                );
-                                userSelect.add(newOption);
-                                showToastAndHideModal('addUserModal', 'success', "Success", "User created successfully! An email has been sent with login credientials.")
+                                const successMessage = data.data?.is_new_user
+                                    ? "User created and assigned successfully! An invite has been sent along with login credentials."
+                                    : "User assigned to project successfully!";
+
+                                showToastAndHideModal('addUserModal', 'success', "Success", successMessage);
                                 bootstrap.Modal.getInstance(document.getElementById('assignUserModal')).hide();
-                                // Show success message
-                                // Toast('success', "Success","User created successfully! An email has been sent with login details." )
-                                // alert('User created successfully! An email has been sent with login details.');
                             } else {
-                                throw new Error(data.message || 'Failed to create user');
+                                throw new Error(data.message || 'Failed to create or assign user');
                             }
                         })
                         .catch(error => {
-                            console.error('Error creating user:', error);
-                            alert(`Error creating user: ${error.message}`);
+                            console.error('Error creating/assigning user:', error);
+                            Toast('error', 'Error', `Error: ${error.message}`, 'bottomCenter');
                         })
                         .finally(hideLoading);
                 });
@@ -5207,11 +5942,15 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
             const toggleDarkModeBtn = document.getElementById('toggleDarkModeBtn');
             if (toggleDarkModeBtn) {
                 // Check localStorage to apply dark mode preference on load
-                if (localStorage.getItem('preferredDarkMode') === 'true') {
+                if (localStorage.getItem('preferredDarkMode') === 'false') {
+                    // document.body.classList.add('dark-mode');
+                    // toggleDarkModeBtn.textContent = 'Light Mode';
+                    document.body.classList.remove('dark-mode');
+                    toggleDarkModeBtn.textContent = 'Dark Mode';
+                } else {
                     document.body.classList.add('dark-mode');
                     toggleDarkModeBtn.textContent = 'Light Mode';
-                } else {
-                    toggleDarkModeBtn.textContent = 'Dark Mode';
+                    // toggleDarkModeBtn.textContent = 'Dark Mode';
                 }
 
                 // Toggle dark mode when the button is clicked
@@ -5274,49 +6013,258 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                     })
                     .finally(hideLoading);
             });
+
+            // Auto-load the saved project if available
+            if (isDashboard) {
+                // var userId = null;
+                // Initialize projects
+                loadProjects();
+                <?php
+                if (isset($_SESSION['user_id'])) {
+                    echo "userId = " . json_encode($_SESSION['user_id']) . ";";
+                }
+                ?>
+                // After projects are loaded, select the saved project if available
+                setTimeout(() => {
+                    const savedProject = getLastSelectedProject();
+                    if (savedProject && savedProject !== 'null' && savedProject !== '0') {
+                        const projectId = parseInt(savedProject);
+
+                        const savedProjectTab = document.querySelector(`.nav-link[data-id="${projectId}"]`);
+                        // alert("sdf"+projectId)
+                        if (savedProjectTab) {
+                            document.querySelectorAll('.nav-link').forEach(t => t.classList.remove('active'));
+                            savedProjectTab.classList.add('active');
+                            selectProject(projectId);
+                        }
+                    }
+                }, 500); // Small delay to ensure projects are loaded
+            }
         }); // End of DOMContentLoaded
 
-        function sendEmailBtn(templateType = "daily_report") {
-            fetch("sendmail.php", {
-                method: "POST",
+        function sendWelcomeEmailTest() {
+
+            fetch('?api=send_welcome_email', {
+                method: 'POST',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    to: "taimoorhamza1999@gmail.com",
-                    template: templateType, // "daily_report" or "reminder"
-                    userName: "Taimoor", // Dynamic user name
-                    taskSummary: "Completed project setup, fixed login bug, and started UI design.",
-                    motivation: "Great job today! Keep up the momentum.",
-                    encouragement: "Let's stay on track and complete our goals!",
-                    deadlineNote: "Remember to finish the pending tasks by tomorrow."
+                    email: "taimoorhamza1999@gmail.com",
+                    username: "User123",
+                    tempPassword: "TempPass123",
+                    projectId: 48
                 })
             })
-                .then(response => {
-                    return response.text(); // Read response as text first
-                })
-                .then(text => {
-                    try {
-                        let data = JSON.parse(text); // Try parsing JSON
-                        if (data.status === "success") {
-                            Toast("success", "Success", data.message);
-                        } else {
-                            Toast("error", "Error", data.message);
-                        }
-                    } catch (error) {
-                        console.error("JSON Parse Error:", error, text);
-                        Toast("error", "Error", "Invalid response format!");
-                    }
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
                 })
                 .catch(error => {
-                    Toast("error", "Error", "Something went wrong!");
-                    console.error("Fetch error:", error);
+                    console.error("Error:", error.message);
+                    alert("Failed to send email.");
                 });
+        }
+        function sendNotificationTest(projectId = 42, title = "DFs Title", body = "DFs Body") {
+            alert("Sending Notification Test");
+            fetch('?api=send_notification_project', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    action: 'send_notification_project',
+                    project_id: projectId,
+                    title: title,
+                    body: body
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log("✅ Notification sent successfully:", data.message);
+                    } else {
+                        console.error("❌ Error sending notification:", data.error);
+                    }
+                })
+                .catch(error => console.error("❌ Request failed:", error));
+        }
+
+        initializeChatLoading();
+
+    </script>
+
+
+    <!-- Firebase -->
+    <?php if (isset($page) && ($page === 'register' || $page === 'login' || $page === 'dashboard')): ?>
+        <script type="module">
+            // Import the functions you need from the SDKs you need
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+            import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-messaging.js";
+
+            // TODO: Add SDKs for Firebase products that you want to use
+            // https://firebase.google.com/docs/web/setup#available-libraries
+            // Your web app's Firebase configuration
+            const firebaseConfig = {
+                apiKey: "AIzaSyAPByoVru7fAR1Mk8_y8AW73vWVRwEDma4",
+                authDomain: "bossgpt-367ab.firebaseapp.com",
+                projectId: "bossgpt-367ab",
+                storageBucket: "bossgpt-367ab.firebasestorage.app",
+                messagingSenderId: "1078128619253",
+                appId: "1:1078128619253:web:edf3e5f2306ab349191fbc"
+            };
+
+            // Initialize Firebase
+            const app = initializeApp(firebaseConfig);
+            const messaging = getMessaging(app);
+
+            // Register service worker first
+            navigator.serviceWorker.register("./assets/js/sw.js")
+                .then((registration) => {
+                    console.log('Service worker registered:', registration);
+
+                    // Then get the messaging token
+                    return getToken(messaging, {
+                        serviceWorkerRegistration: registration,
+                        vapidKey: 'BNvQzVggQ4j6sTH5W6sxSa4K8Q-K0BhPn2tJT1en85dcp1P46M4EFJjoxe_uJI3PnEgQ06LO2mgv0SvcpBfyL00'
+                    });
+                })
+                .then((currentToken) => {
+                    if (currentToken) {
+                        console.log("FCM Token:", currentToken);
+                        // Set the token in the hidden input
+                        $('#fcm_token_value').attr('content', currentToken);
+                        $('#fcm_token').val(currentToken);
+                        fetch('requests.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                requestType: 'storeFCMSession',
+                                fcm_token: currentToken
+                            })
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log("Token stored in session:", data);
+                            })
+                            .catch(error => {
+                                console.error("Error storing token:", error);
+                            });
+
+                    } else {
+                        console.log('No FCM token available. Request permission to generate one.');
+                        // You might want to request permission here
+                    }
+                })
+                .catch((err) => {
+                    console.error('Service worker registration or token retrieval failed:', err);
+                });
+        </script>
+    <?php endif; ?>
+    <!-- Pusher -->
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    <script>
+        // Enable pusher logging - don't include this in production
+        // Pusher.logToConsole = true;
+
+        // var pusher = new Pusher('83a162dc942242f89892', {
+        //   cluster: 'ap2'
+        // });
+
+        // channel is project id
+        // var channel = pusher.subscribe('my-channel');
+        // channel.bind('my-event', function(data) {
+        //     // Increment the notification count
+        //     const badge = document.getElementById('notificationBadge');
+        //     let currentCount = parseInt(badge.textContent) || 0;
+        //     badge.textContent = currentCount + 1;
+        //     badge.style.display = "inline-block";
+
+        //     // Append new notification to dropdown
+        //     appendNotification(data);
+
+        // });
+        // channel.bind('user_added', function(data) {
+        //     // alert("User Added"); 
+        //     // Toast("success", "Success", "New Notification received successfully",'topRight');
+
+        // });
+
+        // channel.bind('task_created', function (data) {
+        //     alert(data.message); // Show notification
+        // });
+
+        // channel.bind('task_updated', function (data) {
+        //     alert(data.message); // Show notification
+        // });
+
+        function appendNotification(notification) {
+            const notificationList = document.querySelector(".notification-list");
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            const actionType = getActionTypeDisplay(notification.action_type);
+            const timeAgo = formatTimeAgo(notification.created_at);
+            const icon = getNotificationIcon(notification.action_type);
+
+            const newNotification = `
+            <div class="dropdown-item border-bottom py-3">
+                <div class="d-flex align-items-start">
+                    <div class="notification-icon ${isDarkMode ? actionType.darkBgColor : actionType.bgColor} rounded-circle me-3"
+                        style="padding:0.6rem 0.8rem !important;">
+                        <i class="bi ${icon} ${actionType.textColor}"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="badge ${isDarkMode ? actionType.darkBgColor : actionType.bgColor} ${actionType.textColor} rounded-pill px-3 py-1">
+                                ${actionType.text}
+                            </span>
+                            <small class="text-muted" style="font-size: 0.75rem;">
+                                ${timeAgo}
+                            </small>
+                        </div>
+                        <div class="notification-text" style="font-size: 0.8rem;">
+                            ${notification.description}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+            // Prepend the new notification to the list
+            notificationList.insertAdjacentHTML('afterbegin', newNotification);
         }
 
 
-        initializeChatLoading();
+        function initPusher(currentProject) {
+            Pusher.logToConsole = true;
+
+            var pusher = new Pusher('83a162dc942242f89892', {
+                cluster: 'ap2'
+            });
+            // Enable pusher logging - don't include this in production
+
+            var channel = pusher.subscribe('project_' + currentProject);
+
+            channel.bind('project_created', function (data) {
+                appendNotification(data);
+                Toast("success", "Project Created", data.message, 'topRight');
+            });
+            channel.bind('user_assigned', function (data) {
+                appendNotification(data);
+                Toast("success", "User Joined", data.message, 'topRight');
+            });
+            channel.bind('task_created', function (data) {
+                appendNotification(data);
+                Toast("success", "Task Created", data.message, 'topRight');
+            });
+            channel.bind('task_updated', function (data) {
+                appendNotification(data);
+                Toast("success", "Success", data.message, 'topRight');
+            });
+        }
     </script>
+
 </body>
 
 </html>

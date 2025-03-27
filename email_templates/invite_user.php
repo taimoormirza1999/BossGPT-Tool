@@ -14,6 +14,12 @@
         padding: 20px;
         font-family: 'Segoe UI','Georgia', 'Times New Roman', serif,'Helvetica Neue'; 
     }
+    span.im {
+    color: #fff!important;
+}
+.ii a[href]{
+    color: #000!important;
+}
     .container { 
         max-width: 600px; 
         margin: auto; 
@@ -39,7 +45,8 @@
         line-height: 1.6; 
         text-align: left; 
         padding: 20px 30px; 
-        background: #333; 
+        background: rgba(90, 90, 90, 0.3);
+    border: 1.6px solid rgba(151, 151, 151, 0.2);
         color: #eee; 
         border-radius: 8px; 
     }
@@ -91,10 +98,11 @@
             font-size: 12px;
         }
         .container {
-            padding: 20px;
+            padding: 20px 0;
         }
         .logo {
             width: 200px;
+            margin-bottom: 10px;
         }
         .footer-info {
             font-size: 11px;

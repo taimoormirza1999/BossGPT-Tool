@@ -4,7 +4,8 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 require 'vendor/autoload.php';
-function sendTemplateEmail($to, $subject, $template, $data) {
+function sendTemplateEmail($to, $subject, $template, $data)
+{
     try {
         $mail = new PHPMailer(true);
 
@@ -13,7 +14,7 @@ function sendTemplateEmail($to, $subject, $template, $data) {
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
         $mail->Username = 'taimoorhamza199@gmail.com';
-        $mail->Password = 'plrjixcrrqvvjwvn';
+        $mail->Password = 'qyiujnhjbwtmpkma';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
@@ -34,45 +35,11 @@ function sendTemplateEmail($to, $subject, $template, $data) {
 
     } catch (Exception $e) {
         error_log("Email Error: " . $e->getMessage());
-        return false;
-    }
-    /**
- * Send verification email to new users
- */
-function sendVerificationEmail($email, $username, $token) {
-    $verificationLink = "http://localhost/bossgpt-tool/verify.php?token=" . $token; // Update with your actual domain
-    
-    $subject = "Verify Your Account";
-    $template = 'verification';
-    $data = [
-        'username' => $username,
-        'verificationLink' => $verificationLink
-    ];
-
-    return sendTemplateEmail($email, $subject, $template, $data);
+        return $e->getMessage();
+    }     
 }
-}
-// **
-//  * Send project invitation email
-//  */
-function sendProjectInvitation($email, $username, $projectId, $role, $token) {
-    $invitationLink = "http://localhost/bossgpt-tool/accept-invitation.php?token=" . $token; // Update with your actual domain
-    
-    $subject = "Project Invitation";
-    $template = 'project_invitation';
-    $data = [
-        'username' => $username,
-        'role' => $role,
-        'invitationLink' => $invitationLink
-    ];
-
-    return sendTemplateEmail($email, $subject, $template, $data);
-}
-
-/**
- * Send task assignment notification
- */
-function sendTaskAssignmentEmail($email, $username, $taskTitle, $projectTitle) {
+function sendTaskAssignmentEmail($email, $username, $taskTitle, $projectTitle)
+{
     $subject = "New Task Assignment";
     $template = 'task_assignment';
     $data = [
@@ -87,7 +54,8 @@ function sendTaskAssignmentEmail($email, $username, $taskTitle, $projectTitle) {
 /**
  * Send project update notification
  */
-function sendProjectUpdateEmail($email, $username, $projectTitle, $updateMessage) {
+function sendProjectUpdateEmail($email, $username, $projectTitle, $updateMessage)
+{
     $subject = "Project Update: {$projectTitle}";
     $template = 'project_update';
     $data = [
@@ -97,4 +65,11 @@ function sendProjectUpdateEmail($email, $username, $projectTitle, $updateMessage
     ];
 
     return sendTemplateEmail($email, $subject, $template, $data);
+}
+
+function getLogoImage($bottomMargin = "0", $topMargin = "-1rem", $width = "15rem", $height = "auto", $positionClass = "position-absolute top-0 start-50 translate-middle", $positionStyle = "position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);", $src="https://res.cloudinary.com/da6qujoed/image/upload/v1742824680/boss-gptold_zti8gh.png")
+{
+    return '<img src=' . $src . ' alt="Logo"
+            class="' . $positionClass . '" 
+            style="margin-top: ' . $topMargin . '; margin-bottom: ' . $bottomMargin . '; width: ' . $width . '; height: ' . $height . '; position: ' . $positionStyle . '">';
 }

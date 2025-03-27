@@ -15,6 +15,12 @@
         padding: 20px;
         font-family: 'Segoe UI','Georgia', 'Times New Roman', serif,'Helvetica Neue'; 
     }
+    span.im {
+    color: #fff!important;
+}
+.ii a[href]{
+    color: #000!important;
+}
     .container { 
         max-width: 600px; 
         margin: auto; 
@@ -82,13 +88,17 @@
             font-size: 12px;
         }
         .container {
-            padding: 20px;
+            padding: 20px 0;
         }
         .logo {
             width: 200px;
+            margin-bottom: 10px;
         }
         .footer-info {
             font-size: 11px;
+        }
+        .blockquote{
+            margin: 5px 0;
         }
     }
     
