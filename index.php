@@ -3981,7 +3981,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 
             <!-- Edit Task Modal -->
             <div class="modal fade" id="editTaskModal" tabindex="-1">
-                <div class="modal-dialog">
+                <div class="modal-dialog modal-dialog-centered ">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">Edit Task</h5>
@@ -4292,7 +4292,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 
             <!-- Add this new modal for enlarged images after your other modals -->
             <div class="modal fade" id="imageModal" tabindex="-1">
-                <div class="modal-dialog modal-lg">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">Task Image</h5>

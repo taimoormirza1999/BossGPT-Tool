@@ -428,6 +428,12 @@ body.dark-mode input[type="range"]::-ms-fill-upper {
 .primary-stroke {
   border: 1px solid var(--bs-primary-stroke);
 }
+#imageModal .modal-content, #imageModal .modal-body{
+  max-height: 80vh!important;
+}
+#editTaskModal .modal-content, #editTaskModal .modal-body{
+  max-height: 80vh!important;
+}
 body.dark-mode .chat-loading-avatar .logo-icon{
   margin-top: 0; margin-bottom: 0; width: 1.93rem; height:auto;
 }
@@ -1417,3 +1423,4 @@ body.dark-mode .task-card .btn-sm.btn-link:hover {
   font-size: calc(var(--font-size, 1.1rem) + 0.1rem) !important;
   transition: font-size 0.4s ease;
 }
+  
