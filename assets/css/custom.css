@@ -118,11 +118,17 @@ body.dark-mode ::selection {
      =============================== */
 /* Dark mode toggle button */
 .dark-mode .btn-main-primary {
+  height: 42px;
+}
+.dark-mode .btn-main-primary,.dark-mode .btn-send-primary {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(248, 249, 250, 0.5);
   border-radius: 10px;
   color: white !important;
-  height: 42px;
+  transition: all 0.4s ease-in-out;
+}
+.dark-mode .btn-main-primary:hover,.dark-mode .btn-send-primary:hover {
+  transform: translateY(-5px);
 }
 button#toggleDarkModeBtn {
   transition: all 0.3s ease;
@@ -315,6 +321,14 @@ textarea:focus {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(248, 249, 250, 0.5);
   backdrop-filter: blur(4px);
+  transition: all 0.4s ease-in-out;
+}
+#messageInput:hover{
+  transform: translateY(-5px);
+}
+#messageInput:focus{
+  border: 1px solid rgba(248, 249, 250, 0.8)!important;
+  transform: translateY(-5px);
 }
 /* Range inputs */
 input[type="range"] {
@@ -414,7 +428,12 @@ body.dark-mode input[type="range"]::-ms-fill-upper {
 .primary-stroke {
   border: 1px solid var(--bs-primary-stroke);
 }
-
+body.dark-mode .chat-loading-avatar .logo-icon{
+  margin-top: 0; margin-bottom: 0; width: 1.93rem; height:auto;
+}
+body.dark-mode .chat-loading-avatar{
+  background: rgba(0, 0, 0, 0.4)!important;
+}
 /* Modal close button styling */
 .dark-mode .btn-close {
   filter: invert(1) grayscale(100%) brightness(200%);
@@ -678,7 +697,8 @@ body.dark-mode #doneColumn .task-column_header {
 /* Modern Task card styling */
 body.dark-mode .task-card {
   transition: all 0.35s cubic-bezier(0.2, 1, 0.3, 1);
-  background-color: rgba(36, 1, 33, 1) !important;
+  /* background-color: rgba(36, 1, 33, 1) !important; */
+  background: linear-gradient(135deg, #240121 0%, #4f0142 100%) !important;
   border-radius: 12px;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -1022,6 +1042,7 @@ body.dark-mode .task-card:hover .task-description {
   border-radius: 16px;
   max-width: 90%;
   word-wrap: break-word;
+  transition: all 0.4s;
 }
 
 .dark-mode .message.user {
@@ -1101,8 +1122,38 @@ body.dark-mode .task-card:hover .task-description {
   left: auto !important;
   margin-top: 0.5rem !important;
   min-width: 300px !important;
+  background: rgba(33, 33, 33, 0.5);
+  backdrop-filter: blur(6.35px);
+  border-width: 0.08rem !important;
+  border-radius: 12px !important;
+  border-color: rgba(255,255,255,0.5);
+                padding-top:0px;
+
+}
+.dark-mode #notificationDropdownMenu {
+  color: #fff;
 }
 
+.dark-mode .dropdown-header {
+  border-color: #585858;
+  color: #ffffff;
+  padding: 1.15rem 1.3rem !important;
+border-bottom: 0.05rem #585858 solid;
+font-size: var(--font-size, 1rem);
+font-family: 'Geist';
+border-radius:12px 0px 0px 0px !important;
+background: #361734c9;
+}
+.dropdown-header {
+ border-bottom: 0.3rem #d3d4d5 solid;
+}
+.dark-mode .dropdown-item {
+  color: #e1e1e1; 
+  transition: all 0.34 ease;
+}
+.dark-mode #notificationDropdownMenu .dropdown-item:hover{
+background: var(--bs-primary-dark60percent);
+}
 .navbar {
   position: relative !important;
   z-index: 9999 !important;
@@ -1169,4 +1220,200 @@ body.dark-mode .task-card:hover .task-description {
 .fade-out {
   opacity: 0;
   pointer-events: none;
+}
+
+/* Subtask buttons styling */
+.ai-add-subtask-btn,
+.add-subtask-btn {
+    opacity: 0;
+    transition: all 0.3s ease;
+    color: #fff !important;
+    text-decoration: none !important;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 4px;
+    z-index: 10;
+    position: relative;
+}
+
+body.dark-mode .task-card:hover .ai-add-subtask-btn,
+body.dark-mode .task-card:hover .add-subtask-btn {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .ai-add-subtask-btn:hover,
+body.dark-mode .add-subtask-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+/* Ensure buttons container is above the shine effect */
+.task-card .subtask-buttons {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+/* Override any conflicting styles */
+body.dark-mode .task-card * {
+    z-index: 2;
+}
+
+body.dark-mode .task-card .ai-add-subtask-btn,
+body.dark-mode .task-card .add-subtask-btn {
+    z-index: 10;
+}
+
+/* Task card action buttons */
+.task-card .btn-link {
+    opacity: 0;
+    transition: all 0.3s ease;
+    color: #fff !important;
+    text-decoration: none !important;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 4px;
+    z-index: 10;
+}
+
+.task-card:hover .btn-link {
+    opacity: 1;
+}
+
+.task-card .btn-link:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+/* Specific button styles */
+.add-subtask-btn,
+.ai-add-subtask-btn,
+.ai-update-dates-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.875rem;
+}
+
+/* Button container */
+.task-card .d-flex.gap-2, .subtasks.mt-2 .d-flex.gap-2  {
+    position: relative;
+    z-index: 10;
+    margin-top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+/* Icon styles */
+.task-card .btn-link i {
+    font-size: 1rem;
+    margin-right: 4px;
+}
+
+/* Dark mode specific styles */
+body.dark-mode .task-card .btn-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+body.dark-mode .task-card:hover .btn-link {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .task-card .btn-link:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff !important;
+}
+
+/* Task card action buttons container */
+.task-card .d-flex.gap-2.mt-2, .subtasks.mt-2 .d-flex.gap-2 {
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    margin-top: 8px;
+    z-index: 15;
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px !important;
+}
+
+/* Show buttons on task card hover */
+.task-card:hover .d-flex.gap-2.mt-2 {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Individual button styling */
+.task-card .btn-sm.btn-link {
+    color: #fff !important;
+    text-decoration: none !important;
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 2px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+/* Button hover effect */
+.task-card .btn-sm.btn-link:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+/* Icon styling */
+.task-card .btn-sm.btn-link i {
+    font-size: 1rem;
+}
+
+/* Dark mode specific styles */
+body.dark-mode .task-card .btn-sm.btn-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+body.dark-mode .task-card:hover .btn-sm.btn-link {
+    opacity: 1;
+    visibility: visible;
+}
+
+body.dark-mode .task-card .btn-sm.btn-link:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff !important;
+}
+
+/* Ensure proper z-index */
+.task-card {
+    position: relative;
+}
+
+.task-card > * {
+    position: relative;
+    z-index: 2;
+}
+
+.task-card .d-flex.gap-2.mt-2 {
+    z-index: 15;
+}
+.column_todo,
+.column_in_progress,
+.column_done {
+    font-size: var(--font-size, 1rem) !important;
+    transition: font-size 0.4s ease;
+}
+.task_title{
+  font-size: calc(var(--font-size, 1.1rem) + 0.1rem) !important;
+  transition: font-size 0.4s ease;
 }

@@ -1,23 +1,23 @@
 // Initial Loader
-document.addEventListener('DOMContentLoaded', function() {
-    // Create and append loader
-    const loader = document.createElement('div');
-    loader.className = 'initial-loader';
-    loader.innerHTML = `
+document.addEventListener("DOMContentLoaded", function () {
+  // Create and append loader
+  const loader = document.createElement("div");
+  loader.className = "initial-loader";
+  loader.innerHTML = `
         <div class="loader-content">
             <div class="loader-spinner"></div>
             <div class="loader-text">Loading BossGPT...</div>
         </div>
     `;
-    document.body.appendChild(loader);
+  document.body.appendChild(loader);
 
-    // Remove loader after 3 seconds
+  // Remove loader after 3 seconds
+  setTimeout(() => {
+    loader.classList.add("fade-out");
     setTimeout(() => {
-        loader.classList.add('fade-out');
-        setTimeout(() => {
-            loader.remove();
-        }, 500);
-    }, 3000);
+      loader.remove();
+    }, 500);
+  }, 3000);
 });
 
 // Notification System
@@ -289,7 +289,7 @@ function showChatLoading() {
         <div class="chat-loading-avatar">
          <img src='https://res.cloudinary.com/da6qujoed/image/upload/v1742656707/logoIcon_pspxgh.png' alt="Logo"
             class="logo-icon"
-            style="margin-top: 0; margin-bottom: 0; width: 1.8rem; height:auto">
+           >
           </div>
           <div class="dots">
               <div class="dot"></div>
@@ -355,7 +355,7 @@ function displayProjectCreationWelcomeMessages(title) {
                   <div class="chat-loading-avatar">
                      <img src='https://res.cloudinary.com/da6qujoed/image/upload/v1742656707/logoIcon_pspxgh.png' alt="Logo"
             class="logo-icon"
-            style="margin-top: 0; margin-bottom: 0; width: 1.8rem; height:auto">
+            >
                   </div>
               </div>
               <div class="message ai">
@@ -475,18 +475,19 @@ function updateNotificationDropdown(notifications) {
             .dark-mode .text-success-emphasis-light{
                 color: #fff !important;
             }
-            .dark-mode .dropdown-item {
-                color: #e1e1e1;
-                // border-color: #2d2d2d !important;
-                // background-color: #1a1a1a !important;
-            }
+            
             .dark-mode .dropdown-item:hover {
                 // background-color: #2d2d2d !important;
             }
             .dark-mode .dropdown-header {
-                border-color: #2d2d2d;
+                border-color: #585858;
                 color: #ffffff;
-                background-color: #1a1a1a !important;
+                padding: 1.3rem 1.3rem !important;
+    border-bottom: 0.05rem #585858 solid;
+    font-size: var(--font-size, 1rem);
+    font-family: 'Geist';
+    border-radius:12px 0px 0px 0px !important;
+background: #361734c9;
             }
             .dropdown-header {
                border-bottom: 0.3rem #d3d4d5 solid;
@@ -510,13 +511,11 @@ function updateNotificationDropdown(notifications) {
                 // border-color: #2d2d2d !important;
                 // border-width: 0.25rem !important;
             }
-            #notificationDropdownMenu.dropdown-menu {
-                border-width: 0.25rem !important;
-                border-radius: 0.5rem !important;
-                background: rgba(255, 255, 255, 0.1);
-border: 1px solid rgba(211, 211, 211, 0.5);
-backdrop-filter: blur(14.3px);
-                
+            #notificationDropdownMenu.dropdown-menu,#notificationDropdownMenu {
+               
+               max-width: 620px;
+    height: 370px;
+
             }
 
             #notificationDropdownMenu.dark-mode .dropdown-menu {
@@ -621,137 +620,171 @@ function sendNotificationTest(projectId, title, body) {
     });
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-    const isDashboard = document.querySelector('.chat-container') !== null;
-    
-    if (isDashboard) {
-        // Function to get last selected project
-        function getLastSelectedProject() {
-            // window.userId should be set in the PHP file before this script loads
-            if (!window.userId) {
-                console.error('User ID not found');
-                return null;
-            }
-            const savedProject = localStorage.getItem(`lastSelectedProject_${window.userId}`);
-            console.log('Retrieved from localStorage:', savedProject);
-            return savedProject;
-        }
+document.addEventListener("DOMContentLoaded", function () {
+  const isDashboard = document.querySelector(".chat-container") !== null;
 
-        // Load projects and initialize
-        function initializeProjects() {
-            showLoading();
-            fetch('?api=get_projects')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const projectDropdown = document.getElementById('projectDropdown');
-                        projectDropdown.innerHTML = '';
+  if (isDashboard) {
+    // Function to get last selected project
+    function getLastSelectedProject() {
+      // window.userId should be set in the PHP file before this script loads
+      if (!window.userId) {
+        console.error("User ID not found");
+        return null;
+      }
+      const savedProject = localStorage.getItem(
+        `lastSelectedProject_${window.userId}`
+      );
+      console.log("Retrieved from localStorage:", savedProject);
+      return savedProject;
+    }
 
-                        if (!data.projects || data.projects.length === 0) {
-                            const placeholder = document.createElement('li');
-                            placeholder.className = 'dropdown-item disabled';
-                            placeholder.textContent = 'No projects found';
-                            projectDropdown.appendChild(placeholder);
-                        } else {
-                            data.projects.forEach(project => {
-                                const li = document.createElement('li');
-                                li.className = 'dropdown-item';
-                                li.innerHTML = `
+    // Load projects and initialize
+    function initializeProjects() {
+      showLoading();
+      fetch("?api=get_projects")
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            const projectDropdown = document.getElementById("projectDropdown");
+            projectDropdown.innerHTML = "";
+
+            if (!data.projects || data.projects.length === 0) {
+              const placeholder = document.createElement("li");
+              placeholder.className = "dropdown-item disabled";
+              placeholder.textContent = "No projects found";
+              projectDropdown.appendChild(placeholder);
+            } else {
+              data.projects.forEach((project) => {
+                const li = document.createElement("li");
+                li.className = "dropdown-item";
+                li.innerHTML = `
                                     <button class="dropdown-item" 
                                             type="button" 
                                             data-id="${project.id}" 
-                                            title="${escapeHtml(project.title)}">
+                                            title="${escapeHtml(
+                                              project.title
+                                            )}">
                                         ${escapeHtml(project.title)}
                                     </button>
                                 `;
-                                projectDropdown.appendChild(li);
-                            });
+                projectDropdown.appendChild(li);
+              });
 
-                            // After adding all projects, try to select the last selected project
-                            const savedProject = getLastSelectedProject();
-                            console.log('Attempting to select project:', savedProject);
-                            
-                            if (savedProject && savedProject !== 'null' && savedProject !== '0') {
-                                const projectId = parseInt(savedProject);
-                                const projectButton = projectDropdown.querySelector(`button[data-id="${projectId}"]`);
-                                if (projectButton) {
-                                    const projectTitle = projectButton.getAttribute('title');
-                                    console.log('Found saved project, selecting:', projectTitle);
-                                    selectProject(projectId, projectTitle);
-                                }
-                            }
-                        }
+              // After adding all projects, try to select the last selected project
+              const savedProject = getLastSelectedProject();
+              console.log("Attempting to select project:", savedProject);
 
-                        // Add click handlers for project selection
-                        document.querySelectorAll('.dropdown-item').forEach(item => {
-                            item.addEventListener('click', (e) => {
-                                e.preventDefault();
-                                const button = item.querySelector('button');
-                                if (button) {
-                                    const projectId = button.dataset.id;
-                                    const projectTitle = button.getAttribute('title');
-                                    selectProject(projectId, projectTitle);
-                                }
-                            });
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error loading projects:', error);
-                    const projectDropdown = document.getElementById('projectDropdown');
-                    projectDropdown.innerHTML = `
+              if (
+                savedProject &&
+                savedProject !== "null" &&
+                savedProject !== "0"
+              ) {
+                const projectId = parseInt(savedProject);
+                const projectButton = projectDropdown.querySelector(
+                  `button[data-id="${projectId}"]`
+                );
+                if (projectButton) {
+                  const projectTitle = projectButton.getAttribute("title");
+                  console.log("Found saved project, selecting:", projectTitle);
+                  selectProject(projectId, projectTitle);
+                }
+              }
+            }
+
+            // Add click handlers for project selection
+            document.querySelectorAll(".dropdown-item").forEach((item) => {
+              item.addEventListener("click", (e) => {
+                e.preventDefault();
+                const button = item.querySelector("button");
+                if (button) {
+                  const projectId = button.dataset.id;
+                  const projectTitle = button.getAttribute("title");
+                  selectProject(projectId, projectTitle);
+                }
+              });
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Error loading projects:", error);
+          const projectDropdown = document.getElementById("projectDropdown");
+          projectDropdown.innerHTML = `
                         <li class="dropdown-item">
                             <div class="alert alert-danger">
                                 Unable to load projects. Please try again later.
                             </div>
                         </li>
                     `;
-                })
-                .finally(hideLoading);
-        }
+        })
+        .finally(hideLoading);
+    }
 
-        // Update selectProject function
-        function selectProject(projectId, selectedProjectTitle = "") {
-            if (!projectId) return;
-            
-            console.log('Selecting project:', projectId, selectedProjectTitle);
-            
-            const $button = $('#projectDropdownButton');
-            const $svg = $button.find('svg').clone();
-            
-            $button.text(selectedProjectTitle || 'Select Project');
-            if ($svg.length > 0) {
-                $button.append($svg);
-            } else {
-                $button.append(`
+    // Update selectProject function
+    function selectProject(projectId, selectedProjectTitle = "") {
+      if (!projectId) return;
+
+      console.log("Selecting project:", projectId, selectedProjectTitle);
+
+      const $button = $("#projectDropdownButton");
+      const $svg = $button.find("svg").clone();
+
+      $button.text(selectedProjectTitle || "Select Project");
+      if ($svg.length > 0) {
+        $button.append($svg);
+      } else {
+        $button.append(`
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 `);
-            }
+      }
 
-            projectId = parseInt(projectId);
-            currentProject = projectId;
-            $('#myselectedcurrentProject').val(currentProject);
+      projectId = parseInt(projectId);
+      currentProject = projectId;
+      $("#myselectedcurrentProject").val(currentProject);
 
-            // Save to localStorage
-            if (window.userId) {
-                console.log('Saving to localStorage:', `lastSelectedProject_${window.userId}`, projectId);
-                localStorage.setItem(`lastSelectedProject_${window.userId}`, projectId);
-            }
+      // Save to localStorage
+      if (window.userId) {
+        console.log(
+          "Saving to localStorage:",
+          `lastSelectedProject_${window.userId}`,
+          projectId
+        );
+        localStorage.setItem(`lastSelectedProject_${window.userId}`, projectId);
+      }
 
-            // Update UI
-            $('#projectDropdown button').removeClass('active');
-            $(`#projectDropdown button[data-id="${projectId}"]`).addClass('active');
+      // Update UI
+      $("#projectDropdown button").removeClass("active");
+      $(`#projectDropdown button[data-id="${projectId}"]`).addClass("active");
 
-            // Load project data
-            fetchNotificationsAndOpen(false);
-            loadTasks(projectId);
-            loadChatHistory(projectId);
-            initPusher(projectId);
-        }
-
-        // Initialize projects
-        initializeProjects();
+      // Load project data
+      fetchNotificationsAndOpen(false);
+      loadTasks(projectId);
+      loadChatHistory(projectId);
+      initPusher(projectId);
     }
+
+    // Initialize projects
+    initializeProjects();
+  }
+});
+
+// Font size control
+document.addEventListener("DOMContentLoaded", function () {
+  const fontSizeRange = document.getElementById("fontSizeRange");
+  if (fontSizeRange) {
+    // Set initial font size
+    document.documentElement.style.setProperty(
+      "--font-size",
+      `${fontSizeRange.value}px`
+    );
+
+    // Update font size when range input changes
+    fontSizeRange.addEventListener("input", function () {
+      document.documentElement.style.setProperty(
+        "--font-size",
+        `${this.value}px`
+      );
+    });
+  }
 });

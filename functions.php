@@ -83,3 +83,7 @@ function getLogoImage($bottomMargin = "0", $topMargin = "-1rem", $width = "15rem
     {
         return file_get_contents('assets/icons/calendar.svg');
     }
+    function getTrashIcon()
+    {
+        return file_get_contents('assets/icons/trash.svg');
+    }

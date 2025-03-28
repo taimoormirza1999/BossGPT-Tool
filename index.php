@@ -2147,7 +2147,7 @@ if (isset($_GET['api'])) {
 
         .task-column {
             /* min-height: 60vh; */
-            min-height: calc(100vh - 330px);
+            min-height: calc(100vh - 335px);
             /* background: #f8f9fa; */
             border-radius: 12px;
             padding: 1rem;
@@ -2230,7 +2230,7 @@ if (isset($_GET['api'])) {
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             word-wrap: break-word;
             transition: all 0.3s ease 0.3s;
-            /* Added 0.3s delay */
+            background: rgba(255, 255, 255, 0.1) !important;
         }
 
         .task-card:hover .task-description {
@@ -2367,12 +2367,13 @@ if (isset($_GET['api'])) {
         }
 
         .delete-task-btn {
+            background-color: rgb(187, 7, 10) !important;
             padding: 0.15rem 0.4rem;
             font-size: 0.8rem;
             opacity: 0;
             transition: opacity 0.2s;
             position: absolute;
-            top: 0.5rem;
+            top: -2.15rem;
             right: 0.5rem;
         }
 
@@ -2381,7 +2382,7 @@ if (isset($_GET['api'])) {
         }
 
         .task-card:hover .delete-task-btn {
-            opacity: 0.7;
+            opacity: 1;
         }
 
         .due-date {
@@ -2536,6 +2537,11 @@ if (isset($_GET['api'])) {
         /* Add this new code to handle image clicks (add it where other event listeners are defined) */
         .enlarge-image {
             transition: transform 0.2s;
+            border-radius: 12px;
+            border: 1px dashed var(--bs-primary-white55percent);
+            height: 11rem;
+            object-fit: cover;
+            width: 100%;
         }
 
         .enlarge-image:hover {
@@ -2642,7 +2648,8 @@ if (isset($_GET['api'])) {
         body.dark-mode .task-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 3px 6px var(--bs-primary-stroke50percent);
-            background-color: rgba(53, 53, 53, 1) !important;
+            background: linear-gradient(135deg, #240121 0%, #4f0142 100%) !important;
+            /* background-color: rgba(53, 53, 53, 1) !important; */
         }
 
         body.dark-mode .task-description {
@@ -2657,7 +2664,7 @@ if (isset($_GET['api'])) {
             border-radius: 20px;
         }
 
-        body.dark-mode .message {
+        body.dark-mode .message, body.dark-mode .suggestion-item {
             border: 1px solid rgba(211, 211, 211, 0.5);
             border-radius: 16px;
             margin: auto auto;
@@ -2806,18 +2813,26 @@ if (isset($_GET['api'])) {
         body.dark-mode .btn-link:hover {
             color: #4080ff;
         }
-
+        
         /* Due Date styling */
         body.dark-mode .due-date {
-            background-color: #18191c;
+            color: rgba(160, 160, 160, 1);
             border: 1px solid #2f3031;
+            background: rgba(255, 255, 255, 0.1);
+            font-size: cal(var(--font-size, auto) - 0.3rem);
+            transition: all 0.4s ease;
         }
-
+        
         body.dark-mode .due-date.overdue {
             background-color: rgba(220, 53, 69, 0.2);
             color: #ff6b6b;
+            font-size: cal(var(--font-size, auto) - 0.3rem);
+            transition: all 0.4s ease;
         }
-
+        
+        body.dark-mode .subtask-item .due-date, body.dark-mode .subtask-item .due-date.overdue{
+            font-size: cal(var(--font-size, 0.7rem) - 0.8rem)!important;
+        }
         /* Subtask controls */
         body.dark-mode .subtask-status {
             background-color: #3a3b3c;
@@ -3120,7 +3135,7 @@ if (isset($_GET['api'])) {
         #projectDropdownButton.dropdown-toggle {
             display: inline-flex;
             align-items: center;
-            font-size: 1.3rem !important;
+            font-size: calc(var(--font-size, 1rem) + 0.15rem) !important;
             text-transform: capitalize;
             color: white !important;
         }
@@ -3440,7 +3455,6 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                         </li> -->
                     </ul>
                     <div class="d-flex align-items-center">
-                        <!-- <span class="navbar-text me-4">Welcome, <?= htmlspecialchars($_SESSION['username']) ?></span> -->
 
                         <div class="d-flex align-items-center me-4">
                             <label for="fontSizeRange" class="text-light me-2 mb-0">Font Size:</label>
@@ -3473,14 +3487,14 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                     class="badge rounded-pill bg-danger position-absolute top-0 start-100 translate-middle"
                                     id="notificationBadge" style="display: none;">0</span>
                             </button>
-                            <div class="dropdown-menu dropdown-menu-end" id="notificationDropdownMenu"
+                            <div class="dropdown-menu dropdown-menu" id="notificationDropdownMenu"
                                 aria-labelledby="notificationDropdown"
                                 style="min-width: 300px; max-height: 400px; overflow-y: auto;">
                                 <div class="dropdown-header p-2 pb-3 pl-5">
                                     <strong class="mb-5">Notifications</strong>
                                 </div>
                                 <div class="notification-list">
-                                    <div class="dropdown-item text-center">Loading notifications...</div>
+                                    <div class="dropdown-item text-center">No notification found 🎉 </div>
                                 </div>
                             </div>
                         </div>
@@ -3644,13 +3658,14 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
             }
             ?>
             <!-- Replace the existing row div with this new layout -->
-            <div class="container-fluid pb-5">
+            <div class="container-fluid pb-3">
                 <!-- New Tab Navigation -->
                 <div class="nav-container row justify-content-between nav-background"
                     style="background-color: var(--bs-primary-dark60percent); ">
                     <div class="col-md-6 d-flex justify-content-between align-items-center self-center">
-                        <h4 class="text-capitalize font-weight-normal d-flex align-items-center" style="font-size: 1.83rem;">
-                            <span style="color: var(--bs-primary-white55percent);">Welcome, <?php echo getCalendarIcon();?></span> <span
+                        <h4 class="text-capitalize font-weight-normal d-flex align-items-center"
+                            style="font-size: 1.83rem;">
+                            <span style="color: var(--bs-primary-white55percent);">Welcome, </span> <span
                                 class=" text-capitalize" style="color: var(--bs-primary-white); font-size: 1.43rem;">
                                 &nbsp;<?php echo $_SESSION['username']; ?>&nbsp;</span>&nbsp;👋
                         </h4>
@@ -3920,7 +3935,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                             <input type="text" class="form-control me-2" id="messageInput"
                                                 placeholder="Type your message...">
                                             <button type="submit"
-                                                class="btn btn-primary"><?php echo file_get_contents("assets/icons/send.svg"); ?>
+                                                class="btn btn-send-primary"><?php echo file_get_contents("assets/icons/send.svg"); ?>
                                             </button>
                                         </form>
                                     </div>
@@ -4723,7 +4738,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                         const now = new Date();
                         const overdueClass = (dueDateObj < now ? 'overdue' : '');
                         const formattedDueDate = dueDateObj.toLocaleDateString(); // you can customize the format if needed
-                        dueDateHtml = `<span class="due-date ${overdueClass}"><i class="bi bi-calendar-event"></i> ${formattedDueDate}</span>`;
+                        dueDateHtml = `<span class="due-date ${overdueClass}"><?php echo getCalendarIcon(); ?> ${formattedDueDate}</span>`;
                     }
 
                     // Build subtasks section with both manual and AI add buttons
@@ -4745,7 +4760,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                                         <div class="flex-grow-1">
                                                             <div class="subtask-title ${subtask.status === 'done' ? 'text-decoration-line-through' : ''}">${escapeHtml(subtask.title)}</div>
                                                             ${subtask.due_date ? `
-                                                                <small class="text-muted due-date ${isOverdue ? 'overdue' : ''}">dgdfgdg
+                                                                <small class="text-muted due-date ${isOverdue ? 'overdue' : ''}">
                                                                     <i class="bi bi-calendar-event"></i>
                                                                     ${subtask.due_date}
                                                                 </small>
@@ -4758,21 +4773,21 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                                 `;
                             }).join('')}
                                         </div>
-                                        <div class="d-flex gap-2 mt-2">
+                                        <div class="d-flex gap-2 mt-2 justify-content-center">
                                             <button class="btn btn-sm btn-link add-subtask-btn" data-task-id="${task.id}">
-                                                <i class="bi bi-plus-circle"></i> Add Subtask
-                                            </button>
-                                            <button class="btn btn-sm btn-link ai-add-subtask-btn" data-task-id="${task.id}">
-                                                <i class="bi bi-robot"></i> Generate AI Subtasks
+                                                Add Subtask
                                             </button>
                                             <button class="btn btn-sm btn-link ai-update-dates-btn" data-task-id="${task.id}">
-                                                <i class="bi bi-calendar-check"></i> AI Update Dates
+                                                AI Update Dates
+                                            </button>
+                                             <button class="btn btn-sm btn-link ai-add-subtask-btn" data-task-id="${task.id}">
+                                                <i class="bi bi-robot"></i> Generate AI Subtasks
                                             </button>
                                         </div>
                                     </div>`;
                         } else {
                             html += `<div class="mt-2 ${task.status !== 'in_progress' ? 'hover-show-subtasks' : ''}">
-                                        <div class="d-flex gap-2">
+                                        <div class="d-flex gap-2 justify-content-center">
                                             <button class="btn btn-sm btn-link add-subtask-btn" data-task-id="${task.id}">
                                                 <i class="bi bi-plus-circle"></i> Add Subtask
                                             </button>
@@ -4805,9 +4820,9 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                             <span class="task-label label-blue"></span>
                         </div>
                         <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h6 class="mb-0">${escapeHtml(task.title)}</h6>
+                            <h6 class="mb-0 task_title">${escapeHtml(task.title)}</h6>
                             <button class="btn btn-sm btn-danger delete-task-btn" data-id="${task.id}">
-                                <i class="bi bi-trash"></i>
+                                <?php echo getTrashIcon(); ?>
                             </button>
                         </div>
                         ${taskPictureHtml}
@@ -5132,7 +5147,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                     </div>
                                 </div>
                                 <button class="btn btn-sm btn-link text-danger delete-subtask-btn" data-id="${subtask.id}">
-                                    <i class="bi bi-trash"></i>
+                                    <?php echo getTrashIcon(); ?>
                                 </button>
                             `;
                             subtasksList.appendChild(subtaskElement);
@@ -5204,57 +5219,6 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                     }
                 });
 
-                // Add event listener for "Assign User" button in the modal
-                // const inviteUserBtn = document.getElementById('inviteUserBtn');
-                // inviteUserBtn.addEventListener('click', function () {
-                //     alert('inviteUserBtn clicked');
-                //     // alert('assignUserBtn clicked');
-                //     // return;
-                //     // const userSelect = document.getElementById('userSelect');
-                //     // const userId = userSelect.value;
-                //     // const userRole = document.getElementById('userRole').value.trim();
-                //     if (!currentProject) {
-                //         Toast('error', 'Error', 'Please select a project first', 'bottomCenter');
-                //         return;
-                //     }
-                //     // if (!userId || !userRole) {
-                //     //     // alert('Please select a user and enter a role');
-                //     //     Toast('error', 'Error', 'Please select a user and enter a role', 'bottomCenter');
-                //     //     return;
-                //     // }
-
-
-                //     showLoading();
-                //     fetch('?api=assign_user_to_project', {
-                //         method: 'POST',
-                //         headers: { 'Content-Type': 'application/json' },
-                //         body: JSON.stringify({
-                //             project_id: currentProject,
-                //             user_id: userId,
-                //             role: userRole
-                //         })
-                //     })
-                //         .then(response => response.json())
-                //         .then(data => {
-                //             if (data.success) {
-                //                 alert("User assigned successfully");
-                //                 bootstrap.Modal.getInstance(document.getElementById('assignUserModal')).hide();
-                //                 // Optionally clear the form fields
-                //                 document.getElementById('userSelect').value = '';
-                //                 document.getElementById('userRole').value = '';
-                //                 // You may want to refresh context or notify the user
-                //             } else {
-                //                 throw new Error(data.message || 'Failed to assign user');
-                //             }
-                //         })
-                //         .catch(error => {
-                //             console.error('Error assigning user:', error);
-                //             alert('Failed to assign user. Please try again.');
-                //         })
-                //         .finally(hideLoading);
-                // });
-
-                // Populate the user dropdown when the "Assign User" modal is shown
 
                 const assignUserModal = document.getElementById('assignUserModal');
                 assignUserModal.addEventListener('shown.bs.modal', function () {
@@ -5311,7 +5275,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                             actionButtons += `
            
             <button class="btn btn-sm btn-outline-danger deleteUser" data-id="${user.id}">
-                <i class="bi bi-trash"></i>
+                <?php echo getTrashIcon(); ?>
             </button>
         `;
                                         }
@@ -5489,7 +5453,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                             <div class="ai-avatar">
                                 <div class="chat-loading-avatar">
                                     <img src='https://res.cloudinary.com/da6qujoed/image/upload/v1742656707/logoIcon_pspxgh.png' alt="Logo"
-                                    class="logo-icon" style="margin-top: 0; margin-bottom: 0; width: 1.8rem; height:auto">
+                                    class="logo-icon" style="">
                                 </div>
                             </div>
                             <div class="message ai">${message}</div>
@@ -5906,7 +5870,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                         suggestionDiv.innerHTML = `
                             <strong>${escapeHtml(suggestion.title)}</strong><br>
                             <span class="my-2">${escapeHtml(suggestion.description)}</span><br>
-                            ${suggestion.due_date ? `<i class="bi bi-calendar-event"></i><em class="text-muted"> Due: ${escapeHtml(suggestion.due_date)}</em>` : ''}<br>
+                            ${suggestion.due_date ? `<?php echo getCalendarIcon(); ?><em class="text-muted"> Due: ${escapeHtml(suggestion.due_date)}</em>` : ''}<br>
                             <button class="btn btn-sm btn-primary mt-1">Add Task</button>
                          `;
                         suggestionDiv.querySelector('button').addEventListener('click', () => {
