@@ -79,3 +79,7 @@ function getLogoImage($bottomMargin = "0", $topMargin = "-1rem", $width = "15rem
                 class="logo-icon"
                 style="margin-top: ' . $topMargin . '; margin-bottom: ' . $bottomMargin . '; width: ' . $width . '; height: ' . $height . '">';
     }
+    function getCalendarIcon()
+    {
+        return file_get_contents('assets/icons/calendar.svg');
+    }
