@@ -1,0 +1,110 @@
+<?php
+class Auth
+{
+    private $db;
+
+    public function __construct()
+    {
+        $this->db = Database::getInstance()->getConnection();
+    }
+
+    public function register($username, $email, $password, $fcm_token)
+    {
+        try {
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                throw new Exception("Invalid email format");
+            }
+
+            if (strlen($password) < 8) {
+                throw new Exception("Password must be at least 8 characters");
+            }
+
+            $stmt = $this->db->prepare("SELECT id FROM users WHERE username = ? OR email = ?");
+            $stmt->execute([$username, $email]);
+            if ($stmt->rowCount() > 0) {
+                throw new Exception("Username or email already exists");
+            }
+
+            $password_hash = password_hash($password, PASSWORD_DEFAULT);
+            $stmt = $this->db->prepare("INSERT INTO users (username, email, password_hash, fcm_token,pro_plan) VALUES (?, ?, ?, ?,?)");
+            $stmt->execute([$username, $email, $password_hash, $fcm_token, 0]);
+
+            return true;
+        } catch (Exception $e) {
+            error_log("Registration error: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    public function login($email, $password)
+    {
+        try {
+            $stmt = $this->db->prepare("SELECT id, username, password_hash, pro_plan as pro_member, invited_by FROM users WHERE email = ?");
+            $stmt->execute([$email]);
+            $user = $stmt->fetch();
+
+            if (!$user || !password_verify($password, $user['password_hash'])) {
+                throw new Exception("Invalid credentials");
+            }
+
+            // Update the last_login timestamp
+            $stmt = $this->db->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
+            $stmt->execute([$user['id']]);
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['pro_member'] = $user['pro_member'];
+
+            if ($user['pro_member'] != 1) {
+                if ($user['invited_by'] === null) {
+                    header("Location: " . $_ENV['STRIPE_PAYMENT_LINK']);
+                    exit;  // Make sure the script stops here after the redirect
+                }
+            }
+            // $_SESSION['pro_member'] = $user['pro_member'];
+
+            return true;
+        } catch (Exception $e) {
+            error_log("Login error: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    public function logout()
+    {
+        echo "<script>
+            localStorage.removeItem('lastSelectedProject');
+    </script>";
+        session_destroy();
+        session_start();
+        session_unset();
+        session_destroy();
+        return true;
+    }
+
+    public function isLoggedIn()
+    {
+        return isset($_SESSION['user_id']);
+    }
+
+    public function getCurrentUser()
+    {
+        if (!$this->isLoggedIn()) {
+            return null;
+        }
+
+        try {
+            $stmt = $this->db->prepare("SELECT id, username, email, pro_plan as pro_member, invited_by FROM users WHERE id = ?");
+            $stmt->execute([$_SESSION['user_id']]);
+            return $stmt->fetch();
+        } catch (Exception $e) {
+            error_log("Error getting current user: " . $e->getMessage());
+            return null;
+        }
+    }
+    public function updateProStatus($userId)
+    {
+        $stmt = $this->db->prepare("UPDATE users SET pro_plan = 1 WHERE id = ?");
+        $stmt->execute([$userId]);
+        return $stmt->rowCount() > 0;
+    }
+}
