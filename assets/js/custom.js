@@ -75,17 +75,6 @@ function fetchNotifications(project_id) {
   });
 }
 
-// Initialize notification system when DOM is loaded
-// document.addEventListener('DOMContentLoaded', function() {
-//     const notificationDropdown = document.getElementById('notificationDropdown');
-//     if (notificationDropdown) {
-//         notificationDropdown.addEventListener('click', fetchNotificationsAndOpen);
-//         // Initial fetch
-//         // fetchNotifications();
-//         // Set up periodic refresh
-//         setInterval(fetchNotifications, 30000); // Refresh every 30 seconds
-//     }
-// });
 
 // Toasts iziToast Helper
 function Toast(type, title, message, positionToast) {
@@ -195,7 +184,7 @@ function initializeChatLoading() {
           height: 8px;
           border-radius: 50%;
         //   background-color: var(--primary-color, #0d6efd);
-         background: #3a3b3c;
+       
           opacity: 0.6;
       }
 
@@ -318,18 +307,65 @@ function scrollToBottom() {
     welcomeThread.scrollTop = welcomeThread.scrollHeight;
   }
 }
+const aiMessageClasses = "ai-message d-flex align-items-start intro-message";
 
-// Welcome AI Messages
+// Add this new function to append a welcome logo
+function appendWelcomeLogo() {
+  const chatMessages = document.getElementById("chatMessages");
+  if (!chatMessages) return;
+  
+  // Remove any existing logo to avoid duplicates
+  const existingLogo = chatMessages.querySelector('.welcome-logo-container');
+  if (existingLogo) {
+    existingLogo.remove();
+  }
+  
+  // Create a centered logo container at the top
+  const logoContainer = document.createElement("div");
+  logoContainer.className = "welcome-logo-container text-center mb-2 mt-2";
+  logoContainer.innerHTML = `${welcomeLogoImage}  `;
+  
+  // Always insert at the beginning of the chat container
+  chatMessages.insertBefore(logoContainer, chatMessages.firstChild);
+  
+  // Log to verify it's being called
+  console.log("Welcome logo added to chat container");
+}
+
+// Add styles for the welcome logo
+document.addEventListener('DOMContentLoaded', function() {
+  const style = document.createElement('style');
+  style.textContent = `
+    .welcome-logo-container {
+        margin-bottom: 1.5rem;
+       padding: 0.8rem;
+    transition: all 0.3s ease;
+    background: rgba(124, 124, 124, 0.2);
+    border: 1px solid rgba(211, 211, 211, 0.5);
+    width: 5rem;
+    border-radius: 50%;
+    height: 5rem;
+    margin:auto;
+    }
+  
+    
+  `;
+  document.head.appendChild(style);
+});
+
+// Welcome AI Messages - modified to add the logo
 function displayProjectCreationWelcomeMessages(title) {
   const chatMessages = document.getElementById("chatMessages");
   if (!chatMessages) return;
 
   chatMessages.innerHTML = "";
+  // Add welcome logo first
+  appendWelcomeLogo();
 
   const welcomeMessages = [
     {
       message: `👋 Hi! I'm here to help you with your project`,
-      delay: 1000,
+      delay: 900,
     },
     {
       message:
@@ -347,13 +383,12 @@ function displayProjectCreationWelcomeMessages(title) {
       }
 
       const messageDiv = document.createElement("div");
-      messageDiv.className = "ai-message";
+      
+      messageDiv.className = aiMessageClasses;
       messageDiv.innerHTML = `
               <div class="ai-avatar">
                   <div class="chat-loading-avatar">
-                     <img src='https://res.cloudinary.com/da6qujoed/image/upload/v1742656707/logoIcon_pspxgh.png' alt="Logo"
-            class="logo-icon"
-            style="margin-top: 0; margin-bottom: 0; width: 1.5rem; height:auto">
+                    ${iconImage}
                   </div>
               </div>
               <div class="message ai">
@@ -591,165 +626,97 @@ backdrop-filter: blur(14.3px);
   }
 }
 
-function sendNotificationTest(projectId, title, body) {
-  fetch("?api=send_notification_test", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      project_id: projectId,
-      title: title,
-      body: body,
-    }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.success) {
-        Toast("success", "Success", "Notification sent successfully");
-        // Refresh notifications after sending
-        fetchNotifications();
-      } else {
-        Toast("error", "Error", data.message || "Failed to send notification");
-      }
-    })
-    .catch((error) => {
-      console.error("Request failed:", error);
-      Toast("error", "Error", "Failed to send notification");
-    });
+// function sendNotificationTest(projectId, title, body) {
+//   fetch("?api=send_notification_test", {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//     body: JSON.stringify({
+//       project_id: projectId,
+//       title: title,
+//       body: body,
+//     }),
+//   })
+//     .then((response) => response.json())
+//     .then((data) => {
+//       if (data.success) {
+//         Toast("success", "Success", "Notification sent successfully");
+//         // Refresh notifications after sending
+//         fetchNotifications();
+//       } else {
+//         Toast("error", "Error", data.message || "Failed to send notification");
+//       }
+//     })
+//     .catch((error) => {
+//       console.error("Request failed:", error);
+//       Toast("error", "Error", "Failed to send notification");
+//     });
+// }
+
+
+// Notification
+function appendNotification(notification) {
+  const notificationList = document.querySelector(".notification-list");
+  const isDarkMode = document.body.classList.contains('dark-mode');
+  const actionType = getActionTypeDisplay(notification.action_type);
+  const timeAgo = formatTimeAgo(notification.created_at);
+  const icon = getNotificationIcon(notification.action_type);
+
+  const newNotification = `
+  <div class="dropdown-item border-bottom py-3">
+      <div class="d-flex align-items-start">
+          <div class="notification-icon ${isDarkMode ? actionType.darkBgColor : actionType.bgColor} rounded-circle me-3"
+              style="padding:0.6rem 0.8rem !important;">
+              <i class="bi ${icon} ${actionType.textColor}"></i>
+          </div>
+          <div class="flex-grow-1">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="badge ${isDarkMode ? actionType.darkBgColor : actionType.bgColor} ${actionType.textColor} rounded-pill px-3 py-1">
+                      ${actionType.text}
+                  </span>
+                  <small class="text-muted" style="font-size: 0.75rem;">
+                      ${timeAgo}
+                  </small>
+              </div>
+              <div class="notification-text" style="font-size: 0.8rem;">
+                  ${notification.description}
+              </div>
+          </div>
+      </div>
+  </div>
+`;
+
+  // Prepend the new notification to the list
+  notificationList.insertAdjacentHTML('afterbegin', newNotification);
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-    const isDashboard = document.querySelector('.chat-container') !== null;
-    
-    if (isDashboard) {
-        // Function to get last selected project
-        function getLastSelectedProject() {
-            // window.userId should be set in the PHP file before this script loads
-            if (!window.userId) {
-                console.error('User ID not found');
-                return null;
-            }
-            const savedProject = localStorage.getItem(`lastSelectedProject_${window.userId}`);
-            console.log('Retrieved from localStorage:', savedProject);
-            return savedProject;
-        }
 
-        // Load projects and initialize
-        function initializeProjects() {
-            showLoading();
-            fetch('?api=get_projects')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const projectDropdown = document.getElementById('projectDropdown');
-                        projectDropdown.innerHTML = '';
+function initPusher(currentProject) {
+  Pusher.logToConsole = true;
 
-                        if (!data.projects || data.projects.length === 0) {
-                            const placeholder = document.createElement('li');
-                            placeholder.className = 'dropdown-item disabled';
-                            placeholder.textContent = 'No projects found';
-                            projectDropdown.appendChild(placeholder);
-                        } else {
-                            data.projects.forEach(project => {
-                                const li = document.createElement('li');
-                                li.className = 'dropdown-item';
-                                li.innerHTML = `
-                                    <button class="dropdown-item" 
-                                            type="button" 
-                                            data-id="${project.id}" 
-                                            title="${escapeHtml(project.title)}">
-                                        ${escapeHtml(project.title)}
-                                    </button>
-                                `;
-                                projectDropdown.appendChild(li);
-                            });
+  var pusher = new Pusher('83a162dc942242f89892', {
+      cluster: 'ap2'
+  });
+  // Enable pusher logging - don't include this in production
 
-                            // After adding all projects, try to select the last selected project
-                            const savedProject = getLastSelectedProject();
-                            console.log('Attempting to select project:', savedProject);
-                            
-                            if (savedProject && savedProject !== 'null' && savedProject !== '0') {
-                                const projectId = parseInt(savedProject);
-                                const projectButton = projectDropdown.querySelector(`button[data-id="${projectId}"]`);
-                                if (projectButton) {
-                                    const projectTitle = projectButton.getAttribute('title');
-                                    console.log('Found saved project, selecting:', projectTitle);
-                                    selectProject(projectId, projectTitle);
-                                }
-                            }
-                        }
+  var channel = pusher.subscribe('project_' + currentProject);
 
-                        // Add click handlers for project selection
-                        document.querySelectorAll('.dropdown-item').forEach(item => {
-                            item.addEventListener('click', (e) => {
-                                e.preventDefault();
-                                const button = item.querySelector('button');
-                                if (button) {
-                                    const projectId = button.dataset.id;
-                                    const projectTitle = button.getAttribute('title');
-                                    selectProject(projectId, projectTitle);
-                                }
-                            });
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error loading projects:', error);
-                    const projectDropdown = document.getElementById('projectDropdown');
-                    projectDropdown.innerHTML = `
-                        <li class="dropdown-item">
-                            <div class="alert alert-danger">
-                                Unable to load projects. Please try again later.
-                            </div>
-                        </li>
-                    `;
-                })
-                .finally(hideLoading);
-        }
+  channel.bind('project_created', function (data) {
+      appendNotification(data);
+      Toast("success", "Project Created", data.message, 'topRight');
+  });
+  channel.bind('user_assigned', function (data) {
+      appendNotification(data);
+      Toast("success", "User Joined", data.message, 'topRight');
+  });
+  channel.bind('task_created', function (data) {
+      appendNotification(data);
+      Toast("success", "Task Created", data.message, 'topRight');
+  });
+  channel.bind('task_updated', function (data) {
+      appendNotification(data);
+      Toast("success", "Success", data.message, 'topRight');
+  });
+}
 
-        // Update selectProject function
-        function selectProject(projectId, selectedProjectTitle = "") {
-            if (!projectId) return;
-            
-            console.log('Selecting project:', projectId, selectedProjectTitle);
-            
-            const $button = $('#projectDropdownButton');
-            const $svg = $button.find('svg').clone();
-            
-            $button.text(selectedProjectTitle || 'Select Project');
-            if ($svg.length > 0) {
-                $button.append($svg);
-            } else {
-                $button.append(`
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                `);
-            }
-
-            projectId = parseInt(projectId);
-            currentProject = projectId;
-            $('#myselectedcurrentProject').val(currentProject);
-
-            // Save to localStorage
-            if (window.userId) {
-                console.log('Saving to localStorage:', `lastSelectedProject_${window.userId}`, projectId);
-                localStorage.setItem(`lastSelectedProject_${window.userId}`, projectId);
-            }
-
-            // Update UI
-            $('#projectDropdown button').removeClass('active');
-            $(`#projectDropdown button[data-id="${projectId}"]`).addClass('active');
-
-            // Load project data
-            fetchNotificationsAndOpen(false);
-            loadTasks(projectId);
-            loadChatHistory(projectId);
-            initPusher(projectId);
-        }
-
-        // Initialize projects
-        initializeProjects();
-    }
-});

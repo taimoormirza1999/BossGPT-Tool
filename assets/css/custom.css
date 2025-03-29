@@ -121,11 +121,11 @@ body.dark-mode ::selection {
   height: 42px;
 }
 .dark-mode .btn-main-primary,.dark-mode .btn-send-primary {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(248, 249, 250, 0.5);
-  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1)!important;
+  border: 1px solid rgba(248, 249, 250, 0.5)!important;
+  border-radius: 10px!important;
   color: white !important;
-  transition: all 0.4s ease-in-out;
+  transition: all 0.4s ease-in-out!important;
 }
 .dark-mode .btn-main-primary:hover,.dark-mode .btn-send-primary:hover {
   transform: translateY(-5px);
@@ -435,10 +435,18 @@ body.dark-mode input[type="range"]::-ms-fill-upper {
   max-height: 80vh!important;
 }
 body.dark-mode .chat-loading-avatar .logo-icon{
-  margin-top: 0; margin-bottom: 0; width: 1.93rem; height:auto;
+  margin-top: 0; margin-bottom: 0; width: 1.83rem; height:auto;
 }
-body.dark-mode .chat-loading-avatar{
-  background: rgba(0, 0, 0, 0.4)!important;
+
+.message.ai > ul:last-child,
+.message.ai > ol:last-child,
+.message.ai > p:last-child,
+.message.ai > span:last-child {
+    margin-bottom: 0 !important; /* Removes bottom margin */
+}
+.intro-message .message.ai > ul{
+  list-style-type: none !important;
+  padding:0;
 }
 /* Modal close button styling */
 .dark-mode .btn-close {

@@ -136,7 +136,7 @@ require_once './api_endPoints.php';
     <!-- Initialize user ID for project management -->
     <script>
         window.userId = <?php echo isset($_SESSION['user_id']) ? json_encode($_SESSION['user_id']) : 'null'; ?>;
-        console.log('User ID initialized:', window.userId);
+        // console.log('User ID initialized:', window.userId)\;
     </script>
     <!-- Custom js -->
     <script src="./assets/js/custom.js"></script>
@@ -647,17 +647,17 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 
                                                         // Hide loading animation
                                                         hideChatLoading();
-
+                                                        appendWelcomeLogo();
                                                         // Create the message div
                                                         const messageDiv = document.createElement('div');
-                                                        messageDiv.className = 'ai-message';
+                                                        messageDiv.className = aiMessageClasses;
                                                         messageDiv.style.opacity = "0";  // Start invisible
                                                         messageDiv.style.transition = "opacity 0.5s ease-in-out"; // Smooth transition
 
                                                         let content = `
         <div class="ai-avatar">
             <div class="chat-loading-avatar">
-            <?php echo getIconImage(0, 0, "1.8rem"); ?>
+            ${iconImage}
             </div>
         </div>
         <div class="message ai text-center mt-3">
@@ -678,7 +678,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                                             if (message.content.cta) {
                                                                 content += `
                 <div class="cta-message">
-                    <button class="btn btn-primary mt-3" onclick="openNewProjectModal()">
+                    <button class="btn btn-main-primary" onclick="openNewProjectModal()">
                         <i class="fas fa-plus-circle"></i> Create New Project
                     </button>
                 </div>`;
@@ -700,14 +700,12 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 
 
                                                     async function displayMessages() {
-                                                        // console.log('Starting to display messages...'); // Debug log
                                                         for (const message of welcomeMessages) {
                                                             await new Promise(resolve => setTimeout(resolve, message.delay));
                                                             await showMessage(message);
                                                         }
                                                     }
 
-                                                    // Start displaying messages
                                                     displayMessages().catch(error => console.error('Error displaying messages:', error));
                                                 })();
                                             </script>
@@ -1094,6 +1092,13 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<!-- for logoIcon -->
+<script>
+    const iconImage = `<?php echo getIconImage(0, 0, "1.8rem"); ?>`
+    const welcomeLogoImage= `<?php echo getIconImage(0,0,'3.3rem'); ?>`; 
+</script>
+
+
     <script>
         var userId = null;
         function getLastSelectedProject() {
@@ -1210,66 +1215,6 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                 }
 
                 // Load projects
-                function loadProjectsOld() {
-                    showLoading();
-                    fetch('?api=get_projects')
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log("Loaded projects: ", data.projects);
-                            if (data.success) {
-                                // const projectTabs = document.getElementById('projectTabs');
-                                // Keep the "New Project" button as the first item
-                                const newProjectBtn = projectTabs.firstElementChild;
-                                projectTabs.innerHTML = '';
-                                projectTabs.appendChild(newProjectBtn);
-
-                                if (!data.projects || data.projects.length === 0) {
-                                    // If no projects exist, display a placeholder tab
-                                    const placeholder = document.createElement('li');
-                                    placeholder.className = 'nav-item';
-                                    placeholder.innerHTML = '<a class="nav-link" href="#">No projects found</a>';
-                                    projectTabs.appendChild(placeholder);
-                                } else {
-                                    data.projects.forEach(project => {
-                                        const li = document.createElement('li');
-                                        li.className = 'nav-item';
-                                        li.innerHTML = `
-                                            <a class="nav-link ${project.id === currentProject ? 'active' : ''}" 
-                                               href="#" 
-                                               data-id="${project.id}"
-                                               title="${escapeHtml(project.title)}">
-                                                <i class="bi bi-kanban"></i>
-                                                ${escapeHtml(project.title)}
-                                            </a>
-                                        `;
-                                        projectTabs.appendChild(li);
-                                    });
-                                }
-                                // Add click handlers for the project tabs
-                                document.querySelectorAll('.nav-link[data-id]').forEach(tab => {
-                                    tab.addEventListener('click', (e) => {
-                                        e.preventDefault();
-                                        document.querySelectorAll('.nav-link').forEach(t => t.classList.remove('active'));
-                                        tab.classList.add('active');
-                                        selectProject(tab.dataset.id);
-                                    });
-                                });
-                                return 2;
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error loading projects:', error);
-                            const projectTabs = document.getElementById('projectTabs');
-                            projectTabs.innerHTML = `
-                                <li class="nav-item">
-                                    <div class="alert alert-danger">
-                                        Unable to load projects. Please try again later.
-                                    </div>
-                                </li>
-                            `;
-                        })
-                        .finally(hideLoading);
-                }
                 function loadProjects() {
                     showLoading();
                     fetch('?api=get_projects')
@@ -1278,7 +1223,6 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                             console.log("Loaded projects: ", data.projects);
                             if (data.success) {
                                 const projectDropdown = document.getElementById('projectDropdown');
-                                // Clear the dropdown menu
                                 projectDropdown.innerHTML = '';
 
                                 if (!data.projects || data.projects.length === 0) {
@@ -1301,36 +1245,29 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                     });
                                 }
 
-                                // // Add click handler for project selection
-                                // document.querySelectorAll('.dropdown-item[data-id]').forEach(item => {
-                                //     item.addEventListener('click', (e) => {
-                                //         e.preventDefault();
-                                //         // const projectTitle = item.querySelector('button').getAttribute('title');
-                                //         // selectProject(item.dataset.id, projectTitle);
-                                //         console.log(item.dataset)
-                                //     });
-                                // });
+                                // Add click handlers for project selection
                                 document.querySelectorAll('.dropdown-item').forEach(item => {
                                     item.addEventListener('click', (e) => {
                                         e.preventDefault();
-
-                                        // Select the <button> inside the dropdown item
                                         const button = item.querySelector('button');
-
                                         if (button) {
-                                            // Get the data-id and title attributes from the button
-                                            const projectId = button.dataset.id; // 'data-id' from button
-                                            const projectTitle = button.getAttribute('title'); // 'title' attribute from button
-
-                                            console.log(projectId, projectTitle); // Check the output
-
-                                            // Call the selectProject function with both the ID and title
+                                            const projectId = button.dataset.id;
+                                            const projectTitle = button.getAttribute('title');
                                             selectProject(projectId, projectTitle);
                                         }
                                     });
                                 });
 
-                                return 2;
+                                // After projects are loaded, check for saved project
+                                const savedProject = getLastSelectedProject();
+                                if (savedProject && savedProject !== 'null' && savedProject !== '0') {
+                                    const projectId = parseInt(savedProject);
+                                    const projectButton = document.querySelector(`#projectDropdown button[data-id="${projectId}"]`);
+                                    if (projectButton) {
+                                        const projectTitle = projectButton.getAttribute('title');
+                                        selectProject(projectId, projectTitle);
+                                    }
+                                }
                             }
                         })
                         .catch(error => {
@@ -1346,15 +1283,23 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                         })
                         .finally(hideLoading);
                 }
+
                 // Select project
                 function selectProject(projectId, selectedProjectTitle = "") {
-                    // Create a temporary div to store the SVG
                     const $button = $('#projectDropdownButton');
+                    
+                    // If no title is provided, get it from the dropdown item
+                    if (!selectedProjectTitle) {
+                        const selectedButton = $(`#projectDropdown button[data-id="${projectId}"]`);
+                        if (selectedButton.length) {
+                            selectedProjectTitle = selectedButton.attr('title');
+                        }
+                    }
 
                     // Get the current SVG if it exists
                     const $svg = $button.find('svg').clone();
 
-                    // Clear the button text
+                    // Clear and update the button text
                     $button.text(selectedProjectTitle);
 
                     // Add the SVG back if it exists
@@ -1368,7 +1313,8 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                             </svg>
                         `);
                     }
-                    // currentProject = projectId;
+
+                    // Update project ID and state
                     projectId = parseInt(projectId);
                     currentProject = parseInt(projectId);
                     $('#myselectedcurrentProject').val(currentProject);
@@ -1376,25 +1322,22 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                     // Save current project to localStorage for persistence
                     localStorage.setItem(`lastSelectedProject_${userId}`, currentProject);
 
-                    // call to fetch notifications
-                    fetchNotificationsAndOpen(false);
-                    if (isNaN(projectId)) {
-                        console.error('Invalid project ID:', projectId);
-                        return;
-                    }
-                    // console.log('Selecting project:', projectId);
-                    currentProject = projectId;
-                    // Mark the selected item in the dropdown
-                    $('#projectDropdown button').attr('data-selected', false);
-                    $('#projectDropdown button').removeClass('active');
-                    $(`#projectDropdown button[data-id="${projectId}"]`).attr('data-selected', true);
-                    $(`#projectDropdown button[data-id="${projectId}"]`).addClass('active');
+                    // Update dropdown selection state
+                    $('#projectDropdown button').removeClass('active').attr('data-selected', false);
+                    $(`#projectDropdown button[data-id="${projectId}"]`).addClass('active').attr('data-selected', true);
 
+                    // Update project items state
                     document.querySelectorAll('.project-item').forEach(item => {
                         const itemId = parseInt(item.dataset.id);
                         item.classList.toggle('active', itemId === projectId);
                     });
+
+                    // call to fetch notifications
+                    fetchNotificationsAndOpen(false);
+                    
+                    // Load project data
                     loadTasks(projectId);
+                    
                     loadChatHistory(projectId);
                     initPusher(projectId);
                 }
@@ -1420,6 +1363,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                             if (data.success) {
                                 chatMessages.innerHTML = '';
                                 if (Array.isArray(data.history)) {
+                                    appendWelcomeLogo();
                                     data.history.forEach(msg => {
                                         appendMessage(msg.message, msg.sender);
                                     });
@@ -1787,12 +1731,11 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                loadProjects();
+                                // No need to call loadProjects() here since selectProject will refresh the UI
                                 bootstrap.Modal.getInstance(document.getElementById('newProjectModal')).hide();
                                 document.getElementById('projectTitle').value = '';
                                 document.getElementById('projectDescription').value = '';
                                 Toast("success", "Success", "Project created successfully", "bottomCenter");
-
                                 selectProject(data.project_id);
                             }
                         })
@@ -2138,7 +2081,6 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                     //     document.getElementById("newUserName").value = username;
                     //     document.getElementById("newUserEmail").value = email;
                     //     document.getElementById("newUserRole").value = role;
-
                     //     // Show the modal
                     //     addUserModal.show();
                     // }
@@ -2258,8 +2200,15 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 
                 // Initial load
                 loadProjects();
-                // selectProject(5);
 
+                // Auto-load the saved project if available
+                if (isDashboard) {
+                    <?php
+                    if (isset($_SESSION['user_id'])) {
+                        echo "userId = " . json_encode($_SESSION['user_id']) . ";";
+                    }
+                    ?>
+                }
 
                 // Font size management
                 const fontSizeRange = document.getElementById('fontSizeRange');
@@ -3127,33 +3076,6 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                     })
                     .finally(hideLoading);
             });
-
-            // Auto-load the saved project if available
-            if (isDashboard) {
-                // var userId = null;
-                // Initialize projects
-                loadProjects();
-                <?php
-                if (isset($_SESSION['user_id'])) {
-                    echo "userId = " . json_encode($_SESSION['user_id']) . ";";
-                }
-                ?>
-                // After projects are loaded, select the saved project if available
-                setTimeout(() => {
-                    const savedProject = getLastSelectedProject();
-                    if (savedProject && savedProject !== 'null' && savedProject !== '0') {
-                        const projectId = parseInt(savedProject);
-
-                        const savedProjectTab = document.querySelector(`.nav-link[data-id="${projectId}"]`);
-                        // alert("sdf"+projectId)
-                        if (savedProjectTab) {
-                            document.querySelectorAll('.nav-link').forEach(t => t.classList.remove('active'));
-                            savedProjectTab.classList.add('active');
-                            selectProject(projectId);
-                        }
-                    }
-                }, 500); // Small delay to ensure projects are loaded
-            }
         }); // End of DOMContentLoaded
 
         function sendWelcomeEmailTest() {
@@ -3211,140 +3133,10 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
 
     <!-- Firebase -->
     <?php if (isset($page) && ($page === 'register' || $page === 'login' || $page === 'dashboard')): ?>
-        <script type="module">
-            // Import the functions you need from the SDKs you need
-            import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
-            import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-messaging.js";
-
-            // TODO: Add SDKs for Firebase products that you want to use
-            // https://firebase.google.com/docs/web/setup#available-libraries
-            // Your web app's Firebase configuration
-            const firebaseConfig = {
-                apiKey: "AIzaSyAPByoVru7fAR1Mk8_y8AW73vWVRwEDma4",
-                authDomain: "bossgpt-367ab.firebaseapp.com",
-                projectId: "bossgpt-367ab",
-                storageBucket: "bossgpt-367ab.firebasestorage.app",
-                messagingSenderId: "1078128619253",
-                appId: "1:1078128619253:web:edf3e5f2306ab349191fbc"
-            };
-
-            // Initialize Firebase
-            const app = initializeApp(firebaseConfig);
-            const messaging = getMessaging(app);
-
-            // Register service worker first
-            navigator.serviceWorker.register("./assets/js/sw.js")
-                .then((registration) => {
-                    console.log('Service worker registered:', registration);
-
-                    // Then get the messaging token
-                    return getToken(messaging, {
-                        serviceWorkerRegistration: registration,
-                        vapidKey: 'BNvQzVggQ4j6sTH5W6sxSa4K8Q-K0BhPn2tJT1en85dcp1P46M4EFJjoxe_uJI3PnEgQ06LO2mgv0SvcpBfyL00'
-                    });
-                })
-                .then((currentToken) => {
-                    if (currentToken) {
-                        console.log("FCM Token:", currentToken);
-                        // Set the token in the hidden input
-                        $('#fcm_token_value').attr('content', currentToken);
-                        $('#fcm_token').val(currentToken);
-                        fetch('requests.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                requestType: 'storeFCMSession',
-                                fcm_token: currentToken
-                            })
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                console.log("Token stored in session:", data);
-                            })
-                            .catch(error => {
-                                console.error("Error storing token:", error);
-                            });
-
-                    } else {
-                        console.log('No FCM token available. Request permission to generate one.');
-                        // You might want to request permission here
-                    }
-                })
-                .catch((err) => {
-                    console.error('Service worker registration or token retrieval failed:', err);
-                });
-        </script>
+        <script type="module" src="assets/js/firbase.js"></script>
     <?php endif; ?>
     <!-- Pusher -->
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
-    <script>
-
-        function appendNotification(notification) {
-            const notificationList = document.querySelector(".notification-list");
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            const actionType = getActionTypeDisplay(notification.action_type);
-            const timeAgo = formatTimeAgo(notification.created_at);
-            const icon = getNotificationIcon(notification.action_type);
-
-            const newNotification = `
-            <div class="dropdown-item border-bottom py-3">
-                <div class="d-flex align-items-start">
-                    <div class="notification-icon ${isDarkMode ? actionType.darkBgColor : actionType.bgColor} rounded-circle me-3"
-                        style="padding:0.6rem 0.8rem !important;">
-                        <i class="bi ${icon} ${actionType.textColor}"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="badge ${isDarkMode ? actionType.darkBgColor : actionType.bgColor} ${actionType.textColor} rounded-pill px-3 py-1">
-                                ${actionType.text}
-                            </span>
-                            <small class="text-muted" style="font-size: 0.75rem;">
-                                ${timeAgo}
-                            </small>
-                        </div>
-                        <div class="notification-text" style="font-size: 0.8rem;">
-                            ${notification.description}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-            // Prepend the new notification to the list
-            notificationList.insertAdjacentHTML('afterbegin', newNotification);
-        }
-
-
-        function initPusher(currentProject) {
-            Pusher.logToConsole = true;
-
-            var pusher = new Pusher('83a162dc942242f89892', {
-                cluster: 'ap2'
-            });
-            // Enable pusher logging - don't include this in production
-
-            var channel = pusher.subscribe('project_' + currentProject);
-
-            channel.bind('project_created', function (data) {
-                appendNotification(data);
-                Toast("success", "Project Created", data.message, 'topRight');
-            });
-            channel.bind('user_assigned', function (data) {
-                appendNotification(data);
-                Toast("success", "User Joined", data.message, 'topRight');
-            });
-            channel.bind('task_created', function (data) {
-                appendNotification(data);
-                Toast("success", "Task Created", data.message, 'topRight');
-            });
-            channel.bind('task_updated', function (data) {
-                appendNotification(data);
-                Toast("success", "Success", data.message, 'topRight');
-            });
-        }
-    </script>
 
 </body>
 
