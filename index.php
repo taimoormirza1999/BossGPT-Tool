@@ -73,6 +73,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         throw new Exception('Email and password are required');
                     }
 
+                    // Store FCM token in session before login
+                    if (isset($_POST['fcm_token']) && $_POST['fcm_token'] !== '0') {
+                        $_SESSION['fcm_token'] = $_POST['fcm_token'];
+                    }
+
                     $auth->login($_POST['email'], $_POST['password']);
                     header('Location: ?page=dashboard');
                     exit;
@@ -351,6 +356,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                 <?php endif; ?>
                                 <form method="POST">
                                     <input type="hidden" name="action" value="login">
+                                    <input type="hidden" name="fcm_token" value="0" id="fcm_token">
                                     <div class="mb-3">
                                         <label for="email" class="form-label">Email</label>
                                         <input type="email" class="form-control" id="email" name="email" required>
@@ -2548,7 +2554,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 
                     if (sender === 'user') {
                         // Get username from session
-                        const username = '<?php echo $_SESSION["username"]; ?>';
+                        const username = '<?php echo isset($_SESSION["username"]) ? $_SESSION["username"] : ""; ?>';
                         const initials = username.split(' ').map(word => word[0].toUpperCase()).join('').slice(0, 2);
 
                         div.innerHTML = `

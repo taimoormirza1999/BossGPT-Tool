@@ -50,17 +50,25 @@ class Auth
             // Update the last_login timestamp
             $stmt = $this->db->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
             $stmt->execute([$user['id']]);
+            
+            // Store user info in session
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['pro_member'] = $user['pro_member'];
 
+            // Update FCM token if available in the session
+            if (isset($_SESSION['fcm_token']) && $_SESSION['fcm_token'] !== '0') {
+                $this->updateFcmToken($user['id'], $_SESSION['fcm_token']);
+                // Clear the session token after updating
+                unset($_SESSION['fcm_token']);
+            }
+
             if ($user['pro_member'] != 1) {
                 if ($user['invited_by'] === null) {
                     header("Location: " . $_ENV['STRIPE_PAYMENT_LINK']);
-                    exit;  // Make sure the script stops here after the redirect
+                    exit;
                 }
             }
-            // $_SESSION['pro_member'] = $user['pro_member'];
 
             return true;
         } catch (Exception $e) {
@@ -106,5 +114,16 @@ class Auth
         $stmt = $this->db->prepare("UPDATE users SET pro_plan = 1 WHERE id = ?");
         $stmt->execute([$userId]);
         return $stmt->rowCount() > 0;
+    }
+
+    public function updateFcmToken($userId, $fcmToken) {
+        try {
+            $stmt = $this->db->prepare("UPDATE users SET fcm_token = ? WHERE id = ?");
+            $stmt->execute([$fcmToken, $userId]);
+            return true;
+        } catch (Exception $e) {
+            error_log("FCM Token update error: " . $e->getMessage());
+            throw $e;
+        }
     }
 }

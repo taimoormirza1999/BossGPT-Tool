@@ -541,7 +541,11 @@ if (isset($_GET['api'])) {
 
                 $gardenManager = new GardenManager();
                 $taskSize = isset($data['size']) ? $data['size'] : 'medium'; // Default to medium if size not specified
-                $gardenManager->plantSeed($task_id, $_SESSION['user_id'], $taskSize);
+                
+                // Plant seeds for each assignee
+                foreach ($assignees as $user_id) {
+                    $gardenManager->plantSeed($task_id, $user_id, $taskSize);
+                }
 
                 $response = ['success' => true, 'task_id' => $task_id];
                 break;
@@ -690,6 +694,31 @@ if (isset($_GET['api'])) {
                         'is_pro' => $is_pro,
                         'payment_link' => $_ENV['STRIPE_PAYMENT_LINK'],
                         'invited_by' => $user['invited_by']
+                    ];
+                }
+                break;
+
+            case 'update_fcm_token':
+                $data = json_decode(file_get_contents("php://input"), true);
+                if (!isset($data['fcm_token'])) {
+                    $response = [
+                        'success' => false,
+                        'message' => 'FCM token is required'
+                    ];
+                    break;
+                }
+
+                try {
+                    $auth = new Auth();
+                    $auth->updateFcmToken($_SESSION['user_id'], $data['fcm_token']);
+                    $response = [
+                        'success' => true,
+                        'message' => 'FCM token updated successfully'
+                    ];
+                } catch (Exception $e) {
+                    $response = [
+                        'success' => false,
+                        'message' => 'Failed to update FCM token: ' . $e->getMessage()
                     ];
                 }
                 break;

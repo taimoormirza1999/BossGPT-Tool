@@ -120,6 +120,19 @@ class Database
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (project_id) REFERENCES projects(id),
                 FOREIGN KEY (user_id) REFERENCES users(id)
+            )",
+            // Add user_garden table
+            "CREATE TABLE IF NOT EXISTS user_garden (
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                user_id INT,
+                task_id INT,
+                stage VARCHAR(20) DEFAULT 'seed',
+                plant_type VARCHAR(20),
+                size VARCHAR(10) DEFAULT 'medium',
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id),
+                FOREIGN KEY (task_id) REFERENCES tasks(id)
             )"
         ];
 
