@@ -20,15 +20,7 @@ ini_set('display_errors', $_ENV['DISPLAY_ERRORS']);
 ini_set('log_errors', 0);
 ini_set('error_log', 'error.log');
 error_reporting(E_ALL);
-define('TESTING_FEATURE', $_ENV['TESTING_FEATURE']);
-// Database configuration
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', $_ENV['DB_PASS']);
-define('DB_NAME', 'project_manager');
-
-// OpenAI API configuration
-define('OPENAI_API_KEY', $_ENV['OPENAI_API_KEY']);
+require_once './config/constants.php';
 ob_start();
 // Database Class
 
@@ -194,7 +186,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 ?>
 
 <body
-    style="background-image: url('https://trello-backgrounds.s3.amazonaws.com/53baf533e697a982248cd73f/2048x2048/22ec03aab9d36ea49139c569a62bb079/shutterstock_134707556.jpg'); background-size: cover; background-position: center; background-color:<?php echo isset($_GET['page']) && ($_GET['page'] == 'login' || $_GET['page'] == 'register') ? '#000' : ''; ?> ">
+style="background-image: url('https://trello-backgrounds.s3.amazonaws.com/53baf533e697a982248cd73f/2048x2048/22ec03aab9d36ea49139c569a62bb079/shutterstock_134707556.jpg'); background-size: cover; background-position: top; background-repeat: no-repeat; background-attachment: fixed; background-color:<?php echo isset($_GET['page']) && ($_GET['page'] == 'login' || $_GET['page'] == 'register') ? '#000' : ''; ?> ">
     <?php
     $auth = new Auth();
 
@@ -273,9 +265,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                             <div class="dropdown-menu dropdown-menu" id="notificationDropdownMenu"
                                 aria-labelledby="notificationDropdown"
                                 style="min-width: 300px; max-height: 400px; overflow-y: auto;">
-                                <div class="dropdown-header p-2 pb-3 pl-5">
-                                    <strong class="mb-5">Notifications</strong>
-                                </div>
+                               
                                 <div class="notification-list">
                                     <div class="dropdown-item text-center">No notification found 🎉 </div>
                                 </div>
@@ -555,8 +545,8 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
     gap: 10px;
     border-bottom: 0.5px solid;
 ">
-                                <h5 class="mb-0"><?php echo getIconImage(0, 0, "2.5rem"); ?> &nbsp; Boss<span
-                                        style="font-weight: 700;">GPT</span> Assistant </h5>
+                                <h5 class="mb-0"><?php echo getIconImage(0, 0, "2.5rem","auto","https://res.cloudinary.com/da6qujoed/image/upload/v1742656707/logoIcon_pspxgh.png",0); ?> &nbsp; Boss<span
+                                style="font-weight: 700;">GPT</span> Assistant </h5>
                             </div>
                             <div class="card-body p-0">
                                 <div class="chat-container">
@@ -712,13 +702,80 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                         <?php endif; ?>
                                     </div>
                                     <div class="chat-input">
+                                    <?php
+
+
+$prompts = [
+    "🎯 Create task 'Your Task' and assign it to myself",
+    "📋 Create tasks for Your Feature",
+    "✏️ Move task #number to in_progress",
+    "👥 Assign task 'Your Task' to @name",
+    "📅 Set deadline for task #number to next Friday",
+    "📝 Update description of task 'Your Task'",
+    "🔄 Mark task #number as completed",
+    "📊 Show project progress",
+    "📑 List all tasks in current project",
+    "🔍 Show tasks assigned to me"
+];
+
+function renderPromptButtons($prompts) {
+    foreach ($prompts as $prompt) {
+        echo '<button style="border-radius: 20px!important;" class="btn btn-outline-light  prompt-btn" type="button" onclick="handlePromptClick(this)">' . $prompt . '</button>';
+    }
+}
+?>
+
+<!-- Prompt suggestions -->
+<div class="prompt-suggestions">
+    <div class="nav nav-tabs border-0 flex-nowrap overflow-auto mb-0 px-0" style="scrollbar-width: none; -ms-overflow-style: none;">
+        <?php renderPromptButtons($prompts); ?>
+    </div>
+</div>
+
+
                                         <form id="chatForm" class="d-flex">
-                                            <input type="text" class="form-control me-2" id="messageInput"
-                                                placeholder="Type your message...">
-                                            <button type="submit"
+                                        <textarea class="form-control me-2" id="messageInput"
+                                                placeholder="Type your message..." rows="1"></textarea>
+                                            <button type="submit" id="aiSendMessageBtn"
                                                 class="btn btn-send-primary"><?php echo file_get_contents("assets/icons/send.svg"); ?>
                                             </button>
                                         </form>
+                                        <script>
+// Auto-resize textarea as user types
+const messageInput = document.getElementById('messageInput');
+if (messageInput) {
+    messageInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+    });
+
+    // Reset height when form is submitted
+    document.getElementById('chatForm').addEventListener('submit', function() {
+        setTimeout(() => {
+            // messageInput.style.height = 'auto';
+        }, 100);
+    });
+}
+
+function handlePromptClick(button) {
+    let promptText = button.innerText;
+    let inputField = document.getElementById("messageInput");
+    let aiSendMessageBtn=document.getElementById("aiSendMessageBtn");
+
+    // Set input field value
+    inputField.value = promptText;
+
+    // Trigger the input event to resize the textarea
+    const inputEvent = new Event('input', { bubbles: true });
+    inputField.dispatchEvent(inputEvent);
+
+    // Auto-submit the form
+    setTimeout(() => {
+        // aiSendMessageBtn.click();
+        // chatForm.submit();
+    }, 200); // Small delay to make it smooth
+}
+</script>
                                     </div>
                                 </div>
                             </div>
@@ -1095,7 +1152,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 <!-- for logoIcon -->
 <script>
     const iconImage = `<?php echo getIconImage(0, 0, "1.8rem"); ?>`
-    const welcomeLogoImage= `<?php echo getIconImage(0,0,'3.3rem'); ?>`; 
+    const welcomeLogoImage= `<?php echo getIconImage(0,0,'3.7rem'); ?>`; 
 </script>
 
 
@@ -1353,44 +1410,37 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                         },
                         body: JSON.stringify({ project_id: projectId })
                     })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            if (data.success) {
-                                chatMessages.innerHTML = '';
-                                if (Array.isArray(data.history)) {
-                                    appendWelcomeLogo();
-                                    data.history.forEach(msg => {
-                                        appendMessage(msg.message, msg.sender);
-                                    });
-                                }
-                                // console.log("object "+data.history.length)
-                                const count = data.history.length;
-
-                                if (count === 0 && $('#chatMessages').is(':empty')) {
-                                    setTimeout(() => {
-                                        if ($('#chatMessages').is(':empty')) {
-                                            displayProjectCreationWelcomeMessages("title");
-                                        }
-                                    }, 2000);
-                                }
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            chatMessages.innerHTML = '';
+                            if (Array.isArray(data.history) && data.history.length > 0) {
+                                appendWelcomeLogo();
+                                data.history.forEach(msg => {
+                                    appendMessage(msg.message, msg.sender);
+                                });
                             } else {
-                                throw new Error(data.message || 'Failed to load chat history');
+                                // If no chat history, show welcome messages
+                                displayProjectCreationWelcomeMessages();
                             }
-                        })
-                        .catch(error => {
-                            console.error('Error loading chat history:', error);
-                            chatMessages.innerHTML = `
+                        } else {
+                            throw new Error(data.message || 'Failed to load chat history');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading chat history:', error);
+                        chatMessages.innerHTML = `
                             <div class="alert alert-danger">
                                 Failed to load chat history. Please try again later.
                             </div>
                         `;
-                        })
-                        .finally(hideLoading);
+                    })
+                    .finally(hideLoading);
                 }
 
                 // Load tasks
@@ -1539,6 +1589,19 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                     ` : '';
 
                     // Updated innerHTML now includes the due date in the task-meta section
+                    const plantBallHtml = `<div class="plant-ball-container">
+    <img src="assets/images/garden/plant-ball.png" alt="Plant Ball" class="plant-ball" style="
+    height: 39px;
+    box-shadow: 0 0 15px 5px rgba(255, 255, 150, 0.8);
+    border-radius: 50%;
+">
+    <img src="assets/images/garden/lush.png" alt="Plant" class="inner-plant" style="
+    height: 30px;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%);
+">
+</div>`;
                     div.innerHTML = `
                     <div class="task-card-labels mb-2">
                             ${task.status === 'todo' ? '<span class="task-label label-red"></span>' : ''}
@@ -1556,6 +1619,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                         ${task.description ? `<div class="task-description">${escapeHtml(task.description)}</div>` : ''}
                         <div class="task-meta">
                             ${dueDateHtml}
+                            ${plantBallHtml}
                             ${task.assigned_users ? `
                                 <div class="task-assignees d-flex gap-1 border-0 m-0 p-0">
                                     ${Object.entries(task.assigned_users).map(([id, username]) => {
@@ -1736,7 +1800,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                 document.getElementById('projectTitle').value = '';
                                 document.getElementById('projectDescription').value = '';
                                 Toast("success", "Success", "Project created successfully", "bottomCenter");
-                                selectProject(data.project_id);
+                                selectProject(data.project_id, title); 
                             }
                         })
                         .catch(error => console.error('Error creating project:', error))
@@ -3127,7 +3191,78 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
         }
 
         initializeChatLoading();
+        let displayedReminders = new Set();
+// get Reminders
+function getReminders() {
+    const fcmToken = "<?php echo isset($_SESSION['fcm_token']) ? $_SESSION['fcm_token'] : ''; ?>";
+    console.log("FCM Token for reminders:", fcmToken);
+    if (!fcmToken) {
+        console.error('No FCM token found');
+        return;
+    }
+    
+    fetch('?api=get_fcm_reminders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fcm_token: fcmToken })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok: ' + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Reminders data:", data);
+        if (data.success && data.reminders && data.reminders.length > 0) {
+            const popupContainer = document.querySelector('.popup-container');
+            if (popupContainer) {
+                // Append each reminder as a popup alert
+                data.reminders.forEach(reminder => {
+                    if (!displayedReminders.has(reminder.id)) {
+                        // Add to the set to track the displayed reminder
+                        displayedReminders.add(reminder.id);
+                    // Create popup using the PHP getPopupAlert function output
+                    const title = reminder.title || 'Reminder';
+                    const description = reminder.description || '';
+                    
+                    const popupHtml = `<?php echo getPopupAlert("TITLE_PLACEHOLDER", "DESCRIPTION_PLACEHOLDER", "REMINDER_ID_PLACEHOLDER"); ?>`
+                        .replace('TITLE_PLACEHOLDER', title)
+                        .replace('DESCRIPTION_PLACEHOLDER', description)
+                        .replace('REMINDER_ID_PLACEHOLDER', reminder.id);
+                    
+                    popupContainer.insertAdjacentHTML('beforeend', popupHtml);
+                    }
+                });
 
+                // Initialize popup functionality
+                const popups = document.querySelectorAll('.popup-alert');
+                // updatePopupVisibility();
+            }
+        } else {
+            console.log("No reminders found or empty response");
+        }
+    })
+    .catch(error => {
+        console.error('Failed to fetch reminders:', error);
+    });
+}
+
+// Add the event listener when DOM is loaded
+document.addEventListener("DOMContentLoaded", function() {
+    interval = setInterval(getReminders, 10000); //every 10 seconds it will check for reminders
+});
+
+function delete_fcm_reminders(reminder_id) {
+    const fcmToken = "<?php echo $_SESSION['fcm_token']; ?>";
+    console.log("FCM Token for reminders:", fcmToken);
+    if(reminder_id){
+    fetch('?api=delete_fcm_reminders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fcm_token: fcmToken,reminder_id:reminder_id })
+    }); }
+}
     </script>
 
 
@@ -3137,7 +3272,39 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
     <?php endif; ?>
     <!-- Pusher -->
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    <div class="popup-container">
+    </div>
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
+    const popups = document.querySelectorAll(".popup-alert");
 
+    function updatePopupVisibility() {
+        popups.forEach((popup, index) => {
+            // if (index < 3) {
+            //     popup.classList.remove("hidden");
+            // } else {
+            //     popup.classList.add("hidden");
+            // }
+        });
+    }
+
+
+    updatePopupVisibility(); // Ensure only 3 popups are shown initially
+});
+function closePopup(button) {
+    let popup = button.parentElement;
+    popup.remove(); // Remove the closed popup
+
+    // Show next hidden popup if available
+    setTimeout(() => {
+        delete_fcm_reminders(popup.dataset.reminderId);
+        let hiddenPopups = document.querySelectorAll(".popup-alert.hidden");
+        if (hiddenPopups.length > 0) {
+            hiddenPopups[0].classList.remove("hidden");
+        }
+    }, 300); // Small delay to create a smooth transition
+}
+</script>
 </body>
 
 </html>

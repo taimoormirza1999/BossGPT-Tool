@@ -242,7 +242,23 @@ if (isset($_GET['api'])) {
                     ]);
                 }
                 exit;
-
+                case 'get_fcm_reminders':
+                    $data = json_decode(file_get_contents("php://input"), true);
+                    $fcm_token = $data['fcm_token'];
+                    $stmt = $db->prepare("SELECT * FROM fcm_reminders_temp WHERE fcm_token = ?");
+                    $stmt->execute([$fcm_token]);
+                    $reminders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    $response = ['success' => true, 'reminders' => $reminders];
+                    break;
+                case 'delete_fcm_reminders':
+                    $data = json_decode(file_get_contents("php://input"), true);
+                    $fcm_token = $data['fcm_token'];
+                    $id = $data['reminder_id'];
+                    $stmt = $db->prepare("DELETE FROM fcm_reminders_temp WHERE fcm_token = ? and id = ?");
+                    $stmt->execute([$fcm_token, $id]);
+                    $reminders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    $response = ['success' => true, 'reminders' => $reminders];
+                    break;
 
             case 'get_users':
                 $stmt = $db->query("SELECT id, username, email FROM users ORDER BY username ASC");
