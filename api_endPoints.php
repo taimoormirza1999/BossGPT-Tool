@@ -125,6 +125,11 @@ if (isset($_GET['api'])) {
                     $data['task_id'],
                     $data['status']
                 );
+                
+                // Update plant growth in the garden
+                $gardenManager = new GardenManager();
+                $gardenManager->updatePlantStage($data['task_id'], $data['status']);
+                
                 $response = ['success' => true];
                 break;
 
@@ -242,24 +247,24 @@ if (isset($_GET['api'])) {
                     ]);
                 }
                 exit;
-                case 'get_fcm_reminders':
-                    $data = json_decode(file_get_contents("php://input"), true);
-                    $fcm_token = $data['fcm_token'];
-                    $stmt = $db->prepare("SELECT * FROM fcm_reminders_temp WHERE fcm_token = ?");
-                    $stmt->execute([$fcm_token]);
-                    $reminders = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                    $response = ['success' => true, 'reminders' => $reminders];
-                    break;
-                case 'delete_fcm_reminders':
-                    $data = json_decode(file_get_contents("php://input"), true);
-                    $fcm_token = $data['fcm_token'];
-                    $id = $data['reminder_id'];
-                    $stmt = $db->prepare("DELETE FROM fcm_reminders_temp WHERE fcm_token = ? and id = ?");
-                    $stmt->execute([$fcm_token, $id]);
-                    $reminders = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                    $response = ['success' => true, 'reminders' => $reminders];
-                    break;
 
+            case 'get_fcm_reminders':
+                $data = json_decode(file_get_contents("php://input"), true);
+                $fcm_token = $data['fcm_token'];
+                $stmt = $db->prepare("SELECT * FROM fcm_reminders_temp WHERE fcm_token = ?");
+                $stmt->execute([$fcm_token]);
+                $reminders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $response = ['success' => true, 'reminders' => $reminders];
+                break;
+            case 'delete_fcm_reminders':
+                $data = json_decode(file_get_contents("php://input"), true);
+                $fcm_token = $data['fcm_token'];
+                $id = $data['reminder_id'];
+                $stmt = $db->prepare("DELETE FROM fcm_reminders_temp WHERE fcm_token = ? and id = ?");
+                $stmt->execute([$fcm_token, $id]);
+                $reminders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $response = ['success' => true, 'reminders' => $reminders];
+                break;
             case 'get_users':
                 $stmt = $db->query("SELECT id, username, email FROM users ORDER BY username ASC");
                 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -533,6 +538,10 @@ if (isset($_GET['api'])) {
                         'message' => "Error: " . $e->getMessage()
                     ];
                 }
+
+                $gardenManager = new GardenManager();
+                $taskSize = isset($data['size']) ? $data['size'] : 'medium'; // Default to medium if size not specified
+                $gardenManager->plantSeed($task_id, $_SESSION['user_id'], $taskSize);
 
                 $response = ['success' => true, 'task_id' => $task_id];
                 break;

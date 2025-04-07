@@ -237,8 +237,12 @@ function initializeChatLoading() {
       }
 
       body.dark-mode .chat-loading-container {
-          background: #3a3b3c;
+          background: var(--bs-primary-darkpurple-linear-gradient);
           box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+          border: 1px solid rgba(211, 211, 211, 0.5);
+    border-radius: 16px;
+    backdrop-filter: blur(8px);
+    color: #e4e6eb;
       }
 
       .chat-loading-avatar {
@@ -255,7 +259,7 @@ function initializeChatLoading() {
       }
 
       body.dark-mode .chat-loading-avatar {
-       background-color: rgba(194, 194, 194, 0.2);
+       background: var(--bs-primary-darkpurple-linear-gradient);
 backdrop-filter: blur(8px);
           color: #fff;
           
@@ -340,11 +344,11 @@ document.addEventListener('DOMContentLoaded', function() {
         margin-bottom: 1.5rem;
        padding: 0.8rem;
     transition: all 0.3s ease;
-    background: rgba(124, 124, 124, 0.2);
+    background: var(--bs-primary-darkpurple-linear-gradient);
     border: 1px solid rgba(211, 211, 211, 0.5);
-    width: 5rem;
     border-radius: 50%;
-    height: 5rem;
+    width: 5.5rem;
+    height: 5.5rem;
     margin:auto;
     }
   
@@ -510,8 +514,6 @@ function updateNotificationDropdown(notifications) {
             }
             .dark-mode .dropdown-item {
                 color: #e1e1e1;
-                // border-color: #2d2d2d !important;
-                // background-color: #1a1a1a !important;
             }
             .dark-mode .dropdown-item:hover {
                 // background-color: #2d2d2d !important;
@@ -525,18 +527,15 @@ function updateNotificationDropdown(notifications) {
                border-bottom: 0.3rem #d3d4d5 solid;
             }
             .dark-mode .notification-text {
-                color: #e1e1e1 !important;
+               color: rgba(131, 131, 131, 1);
+               white-space: normal;
             }
             .dark-mode .text-muted {
                 color: #a0a0a0 !important;
             }
-            .dark-mode-success { background-color: rgba(25, 135, 84, 0.35) !important;  }
-            .dark-mode-info { background-color: rgba(13, 202, 240, 0.35) !important; }
-            .dark-mode-primary { background-color: rgba(13, 110, 253,.35) !important; }
-            .dark-mode-warning { background-color: rgba(255, 193, 7, 0.35) !important; }
-            .dark-mode-secondary { background-color: rgba(108, 117, 125, 0.35) !important; }
+            
             .dark-mode .notification-icon {
-                background-color: rgba(255, 255, 255, 0.15) !important;
+               background: linear-gradient(145.32deg, #240121 -14.49%, #8A047F 82.49%);¸
             }
             .dark-mode .dropdown-menu {
                 // background-color: #1a1a1a !important;
@@ -544,17 +543,14 @@ function updateNotificationDropdown(notifications) {
                 // border-width: 0.25rem !important;
             }
             #notificationDropdownMenu.dropdown-menu {
-                border-width: 0.25rem !important;
-                border-radius: 0.5rem !important;
-                background: rgba(255, 255, 255, 0.1);
-border: 1px solid rgba(211, 211, 211, 0.5);
-backdrop-filter: blur(14.3px);
+               background: rgba(255, 255, 255, 0.8);
+backdrop-filter: blur(3.1px);
+border-radius: 12px;
+width: 300px;
                 
             }
 
             #notificationDropdownMenu.dark-mode .dropdown-menu {
-                // background-color: #1a1a1a !important;
-                // border-color: #2d2d2d !important;
                 border-width: 0.25rem !important;
             }
             .dark-mode .dropdown-item:active,
@@ -582,7 +578,7 @@ backdrop-filter: blur(14.3px);
         const icon = getNotificationIcon(notification.action_type);
 
         return `
-                <div class="dropdown-item border-bottom py-3">
+                <div class="dropdown-item border-bottom pt-2">
                     <div class="d-flex align-items-start">
                         <div class="notification-icon ${
                           isDarkMode
@@ -595,16 +591,16 @@ backdrop-filter: blur(14.3px);
                         </div>
                         <div class="flex-grow-1">
                             <div class="d-flex justify-content-between align-items-center mb-1">
-                                <span class="badge ${
+                                <span class="title-notification ${
                                   isDarkMode
                                     ? actionType.darkBgColor
                                     : actionType.bgColor
                                 } ${
           actionType.textColor
-        } rounded-pill px-3 py-1" >
+               } rounded-pill" >
                                     ${actionType.text}
                                 </span>
-                                <small class="text-muted" style="font-size: 0.75rem;">
+                                 <small class=" notification-time" style="font-size: 0.75rem;">
                                     ${timeAgo}
                                 </small>
                             </div>
@@ -664,7 +660,7 @@ function appendNotification(notification) {
   const icon = getNotificationIcon(notification.action_type);
 
   const newNotification = `
-  <div class="dropdown-item border-bottom py-3">
+  <div class="dropdown-item border-bottom py-1">
       <div class="d-flex align-items-start">
           <div class="notification-icon ${isDarkMode ? actionType.darkBgColor : actionType.bgColor} rounded-circle me-3"
               style="padding:0.6rem 0.8rem !important;">
@@ -720,3 +716,17 @@ function initPusher(currentProject) {
   });
 }
 
+// Handle prompt button clicks
+document.addEventListener('DOMContentLoaded', function() {
+  const promptButtons = document.querySelectorAll('.prompt-btn');
+  const messageInput = document.getElementById('messageInput');
+
+  promptButtons.forEach(button => {
+      button.addEventListener('click', function() {
+          // Get the text without the emoji
+          const promptText = this.textContent.replace(/^[^\w\s]+ /, '');
+          messageInput.value = promptText;
+          messageInput.focus();
+      });
+  });
+});

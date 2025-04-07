@@ -1,15 +1,17 @@
 <?php
 require './vendor/autoload.php';
 //Added to load the environment variables
-// require_once 'env.php';
+// error_reporting(E_ALL);
+// ini_set('display_errors', 1);
 require_once './classes/UserManager.php';
 require_once './classes/Notification.php';
 require_once './classes/NotificationManager.php';
+require_once './classes/GardenManager.php';
 use Dotenv\Dotenv;
 
 // // Load environment variables
 $dotenv = Dotenv::createImmutable(__DIR__);
-session_start();
+
 // Added to persist the login cookie for one year
 session_set_cookie_params(60 * 60 * 24 * 365);
 ini_set('session.gc_maxlifetime', 60 * 60 * 24 * 365);
@@ -20,7 +22,7 @@ ini_set('display_errors', $_ENV['DISPLAY_ERRORS']);
 ini_set('log_errors', 0);
 ini_set('error_log', 'error.log');
 error_reporting(E_ALL);
-require_once './config/constants.php';
+require_once 'config/constants.php';
 ob_start();
 // Database Class
 
@@ -128,7 +130,7 @@ require_once './api_endPoints.php';
     <!-- Initialize user ID for project management -->
     <script>
         window.userId = <?php echo isset($_SESSION['user_id']) ? json_encode($_SESSION['user_id']) : 'null'; ?>;
-        // console.log('User ID initialized:', window.userId)\;
+
     </script>
     <!-- Custom js -->
     <script src="./assets/js/custom.js"></script>
@@ -186,7 +188,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 ?>
 
 <body
-style="background-image: url('https://trello-backgrounds.s3.amazonaws.com/53baf533e697a982248cd73f/2048x2048/22ec03aab9d36ea49139c569a62bb079/shutterstock_134707556.jpg'); background-size: cover; background-position: top; background-repeat: no-repeat; background-attachment: fixed; background-color:<?php echo isset($_GET['page']) && ($_GET['page'] == 'login' || $_GET['page'] == 'register') ? '#000' : ''; ?> ">
+    style="background-image: url('https://trello-backgrounds.s3.amazonaws.com/53baf533e697a982248cd73f/2048x2048/22ec03aab9d36ea49139c569a62bb079/shutterstock_134707556.jpg'); background-size: cover; background-position: top; background-repeat: no-repeat; background-attachment: fixed; background-color:<?php echo isset($_GET['page']) && ($_GET['page'] == 'login' || $_GET['page'] == 'register') ? '#000' : ''; ?> ">
     <?php
     $auth = new Auth();
 
@@ -228,6 +230,11 @@ style="background-image: url('https://trello-backgrounds.s3.amazonaws.com/53baf5
                             <a class="nav-link <?= $page === 'dashboard' ? 'active' : '' ?>"
                                 href="?page=dashboard">Dashboard</a>
                         </li> -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="garden.php">
+                                <i class="bi bi-tree"></i> My Garden
+                            </a>
+                        </li>
                     </ul>
                     <div class="d-flex align-items-center">
 
@@ -265,7 +272,7 @@ style="background-image: url('https://trello-backgrounds.s3.amazonaws.com/53baf5
                             <div class="dropdown-menu dropdown-menu" id="notificationDropdownMenu"
                                 aria-labelledby="notificationDropdown"
                                 style="min-width: 300px; max-height: 400px; overflow-y: auto;">
-                               
+
                                 <div class="notification-list">
                                     <div class="dropdown-item text-center">No notification found 🎉 </div>
                                 </div>
@@ -318,6 +325,10 @@ style="background-image: url('https://trello-backgrounds.s3.amazonaws.com/53baf5
             case 'dashboard':
                 include_dashboard();
                 break;
+            case 'garden_stats':
+                // Redirect to dashboard since we now use a modal for garden stats
+                header('Location: ?page=dashboard');
+                exit;
             default:
                 echo "<h1>404 - Page Not Found</h1>";
         }
@@ -414,66 +425,37 @@ style="background-image: url('https://trello-backgrounds.s3.amazonaws.com/53baf5
             </div>
         <?php }
 
+      
         function include_dashboard()
         {
             ?>
             <?php $projectManager = new ProjectManager();
             $projects = $projectManager->getProjects($_SESSION['user_id']);
-
-            // Display welcome message if set
-            if (isset($_SESSION['welcome_message'])) {
-                echo "<script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        Toast('success', 'Welcome', '" . htmlspecialchars($_SESSION['welcome_message']) . "');
-                    });
-                </script>";
-                unset($_SESSION['welcome_message']); // Clear the message after displaying
+            $gardenManager = new GardenManager();
+            
+            try {
+                $allPlants = $gardenManager->getUserGarden($_SESSION['user_id']);
+                
+                // Map 'lush_tree' to 'tree' for consistency
+                $allPlants = array_map(function($plant) {
+                    if ($plant['stage'] == 'lush_tree') {
+                        $plant['stage'] = 'tree';
+                    }
+                    if ($plant['stage'] == 'seed') {
+                        $plant['stage'] = 'sprout';
+                    }
+                    return $plant;
+                }, $allPlants);
+                
+            } catch (Exception $e) {
+                $allPlants = [];
             }
+            
             ?>
-            <!-- Replace the existing row div with this new layout -->
+
             <div class="container-fluid pb-3">
                 <!-- New Tab Navigation -->
-                <div class="nav-container row justify-content-between nav-background"
-                    style="background-color: var(--bs-primary-dark60percent); ">
-                    <div class="col-md-6 d-flex justify-content-between align-items-center self-center">
-                        <h4 class="text-capitalize font-weight-normal d-flex align-items-center"
-                            style="font-size: 1.83rem;">
-                            <span style="color: var(--bs-primary-white55percent);">Welcome, </span> <span
-                                class=" text-capitalize" style="color: var(--bs-primary-white); font-size: 1.43rem;">
-                                &nbsp;<?php echo $_SESSION['username']; ?>&nbsp;</span>&nbsp;👋
-                        </h4>
-                    </div>
-                    <ul class="col-md-6 nav nav-tabs mb-0 d-flex justify-content-end align-items-center" id="projectTabs"
-                        style="width: auto; ">
-                        <li class="nav-item">
-                            <button type="button" class="btn btn-sm btn-main-primary" data-bs-toggle="modal"
-                                data-bs-target="#assignUserModal">
-                                <i class="bi bi-person-plus"></i> Invite User
-                            </button>
-                        </li>
-                        <li class="nav-item">
-                            <button type="button" class="btn btn-sm btn-main-primary" data-bs-toggle="modal"
-                                data-bs-target="#activityLogModal">
-                                <i class="bi bi-clock-history"></i> Activity Log
-                            </button>
-                        </li>
-                        <?php if (TESTING_FEATURE == 1): ?>
-                            <li class="nav-item">
-
-                                <button type="button" class="btn btn-sm btn-info" onclick='sendWelcomeEmailTest()'>
-                                    <i class="bi bi-clock-history"></i> Testing Feature
-                                </button>
-                            </li>
-                        <?php endif; ?>
-                        <li class="nav-item">
-                            <button type="button" class="btn btn-main-primary" data-bs-toggle="modal"
-                                data-bs-target="#newProjectModal">
-                                <i class="bi bi-plus"></i> New Project
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-
+                <?php require_once 'components/navigation.php'; ?>
                 <!-- Main Content Area -->
                 <div class="row sides-padding " style="width: 100%!important;">
                     <!-- Tasks Panel (Board) - now spans 9 columns -->
@@ -495,11 +477,16 @@ style="background-image: url('https://trello-backgrounds.s3.amazonaws.com/53baf5
                                     </ul>
                                 </div>
 
-
+                                <div class="d-flex align-items-end">
                                 <button type="button" class="btn btn-sm btn-main-primary me-2" data-bs-toggle="modal"
                                     data-bs-target="#newTaskModal">
                                     <i class="bi bi-plus"></i> Create New Task
                                 </button>
+                                <button type="button" class="btn btn-sm btn-main-primary me-2" data-bs-toggle="modal"
+                                    data-bs-target="#gardenStatsModal">
+                                    <i class="bi bi-tree"></i> My Garden Stats
+                                </button>
+                                </div>
 
                             </div>
                             <div class="card-body pb-0">
@@ -534,253 +521,7 @@ style="background-image: url('https://trello-backgrounds.s3.amazonaws.com/53baf5
                     </div>
 
                     <!-- Chat Panel - now spans 3 columns -->
-                    <div class="col-md-3">
-                        <div class="card" style="background-color: transparent!important;">
-                            <div class="card-header" style="
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    /* align-items: center; */
-    padding: 12px 13px;
-    gap: 10px;
-    border-bottom: 0.5px solid;
-">
-                                <h5 class="mb-0"><?php echo getIconImage(0, 0, "2.5rem","auto","https://res.cloudinary.com/da6qujoed/image/upload/v1742656707/logoIcon_pspxgh.png",0); ?> &nbsp; Boss<span
-                                style="font-weight: 700;">GPT</span> Assistant </h5>
-                            </div>
-                            <div class="card-body p-0">
-                                <div class="chat-container">
-                                    <div class="chat-messages" id="chatMessages">
-                                        <?php if (empty($projects)): ?>
-                                            <div class="welcome-guide">
-                                                <div class="message-thread" id="welcomeThread">
-                                                    <!-- Messages will be inserted here by JavaScript -->
-                                                </div>
-                                            </div>
-
-                                            <script>
-                                                // Immediately invoke function to initialize welcome messages
-                                                (function initializeWelcomeMessages() {
-                                                    // console.log('Initializing welcome messages...'); // Debug log
-
-                                                    const welcomeThread = document.getElementById('welcomeThread');
-                                                    const chatMessages = document.getElementById('chatMessages');
-
-                                                    if (!welcomeThread || !chatMessages) {
-                                                        console.error('Required elements not found!');
-                                                        return;
-                                                    }
-
-                                                    const welcomeMessages = [
-                                                        {
-                                                            delay: 0,
-                                                            title: '👋 Welcome to BossGPT!',
-                                                            content: "I'm your AI Project Manager, ready to help you organize and manage your projects efficiently."
-                                                        },
-                                                        {
-                                                            delay: 2000,
-                                                            title: '🚀 Let\'s Get Started!',
-                                                            content: {
-                                                                text: "To begin your journey, click the \"Create New Project\" button above. Here's what I can help you with:",
-                                                                list: [
-                                                                    '✨ Project planning and organization',
-                                                                    '📋 Task management and tracking',
-                                                                    '👥 Team collaboration',
-                                                                    '📊 Progress monitoring'
-                                                                ]
-                                                            }
-                                                        },
-                                                        {
-                                                            delay: 4000,
-                                                            title: '💡 How I Can Help',
-                                                            content: {
-                                                                text: 'Once you create a project, I can:',
-                                                                list: [
-                                                                    '🤖 Generate task suggestions based on your project needs',
-                                                                    '📅 Help manage deadlines and priorities',
-                                                                    '🔍 Provide insights and recommendations',
-                                                                    '💬 Answer questions about your project anytime'
-                                                                ]
-                                                            }
-                                                        },
-                                                        {
-                                                            delay: 6000,
-                                                            title: '🎯 Next Steps',
-                                                            content: {
-                                                                text: 'To get the most out of BossGPT:',
-                                                                list: [
-                                                                    'Click "Create New Project" and give your project a name',
-                                                                    'Describe your project goals and requirements',
-                                                                    'I\'ll help you break it down into manageable tasks',
-                                                                    'Invite team members to collaborate'
-                                                                ],
-                                                                isOrdered: true
-                                                            }
-                                                        },
-                                                        {
-                                                            delay: 8000,
-                                                            title: '🌟 Ready to Begin?',
-                                                            content: {
-                                                                text: 'Create your first project and let\'s make something amazing together!',
-                                                                cta: true
-                                                            }
-                                                        }
-                                                    ];
-
-                                                    async function showMessage(message) {
-
-                                                        // Show loading animation first
-                                                        showChatLoading();
-
-                                                        // Wait for loading animation
-                                                        await new Promise(resolve => setTimeout(resolve, 1500));
-
-                                                        // Hide loading animation
-                                                        hideChatLoading();
-                                                        appendWelcomeLogo();
-                                                        // Create the message div
-                                                        const messageDiv = document.createElement('div');
-                                                        messageDiv.className = aiMessageClasses;
-                                                        messageDiv.style.opacity = "0";  // Start invisible
-                                                        messageDiv.style.transition = "opacity 0.5s ease-in-out"; // Smooth transition
-
-                                                        let content = `
-        <div class="ai-avatar">
-            <div class="chat-loading-avatar">
-            ${iconImage}
-            </div>
-        </div>
-        <div class="message ai text-center mt-3">
-            <h5>${message.title}</h5>`;
-
-                                                        if (typeof message.content === 'string') {
-                                                            content += `<p>${message.content}</p>`;
-                                                        } else {
-                                                            content += `<p>${message.content.text}</p>`;
-                                                            if (message.content.list) {
-                                                                const listType = message.content.isOrdered ? 'ol' : 'ul';
-                                                                content += `<${listType}>`;
-                                                                message.content.list.forEach(item => {
-                                                                    content += `<li>${item}</li>`;
-                                                                });
-                                                                content += `</${listType}>`;
-                                                            }
-                                                            if (message.content.cta) {
-                                                                content += `
-                <div class="cta-message">
-                    <button class="btn btn-main-primary" onclick="openNewProjectModal()">
-                        <i class="fas fa-plus-circle"></i> Create New Project
-                    </button>
-                </div>`;
-                                                            }
-                                                        }
-
-                                                        content += '</div>';
-                                                        messageDiv.innerHTML = content;
-                                                        welcomeThread?.appendChild(messageDiv);
-
-                                                        // Apply fade-in effect
-                                                        setTimeout(() => {
-                                                            messageDiv.style.opacity = "1";
-                                                        }, 100);
-
-                                                        // Scroll to bottom smoothly
-                                                        chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: "smooth" });
-                                                    }
-
-
-                                                    async function displayMessages() {
-                                                        for (const message of welcomeMessages) {
-                                                            await new Promise(resolve => setTimeout(resolve, message.delay));
-                                                            await showMessage(message);
-                                                        }
-                                                    }
-
-                                                    displayMessages().catch(error => console.error('Error displaying messages:', error));
-                                                })();
-                                            </script>
-                                        <?php endif; ?>
-                                    </div>
-                                    <div class="chat-input">
-                                    <?php
-
-
-$prompts = [
-    "🎯 Create task 'Your Task' and assign it to myself",
-    "📋 Create tasks for Your Feature",
-    "✏️ Move task #number to in_progress",
-    "👥 Assign task 'Your Task' to @name",
-    "📅 Set deadline for task #number to next Friday",
-    "📝 Update description of task 'Your Task'",
-    "🔄 Mark task #number as completed",
-    "📊 Show project progress",
-    "📑 List all tasks in current project",
-    "🔍 Show tasks assigned to me"
-];
-
-function renderPromptButtons($prompts) {
-    foreach ($prompts as $prompt) {
-        echo '<button style="border-radius: 20px!important;" class="btn btn-outline-light  prompt-btn" type="button" onclick="handlePromptClick(this)">' . $prompt . '</button>';
-    }
-}
-?>
-
-<!-- Prompt suggestions -->
-<div class="prompt-suggestions">
-    <div class="nav nav-tabs border-0 flex-nowrap overflow-auto mb-0 px-0" style="scrollbar-width: none; -ms-overflow-style: none;">
-        <?php renderPromptButtons($prompts); ?>
-    </div>
-</div>
-
-
-                                        <form id="chatForm" class="d-flex">
-                                        <textarea class="form-control me-2" id="messageInput"
-                                                placeholder="Type your message..." rows="1"></textarea>
-                                            <button type="submit" id="aiSendMessageBtn"
-                                                class="btn btn-send-primary"><?php echo file_get_contents("assets/icons/send.svg"); ?>
-                                            </button>
-                                        </form>
-                                        <script>
-// Auto-resize textarea as user types
-const messageInput = document.getElementById('messageInput');
-if (messageInput) {
-    messageInput.addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = (this.scrollHeight) + 'px';
-    });
-
-    // Reset height when form is submitted
-    document.getElementById('chatForm').addEventListener('submit', function() {
-        setTimeout(() => {
-            // messageInput.style.height = 'auto';
-        }, 100);
-    });
-}
-
-function handlePromptClick(button) {
-    let promptText = button.innerText;
-    let inputField = document.getElementById("messageInput");
-    let aiSendMessageBtn=document.getElementById("aiSendMessageBtn");
-
-    // Set input field value
-    inputField.value = promptText;
-
-    // Trigger the input event to resize the textarea
-    const inputEvent = new Event('input', { bubbles: true });
-    inputField.dispatchEvent(inputEvent);
-
-    // Auto-submit the form
-    setTimeout(() => {
-        // aiSendMessageBtn.click();
-        // chatForm.submit();
-    }, 200); // Small delay to make it smooth
-}
-</script>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <?php require_once 'components/chat_pannel.php'; ?>
                 </div>
             </div>
 
@@ -1143,17 +884,591 @@ function handlePromptClick(button) {
                     </div>
                 </div>
             </div>
+
+            <!-- Garden Stats Modal -->
+            <div class="modal fade" id="gardenStatsModal" tabindex="-1" aria-labelledby="gardenStatsModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-xl">
+                    <div class="modal-content">
+                        <!-- Loading overlay removed as requested -->
+                        
+                        <div class="modal-header text-white border-0 rounded-t-lg">
+                            <h5 class="modal-title" id="gardenStatsModalLabel">Garden Statistics</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" id="closeGardenStats"></button>
+                        </div>
+                        
+                        <div class="modal-body p-0">
+                            <ul class="nav nav-pills mb-3 p-3" id="garden-stats-tabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="garden-all-tab" data-bs-toggle="pill" data-bs-target="#garden-all" type="button" role="tab">All Projects</button>
+                                </li>
+                                <?php foreach ($projects as $project): ?>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="garden-project-<?= $project['id'] ?>-tab" data-bs-toggle="pill" 
+                                            data-bs-target="#garden-project-<?= $project['id'] ?>" type="button" role="tab">
+                                        <?= htmlspecialchars($project['title']) ?>
+                                    </button>
+                                </li>
+                                <?php endforeach; ?>
+                            </ul>
+                            <div class="tab-content p-3" id="garden-stats-content">
+                                <!-- All Projects Tab -->
+                                <div class="tab-pane fade show active" id="garden-all" role="tabpanel">
+                                    <?php
+                                    $plants = $allPlants;
+                                    $completedPlants = array_filter($plants, function($p) { return $p['stage'] == 'tree'; });
+                                    $growingPlants = array_filter($plants, function($p) { return $p['stage'] == 'growing'; });
+                                    $sproutPlants = array_filter($plants, function($p) { return $p['stage'] == 'sprout'; });
+                                    $deadPlants = array_filter($plants, function($p) { return $p['stage'] == 'dead'; });
+                                    
+                                    // Group plants by task status
+                                    $plantsByStatus = [
+                                        'todo' => [],
+                                        'in_progress' => [],
+                                        'done' => [],
+                                        'deleted' => []
+                                    ];
+                                    
+                                    foreach ($plants as $plant) {
+                                        $status = $plant['task_status'] ?? 'unknown';
+                                        if (isset($plantsByStatus[$status])) {
+                                            $plantsByStatus[$status][] = $plant;
+                                        }
+                                    }
+                                    ?>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-12 mb-4">
+                                            <div class="card border-0 shadow-sm">
+                                                <div class="card-body">
+                                                    <div class="d-flex justify-content-between text-center mb-4">
+                                                        <div class="garden-stat-item">
+                                                            <div class="garden-icon">🌱</div>
+                                                            <div class="garden-count"><?= count($sproutPlants) ?></div>
+                                                            <div class="garden-label">Seeds</div>
+                                                        </div>
+                                                        <div class="garden-stat-item">
+                                                            <div class="garden-icon">🌿</div>
+                                                            <div class="garden-count"><?= count($growingPlants) ?></div>
+                                                            <div class="garden-label">Growing</div>
+                                                        </div>
+                                                        <div class="garden-stat-item">
+                                                            <div class="garden-icon">🌳</div>
+                                                            <div class="garden-count"><?= count($completedPlants) ?></div>
+                                                            <div class="garden-label">Flourishing</div>
+                                                        </div>
+                                                        <div class="garden-stat-item">
+                                                            <div class="garden-icon">🥀</div>
+                                                            <div class="garden-count"><?= count($deadPlants) ?></div>
+                                                            <div class="garden-label">Dead</div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <?php if (count($plants) > 0): ?>
+                                                        <div class="progress mb-3" style="height: 20px; border-radius: 10px;">
+                                                            <div class="progress-bar bg-success" role="progressbar" 
+                                                                style="width: <?= round(count($completedPlants) / count($plants) * 100) ?>%" 
+                                                                title="Flourishing: <?= count($completedPlants) ?>">
+                                                                <?= round(count($completedPlants) / count($plants) * 100) ?>%
+                                                            </div>
+                                                            <div class="progress-bar bg-warning" role="progressbar" 
+                                                                style="width: <?= round(count($growingPlants) / count($plants) * 100) ?>%"
+                                                                title="Growing: <?= count($growingPlants) ?>">
+                                                                <?= round(count($growingPlants) / count($plants) * 100) ?>%
+                                                            </div>
+                                                            <div class="progress-bar bg-info" role="progressbar" 
+                                                                style="width: <?= round(count($sproutPlants) / count($plants) * 100) ?>%"
+                                                                title="Seeds: <?= count($sproutPlants) ?>">
+                                                                <?= round(count($sproutPlants) / count($plants) * 100) ?>%
+                                                            </div>
+                                                            <div class="progress-bar bg-danger" role="progressbar" 
+                                                                style="width: <?= round(count($deadPlants) / count($plants) * 100) ?>%"
+                                                                title="Dead: <?= count($deadPlants) ?>">
+                                                                <?= round(count($deadPlants) / count($plants) * 100) ?>%
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <h6 class="mb-3">Garden Stats</h6>
+                                                                <table class="table table-sm">
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td>Total Plants:</td>
+                                                                            <td class="text-end"><strong><?= count($plants) ?></strong></td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>Tasks Completed:</td>
+                                                                            <td class="text-end"><strong><?= count($plantsByStatus['done']) ?></strong></td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>Tasks In Progress:</td>
+                                                                            <td class="text-end"><strong><?= count($plantsByStatus['in_progress']) ?></strong></td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>Tasks Pending:</td>
+                                                                            <td class="text-end"><strong><?= count($plantsByStatus['todo']) ?></strong></td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>Garden Health:</td>
+                                                                            <td class="text-end"><strong><?php 
+                                                                                $health = count($plants) > 0 ? 
+                                                                                    round(((count($completedPlants) + count($growingPlants)) / count($plants)) * 100) : 0;
+                                                                                echo $health . '%';
+                                                                            ?></strong></td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <h6 class="mb-3">Achievements</h6>
+                                                                <div class="d-flex flex-wrap">
+                                                                    <?php if (count($plants) >= 5): ?>
+                                                                        <div class="badge bg-primary p-2 m-1">
+                                                                            🌱 Garden Starter
+                                                                        </div>
+                                                                    <?php endif; ?>
+                                                                    
+                                                                    <?php if (count($completedPlants) >= 3): ?>
+                                                                        <div class="badge bg-success p-2 m-1">
+                                                                            🌳 Forest Creator
+                                                                        </div>
+                                                                    <?php endif; ?>
+                                                                    
+                                                                    <?php if (count(array_filter($completedPlants, function($p) { return $p['size'] == 'large'; })) >= 1): ?>
+                                                                        <div class="badge bg-info p-2 m-1">
+                                                                            🌲 Project Completer
+                                                                        </div>
+                                                                    <?php endif; ?>
+                                                                    
+                                                                    <?php if (count($plants) == 0): ?>
+                                                                        <div class="alert alert-warning w-100">Complete tasks to earn achievement badges!</div>
+                                                                    <?php endif; ?>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    <?php else: ?>
+                                                        <div class="alert alert-info text-center">
+                                                            Your garden is empty. Start completing tasks to grow your garden!
+                                                        </div>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <?php if (count($plants) > 0): ?>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="card border-0 shadow-sm">
+                                                <div class="card-header bg-dark text-white">
+                                                    <h6 class="mb-0">Your Plants</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-striped table-bordered">
+                                                            <thead class="table-dark">
+                                                                <tr>
+                                                                    <th>Project</th>
+                                                                    <th>Task</th>
+                                                                    <th>Plant Type</th>
+                                                                    <th>Growth Stage</th>
+                                                                    <th>Size</th>
+                                                                    <th>Status</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <?php foreach ($plants as $plant): ?>
+                                                                    <tr>
+                                                                        <td><?= htmlspecialchars($plant['project_title'] ?? 'No Project') ?></td>
+                                                                        <td><?= htmlspecialchars($plant['task_title'] ?? 'Unnamed Task') ?></td>
+                                                                        <td><?= htmlspecialchars($plant['plant_type'] ?? 'Unknown') ?></td>
+                                                                        <td>
+                                                                            <?php 
+                                                                                $stageIcons = [
+                                                                                    'sprout' => '🌱',
+                                                                                    'growing' => '🌿',
+                                                                                    'tree' => '🌳',
+                                                                                    'dead' => '🥀'
+                                                                                ];
+                                                                                echo ($stageIcons[$plant['stage']] ?? '') . ' ' . ucfirst($plant['stage'] ?? 'Unknown');
+                                                                            ?>
+                                                                        </td>
+                                                                        <td><?= ucfirst($plant['size'] ?? 'Unknown') ?></td>
+                                                                        <td>
+                                                                            <?php
+                                                                                $statusBadges = [
+                                                                                    'todo' => '<span class="badge bg-secondary">To Do</span>',
+                                                                                    'in_progress' => '<span class="badge bg-warning">In Progress</span>',
+                                                                                    'done' => '<span class="badge bg-success">Completed</span>',
+                                                                                    'deleted' => '<span class="badge bg-danger">Deleted</span>'
+                                                                                ];
+                                                                                echo $statusBadges[$plant['task_status'] ?? 'unknown'] ?? $plant['task_status'] ?? 'Unknown';
+                                                                            ?>
+                                                                        </td>
+                                                                    </tr>
+                                                                <?php endforeach; ?>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php endif; ?>
+                                </div>
+                                
+                                <!-- Project Specific Tabs -->
+                                <?php foreach ($projects as $project): 
+                                    $projectId = $project['id'];
+                                    $projectPlants = array_filter($allPlants, function($p) use ($projectId) { 
+                                        return isset($p['project_id']) && $p['project_id'] == $projectId; 
+                                    });
+                                    
+                                    $projectCompletedPlants = array_filter($projectPlants, function($p) { return $p['stage'] == 'tree'; });
+                                    $projectGrowingPlants = array_filter($projectPlants, function($p) { return $p['stage'] == 'growing'; });
+                                    $projectSproutPlants = array_filter($projectPlants, function($p) { return $p['stage'] == 'sprout'; });
+                                    $projectDeadPlants = array_filter($projectPlants, function($p) { return $p['stage'] == 'dead'; });
+                                    
+                                    // Group plants by task status
+                                    $projectPlantsByStatus = [
+                                        'todo' => [],
+                                        'in_progress' => [],
+                                        'done' => [],
+                                        'deleted' => []
+                                    ];
+                                    
+                                    foreach ($projectPlants as $plant) {
+                                        $status = $plant['task_status'] ?? 'unknown';
+                                        if (isset($projectPlantsByStatus[$status])) {
+                                            $projectPlantsByStatus[$status][] = $plant;
+                                        }
+                                    }
+                                ?>
+                                <div class="tab-pane fade" id="garden-project-<?= $projectId ?>" role="tabpanel">
+                                    <div class="row">
+                                        <div class="col-md-12 mb-4">
+                                            <div class="card border-0 shadow-sm">
+                                                <div class="card-body">
+                                                    <h5 class="mb-3"><?= htmlspecialchars($project['title']) ?> Garden</h5>
+                                                    <div class="d-flex justify-content-between text-center mb-4">
+                                                        <div class="garden-stat-item">
+                                                            <div class="garden-icon">🌱</div>
+                                                            <div class="garden-count"><?= count($projectSproutPlants) ?></div>
+                                                            <div class="garden-label">Seeds</div>
+                                                        </div>
+                                                        <div class="garden-stat-item">
+                                                            <div class="garden-icon">🌿</div>
+                                                            <div class="garden-count"><?= count($projectGrowingPlants) ?></div>
+                                                            <div class="garden-label">Growing</div>
+                                                        </div>
+                                                        <div class="garden-stat-item">
+                                                            <div class="garden-icon">🌳</div>
+                                                            <div class="garden-count"><?= count($projectCompletedPlants) ?></div>
+                                                            <div class="garden-label">Flourishing</div>
+                                                        </div>
+                                                        <div class="garden-stat-item">
+                                                            <div class="garden-icon">🥀</div>
+                                                            <div class="garden-count"><?= count($projectDeadPlants) ?></div>
+                                                            <div class="garden-label">Dead</div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <?php if (count($projectPlants) > 0): ?>
+                                                        <div class="progress mb-3" style="height: 20px; border-radius: 10px;">
+                                                            <div class="progress-bar bg-success" role="progressbar" 
+                                                                style="width: <?= round(count($projectCompletedPlants) / count($projectPlants) * 100) ?>%" 
+                                                                title="Flourishing: <?= count($projectCompletedPlants) ?>">
+                                                                <?= round(count($projectCompletedPlants) / count($projectPlants) * 100) ?>%
+                                                            </div>
+                                                            <div class="progress-bar bg-warning" role="progressbar" 
+                                                                style="width: <?= round(count($projectGrowingPlants) / count($projectPlants) * 100) ?>%"
+                                                                title="Growing: <?= count($projectGrowingPlants) ?>">
+                                                                <?= round(count($projectGrowingPlants) / count($projectPlants) * 100) ?>%
+                                                            </div>
+                                                            <div class="progress-bar bg-info" role="progressbar" 
+                                                                style="width: <?= round(count($projectSproutPlants) / count($projectPlants) * 100) ?>%"
+                                                                title="Seeds: <?= count($projectSproutPlants) ?>">
+                                                                <?= round(count($projectSproutPlants) / count($projectPlants) * 100) ?>%
+                                                            </div>
+                                                            <div class="progress-bar bg-danger" role="progressbar" 
+                                                                style="width: <?= round(count($projectDeadPlants) / count($projectPlants) * 100) ?>%"
+                                                                title="Dead: <?= count($projectDeadPlants) ?>">
+                                                                <?= round(count($projectDeadPlants) / count($projectPlants) * 100) ?>%
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <h6 class="mb-3">Project Garden Stats</h6>
+                                                                <table class="table table-sm">
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td>Total Plants:</td>
+                                                                            <td class="text-end"><strong><?= count($projectPlants) ?></strong></td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>Tasks Completed:</td>
+                                                                            <td class="text-end"><strong><?= count($projectPlantsByStatus['done']) ?></strong></td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>Tasks In Progress:</td>
+                                                                            <td class="text-end"><strong><?= count($projectPlantsByStatus['in_progress']) ?></strong></td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>Tasks Pending:</td>
+                                                                            <td class="text-end"><strong><?= count($projectPlantsByStatus['todo']) ?></strong></td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>Garden Health:</td>
+                                                                            <td class="text-end"><strong><?php 
+                                                                                $health = count($projectPlants) > 0 ? 
+                                                                                    round(((count($projectCompletedPlants) + count($projectGrowingPlants)) / count($projectPlants)) * 100) : 0;
+                                                                                echo $health . '%';
+                                                                            ?></strong></td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <h6 class="mb-3">Project Achievements</h6>
+                                                                <div class="d-flex flex-wrap">
+                                                                    <?php if (count($projectPlants) >= 5): ?>
+                                                                        <div class="badge bg-primary p-2 m-1">
+                                                                            🌱 Garden Starter
+                                                                        </div>
+                                                                    <?php endif; ?>
+                                                                    
+                                                                    <?php if (count($projectCompletedPlants) >= 3): ?>
+                                                                        <div class="badge bg-success p-2 m-1">
+                                                                            🌳 Forest Creator
+                                                                        </div>
+                                                                    <?php endif; ?>
+                                                                    
+                                                                    <?php if (count(array_filter($projectCompletedPlants, function($p) { return $p['size'] == 'large'; })) >= 1): ?>
+                                                                        <div class="badge bg-info p-2 m-1">
+                                                                            🌲 Project Completer
+                                                                        </div>
+                                                                    <?php endif; ?>
+                                                                    
+                                                                    <?php if (count($projectPlants) == 0): ?>
+                                                                        <div class="alert alert-warning w-100">Complete tasks to earn achievement badges!</div>
+                                                                    <?php endif; ?>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    <?php else: ?>
+                                                        <div class="alert alert-info text-center">
+                                                            This project's garden is empty. Start completing tasks to grow your garden!
+                                                        </div>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <?php if (count($projectPlants) > 0): ?>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="card border-0 shadow-sm">
+                                                <div class="card-header bg-dark text-white">
+                                                    <h6 class="mb-0">Project Plants</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-striped table-bordered">
+                                                            <thead class="table-dark">
+                                                                <tr>
+                                                                    <th>Task</th>
+                                                                    <th>Plant Type</th>
+                                                                    <th>Growth Stage</th>
+                                                                    <th>Size</th>
+                                                                    <th>Status</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <?php foreach ($projectPlants as $plant): ?>
+                                                                    <tr>
+                                                                        <td><?= htmlspecialchars($plant['task_title'] ?? 'Unnamed Task') ?></td>
+                                                                        <td><?= htmlspecialchars($plant['plant_type'] ?? 'Unknown') ?></td>
+                                                                        <td>
+                                                                            <?php 
+                                                                                $stageIcons = [
+                                                                                    'sprout' => '🌱',
+                                                                                    'growing' => '🌿',
+                                                                                    'tree' => '🌳',
+                                                                                    'dead' => '🥀'
+                                                                                ];
+                                                                                echo ($stageIcons[$plant['stage']] ?? '') . ' ' . ucfirst($plant['stage'] ?? 'Unknown');
+                                                                            ?>
+                                                                        </td>
+                                                                        <td><?= ucfirst($plant['size'] ?? 'Unknown') ?></td>
+                                                                        <td>
+                                                                            <?php
+                                                                                $statusBadges = [
+                                                                                    'todo' => '<span class="badge bg-secondary">To Do</span>',
+                                                                                    'in_progress' => '<span class="badge bg-warning">In Progress</span>',
+                                                                                    'done' => '<span class="badge bg-success">Completed</span>',
+                                                                                    'deleted' => '<span class="badge bg-danger">Deleted</span>'
+                                                                                ];
+                                                                                echo $statusBadges[$plant['task_status'] ?? 'unknown'] ?? $plant['task_status'] ?? 'Unknown';
+                                                                            ?>
+                                                                        </td>
+                                                                    </tr>
+                                                                <?php endforeach; ?>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php endif; ?>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="garden.php" class="btn btn-primary" id="viewGardenBtn">My Garden</a>
+                            <button type="button" class="btn btn-secondary" id="closeModalBtn">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <style>
+                .garden-stat-item {
+                    padding: 1rem;
+                    text-align: center;
+                    flex: 1;
+                }
+                .garden-icon {
+                    font-size: 2.5rem;
+                    margin-bottom: 0.5rem;
+                }
+                .garden-count {
+                    font-weight: bold;
+                    font-size: 1.8rem;
+                }
+                .garden-label {
+                    font-size: 1rem;
+                    color: #666;
+                }
+            </style>
+            
+            <script>
+                // Add a button to trigger garden stats modal in the navbar
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Clean up any remnants of previous modals
+                    $('.modal-backdrop').remove();
+                    $('body').removeClass('modal-open');
+                    $('body').css('padding-right', '');
+                    $('.modal').removeClass('show');
+                    
+                    // Add Garden Stats button to the project header
+                    const projectHeader = document.querySelector('.projects_card .card-header');
+                    if (projectHeader) {
+                        // const gardenStatsBtn = document.createElement('button');
+                        // gardenStatsBtn.className = 'btn btn-sm btn-info me-2';
+                        // gardenStatsBtn.innerHTML = '<i class="bi bi-tree"></i> Garden Stats';
+                        // gardenStatsBtn.id = 'openGardenStatsBtn';
+                        
+                        // const existingBtns = projectHeader.querySelector('.btn, .dropdown');
+                        // if (existingBtns) {
+                        //     projectHeader.insertBefore(gardenStatsBtn, existingBtns);
+                        // } else {
+                        //     projectHeader.appendChild(gardenStatsBtn);
+                        // }
+                        
+                        // // Add click handler directly
+                        // gardenStatsBtn.addEventListener('click', function() {
+                        //     openGardenStatsModal();
+                        // });
+                    }
+                    
+                    // Direct functions to ensure modal works
+                    function openGardenStatsModal() {
+                        $('#gardenStatsModal').modal('show');
+                        // Loading overlay code removed as requested
+                    }
+                    
+                    function closeGardenStatsModal() {
+                        // Multiple ways to try closing the modal
+                        $('#gardenStatsModal').modal('hide');
+                        $('.modal-backdrop').remove();
+                        $('body').removeClass('modal-open');
+                        $('body').css('padding-right', '');
+                    }
+                    
+                    // Attach event handlers
+                    $('#closeGardenStats, #closeModalBtn').on('click', function() {
+                        closeGardenStatsModal();
+                    });
+                    
+                    $('#viewGardenBtn').on('click', function(e) {
+                        e.preventDefault();
+                        window.location.href = 'garden.php';
+                    });
+                    
+                    // Handle View 3D Garden and Close buttons in the modal
+                    document.getElementById('viewGardenBtn')?.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        window.location.href = 'garden.php';
+                    });
+                    
+                    document.getElementById('closeModalBtn')?.addEventListener('click', function() {
+                        closeGardenStatsModal();
+                    });
+                    
+                    // Close with ESC key
+                    $(document).on('keydown', function(e) {
+                        if (e.key === 'Escape' && $('#gardenStatsModal').hasClass('show')) {
+                            closeGardenStatsModal();
+                        }
+                    });
+                });
+            </script>
+            
+            <style>
+                /* Override modal styles */
+                .modal-backdrop {
+                    z-index: 1040 !important;
+                }
+                #gardenStatsModal {
+                    z-index: 1050 !important;
+                }
+                #gardenStatsModal .modal-content {
+                    z-index: 1050 !important;
+                }
+                
+                .garden-stat-item {
+                    padding: 1rem;
+                    text-align: center;
+                    flex: 1;
+                }
+                .garden-icon {
+                    font-size: 2.5rem;
+                    margin-bottom: 0.5rem;
+                }
+                .garden-count {
+                    font-weight: bold;
+                    font-size: 1.8rem;
+                }
+                .garden-label {
+                    font-size: 1rem;
+                    color: #666;
+                }
+            </style>
         <?php } ?>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<!-- for logoIcon -->
-<script>
-    const iconImage = `<?php echo getIconImage(0, 0, "1.8rem"); ?>`
-    const welcomeLogoImage= `<?php echo getIconImage(0,0,'3.7rem'); ?>`; 
-</script>
+    <!-- for logoIcon -->
+    <script>
+        const iconImage = `<?php echo getIconImage(0, 0, "1.8rem"); ?>`
+        const welcomeLogoImage = `<?php echo getIconImage(0, 0, '3.7rem'); ?>`; 
+    </script>
 
 
     <script>
@@ -1166,7 +1481,13 @@ function handlePromptClick(button) {
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-
+            // Check if we're on the garden stats page
+            const isGardenStats = window.location.href.includes('page=garden_stats');
+            if (isGardenStats) {
+                // Skip the dashboard-specific code for garden stats page
+                return;
+            }
+            
             const currentProject = $('#myselectedcurrentProject').val();
             // console.log(currentProject)
             // alert(currentProject);
@@ -1344,7 +1665,7 @@ function handlePromptClick(button) {
                 // Select project
                 function selectProject(projectId, selectedProjectTitle = "") {
                     const $button = $('#projectDropdownButton');
-                    
+
                     // If no title is provided, get it from the dropdown item
                     if (!selectedProjectTitle) {
                         const selectedButton = $(`#projectDropdown button[data-id="${projectId}"]`);
@@ -1391,10 +1712,10 @@ function handlePromptClick(button) {
 
                     // call to fetch notifications
                     fetchNotificationsAndOpen(false);
-                    
+
                     // Load project data
                     loadTasks(projectId);
-                    
+
                     loadChatHistory(projectId);
                     initPusher(projectId);
                 }
@@ -1410,37 +1731,37 @@ function handlePromptClick(button) {
                         },
                         body: JSON.stringify({ project_id: projectId })
                     })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.success) {
-                            chatMessages.innerHTML = '';
-                            if (Array.isArray(data.history) && data.history.length > 0) {
-                                appendWelcomeLogo();
-                                data.history.forEach(msg => {
-                                    appendMessage(msg.message, msg.sender);
-                                });
-                            } else {
-                                // If no chat history, show welcome messages
-                                displayProjectCreationWelcomeMessages();
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
                             }
-                        } else {
-                            throw new Error(data.message || 'Failed to load chat history');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error loading chat history:', error);
-                        chatMessages.innerHTML = `
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                chatMessages.innerHTML = '';
+                                if (Array.isArray(data.history) && data.history.length > 0) {
+                                    appendWelcomeLogo();
+                                    data.history.forEach(msg => {
+                                        appendMessage(msg.message, msg.sender);
+                                    });
+                                } else {
+                                    // If no chat history, show welcome messages
+                                    displayProjectCreationWelcomeMessages();
+                                }
+                            } else {
+                                throw new Error(data.message || 'Failed to load chat history');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error loading chat history:', error);
+                            chatMessages.innerHTML = `
                             <div class="alert alert-danger">
                                 Failed to load chat history. Please try again later.
                             </div>
                         `;
-                    })
-                    .finally(hideLoading);
+                        })
+                        .finally(hideLoading);
                 }
 
                 // Load tasks
@@ -1602,6 +1923,7 @@ function handlePromptClick(button) {
     transform: translate(-50%);
 ">
 </div>`;
+
                     div.innerHTML = `
                     <div class="task-card-labels mb-2">
                             ${task.status === 'todo' ? '<span class="task-label label-red"></span>' : ''}
@@ -1629,7 +1951,6 @@ function handlePromptClick(button) {
                         const index = parseInt(id) % hues.length;
                         const hue = hues[index];
                         const bgColor = `hsl(${hue}, 50%, 40%)`; // Consistent saturation and lightness
-
                         return `
                                         <span class="task-assignee text-capitalize" style="background-color: ${bgColor}; color: white;">
                                             ${escapeHtml(username[0].charAt(0).toUpperCase() + username[1].charAt(0).toUpperCase())}
@@ -1800,7 +2121,7 @@ function handlePromptClick(button) {
                                 document.getElementById('projectTitle').value = '';
                                 document.getElementById('projectDescription').value = '';
                                 Toast("success", "Success", "Project created successfully", "bottomCenter");
-                                selectProject(data.project_id, title); 
+                                selectProject(data.project_id, title);  // Pass the title here
                             }
                         })
                         .catch(error => console.error('Error creating project:', error))
@@ -2223,7 +2544,7 @@ function handlePromptClick(button) {
                 function appendMessage(message, sender) {
                     const div = document.createElement('div');
                     div.className = sender === 'user' ? 'user-message d-flex align-items-start justify-content-end' : 'ai-message d-flex align-items-start';
-                    const iconImage = `<?php echo getIconImage(0,0,'1.93rem'); ?>`;
+                    const iconImage = `<?php echo getIconImage(0, 0, '1.93rem'); ?>`;
 
                     if (sender === 'user') {
                         // Get username from session
@@ -3189,80 +3510,80 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                 })
                 .catch(error => console.error("❌ Request failed:", error));
         }
-
-        initializeChatLoading();
         let displayedReminders = new Set();
-// get Reminders
-function getReminders() {
-    const fcmToken = "<?php echo isset($_SESSION['fcm_token']) ? $_SESSION['fcm_token'] : ''; ?>";
-    console.log("FCM Token for reminders:", fcmToken);
-    if (!fcmToken) {
-        console.error('No FCM token found');
-        return;
-    }
-    
-    fetch('?api=get_fcm_reminders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fcm_token: fcmToken })
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok: ' + response.status);
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log("Reminders data:", data);
-        if (data.success && data.reminders && data.reminders.length > 0) {
-            const popupContainer = document.querySelector('.popup-container');
-            if (popupContainer) {
-                // Append each reminder as a popup alert
-                data.reminders.forEach(reminder => {
-                    if (!displayedReminders.has(reminder.id)) {
-                        // Add to the set to track the displayed reminder
-                        displayedReminders.add(reminder.id);
-                    // Create popup using the PHP getPopupAlert function output
-                    const title = reminder.title || 'Reminder';
-                    const description = reminder.description || '';
-                    
-                    const popupHtml = `<?php echo getPopupAlert("TITLE_PLACEHOLDER", "DESCRIPTION_PLACEHOLDER", "REMINDER_ID_PLACEHOLDER"); ?>`
-                        .replace('TITLE_PLACEHOLDER', title)
-                        .replace('DESCRIPTION_PLACEHOLDER', description)
-                        .replace('REMINDER_ID_PLACEHOLDER', reminder.id);
-                    
-                    popupContainer.insertAdjacentHTML('beforeend', popupHtml);
-                    }
-                });
-
-                // Initialize popup functionality
-                const popups = document.querySelectorAll('.popup-alert');
-                // updatePopupVisibility();
+        // get Reminders
+        function getReminders() {
+            const fcmToken = "<?php echo isset($_SESSION['fcm_token']) ? $_SESSION['fcm_token'] : ''; ?>";
+            console.log("FCM Token for reminders:", fcmToken);
+            if (!fcmToken) {
+                console.error('No FCM token found');
+                return;
             }
-        } else {
-            console.log("No reminders found or empty response");
+
+            fetch('?api=get_fcm_reminders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fcm_token: fcmToken })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Reminders data:", data);
+                    if (data.success && data.reminders && data.reminders.length > 0) {
+                        const popupContainer = document.querySelector('.popup-container');
+                        if (popupContainer) {
+                            // Append each reminder as a popup alert
+                            data.reminders.forEach(reminder => {
+                                if (!displayedReminders.has(reminder.id)) {
+                                    // Add to the set to track the displayed reminder
+                                    displayedReminders.add(reminder.id);
+                                    // Create popup using the PHP getPopupAlert function output
+                                    const title = reminder.title || 'Reminder';
+                                    const description = reminder.description || '';
+
+                                    const popupHtml = `<?php echo getPopupAlert("TITLE_PLACEHOLDER", "DESCRIPTION_PLACEHOLDER", "REMINDER_ID_PLACEHOLDER"); ?>`
+                                        .replace('TITLE_PLACEHOLDER', title)
+                                        .replace('DESCRIPTION_PLACEHOLDER', description)
+                                        .replace('REMINDER_ID_PLACEHOLDER', reminder.id);
+
+                                    popupContainer.insertAdjacentHTML('beforeend', popupHtml);
+                                }
+                            });
+
+                            // Initialize popup functionality
+                            const popups = document.querySelectorAll('.popup-alert');
+                            // updatePopupVisibility();
+                        }
+                    } else {
+                        console.log("No reminders found or empty response");
+                    }
+                })
+                .catch(error => {
+                    console.error('Failed to fetch reminders:', error);
+                });
         }
-    })
-    .catch(error => {
-        console.error('Failed to fetch reminders:', error);
-    });
-}
 
-// Add the event listener when DOM is loaded
-document.addEventListener("DOMContentLoaded", function() {
-    interval = setInterval(getReminders, 10000); //every 10 seconds it will check for reminders
-});
+        // Add the event listener when DOM is loaded
+        document.addEventListener("DOMContentLoaded", function () {
+            interval = setInterval(getReminders, 10000); //every 10 seconds it will check for reminders
+        });
 
-function delete_fcm_reminders(reminder_id) {
-    const fcmToken = "<?php echo $_SESSION['fcm_token']; ?>";
-    console.log("FCM Token for reminders:", fcmToken);
-    if(reminder_id){
-    fetch('?api=delete_fcm_reminders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fcm_token: fcmToken,reminder_id:reminder_id })
-    }); }
-}
+        function delete_fcm_reminders(reminder_id) {
+            const fcmToken = "<?php echo isset($_SESSION['fcm_token']) ? $_SESSION['fcm_token'] : ''; ?>";
+            console.log("FCM Token for reminders:", fcmToken);
+            if (reminder_id) {
+                fetch('?api=delete_fcm_reminders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fcm_token: fcmToken, reminder_id: reminder_id })
+                });
+            }
+        }
+        initializeChatLoading();
     </script>
 
 
@@ -3274,37 +3595,39 @@ function delete_fcm_reminders(reminder_id) {
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
     <div class="popup-container">
     </div>
+
     <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const popups = document.querySelectorAll(".popup-alert");
+        document.addEventListener("DOMContentLoaded", function () {
+            const popups = document.querySelectorAll(".popup-alert");
 
-    function updatePopupVisibility() {
-        popups.forEach((popup, index) => {
-            // if (index < 3) {
-            //     popup.classList.remove("hidden");
-            // } else {
-            //     popup.classList.add("hidden");
-            // }
+            function updatePopupVisibility() {
+                popups.forEach((popup, index) => {
+                    // if (index < 3) {
+                    //     popup.classList.remove("hidden");
+                    // } else {
+                    //     popup.classList.add("hidden");
+                    // }
+                });
+            }
+
+
+            updatePopupVisibility(); // Ensure only 3 popups are shown initially
         });
-    }
+        function closePopup(button) {
+            let popup = button.parentElement;
+            popup.remove(); // Remove the closed popup
 
-
-    updatePopupVisibility(); // Ensure only 3 popups are shown initially
-});
-function closePopup(button) {
-    let popup = button.parentElement;
-    popup.remove(); // Remove the closed popup
-
-    // Show next hidden popup if available
-    setTimeout(() => {
-        delete_fcm_reminders(popup.dataset.reminderId);
-        let hiddenPopups = document.querySelectorAll(".popup-alert.hidden");
-        if (hiddenPopups.length > 0) {
-            hiddenPopups[0].classList.remove("hidden");
+            // Show next hidden popup if available
+            setTimeout(() => {
+                delete_fcm_reminders(popup.dataset.reminderId);
+                let hiddenPopups = document.querySelectorAll(".popup-alert.hidden");
+                if (hiddenPopups.length > 0) {
+                    hiddenPopups[0].classList.remove("hidden");
+                }
+            }, 300); // Small delay to create a smooth transition
         }
-    }, 300); // Small delay to create a smooth transition
-}
-</script>
+    </script>
+
 </body>
 
 </html>
