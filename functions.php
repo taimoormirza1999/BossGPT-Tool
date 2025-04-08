@@ -79,13 +79,38 @@ function getLogoImage($bottomMargin = "0", $topMargin = "-1rem", $width = "15rem
                 class="logo-icon"
                 style=" filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3)); margin-top: ' . $topMargin . '; margin-bottom: ' . $bottomMargin . '; width: ' . $width . '; height: ' . $height . '">';
     }
-    function getCalendarIcon()
+    function getCalendarIcon($color = 'rgba(160, 160, 160, 1)') {
+        $svg = file_get_contents('assets/icons/calendar.svg');
+    
+        // Target only path stroke attributes
+        $svg = preg_replace('/(<path[^>]*?)stroke="[^"]*"/i', "$1stroke=\"$color\"", $svg);
+    
+        // If stroke doesn't exist at all, inject it
+        $svg = preg_replace_callback('/<path([^>]*)>/i', function($matches) use ($color) {
+            return (strpos($matches[1], 'stroke=') === false)
+                ? '<path stroke="' . $color . '"' . $matches[1] . '>'
+                : '<path' . $matches[1] . '>';
+        }, $svg);
+    
+        // Optional: add an ID to the SVG root
+        $svg = preg_replace('/<svg /', '<svg id="calendar-icon" ', $svg, 1);
+    
+        return $svg;
+    }
+    
+    
+
+    function getFileIcon()
     {
-        return file_get_contents('assets/icons/calendar.svg');
+        return file_get_contents('assets/icons/file.svg');
     }
     function getTrashIcon()
     {
         return file_get_contents('assets/icons/trash.svg');
+    }
+    function getAddSquareIcon()
+    {
+        return file_get_contents('assets/icons/add-square.svg');
     }
     function getPlantBall()
     {

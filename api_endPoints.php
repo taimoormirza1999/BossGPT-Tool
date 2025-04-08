@@ -519,7 +519,15 @@ if (isset($_GET['api'])) {
                 $logedinUser = $Auth->getCurrentUser();
                 $projectTilte = $project_manager->getProjectName($data['project_id']);
                 try {
-                    $emailSent = $userManager->projectUsersTaskAssignedEmail($logedinUser['username'], $projectTilte, $data['title'], $allAssignees, );
+                    $emailSent = $userManager->projectUsersTaskAssignedEmail($logedinUser['username'], $projectTilte, $data['title'], $allAssignees );
+                    // Initialize garden integration
+                    $gardenManager = new GardenManager();
+                    $taskSize = isset($data['size']) ? $data['size'] : 'medium'; // Default to medium if size not specified
+
+                    // Plant seeds for each assignee
+                    foreach ($assignees as $user_id) {
+                        $gardenManager->plantSeed($task_id, $user_id, $taskSize);
+                    }
                     if ($emailSent) {
                         echo json_encode($response = [
                             'success' => $emailSent,
@@ -539,13 +547,7 @@ if (isset($_GET['api'])) {
                     ];
                 }
 
-                $gardenManager = new GardenManager();
-                $taskSize = isset($data['size']) ? $data['size'] : 'medium'; // Default to medium if size not specified
-                
-                // Plant seeds for each assignee
-                foreach ($assignees as $user_id) {
-                    $gardenManager->plantSeed($task_id, $user_id, $taskSize);
-                }
+               
 
                 $response = ['success' => true, 'task_id' => $task_id];
                 break;

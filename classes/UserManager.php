@@ -273,22 +273,22 @@ class UserManager
         return $emailData;
         // return $newUser . " has been added to the project: " . $projectTilte . " at new Role: " . $newRole . " project All Users: " . implode(", ", $allUsers);
     }
-    public function newTaskAddedEmailNotifer($taskCreator, $projectTilte, $taksTitle, $projectAllUsers)
-    {
+    public function newTaskAddedEmailNotifer($taskCreator, $projectTilte, $taskTitle, $projectAllUsers)
+        {
         $allUsers = [];
-        $subject = "New User Added to Project " . $projectTilte;
-        // $template = "new_user_added_to_project";
+        $subject = "New Task Added to Project " . $projectTilte;
+        $template = 'new_task_notification';
         foreach ($projectAllUsers as $user) {
             $allUsers[] = $user['email'];
-            $template = 'welcome_email';
             $emailData = [
                 'email' => $user['email'],
                 'subject' => $subject,
                 'template' => $template,
                 'data' => [
-                    'username' => "",
-                    'tempPassword' => "",
-                    'verificationLink' => ""
+                    'username' => $user['username'],
+                    'project_name' => $projectTilte,
+                    'task_title' => $taskTitle,
+                    'creator_name' => $taskCreator
                 ]
             ];
             // sendTemplateEmail($user['email'], $subject, $template, $emailData);

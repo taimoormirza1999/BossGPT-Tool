@@ -586,12 +586,12 @@ body.dark-mode .chat-input {
 body.dark-mode .form-control,
 body.dark-mode .form-select,
 body.dark-mode textarea {
-  border-color: #fff;
+  /* border-color: #fff;
   color: #e4e6eb;
   background: rgba(12, 1, 17, 0.5);
   border: 1px solid rgba(156, 156, 156, 1);
   border-radius: 12px;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px); */
 }
 
 body.dark-mode .form-control:focus,
@@ -604,14 +604,22 @@ body.dark-mode textarea:focus {
 }
 
 body.dark-mode .modal-content {
-  background: rgba(33, 33, 33, 0.5);
-  backdrop-filter: blur(6.35px);
-  border-radius: 16px;
+background: #000000;
+border: 1px solid rgba(255, 255, 255, 0.2);
+}
+body .modal-content {
+ 
+backdrop-filter: blur(6.35px);
+border-radius: 16px;
 }
 
 body.dark-mode .modal-header,
 body.dark-mode .modal-footer {
   border-color: #2f3031;
+}
+body .modal-footer {
+  display: flex;
+  justify-content: center!important;
 }
 
 body.dark-mode .table {

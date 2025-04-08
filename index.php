@@ -150,7 +150,7 @@ require_once './api_endPoints.php';
     <link rel="stylesheet" href="./assets/css/custom.css">
 
     <link rel="stylesheet" href="./assets/css/customstyle2.css">
-
+ 
 </head>
 <!-- Reuseable Stuff -->
 <?php
@@ -486,7 +486,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                 <div class="d-flex align-items-end">
                                 <button type="button" class="btn btn-sm btn-main-primary me-2" data-bs-toggle="modal"
                                     data-bs-target="#newTaskModal">
-                                    <i class="bi bi-plus"></i> Create New Task
+                                    <?php echo getAddSquareIcon(); ?>Create New Task
                                 </button>
                                 <button type="button" class="btn btn-sm btn-main-primary me-2" data-bs-toggle="modal"
                                     data-bs-target="#gardenStatsModal">
@@ -584,8 +584,15 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                     <textarea class="form-control" id="editTaskDescription" rows="3"></textarea>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="editTaskDueDate" class="form-label">Due Date</label>
-                                    <input type="date" class="form-control" id="editTaskDueDate">
+                                    <?php
+                                    // Use our custom date input component for edit task
+                                    $id = 'editTaskDueDate';
+                                    $name = 'edit_due_date';
+                                    $label = 'Due Date';
+                                    $required = false; 
+                                    $helperText = '';
+                                    include 'components/date_input.php';
+                                    ?>
                                 </div>
                                 <div class="mb-3">
                                     <label for="editTaskAssignees" class="form-label">Assigned Users</label>
@@ -595,6 +602,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                     <small class="form-text text-muted">You can select multiple users. Click to
                                         select/deselect.</small>
                                 </div>
+                                
                                 <div class="mb-3">
                                     <label for="editTaskPicture" class="form-label">Task Picture</label>
                                     <input type="file" class="form-control" id="editTaskPicture" accept="image/*">
@@ -761,6 +769,9 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                     </div>
                 </div>
             </div>
+<!-- Selected Tree template -->
+
+
             <!-- New Task Modal -->
             <div class="modal fade" id="newTaskModal" tabindex="-1">
                 <div class="modal-dialog modal-dialog-centered">
@@ -772,6 +783,9 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                         <div class="modal-body">
                             <form id="newTaskForm">
                                 <div class="mb-3">
+                                <small class="text-muted">Create a new task by setting its title, deadline, and assigning team members to keep everyone aligned.</small>
+                                </div>
+                                <div class="mb-3">
                                     <label for="newTaskTitle" class="form-label">Task
                                         Title<?php echo required_field(); ?></label>
                                     <input type="text" class="form-control" id="newTaskTitle" required>
@@ -779,12 +793,18 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                 <div class="mb-3">
                                     <label for="newTaskDescription"
                                         class="form-label">Description<?php echo required_field(); ?></label>
-                                    <textarea class="form-control" id="newTaskDescription" rows="3"></textarea>
+                                    <textarea class="form-control" id="newTaskDescription" rows="1"></textarea>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="newTaskDueDate" class="form-label">Due
-                                        Date<?php echo required_field(); ?></label>
-                                    <input type="date" class="form-control" id="newTaskDueDate">
+                                    <?php
+                                    // Use our custom date input component
+                                    $id = 'newTaskDueDate';
+                                    $name = 'due_date';
+                                    $label = 'Due Date';
+                                    $required = true;
+                                    $helperText = '';
+                                    include 'components/date_input.php';
+                                    ?>
                                 </div>
                                 <div class="mb-3">
                                     <label for="newTaskAssignees" class="form-label">Assigned
@@ -795,16 +815,27 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                     <small class="form-text text-muted">You can select multiple users. Click to
                                         select/deselect.</small>
                                 </div>
+                          <div class="mb-3">
+  <label class="form-label">
+    Choose Tree Type <span style="color:red">*</span>
+  </label>
+  <!-- A hidden input to store the chosen file -->
+  <input type="hidden" id="selectedTreeType" name="selectedTreeType">
+  
+  <!-- Where the tree images will go -->
+ <!-- The container with clickable tree images -->
+ <div id="taskTreeContainer" class="tree-select-grid">
+  </div>
+</div>
                                 <div class="mb-3">
-                                    <label for="newTaskPicture" class="form-label">Task
-                                        Picture<?php echo required_field(); ?></label>
-                                    <input type="file" class="form-control" id="newTaskPicture" accept="image/*">
+                                    <label for="newTaskPicture" class="form-label"> <?php echo getFileIcon(); ?> <!-- Bootstrap Icon -->
+                                    <span>Choose Files</span><?php echo required_field(); ?></label>
+                                    <input type="file" class="d-none" id="newTaskPicture" accept="image/*">
                                 </div>
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-primary" id="createTaskBtn">Create Task</button>
+                            <button type="button" class="btn btn-primary" id="createTaskBtn"><?php echo getAddSquareIcon(); ?>Create Task</button>
                         </div>
                     </div>
                 </div>
@@ -827,11 +858,18 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                 </div>
                                 <div class="mb-3">
                                     <label for="subtaskDescription" class="form-label">Description</label>
-                                    <textarea class="form-control" id="subtaskDescription" rows="2"></textarea>
+                                    <textarea class="form-control" id="subtaskDescription" rows="1"></textarea>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="subtaskDueDate" class="form-label">Due Date</label>
-                                    <input type="date" class="form-control" id="subtaskDueDate">
+                                    <?php
+                                    // Use our custom date input component for subtask
+                                    $id = 'subtaskDueDate';
+                                    $name = 'subtask_due_date';
+                                    $label = 'Due Date';
+                                    $required = false;
+                                    $helperText = '';
+                                    include 'components/date_input.php';
+                                    ?>
                                 </div>
                             </form>
                         </div>
@@ -1362,8 +1400,51 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
             </style>
             
             <script>
-                // Add a button to trigger garden stats modal in the navbar
-                document.addEventListener('DOMContentLoaded', function() {
+          
+
+  document.addEventListener('DOMContentLoaded', function() {
+    
+
+// 1) The tree images
+const treeImages = [
+    { file: 'treelv2.png', alt: 'Tree Level 2' },
+    { file: 'treelv3.png', alt: 'Tree Level 3' },
+    { file: 'treelv4.png', alt: 'Tree Level 4' },
+    { file: 'treelv5.png', alt: 'Tree Level 5' },
+    { file: 'treelv6.png', alt: 'Tree Level 6' },
+    { file: 'treelv7.png', alt: 'Tree Level 7' },
+    { file: 'treelv8.png', alt: 'Tree Level 8' },
+  ];
+
+  const container = document.getElementById('taskTreeContainer');
+  const hiddenInput = document.getElementById('selectedTreeType');
+
+  // 2) Build and insert the images
+  let html = '';
+  treeImages.forEach(({ file, alt }) => {
+    html += `
+      <div class="tree-option" data-tree="${file}">
+        <img src="assets/images/garden/${file}" alt="${alt}">
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+
+  // 3) Attach click listeners
+  container.querySelectorAll('.tree-option').forEach(optionDiv => {
+    optionDiv.addEventListener('click', () => {
+      // Set hidden input
+      const treeValue = optionDiv.dataset.tree;
+      hiddenInput.value = treeValue;
+      console.log('Selected tree:', treeValue);
+
+      // Highlight selected
+      container.querySelectorAll('.tree-option').forEach(o => o.classList.remove('selected'));
+      optionDiv.classList.add('selected');
+    });
+  });
+
+
                     // Clean up any remnants of previous modals
                     $('.modal-backdrop').remove();
                     $('body').removeClass('modal-open');
@@ -1470,6 +1551,10 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+       
+    </script>
     <!-- for logoIcon -->
     <script>
         const iconImage = `<?php echo getIconImage(0, 0, "1.8rem"); ?>`
@@ -1914,7 +1999,32 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                  onerror="console.error('Image failed to load: ' + this.src); this.style.border='2px solid red';">
                         </div>
                     ` : '';
+// Get plant stage based on task status and garden data
+const getPlantImage = (task) => {
+    console.log(task);
+                        // If we have garden data, use it
+                        if (task.garden.plant_stage && task.garden.plant_type) {
+                            switch (task.garden.plant_stage) {
+                                case 'dead': return 'dead.png';
+                                case 'sprout': return 'seed.png';
+                                case 'growing': return 'growing.png';
+                                case 'tree': 
+                                    // Return the specific tree type image
+                                    return `${task.garden.plant_type}.png`;
+                                default: return 'seed.png';
+                            }
+                        }
 
+                        // Fallback to status-based images if no garden data
+                        switch (task.status) {
+                            case 'todo': return 'seed.png';
+                            case 'in_progress': return 'growing.png';
+                            case 'done': 
+                                // Default to treelv3 if no plant_type specified
+                                return task.garden.plant_type ? `${task.garden.plant_type}.png` : 'treelv3.png';
+                            default: return 'seed.png';
+                        }
+                    };
                     // Updated innerHTML now includes the due date in the task-meta section
                     const plantBallHtml = `<div class="plant-ball-container">
     <img src="assets/images/garden/plant-ball.png" alt="Plant Ball" class="plant-ball" style="
@@ -1922,12 +2032,15 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
     box-shadow: 0 0 15px 5px rgba(255, 255, 150, 0.8);
     border-radius: 50%;
 ">
-    <img src="assets/images/garden/lush.png" alt="Plant" class="inner-plant" style="
-    height: 30px;
-    position: absolute;
-    left: 50%;
-    transform: translate(-50%);
-">
+    <img src="assets/images/garden/${getPlantImage(task)}" 
+         alt="Plant" 
+         class="inner-plant" 
+         style="
+            height: 30px;
+            position: absolute;
+            left: 50%;
+            transform: translate(-50%);
+    ">
 </div>`;
 
                     div.innerHTML = `
@@ -2140,7 +2253,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                     document.getElementById('editTaskTitle').value = task.title;
                     document.getElementById('editTaskDescription').value = task.description || '';
                     document.getElementById('editTaskDueDate').value = task.due_date || '';
-
+                    document.getElementById('editPlantType').value = task.plant_type || '';
                     const editTaskAssignees = document.getElementById('editTaskAssignees');
                     $(editTaskAssignees).empty();  // Clear using jQuery
 
@@ -2292,14 +2405,15 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                     const dueDate = document.getElementById('editTaskDueDate').value || null; // Convert empty string to null
                     const assignees = $('#editTaskAssignees').val().map(value => parseInt(value));
                     const pictureInput = document.getElementById('editTaskPicture');
-
+                    const plantType = document.getElementById('editPlantType').value;
                     function sendUpdateTask(pictureData) {
                         let payload = {
                             task_id: taskId,
                             title: title,
                             description: description,
-                            due_date: dueDate, // This will now be null instead of empty string
-                            assignees: assignees
+                            due_date: dueDate,  
+                            assignees: assignees,
+                            plant_type: plantType
                         };
                         if (pictureData !== null) {
                             payload.picture = pictureData;
@@ -2709,7 +2823,31 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                     const dueDate = document.getElementById('newTaskDueDate').value;
                     const assignees = $('#newTaskAssignees').val().map(value => parseInt(value));
                     const pictureInput = document.getElementById('newTaskPicture');
+                    const selectedTree = document.querySelector('.tree-option.selected');
+                    const plantType = selectedTree ? selectedTree.dataset.tree : '';
+
+                    // console.warn(selectedTree)
+                    if (!title) {
+                        showToastAndHideModal(
+                            'newTaskModal',
+                            'error',
+                            'Error',
+                            'Please enter a task title'
+                        );
+                        return;
+                    }
+
+                    if (!plantType) {
+                        showToastAndHideModal(
+                            'newTaskModal',
+                            'error',
+                            'Error',
+                            'Please select a tree type'
+                        );
+                        return;
+                    }
                     function sendCreateTask(pictureData) {
+                        showLoading();
                         fetch('?api=create_task', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -2719,26 +2857,29 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                 description: description,
                                 due_date: dueDate,
                                 assignees: assignees,
-                                picture: pictureData
+                                picture: pictureData,
+                                plant_type: plantType
                             })
                         })
                             .then(response => response.json())
                             .then(data => {
                                 if (data.success) {
-                                    document.getElementById('newTaskTitle').value = '';
-                                    document.getElementById('newTaskDescription').value = '';
-                                    document.getElementById('newTaskDueDate').value = '';
-                                    $('#newTaskAssignees').val(null).trigger('change');
-                                    document.getElementById('newTaskPicture').value = '';
-                                    bootstrap.Modal.getInstance(document.getElementById('newTaskModal')).hide();
-                                    loadTasks(currentProject);
+                                    document.getElementById('newTaskForm').reset();
+                                document.querySelectorAll('.tree-option').forEach(opt => 
+                                    opt.classList.remove('selected')
+                                );
+                                $('#newTaskAssignees').val(null).trigger('change');
+
+                                // Close modal and refresh
+                                bootstrap.Modal.getInstance(document.getElementById('newTaskModal')).hide();
+                                loadTasks(currentProject);
                                 } else {
                                     throw new Error(data.message || 'Failed to create task');
                                 }
                             })
                             .catch(error => {
                                 console.error('Error creating task:', error);
-                                alert('Failed to create task. Please try again.');
+                                showToastAndHideModal('newTaskModal', 'error', 'Error', 'Failed to create task');
                             })
                             .finally(hideLoading);
                     }
@@ -3604,6 +3745,7 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            // alert('djfdbgjkfd'); // Removing this line which was causing issues
             const popups = document.querySelectorAll(".popup-alert");
 
             function updatePopupVisibility() {
@@ -3633,7 +3775,18 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
             }, 300); // Small delay to create a smooth transition
         }
     </script>
-
+<!-- Tree Selection Component Template -->
+<template id="treeSelectionTemplate">
+  <div class="mb-3">
+    <label class="form-label">Choose Tree Type<span style="color:red">*</span></label>
+    
+    <!-- Hidden input to store which tree is selected -->
+    <input type="hidden" class="tree-type-input" name="selectedTreeType" />
+    
+    <!-- Grid container for images (populated by JS) -->
+    <div class="tree-select-grid"></div>
+  </div>
+</template>
 </body>
 
 </html>

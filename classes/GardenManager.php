@@ -54,7 +54,7 @@ class GardenManager
             
             $stmt = $this->db->prepare(
                 "INSERT INTO user_garden (user_id, task_id, stage, plant_type, size) 
-                 VALUES (?, ?, 'seed', ?, ?)"
+                VALUES (?, ?, 'sprout', ?, ?)"
             );
             $stmt->execute([$userId, $taskId, $plantType, $size]);
             $gardenId = $this->db->lastInsertId();
@@ -104,13 +104,13 @@ class GardenManager
     {
         switch ($taskStatus) {
             case 'todo':
-                return 'seed';
+                return 'sprout';
             case 'in_progress':
                 return 'growing';
             case 'done':
-                return 'lush_tree';
+               return 'tree';
             default:
-                return 'seed';
+                return 'sprout';
         }
     }
 
@@ -152,40 +152,30 @@ class GardenManager
      */
     public function getPlantAsset($stage, $plantType)
     {
-        if ($stage === 'seed') {
-            return 'seed.png';
+        $basePath = 'assets/images/garden/';
+
+        // Handle each stage
+        switch ($stage) {
+            case 'dead':
+                return $basePath . 'dead.png';
+            
+            case 'sprout':
+                return $basePath . 'seed.png';
+            
+            case 'growing':
+                return $basePath . 'growing.png';
+            
+            case 'tree':
+                // For tree stage, use the specific plant type image
+                if ($plantType) {
+                    return $basePath . $plantType . '.png';
+                }
+                // Fallback to default tree image if no plant type
+                return $basePath . 'treelv3.png';
+            
+            default:
+                // Default to seed if stage is unknown
+                return $basePath . 'seed.png';
         }
-        
-        if ($stage === 'sprout' || $stage === 'growing') {
-            switch ($plantType) {
-                case 'flower':
-                    return 'flower.png';
-                case 'treelv2':
-                case 'treelv3':
-                case 'treelv4':
-                case 'treelv5':
-                case 'treelv6':
-                case 'treelv7':
-                case 'treelv8':
-                    return $plantType . '.png';
-                default:
-                    return 'treelv2.png';
-            }
-        }
-        
-        if ($stage === 'tree' || $stage === 'lush_tree') {
-            switch ($plantType) {
-                case 'treebig':
-                    return 'treebig.png';
-                case 'flower':
-                    return 'flower.png';
-                case 'lush':
-                    return 'lush.png';
-                default:
-                    return $plantType . '.png';
-            }
-        }
-        
-        return 'seed.png'; // Default
     }
 } 

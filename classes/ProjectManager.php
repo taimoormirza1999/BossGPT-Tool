@@ -107,7 +107,48 @@ class ProjectManager
             throw $e;
         }
     }
+    public function getProjectTasks($project_id)
+    {
+        try {
+            $stmt = $this->db->prepare(
+                "SELECT t.*, 
+                        GROUP_CONCAT(DISTINCT ta.user_id) as assigned_user_ids,
+                        GROUP_CONCAT(DISTINCT u.username) as assigned_usernames,
+                        g.stage as plant_stage,
+                        g.plant_type,
+                        g.size as plant_size
+                 FROM tasks t
+                 LEFT JOIN task_assignees ta ON t.id = ta.task_id
+                 LEFT JOIN users u ON ta.user_id = u.id
+                 LEFT JOIN user_garden g ON t.id = g.task_id
+                 WHERE t.project_id = ?
+                 GROUP BY t.id
+                 ORDER BY t.created_at DESC"
+            );
+            $stmt->execute([$project_id]);
+            $tasks = $stmt->fetchAll();
 
+            // Process tasks to create proper structure for assigned users
+            foreach ($tasks as &$task) {
+                if ($task['assigned_user_ids'] && $task['assigned_usernames']) {
+                    $userIds = explode(',', $task['assigned_user_ids']);
+                    $usernames = explode(',', $task['assigned_usernames']);
+                    $task['assigned_users'] = array_combine($userIds, array_map(function($username) {
+                        return [$username];
+                    }, $usernames));
+                } else {
+                    $task['assigned_users'] = [];
+                }
+                unset($task['assigned_user_ids']);
+                unset($task['assigned_usernames']);
+            }
+
+            return $tasks;
+        } catch (Exception $e) {
+            error_log("Get Project Tasks Error: " . $e->getMessage());
+            throw $e;
+        }
+    }
     public function getTasks($project_id)
     {
         try {
@@ -141,17 +182,21 @@ class ProjectManager
                             FROM subtasks s 
                             WHERE s.task_id = t.id
                         ), '[]'
-                    ) AS subtasks
+                    ) AS subtasks,
+                    g.stage as plant_stage,
+                    g.plant_type,
+                    g.size as plant_size
                 FROM tasks t
                 LEFT JOIN task_assignees ta ON t.id = ta.task_id
                 LEFT JOIN users u ON ta.user_id = u.id
+                LEFT JOIN user_garden g ON t.id = g.task_id AND g.user_id = ?
                 WHERE t.project_id = ? 
                 AND t.status != 'deleted'
-                GROUP BY t.id, t.project_id, t.title, t.description, t.picture, t.status, t.due_date, t.created_at, t.updated_at
+                GROUP BY t.id, t.project_id, t.title, t.description, t.picture, t.status, t.due_date, t.created_at, t.updated_at, g.stage, g.plant_type, g.size
                 ORDER BY t.created_at DESC"
             );
 
-            $stmt->execute([$project_id]);
+            $stmt->execute([$_SESSION['user_id'], $project_id]);
             $tasks = $stmt->fetchAll();
 
             // Process the concatenated strings into arrays
@@ -166,6 +211,18 @@ class ProjectManager
 
                 // Parse subtasks JSON
                 $task['subtasks'] = json_decode($task['subtasks'] ?? '[]', true) ?? [];
+                
+                // Add garden info if available
+                $task['garden'] = [
+                    'stage' => $task['plant_stage'] ?? null,
+                    'plant_type' => $task['plant_type'] ?? null,
+                    'size' => $task['plant_size'] ?? null
+                ];
+                
+                // Remove the raw garden fields
+                unset($task['plant_stage']);
+                unset($task['plant_type']);
+                unset($task['plant_size']);
             }
             unset($task);
 
