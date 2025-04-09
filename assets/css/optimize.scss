@@ -1,0 +1,370 @@
+$black-color: #000;
+$black-color-10: rgba(0, 0, 0, 0.1);
+$black-color-20: rgba(0, 0, 0, 0.2);
+$black-color-40: rgba(0, 0, 0, 0.4);
+$black-color-70: rgba(0, 0, 0, 0.7);
+$black-color-80: rgba(0, 0, 0, 0.8);
+$white-color: #fff;
+$white-color-05: rgba(255, 255, 255, 0.05);
+$white-color-10: rgba(255, 255, 255, 0.1);
+$white-color-20: rgba(255, 255, 255, 0.2);
+$white-color-50: rgba(255, 255, 255, 0.5);
+$white-color-60: rgba(255, 255, 255, 0.6);
+$white-color-80: rgba(255, 255, 255, 0.8);
+$gray-color-e1: #e1e1e1;
+$gray-color-92: rgba(92, 92, 92, 1);
+$gray-color-3: #2f3031;
+$border-radius-8: 8px;
+$border-radius-12: 12px;
+$border-radius-16: 16px;
+$notiifcationicon-color1: linear-gradient(
+  145.32deg,
+  #240121 -14.49%,
+  #8a047f 82.49%
+);
+$notiifcationicon-color2: linear-gradient(
+  145.32deg,
+  #ffffff -14.49%,
+  #048a40 82.49%
+);
+$notiifcationicon-color3: linear-gradient(
+  145.32deg,
+  #fbfbfb -14.49%,
+  #04068a 82.49%
+);
+$notiifcationicon-color4: linear-gradient(
+  145.32deg,
+  #ebe5eb -14.49%,
+  #8a5204 82.49%
+);
+$notiifcationicon-color5: linear-gradient(
+  145.32deg,
+  #ffffff -14.49%,
+  #8a8304 82.49%
+);
+
+$icon-height: 24px;
+$icon-width: 24px;
+$icon-font-size: 1.25rem;
+$button-icon-gap: 0.5rem;
+$button-height: 42px;
+$dark-mode-card-task-bgcolor: linear-gradient(
+  135deg,
+  #240121 0%,
+  #4f0142 100%
+) !important;
+$dark-mode-modal-bgcolor: $black-color;
+$dark-mode-modal-border: 1px solid $white-color-20;
+$dark-mode-message-ai-bgcolor: var(--bs-primary-darkpurple-linear-gradient);
+$dark-mode-message-ai-border: 1px solid rgba(211, 211, 211, 0.5);
+$dark-mode-message-ai-color: #e4e6eb;
+$dark-mode-prompt-btn-bgcolor: $white-color-10;
+$dark-mode-prompt-btn-border: rgba(248, 249, 250, 0.5);
+$dark-mode-message-user-bgcolor: $white-color-20;
+$dark-mode-message-user-color: $white-color;
+$transition-duration-34: 0.34s;
+$transition-duration-40: 0.4s;
+$transition-duration-50: 0.5s;
+$notification-icon-padding: 0.5rem;
+
+@mixin theme-bgcolor($bg-color) {
+  background: $bg-color;
+}
+@mixin theme-text-color($text-color) {
+  color: $text-color;
+}
+
+@mixin flex-center-hv {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin button-icon-only {
+  height: $icon-height;
+  width: $icon-width;
+}
+
+#user-add-icon {
+  @include button-icon-only;
+}
+#user-add-icon path {
+  stroke: $white-color;
+}
+.bi {
+  font-size: $icon-font-size;
+}
+
+.btn-main-primary {
+  gap: $button-icon-gap;
+  height: $button-height;
+  @include flex-center-hv;
+}
+body.dark-mode {
+  background-image: url("https://trello-backgrounds.s3.amazonaws.com/53baf533e697a982248cd73f/2048x2048/22ec03aab9d36ea49139c569a62bb079/shutterstock_134707556.jpg");
+  .task-card {
+    @include theme-bgcolor($dark-mode-card-task-bgcolor);
+  }
+  .notification-list {
+    .dropdown-item {
+      @include theme-text-color($gray-color-e1);
+    }
+    .dropdown-item .title-notification {
+      @include theme-text-color($gray-color-92);
+    }
+    .dropdown-item:hover {
+      @include theme-bgcolor($dark-mode-card-task-bgcolor);
+    }
+    .dropdown-item:hover .title-notification {
+      @include theme-text-color($white-color);
+    }
+  }
+}
+body.light-mode {
+  background-image: url("https://trello-backgrounds.s3.amazonaws.com/53baf533e697a982248cd73f/2048x2048/22ec03aab9d36ea49139c569a62bb079/shutterstock_134707556.jpg");
+}
+body {
+  background-image: url("https://res.cloudinary.com/da6qujoed/image/upload/v1742653725/tool-bg_x91qyx.png");
+  background-size: cover;
+  background-position: top;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  .navbar {
+    background: rgba(20, 20, 35, 0.3) !important;
+    backdrop-filter: blur(16px) !important;
+    box-shadow: 0 4px 30px $black-color-10 !important;
+    border-bottom: 1px solid $gray-color-3;
+    button {
+      border: 1.4px solid $white-color-80 !important;
+    }
+    button#notificationDropdown,
+    button#toggleDarkModeBtn,
+    button.btn-logout {
+      padding: 10px !important;
+    }
+  }
+  .form-control {
+    padding: 0.7rem 1rem;
+    box-sizing: border-box;
+    border: 1px solid $white-color-20;
+    border-radius: $border-radius-12;
+  }
+
+  .btn-main-primary,
+  .btn-send-primary {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(248, 249, 250, 0.5) !important;
+    border-radius: $border-radius-8 !important;
+    color: white !important;
+    transition: all $transition-duration-40 ease-in-out !important;
+  }
+  .projects_card {
+    box-shadow: 0 2px 5px $black-color-20;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(211, 211, 211, 0.5);
+    backdrop-filter: blur(7.199999809265137px);
+    .card-header {
+      background-color: var(--bs-primary-dark60percent) !important;
+      box-shadow: 0px 4px 30px $black-color-10 !important;
+      button {
+        @include flex-center-hv;
+      }
+      #projectDropdownButton {
+        text-decoration: none !important;
+      }
+    }
+    .card-body {
+      .task-column_section {
+        .task-column_header {
+          backdrop-filter: blur(4px);
+          border: 1px solid $white-color-05;
+          color: $white-color;
+          font-weight: 800;
+          border-radius: $border-radius-12;
+          padding: 14px;
+          margin-bottom: 16px;
+          font-family: "CabinetGroteskBold";
+          text-transform: uppercase;
+          box-shadow: 0 4px 15px $black-color-40;
+          transition: all $transition-duration-40 ease;
+          letter-spacing: 1px;
+          font-size: medium;
+        }
+        .task-column {
+          background: rgba(76, 76, 76, 0.25);
+          backdrop-filter: blur(20px);
+          border: 1px dashed $white-color-50;
+          transition: all $transition-duration-50 ease;
+          min-height: calc(100vh - 335px);
+          border-radius: $border-radius-12;
+          padding: 1rem;
+          overflow-y: auto;
+          .task-card {
+            transition: all $transition-duration-34;
+            transform-origin: center;
+            backface-visibility: hidden;
+            will-change: transform, box-shadow;
+            transition: all $transition-duration-34 cubic-bezier(0.2, 1, 0.3, 1);
+            border-radius: $border-radius-12;
+            backdrop-filter: blur(10px);
+            margin-bottom: 16px;
+            padding: 16px;
+            box-shadow: 0 4px 20px $black-color-40;
+            color: $white-color;
+            position: relative;
+            overflow: hidden;
+
+            .d-flex.gap-2.mt-2,
+            .subtasks.mt-2 .d-flex.gap-2 {
+              opacity: 0;
+              visibility: hidden;
+              transition: all $transition-duration-34 ease;
+              margin-top: 8px;
+              z-index: 15;
+              position: relative;
+              gap: 8px !important;
+            }
+
+            &:hover {
+              .d-flex.gap-2.mt-2,
+              .subtasks.mt-2 .d-flex.gap-2 {
+                opacity: 1;
+                visibility: visible;
+                display: flex !important;
+                flex-wrap: wrap;
+              }
+
+              .add-subtask-btn,
+              .ai-add-subtask-btn,
+              .ai-update-dates-btn {
+                opacity: 1;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+              }
+
+              .btn-sm.btn-link {
+                display: inline-flex;
+                opacity: 1;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  .chat-pannel {
+    .card-header h5{
+        color: $white-color;
+    }
+    .chat-input {
+      border-bottom-left-radius: 1rem;
+      border-bottom-right-radius: 1rem;
+      background: rgba(24, 25, 28, 0.2);
+      border-top: 0.666667px solid rgba(211, 211, 211, 0.5);
+    }
+    .message.ai {
+      margin-left: 0.5rem;
+      @include theme-bgcolor($dark-mode-message-ai-bgcolor);
+      @include theme-text-color($dark-mode-message-ai-color);
+      border: $dark-mode-message-ai-border;
+      border-radius: $border-radius-16;
+      backdrop-filter: blur(8px);
+      padding: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .message.user {
+      @include theme-bgcolor($dark-mode-message-user-bgcolor);
+      @include theme-text-color($dark-mode-message-user-color);
+    }
+    .prompt-btn {
+      @include theme-bgcolor($dark-mode-prompt-btn-bgcolor);
+      border-color: $dark-mode-prompt-btn-border;
+    }
+  }
+}
+
+.notification-icon {
+  padding: $notification-icon-padding;
+  svg {
+    width: $icon-width;
+    height: $icon-height;
+  }
+}
+.notification-list {
+  .dropdown-item {
+    transition: all $transition-duration-50 ease;
+    .notification-icon-user_assigned {
+      background: $notiifcationicon-color3;
+    }
+    .notification-icon-project_created {
+      background: $notiifcationicon-color5;
+    }
+    .notification-icon-user_removed {
+      background: $notiifcationicon-color4;
+    }
+    .notification-icon-task_created {
+      background: $notiifcationicon-color1;
+    }
+    .notification-icon-task_status_updated {
+      background: $notiifcationicon-color1;
+    }
+    .notification-icon-subtask_status_updated {
+      background: $notiifcationicon-color2;
+    }
+    .notification-icon-subtask_created {
+      background: $notiifcationicon-color2;
+    }
+    .notification-icon-subtask_deleted {
+      background: $notiifcationicon-color2;
+    }
+    .notification-icon-subtask_updated {
+      background: $notiifcationicon-color2;
+    }
+  }
+}
+
+.modal {
+  .modal-dialog {
+    @media (min-width: 576px) {
+      &:not(.modal-lg):not(.modal-xl) {
+        max-width: 650px;
+      }
+      .modal-content {
+        background: $dark-mode-modal-bgcolor;
+        border: $dark-mode-modal-border;
+      }
+    }
+  }
+}
+
+// Ensure buttons are properly styled in all columns
+.column_todo,
+.column_in_progress,
+.column_done {
+  .task-card {
+    .btn-sm.btn-link,
+    .add-subtask-btn,
+    .ai-add-subtask-btn,
+    .ai-update-dates-btn {
+      color: $white-color !important;
+      text-decoration: none !important;
+      padding: 6px 12px;
+      border-radius: $border-radius-8;
+      background: $white-color-10;
+      border: 1px solid $white-color-10;
+      margin: 2px;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.875rem;
+      transition: all $transition-duration-34 ease;
+      white-space: nowrap;
+      
+      &:hover {
+        background: $white-color-20;
+        transform: translateY(-1px);
+      }
+    }
+  }
+}

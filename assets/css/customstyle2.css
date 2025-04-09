@@ -28,43 +28,6 @@
   background: white;
 }
 
-.task-column {
-  min-height: calc(100vh - 335px);
-  border-radius: 12px;
-  padding: 1rem;
-  overflow-y: auto;
-}
-
-body.dark-mode .task-column {
-  background: rgba(76, 76, 76, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(10px);
-  border-radius: 8px;
-}
-
-body.dark-mode .task-column_header {
-  background: rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(4px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  color: white;
-  font-size: large;
-  font-weight: 800;
-}
-
-.task-card {
-  background: white;
-  border: 1px solid #dee2e6;
-  border-radius: 12px;
-  padding: 0.75rem;
-  margin-bottom: 0.5rem;
-  cursor: pointer;
-  position: relative;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  transform-origin: center;
-  backface-visibility: hidden;
-  will-change: transform, box-shadow;
-}
-
 .task-card:hover {
   transform: translateY(-4px) scale(1.02);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
@@ -148,9 +111,6 @@ body.dark-mode .task-column_header {
   word-wrap: break-word;
 }
 
-.dark-mode .message.user {
-  background: rgba(255, 255, 255, 0.2);
-}
 
 .message.user {
   color: white;
@@ -251,8 +211,8 @@ body.dark-mode .task-column_header {
 }
 
 .delete-task-btn {
-  background-color: rgb(187, 7, 10) !important;
-  padding: 0.4rem;
+  background-color: rgb(187 7 11) !important;
+  padding: 0.6rem 0.8rem !important;
   opacity: 0;
   transition: opacity 0.34s;
   position: absolute;
@@ -333,24 +293,16 @@ body.dark-mode .task-column_header {
     gap: 6px;
 }
 
-/* Button container */
-.task-card .d-flex.gap-2.mt-2,
-.subtasks.mt-2 .d-flex.gap-2 {
-    display: none !important;  /* Hide by default */
-    margin-top: 8px;
-    z-index: 15;
-    position: relative;
-    gap: 8px !important;
-}
-
-/* Show buttons container on hover */
-.task-card:hover .d-flex.gap-2.mt-2 {
-    display: flex !important;
-    flex-wrap: wrap;
-}
-
-/* Individual button styling */
-.task-card .btn-sm.btn-link {
+/* Task Card Button Styles */
+.task-card .btn-sm.btn-link,
+.task-card .add-subtask-btn,
+.task-card .ai-add-subtask-btn,
+.task-card .ai-update-dates-btn {
+    opacity: 0;
+    visibility: hidden;
+    display: inline-flex !important;
+    align-items: center;
+    gap: 6px;
     color: #fff !important;
     text-decoration: none !important;
     padding: 6px 12px;
@@ -358,16 +310,56 @@ body.dark-mode .task-column_header {
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.1);
     margin: 2px;
-    display: none;  /* Hide by default */
-    align-items: center;
-    gap: 6px;
     font-size: 0.875rem;
-    transition: all 0.3s ease;
+    transition: all 0.34s ease;
     white-space: nowrap;
-}/* Show buttons on hover */
-.task-card:hover .btn-sm.btn-link {
-    display: inline-flex;
+    z-index: 10;
 }
+
+.task-card:hover .btn-sm.btn-link,
+.task-card:hover .add-subtask-btn,
+.task-card:hover .ai-add-subtask-btn,
+.task-card:hover .ai-update-dates-btn {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Button hover effect */
+.task-card .btn-sm.btn-link:hover,
+.task-card .add-subtask-btn:hover,
+.task-card .ai-add-subtask-btn:hover,
+.task-card .ai-update-dates-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+/* Ensure buttons container is above other elements */
+.task-card .d-flex.gap-2.mt-2,
+.task-card .subtasks.mt-2 .d-flex.gap-2 {
+    position: relative;
+    z-index: 15;
+    margin-top: 8px;
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 8px !important;
+}
+
+/* Override any conflicting styles */
+.column_todo .task-card .btn-sm.btn-link,
+.column_todo .task-card .add-subtask-btn,
+.column_todo .task-card .ai-add-subtask-btn,
+.column_todo .task-card .ai-update-dates-btn,
+.column_in_progress .task-card .btn-sm.btn-link,
+.column_in_progress .task-card .add-subtask-btn,
+.column_in_progress .task-card .ai-add-subtask-btn,
+.column_in_progress .task-card .ai-update-dates-btn,
+.column_done .task-card .btn-sm.btn-link,
+.column_done .task-card .add-subtask-btn,
+.column_done .task-card .ai-add-subtask-btn,
+.column_done .task-card .ai-update-dates-btn {
+    display: inline-flex !important;
+}
+
 .task-card.dragging {
   opacity: 0.5;
   transform: scale(0.95);
@@ -452,20 +444,21 @@ body.dark-mode .task-column_header {
 }
 
 .hover-show-subtasks {
-  display: block;
-  opacity: 0;
+  display: none;
+  /* opacity: 0;
   max-height: 0;
-  overflow: hidden;
+  overflow: hidden; */
   transition: all 0.3s ease 0.3s;
   margin-top: 0.5rem;
   margin-bottom: 0;
 }
 
 .task-card:hover .hover-show-subtasks {
+  display: block;
   opacity: 1;
   max-height: 1000px;
   line-height: 1;
-  height: 12px;
+  /* height: 12px; */
 }
 
 .task-card {
@@ -483,10 +476,6 @@ body.dark-mode .task-column_header {
   opacity: 0.7;
 }
 
-body.dark-mode {
-  background-color: #1a1b1e;
-  color: #e4e6eb;
-}
 
 body.dark-mode .card {
   border-color: var(--bs-primary-stroke50percent);
@@ -502,9 +491,6 @@ body.dark-mode .projects_card {
 }
 
 body.dark-mode .navbar {
-  background: rgba(131, 131, 131, 0.3);
-  box-shadow: 0px 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(8px);
   border-bottom: 1px solid #2f3031;
 }
 
@@ -522,20 +508,9 @@ body.dark-mode .project-item.active {
   border-left: 4px solid #2374e1;
 }
 
-body.dark-mode .task-card {
-  background-color: #101204;
-  border: 1px solid rgb(89 89 91 / 48%);
-  border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  display: flex;
-    flex-direction: column;
-    min-height: fit-content;
-}
-
 body.dark-mode .task-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 3px 6px var(--bs-primary-stroke50percent);
-  background: linear-gradient(135deg, #240121 0%, #4f0142 100%) !important;
+  box-shadow: 0 3px 6px var(--bs-primary-stroke50percent);background: linear-gradient(135deg, #240121 0%, #4f0142 100%) !important;
 }
 
 body.dark-mode .task-description {
@@ -559,29 +534,13 @@ body.dark-mode .suggestion-item {
   backdrop-filter: blur(8px);
 }
 
-body.dark-mode .message.ai {
-  margin-left: 0.5rem;
-  background: var(--bs-primary-darkpurple-linear-gradient) ;
-  border: 1px solid rgba(211, 211, 211, 0.5);
-  border-radius: 16px;
-  backdrop-filter: blur(8px);
-  color: #e4e6eb;
-  padding: 1rem;
-  margin-bottom: 0.5rem;
-}
-
 body.dark-mode .chat-messages {
   background-color: var(--bs-primary-white10percent);
   border-top: 0px;
   backdrop-filter: blur(10px);
 }
 
-body.dark-mode .chat-input {
-  border-bottom-left-radius: 1rem;
-  border-bottom-right-radius: 1rem;
-  background: rgba(24, 25, 28, 0.2);
-  border-top: 0.666667px solid rgba(211, 211, 211, 0.5);
-}
+
 
 body.dark-mode .form-control,
 body.dark-mode .form-select,
@@ -603,10 +562,6 @@ body.dark-mode textarea:focus {
   box-shadow: 0 0 0 2px rgba(35, 116, 225, 0.2);
 }
 
-body.dark-mode .modal-content {
-background: #000000;
-border: 1px solid rgba(255, 255, 255, 0.2);
-}
 body .modal-content {
  
 backdrop-filter: blur(6.35px);
@@ -971,13 +926,6 @@ body.dark-mode .nav-tabs::-webkit-scrollbar-track {
   transform: rotate(180deg);
 }
 
-.task-column {
-  border-radius: 12px;
-}
-
-.task-card {
-  border-radius: 12px;
-}
 
 .message {
   border-radius: 16px;
@@ -1044,15 +992,9 @@ body.dark-mode .nav-tabs::-webkit-scrollbar-track {
 .btn-sm {
   padding: 7px 16px;
   font-size: 1rem !important;
-  border-radius: 10px !important;
-  border: 1px solid var(--bs-secondary-stroke50percent) !important;
-  transition: all 0.5s ease-in-out !important;
 }
 
-button#notificationDropdown,
-button#toggleDarkModeBtn {
-  padding: 7px 10px !important;
-}
+
 
 button#notificationDropdown:focus,
 button#toggleDarkModeBtn:focus,

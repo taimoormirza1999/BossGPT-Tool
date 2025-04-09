@@ -410,31 +410,31 @@ function getActionTypeDisplay(action_type) {
     project_created: {
       text: "New Project Created",
       bgColor: "bg-success bg-opacity-10",
-      textColor: "text-success-emphasis text-success-emphasis-light",
+      textColor: "text-success-emphasis",
       darkBgColor: "dark-mode-success",
     },
     user_assigned: {
       text: "New User Added",
       bgColor: "bg-info bg-opacity-10",
-      textColor: "text-info-emphasis text-success-emphasis-light",
+      textColor: "text-info-emphasis",
       darkBgColor: "dark-mode-info",
     },
     task_created: {
       text: "New Task Created",
       bgColor: "bg-primary bg-opacity-10",
-      textColor: "text-primary-emphasis text-success-emphasis-light",
+      textColor: "text-primary-emphasis",
       darkBgColor: "dark-mode-primary",
     },
     user_removed: {
       text: "User Removed",
-      bgColor: "bg-danger bg-opacity-10",
-      textColor: "text-primary-emphasis text-success-emphasis-light",
-      darkBgColor: "dark-mode-danger bg-danger bg-opacity-50",
+      bgColor: "bg-opacity-10",
+      textColor: "text-primary-emphasis",
+      darkBgColor: "dark-mode-danger bg-opacity-50",
     },
     task_status_updated: {
       text: "Task Status Updated",
-      bgColor: "bg-warning bg-opacity-10",
-      textColor: "text-warning-emphasis text-success-emphasis-light",
+      bgColor: "bg-opacity-10",
+      textColor: "text-warning-emphasis",
       darkBgColor: "dark-mode-primary",
     },
   };
@@ -442,7 +442,7 @@ function getActionTypeDisplay(action_type) {
     actionTypes[action_type] || {
       text: action_type,
       bgColor: "bg-secondary bg-opacity-10",
-      textColor: "text-secondary-emphasis text-success-emphasis-light",
+      textColor: "text-secondary-emphasis",
       darkBgColor: "dark-mode-secondary",
     }
   );
@@ -478,17 +478,6 @@ function formatTimeAgo(dateString) {
   }
 }
 
-function getNotificationIcon(action_type) {
-  const icons = {
-    project_created: "bi-folder-plus",
-    user_removed: "bi-person-dash",
-    user_assigned: "bi-person-plus",
-    task_created: "bi-list-check",
-    task_status_updated: "bi-arrow-repeat",
-  };
-  return icons[action_type] || "bi-bell";
-}
-
 function updateNotificationDropdown(notifications) {
   const notificationList = document.querySelector(".notification-list");
   const badge = document.getElementById("notificationBadge");
@@ -506,18 +495,6 @@ function updateNotificationDropdown(notifications) {
                 border-color: #2d2d2d !important;
               
             }
-            .text-success-emphasis-light{
-                color: #212121 !important;
-            }
-            .dark-mode .text-success-emphasis-light{
-                color: #fff !important;
-            }
-            .dark-mode .dropdown-item {
-                color: #e1e1e1;
-            }
-            .dark-mode .dropdown-item:hover {
-                // background-color: #2d2d2d !important;
-            }
             .dark-mode .dropdown-header {
                 border-color: #2d2d2d;
                 color: #ffffff;
@@ -534,29 +511,19 @@ function updateNotificationDropdown(notifications) {
                 color: #a0a0a0 !important;
             }
             
-            .dark-mode .notification-icon {
-               background: linear-gradient(145.32deg, #240121 -14.49%, #8A047F 82.49%);¸
-            }
-            .dark-mode .dropdown-menu {
-                // background-color: #1a1a1a !important;
-                // border-color: #2d2d2d !important;
-                // border-width: 0.25rem !important;
-            }
+           
             #notificationDropdownMenu.dropdown-menu {
                background: rgba(255, 255, 255, 0.8);
 backdrop-filter: blur(3.1px);
 border-radius: 12px;
-width: 300px;
-                
+width: 300px;     
             }
 
             #notificationDropdownMenu.dark-mode .dropdown-menu {
                 border-width: 0.25rem !important;
             }
-            .dark-mode .dropdown-item:active,
-            .dark-mode .dropdown-item:focus {
-                // background-color: #2d2d2d !important;
-            }
+           
+       
         `;
     document.head.appendChild(styleSheet);
   }
@@ -569,6 +536,7 @@ width: 300px;
     badge.style.display = "none";
   }
 
+
   // Update notification list
   if (notifications.length > 0) {
     notificationList.innerHTML = notifications
@@ -576,18 +544,20 @@ width: 300px;
         const actionType = getActionTypeDisplay(notification.action_type);
         const timeAgo = formatTimeAgo(notification.created_at);
         const icon = getNotificationIcon(notification.action_type);
+        const iconClass = getNotificationIconClass(notification.action_type);
 
         return `
                 <div class="dropdown-item border-bottom pt-2">
                     <div class="d-flex align-items-start">
-                        <div class="notification-icon ${
+                        <div class="notification-icon ${iconClass} ${
+                         
                           isDarkMode
                             ? actionType.darkBgColor
                             : actionType.bgColor
                         } rounded-circle  me-3"
-                        style="padding:0.6rem 0.8rem !important;"
+                       
                         >
-                            <i class="bi ${icon} ${actionType.textColor}"></i>
+                        ${icon}
                         </div>
                         <div class="flex-grow-1">
                             <div class="d-flex justify-content-between align-items-center mb-1">
@@ -622,35 +592,6 @@ width: 300px;
   }
 }
 
-// function sendNotificationTest(projectId, title, body) {
-//   fetch("?api=send_notification_test", {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify({
-//       project_id: projectId,
-//       title: title,
-//       body: body,
-//     }),
-//   })
-//     .then((response) => response.json())
-//     .then((data) => {
-//       if (data.success) {
-//         Toast("success", "Success", "Notification sent successfully");
-//         // Refresh notifications after sending
-//         fetchNotifications();
-//       } else {
-//         Toast("error", "Error", data.message || "Failed to send notification");
-//       }
-//     })
-//     .catch((error) => {
-//       console.error("Request failed:", error);
-//       Toast("error", "Error", "Failed to send notification");
-//     });
-// }
-
-
 // Notification
 function appendNotification(notification) {
   const notificationList = document.querySelector(".notification-list");
@@ -663,7 +604,7 @@ function appendNotification(notification) {
   <div class="dropdown-item border-bottom py-1">
       <div class="d-flex align-items-start">
           <div class="notification-icon ${isDarkMode ? actionType.darkBgColor : actionType.bgColor} rounded-circle me-3"
-              style="padding:0.6rem 0.8rem !important;">
+              >
               <i class="bi ${icon} ${actionType.textColor}"></i>
           </div>
           <div class="flex-grow-1">

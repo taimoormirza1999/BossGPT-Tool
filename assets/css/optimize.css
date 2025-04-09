@@ -1,0 +1,286 @@
+#user-add-icon {
+  height: 24px;
+  width: 24px;
+}
+
+#user-add-icon path {
+  stroke: #fff;
+}
+
+.bi {
+  font-size: 1.25rem;
+}
+
+.btn-main-primary {
+  gap: 0.5rem;
+  height: 42px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+body.dark-mode {
+  background-image: url("https://trello-backgrounds.s3.amazonaws.com/53baf533e697a982248cd73f/2048x2048/22ec03aab9d36ea49139c569a62bb079/shutterstock_134707556.jpg");
+}
+body.dark-mode .task-card {
+  background: linear-gradient(135deg, #240121 0%, #4f0142 100%) !important;
+}
+body.dark-mode .notification-list .dropdown-item {
+  color: #e1e1e1;
+}
+body.dark-mode .notification-list .dropdown-item .title-notification {
+  color: rgb(92, 92, 92);
+}
+body.dark-mode .notification-list .dropdown-item:hover {
+  background: linear-gradient(135deg, #240121 0%, #4f0142 100%) !important;
+}
+body.dark-mode .notification-list .dropdown-item:hover .title-notification {
+  color: #fff;
+}
+
+body.light-mode {
+  background-image: url("https://trello-backgrounds.s3.amazonaws.com/53baf533e697a982248cd73f/2048x2048/22ec03aab9d36ea49139c569a62bb079/shutterstock_134707556.jpg");
+}
+
+body {
+  background-image: url("https://res.cloudinary.com/da6qujoed/image/upload/v1742653725/tool-bg_x91qyx.png");
+  background-size: cover;
+  background-position: top;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+body .navbar {
+  background: rgba(20, 20, 35, 0.3) !important;
+  backdrop-filter: blur(16px) !important;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1) !important;
+  border-bottom: 1px solid #2f3031;
+}
+body .navbar button {
+  border: 1.4px solid rgba(255, 255, 255, 0.8) !important;
+}
+body .navbar button#notificationDropdown,
+body .navbar button#toggleDarkModeBtn,
+body .navbar button.btn-logout {
+  padding: 10px !important;
+}
+body .form-control {
+  padding: 0.7rem 1rem;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+}
+body .btn-main-primary,
+body .btn-send-primary {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(248, 249, 250, 0.5) !important;
+  border-radius: 8px !important;
+  color: white !important;
+  transition: all 0.4s ease-in-out !important;
+}
+body .projects_card {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(211, 211, 211, 0.5);
+  backdrop-filter: blur(7.1999998093px);
+}
+body .projects_card .card-header {
+  background-color: var(--bs-primary-dark60percent) !important;
+  box-shadow: 0px 4px 30px rgba(0, 0, 0, 0.1) !important;
+}
+body .projects_card .card-header button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+body .projects_card .card-header #projectDropdownButton {
+  text-decoration: none !important;
+}
+body .projects_card .card-body .task-column_section .task-column_header {
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: #fff;
+  font-weight: 800;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 16px;
+  font-family: "CabinetGroteskBold";
+  text-transform: uppercase;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  transition: all 0.4s ease;
+  letter-spacing: 1px;
+  font-size: medium;
+}
+body .projects_card .card-body .task-column_section .task-column {
+  background: rgba(76, 76, 76, 0.25);
+  backdrop-filter: blur(20px);
+  border: 1px dashed rgba(255, 255, 255, 0.5);
+  transition: all 0.5s ease;
+  min-height: calc(100vh - 335px);
+  border-radius: 12px;
+  padding: 1rem;
+  overflow-y: auto;
+}
+body .projects_card .card-body .task-column_section .task-column .task-card {
+  transition: all 0.34s;
+  transform-origin: center;
+  backface-visibility: hidden;
+  will-change: transform, box-shadow;
+  transition: all 0.34s cubic-bezier(0.2, 1, 0.3, 1);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  margin-bottom: 16px;
+  padding: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+body .projects_card .card-body .task-column_section .task-column .task-card .d-flex.gap-2.mt-2,
+body .projects_card .card-body .task-column_section .task-column .task-card .subtasks.mt-2 .d-flex.gap-2 {
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.34s ease;
+  margin-top: 8px;
+  z-index: 15;
+  position: relative;
+  gap: 8px !important;
+}
+body .projects_card .card-body .task-column_section .task-column .task-card:hover .d-flex.gap-2.mt-2,
+body .projects_card .card-body .task-column_section .task-column .task-card:hover .subtasks.mt-2 .d-flex.gap-2 {
+  opacity: 1;
+  visibility: visible;
+  display: flex !important;
+  flex-wrap: wrap;
+}
+body .projects_card .card-body .task-column_section .task-column .task-card:hover .add-subtask-btn,
+body .projects_card .card-body .task-column_section .task-column .task-card:hover .ai-add-subtask-btn,
+body .projects_card .card-body .task-column_section .task-column .task-card:hover .ai-update-dates-btn {
+  opacity: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+body .projects_card .card-body .task-column_section .task-column .task-card:hover .btn-sm.btn-link {
+  display: inline-flex;
+  opacity: 1;
+}
+body .chat-pannel .card-header h5 {
+  color: #fff;
+}
+body .chat-pannel .chat-input {
+  border-bottom-left-radius: 1rem;
+  border-bottom-right-radius: 1rem;
+  background: rgba(24, 25, 28, 0.2);
+  border-top: 0.666667px solid rgba(211, 211, 211, 0.5);
+}
+body .chat-pannel .message.ai {
+  margin-left: 0.5rem;
+  background: var(--bs-primary-darkpurple-linear-gradient);
+  color: #e4e6eb;
+  border: 1px solid rgba(211, 211, 211, 0.5);
+  border-radius: 16px;
+  backdrop-filter: blur(8px);
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+}
+body .chat-pannel .message.user {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+body .chat-pannel .prompt-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(248, 249, 250, 0.5);
+}
+
+.notification-icon {
+  padding: 0.5rem;
+}
+.notification-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.notification-list .dropdown-item {
+  transition: all 0.5s ease;
+}
+.notification-list .dropdown-item .notification-icon-user_assigned {
+  background: linear-gradient(145.32deg, #fbfbfb -14.49%, #04068a 82.49%);
+}
+.notification-list .dropdown-item .notification-icon-project_created {
+  background: linear-gradient(145.32deg, #ffffff -14.49%, #8a8304 82.49%);
+}
+.notification-list .dropdown-item .notification-icon-user_removed {
+  background: linear-gradient(145.32deg, #ebe5eb -14.49%, #8a5204 82.49%);
+}
+.notification-list .dropdown-item .notification-icon-task_created {
+  background: linear-gradient(145.32deg, #240121 -14.49%, #8a047f 82.49%);
+}
+.notification-list .dropdown-item .notification-icon-task_status_updated {
+  background: linear-gradient(145.32deg, #240121 -14.49%, #8a047f 82.49%);
+}
+.notification-list .dropdown-item .notification-icon-subtask_status_updated {
+  background: linear-gradient(145.32deg, #ffffff -14.49%, #048a40 82.49%);
+}
+.notification-list .dropdown-item .notification-icon-subtask_created {
+  background: linear-gradient(145.32deg, #ffffff -14.49%, #048a40 82.49%);
+}
+.notification-list .dropdown-item .notification-icon-subtask_deleted {
+  background: linear-gradient(145.32deg, #ffffff -14.49%, #048a40 82.49%);
+}
+.notification-list .dropdown-item .notification-icon-subtask_updated {
+  background: linear-gradient(145.32deg, #ffffff -14.49%, #048a40 82.49%);
+}
+
+@media (min-width: 576px) {
+  .modal .modal-dialog:not(.modal-lg):not(.modal-xl) {
+    max-width: 650px;
+  }
+  .modal .modal-dialog .modal-content {
+    background: #000;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+}
+
+.column_todo .task-card .btn-sm.btn-link,
+.column_todo .task-card .add-subtask-btn,
+.column_todo .task-card .ai-add-subtask-btn,
+.column_todo .task-card .ai-update-dates-btn,
+.column_in_progress .task-card .btn-sm.btn-link,
+.column_in_progress .task-card .add-subtask-btn,
+.column_in_progress .task-card .ai-add-subtask-btn,
+.column_in_progress .task-card .ai-update-dates-btn,
+.column_done .task-card .btn-sm.btn-link,
+.column_done .task-card .add-subtask-btn,
+.column_done .task-card .ai-add-subtask-btn,
+.column_done .task-card .ai-update-dates-btn {
+  color: #fff !important;
+  text-decoration: none !important;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 2px;
+  display: none;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  transition: all 0.34s ease;
+  white-space: nowrap;
+}
+.column_todo .task-card .btn-sm.btn-link:hover,
+.column_todo .task-card .add-subtask-btn:hover,
+.column_todo .task-card .ai-add-subtask-btn:hover,
+.column_todo .task-card .ai-update-dates-btn:hover,
+.column_in_progress .task-card .btn-sm.btn-link:hover,
+.column_in_progress .task-card .add-subtask-btn:hover,
+.column_in_progress .task-card .ai-add-subtask-btn:hover,
+.column_in_progress .task-card .ai-update-dates-btn:hover,
+.column_done .task-card .btn-sm.btn-link:hover,
+.column_done .task-card .add-subtask-btn:hover,
+.column_done .task-card .ai-add-subtask-btn:hover,
+.column_done .task-card .ai-update-dates-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+/*# sourceMappingURL=optimize.css.map */

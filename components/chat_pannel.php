@@ -1,4 +1,4 @@
-<div class="col-md-3">
+<div class="col-md-3 chat-pannel">
     <div class="card" style="background-color: transparent!important;">
         <div class="card-header" style="
                                             display: flex;

@@ -98,8 +98,43 @@ function getLogoImage($bottomMargin = "0", $topMargin = "-1rem", $width = "15rem
         return $svg;
     }
     
-    
+    function getTreeIcon()
+    {
+        return file_get_contents('assets/icons/tree.svg');
+    }
+    function getLogoutIcon()
+    {
+        return file_get_contents('assets/icons/logout.svg');
+    }
+    function getFolderIcon()
+    {
+        return file_get_contents('assets/icons/folder.svg');
+    }
+    function getProfileIcon()
+    {
+        return file_get_contents('assets/icons/profile.svg');
+    }
+    function getProfileDeleteIcon()
+    {
+        return file_get_contents('assets/icons/profile-delete.svg');
+    }
+    function getclipboardIcon()
+    {
+        return file_get_contents('assets/icons/clipboard.svg');
+    }
+    function getPaperclipIcon()
+    {
+        return file_get_contents('assets/icons/paperclip.svg');
+    }
 
+    function getClockIcon()
+    {
+        return file_get_contents('assets/icons/clock.svg');
+    }
+    function getAddUserIcon()
+    {
+        return file_get_contents('assets/icons/user-add.svg');
+    }
     function getFileIcon()
     {
         return file_get_contents('assets/icons/file.svg');
@@ -135,3 +170,5 @@ function getLogoImage($bottomMargin = "0", $topMargin = "-1rem", $width = "15rem
         <button class="close-button" onclick="closePopup(this)">×</button>
       </div>';
     }
+
+    
