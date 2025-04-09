@@ -150,7 +150,7 @@ require_once './api_endPoints.php';
     <link rel="stylesheet" href="./assets/css/custom.css">
 
     <link rel="stylesheet" href="./assets/css/customstyle2.css">
- 
+
 </head>
 <!-- Reuseable Stuff -->
 <?php
@@ -815,7 +815,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                     <small class="form-text text-muted">You can select multiple users. Click to
                                         select/deselect.</small>
                                 </div>
-                          <div class="mb-3">
+                                <div class="mb-3">
   <label class="form-label">
     Choose Tree Type <span style="color:red">*</span>
   </label>
@@ -874,8 +874,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-primary" id="saveSubtaskBtn">Add Subtask</button>
+]                            <button type="button" class="btn btn-primary" id="saveSubtaskBtn">Add Subtask</button>
                         </div>
                     </div>
                 </div>
@@ -1402,7 +1401,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
             <script>
           
 
-  document.addEventListener('DOMContentLoaded', function() {
+                document.addEventListener('DOMContentLoaded', function() {
     
 
 // 1) The tree images
@@ -1552,9 +1551,6 @@ const treeImages = [
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-       
-    </script>
     <!-- for logoIcon -->
     <script>
         const iconImage = `<?php echo getIconImage(0, 0, "1.8rem"); ?>`
@@ -2036,11 +2032,11 @@ const getPlantImage = (task) => {
          alt="Plant" 
          class="inner-plant" 
          style="
-            height: 30px;
-            position: absolute;
-            left: 50%;
-            transform: translate(-50%);
-    ">
+    height: 30px;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%);
+">
 </div>`;
 
                     div.innerHTML = `
@@ -2253,7 +2249,7 @@ const getPlantImage = (task) => {
                     document.getElementById('editTaskTitle').value = task.title;
                     document.getElementById('editTaskDescription').value = task.description || '';
                     document.getElementById('editTaskDueDate').value = task.due_date || '';
-                    document.getElementById('editPlantType').value = task.plant_type || '';
+
                     const editTaskAssignees = document.getElementById('editTaskAssignees');
                     $(editTaskAssignees).empty();  // Clear using jQuery
 
@@ -2411,9 +2407,8 @@ const getPlantImage = (task) => {
                             task_id: taskId,
                             title: title,
                             description: description,
-                            due_date: dueDate,  
-                            assignees: assignees,
-                            plant_type: plantType
+                            due_date: dueDate, // This will now be null instead of empty string
+                            assignees: assignees
                         };
                         if (pictureData !== null) {
                             payload.picture = pictureData;
@@ -2868,11 +2863,11 @@ const getPlantImage = (task) => {
                                 document.querySelectorAll('.tree-option').forEach(opt => 
                                     opt.classList.remove('selected')
                                 );
-                                $('#newTaskAssignees').val(null).trigger('change');
+                                    $('#newTaskAssignees').val(null).trigger('change');
 
                                 // Close modal and refresh
-                                bootstrap.Modal.getInstance(document.getElementById('newTaskModal')).hide();
-                                loadTasks(currentProject);
+                                    bootstrap.Modal.getInstance(document.getElementById('newTaskModal')).hide();
+                                    loadTasks(currentProject);
                                 } else {
                                     throw new Error(data.message || 'Failed to create task');
                                 }
@@ -3679,7 +3674,7 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                     return response.json();
                 })
                 .then(data => {
-                    console.log("Reminders data:", data);
+                    // console.log("Reminders data:", data);
                     if (data.success && data.reminders && data.reminders.length > 0) {
                         const popupContainer = document.querySelector('.popup-container');
                         if (popupContainer) {
@@ -3716,7 +3711,11 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
 
         // Add the event listener when DOM is loaded
         document.addEventListener("DOMContentLoaded", function () {
-            interval = setInterval(getReminders, 10000); //every 10 seconds it will check for reminders
+            const fcmToken = "<?php echo isset($_SESSION['fcm_token']) ? $_SESSION['fcm_token'] : ''; ?>";
+            // console.log("FCM Token for reminders:", fcmToken);
+            if (fcmToken) {
+                interval = setInterval(getReminders, 10000); //every 10 seconds it will check for reminders
+            }
         });
 
         function delete_fcm_reminders(reminder_id) {
@@ -3775,19 +3774,7 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
             }, 300); // Small delay to create a smooth transition
         }
     </script>
-<!-- Tree Selection Component Template -->
-<template id="treeSelectionTemplate">
-  <div class="mb-3">
-    <label class="form-label">Choose Tree Type<span style="color:red">*</span></label>
-    
-    <!-- Hidden input to store which tree is selected -->
-    <input type="hidden" class="tree-type-input" name="selectedTreeType" />
-    
-    <!-- Grid container for images (populated by JS) -->
-    <div class="tree-select-grid"></div>
-  </div>
-</template>
+
 </body>
 
 </html>
-<!-- # Training parameters -->
