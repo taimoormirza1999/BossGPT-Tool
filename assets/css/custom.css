@@ -531,7 +531,7 @@
     font-size: 2rem !important;
   }
   .register-page .card .card-body, .login-page .card .card-body{
-    display: flex!important;
+    display: flex!important ;
     flex-direction: column!important;
     padding: 1.7rem 1.5rem!important;
   }
