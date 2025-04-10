@@ -211,8 +211,8 @@
 }
 
 .delete-task-btn {
-  background-color: rgb(187 7 11) !important;
-  padding: 0.6rem 0.8rem !important;
+  background-color: rgb(187, 7, 10) !important;
+  padding: 0.4rem;
   opacity: 0;
   transition: opacity 0.34s;
   position: absolute;
@@ -293,16 +293,24 @@
     gap: 6px;
 }
 
-/* Task Card Button Styles */
-.task-card .btn-sm.btn-link,
-.task-card .add-subtask-btn,
-.task-card .ai-add-subtask-btn,
-.task-card .ai-update-dates-btn {
-    opacity: 0;
-    visibility: hidden;
-    display: inline-flex !important;
-    align-items: center;
-    gap: 6px;
+/* Button container */
+.task-card .d-flex.gap-2.mt-2,
+.subtasks.mt-2 .d-flex.gap-2 {
+    display: none !important;  /* Hide by default */
+    margin-top: 8px;
+    z-index: 15;
+    position: relative;
+    gap: 8px !important;
+}
+
+/* Show buttons container on hover */
+.task-card:hover .d-flex.gap-2.mt-2 {
+    display: flex !important;
+    flex-wrap: wrap;
+}
+
+/* Individual button styling */
+.task-card .btn-sm.btn-link {
     color: #fff !important;
     text-decoration: none !important;
     padding: 6px 12px;
@@ -310,56 +318,16 @@
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.1);
     margin: 2px;
+    display: none;  /* Hide by default */
+    align-items: center;
+    gap: 6px;
     font-size: 0.875rem;
-    transition: all 0.34s ease;
+    transition: all 0.3s ease;
     white-space: nowrap;
-    z-index: 10;
+}/* Show buttons on hover */
+.task-card:hover .btn-sm.btn-link {
+    display: inline-flex;
 }
-
-.task-card:hover .btn-sm.btn-link,
-.task-card:hover .add-subtask-btn,
-.task-card:hover .ai-add-subtask-btn,
-.task-card:hover .ai-update-dates-btn {
-    opacity: 1;
-    visibility: visible;
-}
-
-/* Button hover effect */
-.task-card .btn-sm.btn-link:hover,
-.task-card .add-subtask-btn:hover,
-.task-card .ai-add-subtask-btn:hover,
-.task-card .ai-update-dates-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-1px);
-}
-
-/* Ensure buttons container is above other elements */
-.task-card .d-flex.gap-2.mt-2,
-.task-card .subtasks.mt-2 .d-flex.gap-2 {
-    position: relative;
-    z-index: 15;
-    margin-top: 8px;
-    display: flex !important;
-    flex-wrap: wrap;
-    gap: 8px !important;
-}
-
-/* Override any conflicting styles */
-.column_todo .task-card .btn-sm.btn-link,
-.column_todo .task-card .add-subtask-btn,
-.column_todo .task-card .ai-add-subtask-btn,
-.column_todo .task-card .ai-update-dates-btn,
-.column_in_progress .task-card .btn-sm.btn-link,
-.column_in_progress .task-card .add-subtask-btn,
-.column_in_progress .task-card .ai-add-subtask-btn,
-.column_in_progress .task-card .ai-update-dates-btn,
-.column_done .task-card .btn-sm.btn-link,
-.column_done .task-card .add-subtask-btn,
-.column_done .task-card .ai-add-subtask-btn,
-.column_done .task-card .ai-update-dates-btn {
-    display: inline-flex !important;
-}
-
 .task-card.dragging {
   opacity: 0.5;
   transform: scale(0.95);
@@ -444,21 +412,20 @@
 }
 
 .hover-show-subtasks {
-  display: none;
-  /* opacity: 0;
+  display: block;
+  opacity: 0;
   max-height: 0;
-  overflow: hidden; */
+  overflow: hidden;
   transition: all 0.3s ease 0.3s;
   margin-top: 0.5rem;
   margin-bottom: 0;
 }
 
 .task-card:hover .hover-show-subtasks {
-  display: block;
   opacity: 1;
   max-height: 1000px;
   line-height: 1;
-  /* height: 12px; */
+  height: 12px;
 }
 
 .task-card {

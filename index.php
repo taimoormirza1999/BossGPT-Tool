@@ -373,6 +373,9 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 
                 <!-- Main Content Area -->
                 <div class="row sides-padding " style="width: 100%!important;">
+                <button class="btn btn-link p-0 text-white show open-icon-btn " data-bs-dismiss="modal"
+    aria-label="Close"
+    onclick="openChatPannel()"><?php echo getIconImage(0, 0, "2.5rem", "auto", "https://res.cloudinary.com/da6qujoed/image/upload/v1742656707/logoIcon_pspxgh.png", 0); ?></button>
                     <!-- Tasks Panel (Board) - now spans 9 columns -->
                     <div class="col-12 col-md-9 tasks-panel">
                         <div class="card h-100 projects_card">

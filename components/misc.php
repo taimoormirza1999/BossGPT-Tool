@@ -1,6 +1,11 @@
 <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const openIconBtn = document.querySelector('.open-icon-btn');
+    $(openIconBtn).toggleClass('d-none');
+    $(openIconBtn).toggleClass('show');
+  });
 const notificationIcons = {
-    project_created: `<?= getFolderIcon(); ?>`,
+  project_created: `<?= getFolderIcon(); ?>`,
   user_removed: `<?= getProfileDeleteIcon(); ?>`,
   user_assigned: `<?= getProfileIcon(); ?>`,
   task_created: `<?= getclipboardIcon(); ?>`,
@@ -27,4 +32,20 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
+function closeChatPannel() {
+  const chatPannel = document.querySelector('.chat-pannel');
+  chatPannel.classList.add('d-none');
+
+  console.log($('.open-icon-btn'));
+  $('.open-icon-btn').addClass('show');
+  $('.open-icon-btn').removeClass('d-none');
+  console.log($('.open-icon-btn'));
+}
+function openChatPannel() {
+  const openIconBtn = document.querySelector('.open-icon-btn');
+  $(openIconBtn).toggleClass('d-none');
+  $(openIconBtn).toggleClass('show');
+  const chatPannel = document.querySelector('.chat-pannel');
+  chatPannel.classList.remove('d-none');  
+}
 </script>

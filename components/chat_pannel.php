@@ -1,3 +1,4 @@
+
 <div class="col-md-3 chat-pannel">
     <div class="card" style="background-color: transparent!important;">
         <div class="card-header" style="
@@ -14,7 +15,8 @@
                 &nbsp; Boss<span style="font-weight: 700;">GPT</span> Assistant
             </h5>
             <button class="btn btn-link p-0 text-white close-icon-btn position-absolute " data-bs-dismiss="modal"
-                aria-label="Close"><?php echo getCloseSquareIcon(); ?></button>
+                aria-label="Close" onclick="closeChatPannel()"><?php echo getCloseSquareIcon(); ?></button>
+
         </div>
         <div class="card-body p-0">
             <div class="chat-container">

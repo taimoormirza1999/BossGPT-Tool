@@ -116,10 +116,7 @@ body.dark-mode {
       @include theme-bgcolor($dark-mode-card-task-bgcolor);
     }
     .dropdown-item:hover .title-notification {
-      color: $white-color !important;
-    }
-    .dropdown-item:hover .notification-text {
-      color: $white-color-60 !important;
+      @include theme-text-color($white-color);
     }
   }
 }
@@ -139,6 +136,11 @@ body {
     }
   }
   .nav-container{
+    h4{
+      @media (max-width: 768px) {
+        font-size: 1.3rem!important;
+      }
+    }
     @media (max-width: 768px) {
       border-radius: 12px;
       margin: 0 0.5rem;
@@ -174,6 +176,7 @@ body {
       padding: 10px !important;
     }
     @media (max-width: 768px) {
+      border-bottom: 0px!important;
       button.navbar-toggler {
         padding: 0.6rem 0.6rem 0.4rem 0.6rem;
       }
@@ -311,6 +314,20 @@ body {
       }
     }
   }
+  .open-icon-btn{
+    display: none;
+    @media (max-width: 768px) {
+      background: var(--bs-primary-darkpurple-linear-gradient);
+      display: inline-block;
+      width: auto;
+      padding: 0.7rem 0.5rem !important;
+      border-radius: 50%;
+      position:fixed;
+      bottom: 15px;
+      right: 15px;
+    }
+  }
+
   .chat-pannel {
     @media (max-width: 768px) {
       position: fixed;
