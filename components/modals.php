@@ -4,8 +4,8 @@
                     <div class="modal-content border-0 shadow-lg rounded-lg">
                         <div class="modal-header text-white border-0 rounded-t-lg">
                             <h5 class="modal-title">Create New Project</h5>
-                            <button type="button" class="btn-close text-white" data-bs-dismiss="modal"
-                                aria-label="Close "></button>
+                            <button type="button" class="btn btn-link p-0 text-white close-icon-btn" data-bs-dismiss="modal"
+                                aria-label="Close"><?php echo getCloseSquareIcon(); ?></button>
                         </div>
                         <div class="modal-body">
                             <form id="newProjectForm">
@@ -36,7 +36,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">Edit Task</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            <button type="button" class="btn-close close-icon-btn" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body">
                             <form id="editTaskForm">
@@ -115,7 +115,8 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">Assign User to Project</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            <button type="button" class="btn btn-link p-0 text-white close-icon-btn" data-bs-dismiss="modal"
+                                aria-label="Close"><?php echo getCloseSquareIcon(); ?></button>
                         </div>
                         <div class="modal-body">
                             <form id="assignUserForm">
@@ -144,8 +145,8 @@
                     <div class="modal-content border-0 shadow-lg rounded-lg">
                         <div class="modal-header text-white border-0 rounded-t-lg">
                             <h5 class="modal-title" id="assignUserModalLabel">Invite User to Project</h5>
-                            <button type="button" class="btn-close text-white" data-bs-dismiss="modal"
-                                aria-label="Close "></button>
+                            <button type="button" class="btn btn-link p-0 text-white close-icon-btn" data-bs-dismiss="modal"
+                                aria-label="Close"><?php echo getCloseSquareIcon(); ?></button>
                         </div>
 
                         <div class="modal-body position-relative">
@@ -176,7 +177,8 @@
                     <div class="modal-content">
                         <div class="modal-header text-white border-0 rounded-t-lg">
                             <h5 class="modal-title">Add New User</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            <button type="button" class="btn btn-link p-0 text-white close-icon-btn" data-bs-dismiss="modal"
+                                aria-label="Close"><?php echo getCloseSquareIcon(); ?></button>
                         </div>
                         <div class="modal-body">
                             <form id="addUserForm">
@@ -208,7 +210,8 @@
                     <div class="modal-content">
                         <div class="modal-header text-white border-0 rounded-t-lg">
                             <h5 class="modal-title">Create New Task</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            <button type="button" class="btn btn-link p-0 text-white close-icon-btn" data-bs-dismiss="modal"
+                                aria-label="Close"><?php echo getCloseSquareIcon(); ?></button>
                         </div>
                         <div class="modal-body">
                             <form id="newTaskForm">
@@ -277,7 +280,8 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">Add Subtask</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            <button type="button" class="btn btn-link p-0 text-white close-icon-btn" data-bs-dismiss="modal"
+                                aria-label="Close"><?php echo getCloseSquareIcon(); ?></button>
                         </div>
                         <div class="modal-body">
                             <form id="addSubtaskForm">
@@ -316,7 +320,8 @@
                     <div class="modal-content">
                         <div class="modal-header text-white border-0 rounded-t-lg">
                             <h5 class="modal-title">Project Activity Log</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            <button type="button" class="btn btn-link p-0 text-white close-icon-btn" data-bs-dismiss="modal"
+                                aria-label="Close"><?php echo getCloseSquareIcon(); ?></button>
                         </div>
                         <div class="modal-body">
                             <div class="table-responsive">
@@ -348,7 +353,8 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">Task Image</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            <button type="button" class="btn btn-link p-0 text-white close-icon-btn" data-bs-dismiss="modal"
+                                aria-label="Close"><?php echo getCloseSquareIcon(); ?></button>
                         </div>
                         <div class="modal-body text-center">
                             <img id="enlargedImage" src="" alt="Enlarged task image"
@@ -366,7 +372,8 @@
                         
                         <div class="modal-header text-white border-0 rounded-t-lg">
                             <h5 class="modal-title" id="gardenStatsModalLabel">Garden Statistics</h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" id="closeGardenStats"></button>
+                            <button type="button" class="btn btn-link p-0 text-white close-icon-btn" data-bs-dismiss="modal"
+                            aria-label="Close"><?php echo getCloseSquareIcon(); ?></button>
                         </div>
                         
                         <div class="modal-body p-0">

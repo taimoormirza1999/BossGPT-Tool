@@ -4,7 +4,7 @@
             <?php echo getLogoImage($bottomMargin = '0.4rem', $topMargin = "0.4rem", $width = "11rem", $height = "auto", $positionClass = " ", $positionStyle = " ", $src = "https://res.cloudinary.com/da6qujoed/image/upload/v1742651528/bossgpt-transparent_n4axv7.png"); ?>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
+            <span class="navbar-toggler-icon"><?php echo getMenuIcon(); ?></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">

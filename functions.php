@@ -98,6 +98,14 @@ function getLogoImage($bottomMargin = "0", $topMargin = "-1rem", $width = "15rem
         return $svg;
     }
     
+    function getMenuIcon()
+    {
+        return file_get_contents('assets/icons/category.svg');
+    }
+    function getCloseSquareIcon()
+    {
+        return file_get_contents('assets/icons/close-square.svg');
+    }
     function getTreeIcon()
     {
         return file_get_contents('assets/icons/tree.svg');

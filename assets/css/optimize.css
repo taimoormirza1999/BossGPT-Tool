@@ -35,7 +35,10 @@ body.dark-mode .notification-list .dropdown-item:hover {
   background: linear-gradient(135deg, #240121 0%, #4f0142 100%) !important;
 }
 body.dark-mode .notification-list .dropdown-item:hover .title-notification {
-  color: #fff;
+  color: #fff !important;
+}
+body.dark-mode .notification-list .dropdown-item:hover .notification-text {
+  color: rgba(255, 255, 255, 0.6) !important;
 }
 
 body.light-mode {
@@ -48,6 +51,36 @@ body {
   background-position: top;
   background-repeat: no-repeat;
   background-attachment: fixed;
+}
+@media (max-width: 768px) {
+  body .container-fluid > .row:first-child {
+    border-radius: 12px;
+    margin: 0 0.5rem;
+  }
+}
+@media (max-width: 768px) {
+  body .nav-container {
+    border-radius: 12px;
+    margin: 0 0.5rem;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem !important;
+  }
+}
+body .sides-padding {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+@media (max-width: 768px) {
+  body .sides-padding {
+    padding-left: 0.2rem !important;
+    padding-right: 0.2rem !important;
+  }
+}
+@media (max-width: 768px) {
+  body .tasks-panel {
+    padding-left: 0.2rem;
+    padding-right: 0.2rem;
+  }
 }
 body .navbar {
   background: rgba(20, 20, 35, 0.3) !important;
@@ -62,6 +95,16 @@ body .navbar button#notificationDropdown,
 body .navbar button#toggleDarkModeBtn,
 body .navbar button.btn-logout {
   padding: 10px !important;
+}
+@media (max-width: 768px) {
+  body .navbar button.navbar-toggler {
+    padding: 0.6rem 0.6rem 0.4rem 0.6rem;
+  }
+  body .navbar .navbar-toggler-icon {
+    width: 2rem;
+    height: 2rem;
+    background-image: none !important;
+  }
 }
 body .form-control {
   padding: 0.7rem 1rem;
@@ -87,6 +130,13 @@ body .projects_card .card-header {
   background-color: var(--bs-primary-dark60percent) !important;
   box-shadow: 0px 4px 30px rgba(0, 0, 0, 0.1) !important;
 }
+@media (max-width: 768px) {
+  body .projects_card .card-header {
+    display: flex !important;
+    flex-wrap: nowrap;
+    overflow-x: scroll;
+  }
+}
 body .projects_card .card-header button {
   display: flex;
   justify-content: center;
@@ -94,6 +144,18 @@ body .projects_card .card-header button {
 }
 body .projects_card .card-header #projectDropdownButton {
   text-decoration: none !important;
+}
+@media (max-width: 768px) {
+  body .projects_card .card-body .row {
+    overflow-x: scroll;
+    flex-wrap: nowrap;
+    gap: 0.7rem;
+  }
+}
+@media (max-width: 768px) {
+  body .projects_card .card-body .row .col-10 {
+    padding: 0% !important;
+  }
 }
 body .projects_card .card-body .task-column_section .task-column_header {
   backdrop-filter: blur(4px);
@@ -163,6 +225,22 @@ body .projects_card .card-body .task-column_section .task-column .task-card:hove
 body .projects_card .card-body .task-column_section .task-column .task-card:hover .btn-sm.btn-link {
   display: inline-flex;
   opacity: 1;
+}
+@media (max-width: 768px) {
+  body .chat-pannel {
+    position: fixed;
+    bottom: 10px;
+    backdrop-filter: blur(15px);
+  }
+}
+body .chat-pannel .close-icon-btn {
+  display: none;
+}
+@media (max-width: 768px) {
+  body .chat-pannel .close-icon-btn {
+    display: block;
+    right: 20px;
+  }
 }
 body .chat-pannel .card-header h5 {
   color: #fff;
@@ -235,10 +313,23 @@ body .chat-pannel .prompt-btn {
   .modal .modal-dialog:not(.modal-lg):not(.modal-xl) {
     max-width: 650px;
   }
-  .modal .modal-dialog .modal-content {
-    background: #000;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  }
+}
+.modal .modal-dialog .modal-content {
+  color: #fff;
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.modal .modal-dialog .modal-content .close-icon-btn {
+  transform: translateY(-50%);
+  top: 50%;
+  position: absolute;
+  right: 20px;
+}
+.modal .modal-dialog .modal-content .modal-footer button {
+  transition: all 0.34s ease-in-out;
+}
+.modal .modal-dialog .modal-content .modal-footer button:hover svg path {
+  stroke: #000;
 }
 
 .column_todo .task-card .btn-sm.btn-link,

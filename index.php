@@ -194,7 +194,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 ?>
 
 <body
-    style="background-color:<?php echo isset($_GET['page']) && ($_GET['page'] == 'login' || $_GET['page'] == 'register') ? '#000' : ''; ?> ">
+    style="background-color:<?php echo isset($_GET['page']) && ($_GET['page'] == 'login' || $_GET['page'] == 'register') ? '#000' : ''; ?> " class="dark-mode">
     <?php
     $auth = new Auth();
 
@@ -374,7 +374,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                 <!-- Main Content Area -->
                 <div class="row sides-padding " style="width: 100%!important;">
                     <!-- Tasks Panel (Board) - now spans 9 columns -->
-                    <div class="col-md-9">
+                    <div class="col-12 col-md-9 tasks-panel">
                         <div class="card h-100 projects_card">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <div class="dropdown">
@@ -395,18 +395,18 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                 <div class="d-flex align-items-end">
                                 <button type="button" class="btn btn-sm btn-main-primary me-2" data-bs-toggle="modal"
                                     data-bs-target="#newTaskModal">
-                                    <?php echo getAddSquareIcon(); ?>Create New Task
+                                    <?php echo getAddSquareIcon(); ?>Create&nbsp;New&nbsp;Task
                                 </button>
                                 <button type="button" class="btn btn-sm btn-main-primary me-2" data-bs-toggle="modal"
                                     data-bs-target="#gardenStatsModal">
-                                    <i class="bi bi-tree"></i> My Garden Stats
+                                    <i class="bi bi-tree"></i> My&nbsp;Garden&nbsp;Stats
                                 </button>
                                 </div>
 
                             </div>
                             <div class="card-body pb-0">
                                 <div class="row">
-                                    <div class="col-md-4">
+                                    <div class="col-10 col-md-4">
                                         <div class="task-column_section ">
                                             <h6 class="text-center task-column_header column_todo">To Do</h6>
                                             <div class="task-column" id="todoTasks" data-status="todo">
@@ -414,7 +414,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-10 col-md-4">
                                         <div class="task-column_section">
                                             <h6 class="text-center task-column_header column_in_progress">In Progress</h6>
                                             <div class="task-column" id="inProgressTasks" data-status="in_progress">
@@ -422,7 +422,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-10 col-md-4">
                                         <div class="task-column_section">
                                             <h6 class="text-center task-column_header column_done">Done</h6>
                                             <div class="task-column" id="doneTasks" data-status="done">

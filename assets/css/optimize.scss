@@ -116,7 +116,10 @@ body.dark-mode {
       @include theme-bgcolor($dark-mode-card-task-bgcolor);
     }
     .dropdown-item:hover .title-notification {
-      @include theme-text-color($white-color);
+      color: $white-color !important;
+    }
+    .dropdown-item:hover .notification-text {
+      color: $white-color-60 !important;
     }
   }
 }
@@ -129,6 +132,34 @@ body {
   background-position: top;
   background-repeat: no-repeat;
   background-attachment: fixed;
+  .container-fluid > .row:first-child{
+    @media (max-width: 768px) {
+      border-radius: 12px;
+      margin: 0 0.5rem;
+    }
+  }
+  .nav-container{
+    @media (max-width: 768px) {
+      border-radius: 12px;
+      margin: 0 0.5rem;
+      padding: 0.5rem;
+      margin-bottom: 0.5rem !important;
+    }
+  }
+  .sides-padding {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    @media (max-width: 768px) {
+      padding-left: 0.2rem !important;
+      padding-right: 0.2rem !important;
+    }
+  }
+  .tasks-panel {
+    @media (max-width: 768px) {
+      padding-left: 0.2rem;
+      padding-right: 0.2rem;
+    }
+  }
   .navbar {
     background: rgba(20, 20, 35, 0.3) !important;
     backdrop-filter: blur(16px) !important;
@@ -141,6 +172,16 @@ body {
     button#toggleDarkModeBtn,
     button.btn-logout {
       padding: 10px !important;
+    }
+    @media (max-width: 768px) {
+      button.navbar-toggler {
+        padding: 0.6rem 0.6rem 0.4rem 0.6rem;
+      }
+      .navbar-toggler-icon {
+        width: 2rem;
+        height: 2rem;
+        background-image: none !important;
+      }
     }
   }
   .form-control {
@@ -166,6 +207,11 @@ body {
     .card-header {
       background-color: var(--bs-primary-dark60percent) !important;
       box-shadow: 0px 4px 30px $black-color-10 !important;
+      @media (max-width: 768px) {
+        display: flex !important;
+            flex-wrap: nowrap;
+            overflow-x: scroll;
+      }
       button {
         @include flex-center-hv;
       }
@@ -174,6 +220,18 @@ body {
       }
     }
     .card-body {
+      .row {
+        @media (max-width: 768px) {
+          overflow-x: scroll;
+          flex-wrap: nowrap;
+          gap: 0.7rem;
+        }
+        .col-10 {
+          @media (max-width: 768px) {
+            padding: 0% !important;
+          }
+        }
+      }
       .task-column_section {
         .task-column_header {
           backdrop-filter: blur(4px);
@@ -254,8 +312,22 @@ body {
     }
   }
   .chat-pannel {
-    .card-header h5{
-        color: $white-color;
+    @media (max-width: 768px) {
+      position: fixed;
+      bottom: 10px;
+      backdrop-filter: blur(15px);
+      
+    }
+    .close-icon-btn{
+      display: none;
+      @media (max-width: 768px) {
+        display: block;
+        right: 20px;
+      }
+    }
+
+    .card-header h5 {
+      color: $white-color;
     }
     .chat-input {
       border-bottom-left-radius: 1rem;
@@ -330,9 +402,28 @@ body {
       &:not(.modal-lg):not(.modal-xl) {
         max-width: 650px;
       }
-      .modal-content {
-        background: $dark-mode-modal-bgcolor;
-        border: $dark-mode-modal-border;
+    }
+    .modal-content {
+      color: $white-color;
+      background: $dark-mode-modal-bgcolor;
+      border: $dark-mode-modal-border;
+      .close-icon-btn {
+        transform: translateY(-50%);
+        top: 50%;
+        position: absolute;
+        right: 20px;
+      }
+      .modal-footer {
+        button {
+          transition: all $transition-duration-34 ease-in-out;
+          &:hover {
+            svg {
+              path {
+                stroke: $black-color;
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -360,7 +451,7 @@ body {
       font-size: 0.875rem;
       transition: all $transition-duration-34 ease;
       white-space: nowrap;
-      
+
       &:hover {
         background: $white-color-20;
         transform: translateY(-1px);

@@ -5,6 +5,7 @@ const notificationIcons = {
   user_assigned: `<?= getProfileIcon(); ?>`,
   task_created: `<?= getclipboardIcon(); ?>`,
   task_status_updated: `<?= getclipboardIcon(); ?>`,
+  task_updated: `<?= getclipboardIcon(); ?>`,
   subtask_status_updated: `<?= getPaperclipIcon(); ?>`,
   subtask_created: `<?= getPaperclipIcon(); ?>`,
   subtask_deleted: `<?= getPaperclipIcon(); ?>`,

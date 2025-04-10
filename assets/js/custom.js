@@ -670,4 +670,4 @@ document.addEventListener('DOMContentLoaded', function() {
           messageInput.focus();
       });
   });
-});
+}); 
