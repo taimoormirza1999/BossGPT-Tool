@@ -412,24 +412,24 @@
 }
 
 .hover-show-subtasks {
-  display: block;
+  display: none;
   opacity: 0;
-  max-height: 0;
   overflow: hidden;
-  transition: all 0.3s ease 0.3s;
+  transition: all 1s ease;
   margin-top: 0.5rem;
   margin-bottom: 0;
 }
 
 .task-card:hover .hover-show-subtasks {
+  display: block;
   opacity: 1;
   max-height: 1000px;
   line-height: 1;
-  height: 12px;
 }
 
 .task-card {
   position: relative;
+  transition: all 1s ease;
 }
 
 .task-card[data-has-subtasks="true"]::after {
