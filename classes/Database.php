@@ -45,6 +45,11 @@ class Database
                 username VARCHAR(50) UNIQUE NOT NULL,
                 email VARCHAR(100) NOT NULL,
                 password_hash VARCHAR(255) NOT NULL,
+                last_login DATETIME NULL,
+                invited_by INT DEFAULT NULL,
+                pro_plan BOOLEAN DEFAULT FALSE,
+                fcm_token VARCHAR(255) NULL,
+                verification_token VARCHAR(255) NULL,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )",
 
@@ -117,6 +122,7 @@ class Database
                 user_id INT,
                 action_type VARCHAR(50) NOT NULL,
                 description TEXT NOT NULL,
+                status ENUM('read', 'unread') DEFAULT 'unread',
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (project_id) REFERENCES projects(id),
                 FOREIGN KEY (user_id) REFERENCES users(id)
@@ -133,6 +139,14 @@ class Database
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 FOREIGN KEY (user_id) REFERENCES users(id),
                 FOREIGN KEY (task_id) REFERENCES tasks(id)
+            )",
+            // Add fcm_reminders_temp table
+            "CREATE TABLE IF NOT EXISTS fcm_reminders_temp (
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                fcm_token TEXT NOT NULL,
+                title VARCHAR(255),
+                description TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )"
         ];
 
