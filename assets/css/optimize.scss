@@ -17,6 +17,10 @@ $gray-color-3: #2f3031;
 $border-radius-8: 8px;
 $border-radius-12: 12px;
 $border-radius-16: 16px;
+$bg-img1-black: url("https://res.cloudinary.com/da6qujoed/image/upload/v1742653725/tool-bg_x91qyx.png");
+$bg-img2-multi: url("https://trello-backgrounds.s3.amazonaws.com/53baf533e697a982248cd73f/2048x2048/22ec03aab9d36ea49139c569a62bb079/shutterstock_134707556.jpg");
+$bg-img3-brown: url("https://res.cloudinary.com/da6qujoed/image/upload/v1744289266/a7190ff1f5577d8c63d61ed085165786_s6ghtx.png");
+
 $notiifcationicon-color1: linear-gradient(
   145.32deg,
   #240121 -14.49%,
@@ -53,20 +57,51 @@ $dark-mode-card-task-bgcolor: linear-gradient(
   #240121 0%,
   #4f0142 100%
 ) !important;
+$purple-mode-card-task-bgcolor: linear-gradient(
+  135deg,
+  #240121 0%,
+  #4f0142 100%
+) !important;
+$default-mode-topbar-bgcolor: rgba(24, 25, 28, 1);
+$default-mode-main-bgcolor: rgba(36, 37, 38, 1);
+$default-mode-card-task-bgcolor: rgba(53, 53, 53, 1) !important;
+$black-mode-card-task-bgcolor: rgba(9, 1, 12, 1) !important;
+$brown-mode-card-task-bgcolor: rgba(65, 4, 4, 1) !important;
+$dark-mode-bar-bgcolor: rgba(40, 3, 59, 0.6);
+$purple-mode-bar-bgcolor: rgba(40, 3, 59, 0.6);
+$black-mode-bar-bgcolor: rgba(36, 37, 38, 0.5);
+$brown-mode-bar-bgcolor: rgba(65, 4, 4, 1);
+$light-mode-bar-bgcolor: rgba(255, 255, 255, 0.6);
 $dark-mode-modal-bgcolor: $black-color;
 $dark-mode-modal-border: 1px solid $white-color-20;
-$dark-mode-message-ai-bgcolor: var(--bs-primary-darkpurple-linear-gradient);
+$dark-mode-bar-bgcolor: var(--bs-primary-darkpurple-linear-gradient);
 $dark-mode-message-ai-border: 1px solid rgba(211, 211, 211, 0.5);
 $dark-mode-message-ai-color: #e4e6eb;
+$dark-mode-message-user-bgcolor: $white-color-20;
+$purple-mode-message-user-bgcolor: $white-color-20;
+$black-mode-message-user-bgcolor: $white-color-20;
+$brown-mode-message-user-bgcolor: $white-color-20;
+$light-mode-message-user-bgcolor: $white-color-20;
 $dark-mode-prompt-btn-bgcolor: $white-color-10;
 $dark-mode-prompt-btn-border: rgba(248, 249, 250, 0.5);
-$dark-mode-message-user-bgcolor: $white-color-20;
+$dark-mode-bar-bgcolor: $white-color-20;
 $dark-mode-message-user-color: $white-color;
 $transition-duration-34: 0.34s;
 $transition-duration-40: 0.4s;
 $transition-duration-50: 0.5s;
 $notification-icon-padding: 0.5rem;
 
+@mixin commomtaskheader {
+  .column_todo{
+    background-color: rgb(187, 7, 10)!important;
+  }
+  .column_in_progress{
+    background-color: rgb(158, 17, 147)!important;
+  }
+  .column_done{
+    background-color: rgb(21, 158, 97)!important;
+  }
+}
 @mixin theme-bgcolor($bg-color) {
   background: $bg-color;
 }
@@ -80,6 +115,12 @@ $notification-icon-padding: 0.5rem;
   align-items: center;
 }
 
+@mixin flex-center-hv-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
 @mixin button-icon-only {
   height: $icon-height;
   width: $icon-width;
@@ -102,8 +143,38 @@ $notification-icon-padding: 0.5rem;
 }
 body.dark-mode {
   background-image: url("https://trello-backgrounds.s3.amazonaws.com/53baf533e697a982248cd73f/2048x2048/22ec03aab9d36ea49139c569a62bb079/shutterstock_134707556.jpg");
-  .task-card {
-    @include theme-bgcolor($dark-mode-card-task-bgcolor);
+
+  .projects_card {
+    .column_todo{
+      background-color: rgb(187, 7, 10)!important;
+    }
+    .column_in_progress{
+      background-color: rgb(158, 17, 147)!important;
+    }
+    .column_done{
+      background-color: rgb(21, 158, 97)!important;
+    }
+    .card-header {
+      @include theme-bgcolor($dark-mode-bar-bgcolor);
+    }
+    .card-body {
+      .task-card {
+        @include theme-bgcolor($dark-mode-card-task-bgcolor);
+      }
+    }
+  }
+  .chat-pannel {
+    .card-header {
+      @include theme-bgcolor($dark-mode-bar-bgcolor);
+    }
+    .card-body {
+      .message.ai {
+        @include theme-bgcolor($dark-mode-bar-bgcolor);
+      }
+      .message.user {
+        @include theme-bgcolor($dark-mode-message-user-bgcolor);
+      }
+    }
   }
   .notification-list {
     .dropdown-item {
@@ -120,25 +191,235 @@ body.dark-mode {
     }
   }
 }
-body.light-mode {
-  background-image: url("https://trello-backgrounds.s3.amazonaws.com/53baf533e697a982248cd73f/2048x2048/22ec03aab9d36ea49139c569a62bb079/shutterstock_134707556.jpg");
+body.system-mode {
+  background-image: $bg-img1-black;
+
+  .nav-background {
+    @include theme-bgcolor($default-mode-topbar-bgcolor);
+  }
+  .projects_card {
+
+      .column_todo,
+      .column_in_progress,
+      .column_done {
+        background: $default-mode-main-bgcolor !important;
+      }
+     
+    .card-header {
+      @include theme-bgcolor($default-mode-main-bgcolor);
+      border-bottom: 1px solid rgba(211, 211, 211, 0.5) !important;
+    }
+    .card-body {
+      .task-column_header {
+        border: 1px solid rgba(211, 211, 211, 0.5) !important;
+      }
+      .task-card {
+        @include theme-bgcolor($default-mode-card-task-bgcolor);
+      }
+    }
+  }
+  .chat-pannel {
+    .card-header {
+      @include theme-bgcolor($default-mode-main-bgcolor);
+    }
+    .card-body {
+      .welcome-logo-container {
+        background: rgba(24, 24, 24, 1);
+      }
+      .message.ai {
+        background: rgba(53, 53, 53, 1);
+      }
+      .message.user {
+        @include theme-bgcolor($purple-mode-message-user-bgcolor);
+      }
+    }
+  }
+  .notification-list {
+    .dropdown-item {
+      @include theme-text-color($gray-color-e1);
+    }
+    .dropdown-item .title-notification {
+      @include theme-text-color($gray-color-92);
+    }
+    .dropdown-item:hover {
+      @include theme-bgcolor($purple-mode-card-task-bgcolor);
+    }
+    .dropdown-item:hover .title-notification {
+      @include theme-text-color($white-color);
+    }
+  }
 }
+body.purple-mode {
+  background-image: $bg-img2-multi;
+
+  .nav-background {
+    @include theme-bgcolor($purple-mode-bar-bgcolor);
+  }
+  .projects_card {
+    @include commomtaskheader;
+   
+    .card-header {
+      @include theme-bgcolor($purple-mode-bar-bgcolor);
+    }
+    .card-body {
+      .task-card {
+        @include theme-bgcolor($purple-mode-card-task-bgcolor);
+      }
+    }
+  }
+  .chat-pannel {
+    .welcome-logo-container {
+      background-color: $purple-mode-bar-bgcolor;
+    }
+    .card-header {
+      @include theme-bgcolor($purple-mode-bar-bgcolor);
+    }
+    .card-body {
+      .task-column_header {
+        background: auto !important;
+      }
+      .message.ai {
+        @include theme-bgcolor($purple-mode-bar-bgcolor);
+      }
+      .message.user {
+        @include theme-bgcolor($purple-mode-message-user-bgcolor);
+      }
+    }
+  }
+  .notification-list {
+    .dropdown-item {
+      @include theme-text-color($gray-color-e1);
+    }
+    .dropdown-item .title-notification {
+      @include theme-text-color($gray-color-92);
+    }
+    .dropdown-item:hover {
+      @include theme-bgcolor($purple-mode-card-task-bgcolor);
+    }
+    .dropdown-item:hover .title-notification {
+      @include theme-text-color($white-color);
+    }
+  }
+}
+body.black-mode {
+  background-image: $bg-img2-multi;
+
+  .nav-background {
+    @include theme-bgcolor($black-mode-bar-bgcolor);
+  }
+  .projects_card {
+    @include commomtaskheader;
+    .card-header {
+      @include theme-bgcolor($black-mode-bar-bgcolor);
+    }
+    .card-body {
+      .task-card {
+        @include theme-bgcolor($black-mode-card-task-bgcolor);
+      }
+    }
+  }
+  .chat-pannel {
+    .welcome-logo-container {
+      @include theme-bgcolor($black-mode-bar-bgcolor);
+    }
+    .card-header {
+      @include theme-bgcolor($black-mode-bar-bgcolor);
+    }
+    .card-body {
+      .message.ai {
+        @include theme-bgcolor($black-mode-bar-bgcolor);
+      }
+      .message.user {
+        @include theme-bgcolor($black-mode-message-user-bgcolor);
+      }
+    }
+  }
+  .notification-list {
+    .dropdown-item {
+      @include theme-text-color($gray-color-e1);
+    }
+    .dropdown-item .title-notification {
+      @include theme-text-color($gray-color-92);
+    }
+    .dropdown-item:hover {
+      @include theme-bgcolor($black-mode-card-task-bgcolor);
+    }
+    .dropdown-item:hover .title-notification {
+      @include theme-text-color($white-color);
+    }
+  }
+}
+body.brown-mode {
+  background-image: $bg-img3-brown;
+
+  .nav-background {
+    @include theme-bgcolor($brown-mode-bar-bgcolor);
+  }
+  .projects_card {
+    @include commomtaskheader;
+    .card-header {
+      @include theme-bgcolor($brown-mode-bar-bgcolor);
+    }
+    .card-body {
+      .task-card {
+        @include theme-bgcolor($brown-mode-card-task-bgcolor);
+      }
+    }
+  }
+  .chat-pannel {
+    .welcome-logo-container {
+      @include theme-bgcolor($brown-mode-bar-bgcolor);
+    }
+    .card-header {
+      @include theme-bgcolor($brown-mode-bar-bgcolor);
+    }
+    .card-body {
+      .message.ai {
+        @include theme-bgcolor($brown-mode-bar-bgcolor);
+      }
+      .message.user {
+        @include theme-bgcolor($brown-mode-message-user-bgcolor);
+      }
+    }
+  }
+  .notification-list {
+    .dropdown-item {
+      @include theme-text-color($gray-color-e1);
+    }
+    .dropdown-item .title-notification {
+      @include theme-text-color($gray-color-92);
+    }
+    .dropdown-item:hover {
+      @include theme-bgcolor($brown-mode-card-task-bgcolor);
+    }
+    .dropdown-item:hover .title-notification {
+      @include theme-text-color($white-color);
+    }
+  }
+}
+body.light-mode {
+  background-image: $bg-img2-multi;
+  .nav-background {
+    @include theme-bgcolor($light-mode-bar-bgcolor);
+  }
+}
+
 body {
-  background-image: url("https://res.cloudinary.com/da6qujoed/image/upload/v1742653725/tool-bg_x91qyx.png");
+  background-image: $bg-img1-black;
   background-size: cover;
   background-position: top;
   background-repeat: no-repeat;
   background-attachment: fixed;
-  .container-fluid > .row:first-child{
+  .container-fluid > .row:first-child {
     @media (max-width: 768px) {
       border-radius: 12px;
       margin: 0 0.5rem;
     }
   }
-  .nav-container{
-    h4{
+  .nav-container {
+    h4 {
       @media (max-width: 768px) {
-        font-size: 1.3rem!important;
+        font-size: 1.3rem !important;
       }
     }
     @media (max-width: 768px) {
@@ -172,11 +453,85 @@ body {
     }
     button#notificationDropdown,
     button#toggleDarkModeBtn,
-    button.btn-logout {
-      padding: 10px !important;
+    button.btn-logout,
+    button#btn-theme {
+      padding: 0px !important;
+      height: 42px;
+      width: 42px;
+      @include flex-center-hv;
+    }
+    .theme-icon-container {
+      @include flex-center-hv-column;
+      gap: 0.3rem;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(3.1px);
+      border-radius: $border-radius-12;
+      padding: 0.75rem 1.3rem;
+      position: absolute;
+      top: 4.2rem;
+      .theme-icon-content-container {
+        @include flex-center-hv;
+        gap: 0.7rem;
+        h6 {
+          font-family: "Cabinet Grotesk";
+          font-style: normal;
+          font-weight: 800;
+          font-size: 1.3rem;
+          line-height: 11px;
+          letter-spacing: 0.5px;
+          color: #121212;
+        }
+        .theme-icon-content-item {
+          @include flex-center-hv-column;
+          gap: 0.5rem;
+          span {
+            font-family: "Cabinet Grotesk";
+            font-style: normal;
+            font-weight: 400;
+            font-size: 0.9rem;
+            line-height: 11px;
+            color: #240121;
+            letter-spacing: 0.5px;
+          }
+          .theme-icon-color {
+            width: 1.9rem;
+            height: 1.9rem;
+            border-radius: 50%;
+            // background-color: #000;
+          }
+          &:nth-child(1) .theme-icon-color {
+            background: linear-gradient(
+              152.14deg,
+              #240121 8.15%,
+              #8a047f 91.85%
+            );
+          }
+          &:nth-child(2) .theme-icon-color {
+            background: linear-gradient(
+              156.22deg,
+              #0b020f 8.55%,
+              #561075 91.45%
+            );
+          }
+          &:nth-child(3) .theme-icon-color {
+            background: linear-gradient(
+              153.27deg,
+              #410404 8.31%,
+              #a70a0a 91.69%
+            );
+          }
+          &:nth-child(4) .theme-icon-color {
+            background: linear-gradient(
+              153.27deg,
+              #410404 8.31%,
+              #021415 91.69%
+            );
+          }
+        }
+      }
     }
     @media (max-width: 768px) {
-      border-bottom: 0px!important;
+      border-bottom: 0px !important;
       button.navbar-toggler {
         padding: 0.6rem 0.6rem 0.4rem 0.6rem;
       }
@@ -208,12 +563,11 @@ body {
     border: 1px solid rgba(211, 211, 211, 0.5);
     backdrop-filter: blur(7.199999809265137px);
     .card-header {
-      background-color: var(--bs-primary-dark60percent) !important;
       box-shadow: 0px 4px 30px $black-color-10 !important;
       @media (max-width: 768px) {
         display: flex !important;
-            flex-wrap: nowrap;
-            overflow-x: scroll;
+        flex-wrap: nowrap;
+        overflow-x: scroll;
       }
       button {
         @include flex-center-hv;
@@ -274,7 +628,16 @@ body {
             color: $white-color;
             position: relative;
             overflow: hidden;
-
+            .due-date {
+              border: 1px solid #2f3031;
+              background: rgba(255, 255, 255, 0.1);
+              font-size: 1.3rem;
+              transition: all 0.4s ease;
+            }
+            svg#calendar-icon {
+              height: 1.2rem !important;
+              width: 1.2rem !important;
+            }
             .d-flex.gap-2.mt-2,
             .subtasks.mt-2 .d-flex.gap-2 {
               opacity: 0;
@@ -314,7 +677,7 @@ body {
       }
     }
   }
-  .open-icon-btn{
+  .open-icon-btn {
     display: none;
     @media (max-width: 768px) {
       background: var(--bs-primary-darkpurple-linear-gradient);
@@ -322,7 +685,7 @@ body {
       width: auto;
       padding: 0.7rem 0.5rem !important;
       border-radius: 50%;
-      position:fixed;
+      position: fixed;
       bottom: 15px;
       right: 15px;
     }
@@ -333,9 +696,8 @@ body {
       position: fixed;
       bottom: 10px;
       backdrop-filter: blur(15px);
-      
     }
-    .close-icon-btn{
+    .close-icon-btn {
       display: none;
       @media (max-width: 768px) {
         display: block;
@@ -354,7 +716,7 @@ body {
     }
     .message.ai {
       margin-left: 0.5rem;
-      @include theme-bgcolor($dark-mode-message-ai-bgcolor);
+      @include theme-bgcolor($dark-mode-bar-bgcolor);
       @include theme-text-color($dark-mode-message-ai-color);
       border: $dark-mode-message-ai-border;
       border-radius: $border-radius-16;
@@ -363,7 +725,7 @@ body {
       margin-bottom: 0.5rem;
     }
     .message.user {
-      @include theme-bgcolor($dark-mode-message-user-bgcolor);
+      @include theme-bgcolor($dark-mode-bar-bgcolor);
       @include theme-text-color($dark-mode-message-user-color);
     }
     .prompt-btn {

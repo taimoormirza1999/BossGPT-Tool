@@ -122,7 +122,7 @@ require_once './api_endPoints.php';
         content="949298386531-pbk4td6p6ga18e6diee9rifskto0ou0v.apps.googleusercontent.com.apps.googleusercontent.com">
     <meta name="fcm_token_value" content="0" id="fcm_token_value">
 
-    <title>Project Manager AI</title>
+    <title>BOSS GPT - Project Manager AI</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -194,7 +194,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 ?>
 
 <body
-    style="background-color:<?php echo isset($_GET['page']) && ($_GET['page'] == 'login' || $_GET['page'] == 'register') ? '#000' : ''; ?> " class="dark-mode">
+    style="background-color:<?php echo isset($_GET['page']) && ($_GET['page'] == 'login' || $_GET['page'] == 'register') ? '#000' : ''; ?> " class="system-mode">
     <?php
     $auth = new Auth();
 
@@ -252,7 +252,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                 <div class="row justify-content-center w-100 position-relative">
 
                     <?php echo getLogoImage("", "-70px"); ?>
-                    <div class="col-md-6 col-lg-4">
+                    <div class="col-md-6 col-lg-12">
                         <div class="card">
                             <div class="card-body">
                                 <h2 class="card-title text-center mb-4">Login</h2>
@@ -298,7 +298,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                         class="position-absolute top-0 start-50 translate-middle "
                         style="margin-top: -1rem; width: 15rem; height: 10rem;position: absolute;top: 50%;left: 50%;transform: translate(-50%,-50%);"> -->
                     <?php echo getLogoImage(); ?>
-                    <div class="col-md-6 col-lg-4 mt-5">
+                    <div class="col-md-6 col-lg-12 mt-5">
                         <div class="card">
                             <div class="card-body">
                                 <h2 class="card-title text-center mb-4">Register</h2>
@@ -820,7 +820,7 @@ const treeImages = [
                         // If SVG doesn't exist, add a new one
                         $button.append(`
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M4 6L8 10L12 6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                         `);
                     }

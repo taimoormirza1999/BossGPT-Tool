@@ -486,11 +486,7 @@ body.dark-mode .task-description {
   border-radius: 12px;
 }
 
-body.dark-mode .task-assignee {
-  background-color: #3a3b3c;
-  color: #e4e6eb;
-  border-radius: 20px;
-}
+
 
 body.dark-mode .message,
 body.dark-mode .suggestion-item {
@@ -628,13 +624,7 @@ body.dark-mode .btn-link:hover {
   color: #4080ff;
 }
 
-body.dark-mode .due-date {
-  color: rgba(160, 160, 160, 1);
-  border: 1px solid #2f3031;
-  background: rgba(255, 255, 255, 0.1);
-  font-size: cal(var(--font-size, auto) - 0.3rem);
-  transition: all 0.4s ease;
-}
+
 
 body.dark-mode .due-date.overdue {
   background-color: rgba(220, 53, 69, 0.2);

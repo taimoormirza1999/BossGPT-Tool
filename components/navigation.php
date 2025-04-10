@@ -62,7 +62,7 @@
 
                 <!-- Dark Mode Toggle Button -->
                 <!-- <button id="toggleDarkModeBtn" class="btn btn-outline-light mx-2">Dark Mode</button> -->
-                <button id="toggleDarkModeBtn" class="btn btn-icon-only mx-2" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Switch Theme">
+                <!-- <button id="toggleDarkModeBtn" class="btn btn-icon-only mx-2" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Switch Theme">
                     <svg width="24" id="light-icon" height="24" viewBox="0 0 24 24" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -73,7 +73,7 @@
                             stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
 
-                    <svg id="dark-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                    <svg id="dark-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white"
                         viewBox="0 0 28 30">
                         <path d="
             M 23, 5
@@ -81,7 +81,32 @@
             A 12 12 0 0 1 23, 5
         "></path>
                     </svg>
-                </button>
+                </button> -->
+                <button class="btn btn-icon-only mx-2" id="btn-theme" onclick="toggleThemeClick()" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Switch Theme">
+            <?php echo getThemeIcon(); ?>
+            <div class="theme-icon-container">
+                <h6>Theme</h6>
+                <div class="theme-icon-content-container">
+                    <div class="theme-icon-content-item">
+                    <div class="theme-icon-color" onclick="changeTheme('purple-mode')"></div>
+                    <span>Purple</span>
+                    </div>
+                
+                   <div class="theme-icon-content-item">
+                   <div class="theme-icon-color" onclick="changeTheme('black-mode')"></div>
+                   <span>Black</span>
+                   </div>
+                   <div class="theme-icon-content-item">
+                   <div class="theme-icon-color" onclick="changeTheme('brown-mode')"></div>
+                   <span>Brown</span>
+                   </div>
+                   <div class="theme-icon-content-item">
+                   <div class="theme-icon-color" onclick="changeTheme('system-mode')"></div>
+                   <span>Default</span>
+                   </div>
+                </div>
+            </div>
+        </button>
                 <!-- Logout Form -->
                 <form method="POST" class="d-inline">
                     <input type="hidden" name="action" value="logout">

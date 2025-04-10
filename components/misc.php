@@ -48,4 +48,20 @@ function openChatPannel() {
   const chatPannel = document.querySelector('.chat-pannel');
   chatPannel.classList.remove('d-none');  
 }
+function changeTheme(theme) {
+  // List of all possible theme classes
+  const themes = ['light-mode', 'dark-mode', 'brown-mode', 'purple-mode', 'black-mode'];
+  // Remove all theme classes from the body
+  themes.forEach(function(currentTheme) {
+    $('body').removeClass(currentTheme);
+  });
+  // Add the selected theme
+  $('body').addClass(theme);
+  // console.log(theme);
+}
+function toggleThemeClick() {
+const themeContainer = document.querySelector('.theme-icon-container');
+themeContainer.classList.toggle('d-none');
+}
+
 </script>

@@ -9,8 +9,7 @@
     unset($_SESSION['welcome_message']);
 }
 ?>
-<div class="nav-container row justify-content-between nav-background"
-    style="background-color: var(--bs-primary-dark60percent); ">
+<div class="nav-container row justify-content-between nav-background">
     <div class="col-md-6 d-flex justify-content-between align-items-center self-center">
         <h4 class="text-capitalize font-weight-normal d-flex align-items-center" style="font-size: 1.83rem;">
             <span style="color: var(--bs-primary-white55percent);">Welcome, </span> <span class=" text-capitalize"
