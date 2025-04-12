@@ -477,24 +477,12 @@ function updateNotificationDropdown(notifications) {
     const styleSheet = document.createElement("style");
     styleSheet.id = "notification-dark-mode-styles";
     styleSheet.textContent = `
-            .dark-mode .notification-dropdown {
-                background-color: #1a1a1a !important;
-                border-color: #2d2d2d !important;
-              
-            }
-            .dark-mode .dropdown-header {
-                border-color: #2d2d2d;
-                color: #ffffff;
-                background-color: #1a1a1a !important;
-            }
-            .dropdown-header {
-               border-bottom: 0.3rem #d3d4d5 solid;
-            }
-            .dark-mode .notification-text {
+            
+            .notification-text {
                color: rgba(131, 131, 131, 1);
                white-space: normal;
             }
-            .dark-mode .text-muted {
+           .text-muted {
                 color: #a0a0a0 !important;
             }
             
@@ -561,7 +549,7 @@ width: 300px;
                                     ${timeAgo}
                                 </small>
                             </div>
-                            <div class="notification-text" style="font-size: 0.8rem;">
+                            <div class="notification-text" style="font-size: 0.8rem;text-wrap: auto;">
                                 ${notification.description}
                             </div>
                         </div>

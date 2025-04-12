@@ -195,6 +195,72 @@ $geist-fonts: (
   width: $icon-width;
 }
 
+@mixin theme-common-notification-list($bgcolor) {
+  .dropdown-item {
+    &:hover {
+      @include theme-bgcolor($bgcolor);
+    }
+  }
+}
+@mixin theme-common-modal($container-bgcolor, $header-bgcolor, $input-bgcolor) {
+  .modal {
+    .modal-dialog {
+      .modal-content {
+        @include theme-bgcolor($container-bgcolor);
+        .close-icon-btn {
+        }
+        .modal-header {
+          @include theme-bgcolor($header-bgcolor);
+          .modal-title {
+          }
+        }
+        .modal-body {
+          input,
+          textarea,
+          .select2-container--default .select2-selection--multiple,
+          .tree-option {
+            @include theme-bgcolor($input-bgcolor);
+          }
+        }
+
+        .modal-footer {
+        }
+      }
+    }
+  }
+}
+@mixin theme-common-chat-pannel(
+  $card-header-bgcolor,
+  $card-body-welcome-logo-bgcolor,
+  $card-body-chat-loading-container-bgcolor,
+  $card-body-ai-message-bgcolor,
+  $card-body-message-user-bgcolor
+) {
+  .chat-pannel {
+    .card-header {
+      @include theme-bgcolor($card-header-bgcolor);
+    }
+    .card-body {
+      .welcome-logo-container {
+        @include theme-bgcolor($card-body-welcome-logo-bgcolor);
+      }
+      .chat-loading-container {
+        @include theme-bgcolor($card-body-chat-loading-container-bgcolor);
+      }
+      .ai-message {
+        .chat-loading-avatar {
+          @include theme-bgcolor($card-body-ai-message-bgcolor);
+        }
+        .message.ai {
+          @include theme-bgcolor($card-body-ai-message-bgcolor);
+        }
+      }
+      .message.user {
+        @include theme-bgcolor($card-body-message-user-bgcolor);
+      }
+    }
+  }
+}
 #user-add-icon {
   @include button-icon-only;
 }
@@ -213,7 +279,7 @@ $geist-fonts: (
 
 body.system-mode {
   background-image: $bg-img1-black;
- 
+
   .nav-background {
     @include theme-bgcolor($default-mode-topbar-bgcolor);
   }
@@ -237,71 +303,21 @@ body.system-mode {
       }
     }
   }
-  .chat-pannel {
-    .card-header {
-      @include theme-bgcolor($default-mode-main-bgcolor);
-    }
-    .card-body {
-      .welcome-logo-container {
-        background: rgba(24, 24, 24, 1);
-      }
-      .chat-loading-container {
-        @include theme-bgcolor($default-mode-main-bgcolor);
-      }
-      .ai-message {
-        .chat-loading-avatar {
-          @include theme-bgcolor($default-mode-main-bgcolor);
-        }
-        .message.ai {
-          background: rgba(53, 53, 53, 1);
-        }
-      }
-      .message.user {
-        @include theme-bgcolor($purple-mode-message-user-bgcolor);
-      }
-    }
-  }
-  .notification-list {
-    .dropdown-item {
-      @include theme-text-color($gray-color-e1);
-    }
-    .dropdown-item .title-notification {
-      @include theme-text-color($gray-color-92);
-    }
-    .dropdown-item:hover {
-      @include theme-bgcolor($purple-mode-card-task-bgcolor);
-    }
-    .dropdown-item:hover .title-notification {
-      @include theme-text-color($white-color);
-    }
-  }
+  @include theme-common-chat-pannel(
+    $default-mode-main-bgcolor,
+    $default-mode-main-bgcolor,
+    $default-mode-main-bgcolor,
+    $default-mode-main-bgcolor,
+    $default-mode-main-bgcolor
+  );
+  @include theme-common-notification-list($default-mode-card-task-bgcolor);
+  @include theme-common-modal(
+    $default-mode-modal-container-bgcolor,
+    $default-mode-modal-header-bgcolor,
+    $default-mode-modal-input-bgcolor
+  );
   table tbody tr:nth-child(odd) > * {
     @include theme-bgcolor($default-mode-modal-input-bgcolor);
-  }
-  .modal {
-    .modal-dialog {
-      .modal-content {
-        @include theme-bgcolor($default-mode-modal-container-bgcolor);
-        .close-icon-btn {
-        }
-        .modal-header {
-          @include theme-bgcolor($default-mode-modal-header-bgcolor);
-          .modal-title {
-          }
-        }
-        .modal-body {
-          input,
-          textarea,
-          .select2-container--default .select2-selection--multiple,
-          .tree-option {
-            @include theme-bgcolor($default-mode-modal-input-bgcolor);
-          }
-        }
-
-        .modal-footer {
-        }
-      }
-    }
   }
 }
 body.purple-mode {
@@ -322,75 +338,22 @@ body.purple-mode {
       }
     }
   }
-  .chat-pannel {
-    .card-header {
-      @include theme-bgcolor($purple-mode-bar-bgcolor);
-    }
-    .card-body {
-      .welcome-logo-container {
-        background-color: $purple-mode-bar-bgcolor;
-      }
-      .task-column_header {
-        background: auto !important;
-      }
-      .chat-loading-container {
-        @include theme-bgcolor($purple-mode-bar-bgcolor);
-      }
-      .ai-message {
-        .chat-loading-avatar {
-          @include theme-bgcolor($purple-mode-bar-bgcolor);
-        }
-        .message.ai {
-          @include theme-bgcolor($purple-mode-bar-bgcolor);
-        }
-      }
-      .message.user {
-        @include theme-bgcolor($purple-mode-message-user-bgcolor);
-      }
-    }
-  }
-  .notification-list {
-    .dropdown-item {
-      @include theme-text-color($gray-color-e1);
-    }
-    .dropdown-item .title-notification {
-      @include theme-text-color($gray-color-92);
-    }
-    .dropdown-item:hover {
-      @include theme-bgcolor($purple-mode-card-task-bgcolor);
-    }
-    .dropdown-item:hover .title-notification {
-      @include theme-text-color($white-color);
-    }
-  }
+  @include theme-common-chat-pannel(
+    $purple-mode-bar-bgcolor,
+    $purple-mode-bar-bgcolor,
+    $purple-mode-bar-bgcolor,
+    $purple-mode-bar-bgcolor,
+    $purple-mode-message-user-bgcolor
+  );
+  @include theme-common-notification-list($purple-mode-card-task-bgcolor);
   table tbody tr:nth-child(odd) > * {
     @include theme-bgcolor($purple-mode-modal-input-bgcolor);
   }
-  .modal {
-    .modal-dialog {
-      .modal-content {
-        @include theme-bgcolor($purple-mode-modal-container-bgcolor);
-        .close-icon-btn {
-        }
-        .modal-header {
-          @include theme-bgcolor($purple-mode-modal-header-bgcolor);
-          .modal-title {
-          }
-        }
-        .modal-body {
-          input,
-          textarea,
-          .select2-container--default .select2-selection--multiple,
-          .tree-option {
-            @include theme-bgcolor($purple-mode-modal-input-bgcolor);
-          }
-        }
-
-        .modal-footer {
-        }
-      }
-    }
-  }
+  @include theme-common-modal(
+    $purple-mode-modal-container-bgcolor,
+    $purple-mode-modal-header-bgcolor,
+    $purple-mode-modal-input-bgcolor
+  );
 }
 body.black-mode {
   background-image: $bg-img2-multi;
@@ -409,72 +372,22 @@ body.black-mode {
       }
     }
   }
-  .chat-pannel {
-    .card-header {
-      @include theme-bgcolor($black-mode-bar-bgcolor);
-    }
-    .card-body {
-      .welcome-logo-container {
-        @include theme-bgcolor($black-mode-bar-bgcolor);
-      }
-      .chat-loading-container {
-        @include theme-bgcolor($black-mode-bar-bgcolor);
-      }
-      .ai-message {
-        .chat-loading-avatar {
-          @include theme-bgcolor($black-mode-bar-bgcolor);
-        }
-        .message.ai {
-          @include theme-bgcolor($black-mode-bar-bgcolor);
-        }
-      }
-      .message.user {
-        @include theme-bgcolor($black-mode-message-user-bgcolor);
-      }
-    }
-  }
-  .notification-list {
-    .dropdown-item {
-      @include theme-text-color($gray-color-e1);
-    }
-    .dropdown-item .title-notification {
-      @include theme-text-color($gray-color-92);
-    }
-    .dropdown-item:hover {
-      @include theme-bgcolor($black-mode-card-task-bgcolor);
-    }
-    .dropdown-item:hover .title-notification {
-      @include theme-text-color($white-color);
-    }
-  }
+  @include theme-common-chat-pannel(
+    $black-mode-bar-bgcolor,
+    $black-mode-bar-bgcolor,
+    $black-mode-bar-bgcolor,
+    $black-mode-bar-bgcolor,
+    $black-mode-message-user-bgcolor
+  );
+  @include theme-common-notification-list($black-mode-card-task-bgcolor);
   table tbody tr:nth-child(odd) > * {
     @include theme-bgcolor($black-mode-modal-input-bgcolor);
   }
-  .modal {
-    .modal-dialog {
-      .modal-content {
-        @include theme-bgcolor($black-mode-modal-container-bgcolor);
-        .close-icon-btn {
-        }
-        .modal-header {
-          @include theme-bgcolor($black-mode-modal-header-bgcolor);
-          .modal-title {
-          }
-        }
-        .modal-body {
-          input,
-          textarea,
-          .select2-container--default .select2-selection--multiple,
-          .tree-option {
-            @include theme-bgcolor($black-mode-modal-input-bgcolor);
-          }
-        }
-
-        .modal-footer {
-        }
-      }
-    }
-  }
+  @include theme-common-modal(
+    $black-mode-modal-container-bgcolor,
+    $black-mode-modal-header-bgcolor,
+    $black-mode-modal-input-bgcolor
+  );
 }
 body.brown-mode {
   background-image: $bg-img3-brown;
@@ -493,134 +406,23 @@ body.brown-mode {
       }
     }
   }
-  .chat-pannel {
-    .card-header {
-      @include theme-bgcolor($brown-mode-bar-bgcolor);
-    }
-    .card-body {
-      .welcome-logo-container {
-        @include theme-bgcolor($brown-mode-bar-bgcolor);
-      }
-      .chat-loading-container {
-        @include theme-bgcolor($brown-mode-bar-bgcolor);
-      }
-      .ai-message {
-        .chat-loading-avatar {
-          @include theme-bgcolor($brown-mode-bar-bgcolor);
-        }
-        .message.ai {
-          @include theme-bgcolor($brown-mode-bar-bgcolor);
-        }
-      }
-      .message.user {
-        @include theme-bgcolor($brown-mode-message-user-bgcolor);
-      }
-    }
-  }
-  .notification-list {
-    .dropdown-item {
-      @include theme-text-color($gray-color-e1);
-    }
-    .dropdown-item .title-notification {
-      @include theme-text-color($gray-color-92);
-    }
-    .dropdown-item:hover {
-      @include theme-bgcolor($brown-mode-card-task-bgcolor);
-    }
-    .dropdown-item:hover .title-notification {
-      @include theme-text-color($white-color);
-    }
-  }
+  @include theme-common-chat-pannel(
+    $brown-mode-bar-bgcolor,
+    $brown-mode-bar-bgcolor,
+    $brown-mode-bar-bgcolor,
+    $brown-mode-bar-bgcolor,
+    $brown-mode-message-user-bgcolor
+  );
+  @include theme-common-notification-list($brown-mode-card-task-bgcolor);
   table tbody tr:nth-child(odd) > * {
     @include theme-bgcolor($brown-mode-modal-input-bgcolor);
   }
-  .modal {
-    .modal-dialog {
-      .modal-content {
-        @include theme-bgcolor($brown-mode-modal-container-bgcolor);
-        .close-icon-btn {
-        }
-        .modal-header {
-          @include theme-bgcolor($brown-mode-modal-header-bgcolor);
-          .modal-title {
-          }
-        }
-        .modal-body {
-          input,
-          textarea,
-          .select2-container--default .select2-selection--multiple,
-          .tree-option, {
-            @include theme-bgcolor($brown-mode-modal-input-bgcolor);
-          }
-        }
-
-        .modal-footer {
-        }
-      }
-    }
-  }
+  @include theme-common-modal(
+    $brown-mode-modal-container-bgcolor,
+    $brown-mode-modal-header-bgcolor,
+    $brown-mode-modal-input-bgcolor
+  );
 }
-// body.light-mode {
-//   background-image: $bg-img2-multi;
-//   .nav-background {
-//     @include theme-bgcolor($light-mode-bar-bgcolor);
-//   }
-// }
-// body.dark-mode {
-//   background-image: url("https://trello-backgrounds.s3.amazonaws.com/53baf533e697a982248cd73f/2048x2048/22ec03aab9d36ea49139c569a62bb079/shutterstock_134707556.jpg");
-
-//   .projects_card {
-//     .column_todo {
-//       background-color: rgb(187, 7, 10) !important;
-//     }
-//     .column_in_progress {
-//       background-color: rgb(158, 17, 147) !important;
-//     }
-//     .column_done {
-//       background-color: rgb(21, 158, 97) !important;
-//     }
-//     .card-header {
-//       @include theme-bgcolor($dark-mode-bar-bgcolor);
-//     }
-//     .card-body {
-//       .task-card {
-//         @include theme-bgcolor($dark-mode-card-task-bgcolor);
-//       }
-//     }
-//   }
-//   .chat-pannel {
-//     .card-header {
-//       @include theme-bgcolor($dark-mode-bar-bgcolor);
-//     }
-//     .card-body {
-//       .ai-message {
-//         .chat-loading-avatar {
-//           @include theme-bgcolor($dark-mode-bar-bgcolor);
-//         }
-//         .message.ai {
-//           @include theme-bgcolor($dark-mode-bar-bgcolor);
-//         }
-//       }
-//       .message.user {
-//         @include theme-bgcolor($dark-mode-message-user-bgcolor);
-//       }
-//     }
-//   }
-//   .notification-list {
-//     .dropdown-item {
-//       @include theme-text-color($gray-color-e1);
-//     }
-//     .dropdown-item .title-notification {
-//       @include theme-text-color($gray-color-92);
-//     }
-//     .dropdown-item:hover {
-//       @include theme-bgcolor($dark-mode-card-task-bgcolor);
-//     }
-//     .dropdown-item:hover .title-notification {
-//       @include theme-text-color($white-color);
-//     }
-//   }
-// }
 body {
   @extend .font-primary;
   background-image: $bg-img1-black;
@@ -1231,6 +1033,14 @@ body {
 .notification-list {
   .dropdown-item {
     transition: all $transition-duration-50 ease;
+    @include theme-text-color($gray-color-e1);
+    &:hover {
+      @include theme-bgcolor($default-mode-main-bgcolor);
+      border-radius: 8px;
+    }
+    &:hover .title-notification {
+      color: $white-color !important;
+    }
     .notification-icon-user_assigned {
       background: $notiifcationicon-color3;
     }
@@ -1258,6 +1068,10 @@ body {
     .notification-icon-subtask_updated {
       background: $notiifcationicon-color2;
     }
+  }
+  .dropdown-item .title-notification {
+    transition: all $transition-duration-34 ease-in-out;
+    @include theme-text-color($gray-color-92);
   }
 }
 

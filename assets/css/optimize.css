@@ -131,7 +131,7 @@ body.system-mode .chat-pannel .card-header {
   background: rgb(36, 37, 38);
 }
 body.system-mode .chat-pannel .card-body .welcome-logo-container {
-  background: rgb(24, 24, 24);
+  background: rgb(36, 37, 38);
 }
 body.system-mode .chat-pannel .card-body .chat-loading-container {
   background: rgb(36, 37, 38);
@@ -140,25 +140,13 @@ body.system-mode .chat-pannel .card-body .ai-message .chat-loading-avatar {
   background: rgb(36, 37, 38);
 }
 body.system-mode .chat-pannel .card-body .ai-message .message.ai {
-  background: rgb(53, 53, 53);
+  background: rgb(36, 37, 38);
 }
 body.system-mode .chat-pannel .card-body .message.user {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgb(36, 37, 38);
 }
-body.system-mode .notification-list .dropdown-item {
-  color: #e1e1e1;
-}
-body.system-mode .notification-list .dropdown-item .title-notification {
-  color: rgb(92, 92, 92);
-}
-body.system-mode .notification-list .dropdown-item:hover {
-  background: linear-gradient(135deg, #240121 0%, #4f0142 100%) !important;
-}
-body.system-mode .notification-list .dropdown-item:hover .title-notification {
-  color: #fff;
-}
-body.system-mode table tbody tr:nth-child(odd) > * {
-  background: rgba(10, 10, 10, 0.2);
+body.system-mode .dropdown-item:hover {
+  background: rgb(53, 53, 53) !important;
 }
 body.system-mode .modal .modal-dialog .modal-content {
   background: #242526;
@@ -172,6 +160,10 @@ body.system-mode .modal .modal-dialog .modal-content .modal-body .select2-contai
 body.system-mode .modal .modal-dialog .modal-content .modal-body .tree-option {
   background: rgba(10, 10, 10, 0.2);
 }
+body.system-mode table tbody tr:nth-child(odd) > * {
+  background: rgba(10, 10, 10, 0.2);
+}
+
 body.purple-mode {
   background-image: url("https://trello-backgrounds.s3.amazonaws.com/53baf533e697a982248cd73f/2048x2048/22ec03aab9d36ea49139c569a62bb079/shutterstock_134707556.jpg");
 }
@@ -197,10 +189,7 @@ body.purple-mode .chat-pannel .card-header {
   background: rgba(40, 3, 59, 0.6);
 }
 body.purple-mode .chat-pannel .card-body .welcome-logo-container {
-  background-color: rgba(40, 3, 59, 0.6);
-}
-body.purple-mode .chat-pannel .card-body .task-column_header {
-  background: auto !important;
+  background: rgba(40, 3, 59, 0.6);
 }
 body.purple-mode .chat-pannel .card-body .chat-loading-container {
   background: rgba(40, 3, 59, 0.6);
@@ -214,17 +203,8 @@ body.purple-mode .chat-pannel .card-body .ai-message .message.ai {
 body.purple-mode .chat-pannel .card-body .message.user {
   background: rgba(255, 255, 255, 0.2);
 }
-body.purple-mode .notification-list .dropdown-item {
-  color: #e1e1e1;
-}
-body.purple-mode .notification-list .dropdown-item .title-notification {
-  color: rgb(92, 92, 92);
-}
-body.purple-mode .notification-list .dropdown-item:hover {
+body.purple-mode .dropdown-item:hover {
   background: linear-gradient(135deg, #240121 0%, #4f0142 100%) !important;
-}
-body.purple-mode .notification-list .dropdown-item:hover .title-notification {
-  color: #fff;
 }
 body.purple-mode table tbody tr:nth-child(odd) > * {
   background: rgba(12, 1, 17, 0.5);
@@ -280,17 +260,8 @@ body.black-mode .chat-pannel .card-body .ai-message .message.ai {
 body.black-mode .chat-pannel .card-body .message.user {
   background: rgba(255, 255, 255, 0.2);
 }
-body.black-mode .notification-list .dropdown-item {
-  color: #e1e1e1;
-}
-body.black-mode .notification-list .dropdown-item .title-notification {
-  color: rgb(92, 92, 92);
-}
-body.black-mode .notification-list .dropdown-item:hover {
+body.black-mode .dropdown-item:hover {
   background: rgb(9, 1, 12) !important;
-}
-body.black-mode .notification-list .dropdown-item:hover .title-notification {
-  color: #fff;
 }
 body.black-mode table tbody tr:nth-child(odd) > * {
   background: rgba(12, 1, 17, 0.2);
@@ -346,17 +317,8 @@ body.brown-mode .chat-pannel .card-body .ai-message .message.ai {
 body.brown-mode .chat-pannel .card-body .message.user {
   background: rgba(255, 255, 255, 0.2);
 }
-body.brown-mode .notification-list .dropdown-item {
-  color: #e1e1e1;
-}
-body.brown-mode .notification-list .dropdown-item .title-notification {
-  color: rgb(92, 92, 92);
-}
-body.brown-mode .notification-list .dropdown-item:hover {
+body.brown-mode .dropdown-item:hover {
   background: rgb(65, 4, 4) !important;
-}
-body.brown-mode .notification-list .dropdown-item:hover .title-notification {
-  color: #fff;
 }
 body.brown-mode table tbody tr:nth-child(odd) > * {
   background: rgba(12, 1, 17, 0.2);
@@ -943,6 +905,14 @@ body .modal .modal-dialog .modal-content .modal-footer button {
 
 .notification-list .dropdown-item {
   transition: all 0.5s ease;
+  color: #e1e1e1;
+}
+.notification-list .dropdown-item:hover {
+  background: rgb(36, 37, 38);
+  border-radius: 8px;
+}
+.notification-list .dropdown-item:hover .title-notification {
+  color: #fff !important;
 }
 .notification-list .dropdown-item .notification-icon-user_assigned {
   background: linear-gradient(145.32deg, #fbfbfb -14.49%, #04068a 82.49%);
@@ -970,6 +940,10 @@ body .modal .modal-dialog .modal-content .modal-footer button {
 }
 .notification-list .dropdown-item .notification-icon-subtask_updated {
   background: linear-gradient(145.32deg, #ffffff -14.49%, #048a40 82.49%);
+}
+.notification-list .dropdown-item .title-notification {
+  transition: all 0.34s ease-in-out;
+  color: rgb(92, 92, 92);
 }
 
 .column_todo .task-card .btn-sm.btn-link,
