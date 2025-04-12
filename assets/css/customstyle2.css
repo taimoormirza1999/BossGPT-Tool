@@ -253,7 +253,7 @@
   border-radius: 10px;
   background-color: rgba(0, 0, 0, 0.02);
   margin-bottom: 0.25rem;
-  border: 1px solid;
+  border: 1px solid rgb(255 255 255 / 48%);
   border-radius: 20px;
 }
 
@@ -392,7 +392,7 @@
 
 .enlarge-image {
   transition: transform 0.2s;
-  border-radius: 12px;
+  border-radius: 12px!important;
   border: 1px dashed var(--bs-primary-white55percent);
   height: 11rem;
   object-fit: cover;

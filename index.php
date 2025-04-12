@@ -1716,12 +1716,12 @@ const getPlantImage = (task) => {
                     if (sender === 'user') {
                         // Get username from session
                         const username = '<?php echo isset($_SESSION["username"]) ? $_SESSION["username"] : ""; ?>';
-                        const initials = username.split(' ').map(word => word[0].toUpperCase()).join('').slice(0, 2);
+                        const initials = username.split(' ').map(word => word[0].toUpperCase()).join('').slice(0, 2)+username.split(' ').map(word => word[1].toUpperCase()).join('').slice(0, 2);
 
                         div.innerHTML = `
                             <div class="message user me-2">${message}</div>
                             <div class="user-avatar">
-                                <div class="chat-loading-avatar d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #44125c 0%, #713e7f 100%);">
+                                <div class="chat-loading-avatar d-flex align-items-center justify-content-center" style="background-color: rgba(8, 190, 139, 1);">
                                     ${initials}
                                 </div>
                             </div>

@@ -230,26 +230,13 @@ function initializeChatLoading() {
           display: flex;
           align-items: center;
           gap: 10px;
-          background: var(--message-bg, #f0f2f5);
           padding: 10px 20px;
           border-radius: 18px;
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
       }
-
-      body.dark-mode .chat-loading-container {
-          background: var(--bs-primary-darkpurple-linear-gradient);
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-          border: 1px solid rgba(211, 211, 211, 0.5);
-    border-radius: 16px;
-    backdrop-filter: blur(8px);
-    color: #e4e6eb;
-      }
-
       .chat-loading-avatar {
           width: 32px;
           height: 32px;
           border-radius: 50%;
-        //   background: var(--primary-color, #0d6efd);
           display: flex;
           align-items: center;
           justify-content: center;

@@ -128,7 +128,6 @@ $geist-fonts: (
     font-style: normal;
   }
 }
-
 // CabinetGrotesk Fonts - Direct declarations without nth()
 @font-face {
   font-family: "CabinetGroteskBold";
@@ -136,7 +135,6 @@ $geist-fonts: (
   font-weight: 700;
   font-style: normal;
 }
-
 @font-face {
   font-family: "CabinetGroteskLight";
   src: url("../fonts/CabinetGrotesk-Regular.woff2") format("woff2");
@@ -181,13 +179,11 @@ $geist-fonts: (
 @mixin theme-text-color($text-color) {
   color: $text-color;
 }
-
 @mixin flex-center-hv {
   display: flex;
   justify-content: center;
   align-items: center;
 }
-
 @mixin flex-center-hv-column {
   display: flex;
   flex-direction: column;
@@ -208,7 +204,6 @@ $geist-fonts: (
 .bi {
   font-size: $icon-font-size;
 }
-
 .btn-main-primary {
   gap: $button-icon-gap;
   height: $button-height;
@@ -249,6 +244,9 @@ body.system-mode {
     .card-body {
       .welcome-logo-container {
         background: rgba(24, 24, 24, 1);
+      }
+      .chat-loading-container {
+       @include theme-bgcolor($default-mode-main-bgcolor);
       }
       .ai-message {
         .chat-loading-avatar {
@@ -332,6 +330,9 @@ body.purple-mode {
       .task-column_header {
         background: auto !important;
       }
+      .chat-loading-container {
+        @include theme-bgcolor($purple-mode-bar-bgcolor);
+      }
       .ai-message {
         .chat-loading-avatar {
           @include theme-bgcolor($purple-mode-bar-bgcolor);
@@ -410,6 +411,9 @@ body.black-mode {
       .welcome-logo-container {
         @include theme-bgcolor($black-mode-bar-bgcolor);
       }
+      .chat-loading-container {
+        @include theme-bgcolor($black-mode-bar-bgcolor);
+      }
       .ai-message {
         .chat-loading-avatar {
           @include theme-bgcolor($black-mode-bar-bgcolor);
@@ -486,6 +490,9 @@ body.brown-mode {
     }
     .card-body {
       .welcome-logo-container {
+        @include theme-bgcolor($brown-mode-bar-bgcolor);
+      }
+      .chat-loading-container {
         @include theme-bgcolor($brown-mode-bar-bgcolor);
       }
       .ai-message {
@@ -884,7 +891,7 @@ body {
       }
       button {
         @include flex-center-hv;
-        @extend .hover-up;
+        // @extend .hover-up;
       }
       #projectDropdownButton {
         text-decoration: none !important;
@@ -895,23 +902,24 @@ body {
         border: 1px solid rgba(211, 211, 211, 0.5);
         backdrop-filter: blur(4.3px);
         li.dropdown-item {
-          color: $white-color!important;
+          color: $white-color !important;
           @extend .font-secondaryBold;
           @extend .hover-up;
-          &:hover{
+          &:hover {
             background: rgba(255, 255, 255, 0.2);
           }
           .dropdown-item.active {
-            background: transparent!important;
-            &:parent{
-            background: rgba(255, 255, 255, 0.2)!important;
+            background: transparent !important;
+            &:parent {
+              background: rgba(255, 255, 255, 0.2) !important;
             }
           }
-         
-          button.dropdown-item, button.dropdown-item.active{
-            color: $white-color!important;
-            &:hover{
-              background: transparent!important;
+
+          button.dropdown-item,
+          button.dropdown-item.active {
+            color: $white-color !important;
+            &:hover {
+              background: transparent !important;
             }
           }
         }
@@ -944,7 +952,8 @@ body {
           box-shadow: 0 4px 15px $black-color-40;
           transition: all $transition-duration-40 ease;
           letter-spacing: 1px;
-          font-size: medium;
+          font-size: 1rem!important;
+          @extend .font-secondaryBold;
         }
         .task-column {
           background: rgba(76, 76, 76, 0.25);
@@ -974,6 +983,7 @@ body {
               background: rgba(255, 255, 255, 0.1);
               font-size: 1.3rem;
               transition: all 0.4s ease;
+              color: rgba(160, 160, 160, 1)!important;
             }
             svg#calendar-icon {
               height: 1.2rem !important;
@@ -1061,6 +1071,13 @@ body {
       }
       .chat-loading-avatar {
         @extend .hover-up;
+      }
+      .chat-loading-container {
+        border: 1px solid rgba(211, 211, 211, 0.5);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        border-radius: 16px;
+        backdrop-filter: blur(8px);
+        color: #e4e6eb!important;
       }
       .message.ai {
         margin-left: 0.5rem;
