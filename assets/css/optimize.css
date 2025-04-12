@@ -56,7 +56,7 @@ body .login-page .card .card-body .divider, body {
   font-family: "Geist-Bold", sans-serif !important;
 }
 
-.font-secondaryBold, body .projects_card .card-body .task-column_section .task-column_header, body .projects_card .card-header ul#projectDropdown li.dropdown-item, body .register-page .btn-primary,
+.font-secondaryBold, body .modal .modal-dialog .modal-content .modal-header .modal-title, body .projects_card .card-body .task-column_section .task-column_header, body .projects_card .card-header ul#projectDropdown li.dropdown-item, body .register-page .btn-primary,
 body .login-page .btn-primary, body .register-page .card .card-title,
 body .login-page .card .card-title, body .register-page .card .card-body a.footer-text,
 body .login-page .card .card-body a.footer-text {
@@ -697,7 +697,7 @@ body .projects_card .card-body .task-column_section .task-column_header {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
   transition: all 0.4s ease;
   letter-spacing: 1px;
-  font-size: 1rem !important;
+  font-size: 1.18rem !important;
 }
 body .projects_card .card-body .task-column_section .task-column {
   background: rgba(76, 76, 76, 0.25);
@@ -858,7 +858,7 @@ body .modal .modal-dialog .modal-content .modal-header {
 }
 body .modal .modal-dialog .modal-content .modal-header .modal-title {
   color: var(--bs-primary-white) !important;
-  font-size: 1.2rem !important;
+  font-size: 1.35rem !important;
 }
 body .modal .modal-dialog .modal-content .modal-body {
   max-height: calc(60vh - 130px);

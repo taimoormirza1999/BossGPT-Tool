@@ -649,7 +649,6 @@
   body .task-card .h5,
   body .task-card h6,
   body .task-card .h6 {
-    font-size: 1rem;
     text-transform: capitalize;
     font-weight: 600;
     margin-bottom: 12px;
@@ -735,6 +734,7 @@
   }
   body .modal .form-label{
     font-weight: 600!important;
+    font-size: 0.937rem!important;
   }
  
   body.dark-mode .form-control:focus,
@@ -1241,7 +1241,7 @@
       transition: font-size 0.4s ease;
   }
   .task_title{
-    font-size: calc(var(--font-size, 1.15rem) + 0.1rem) !important;
+    font-size: 1.11rem !important;
     transition: font-size 0.4s ease;
   font-family: 'CabinetGroteskBold';
   font-style: normal;
