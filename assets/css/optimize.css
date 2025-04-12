@@ -56,7 +56,7 @@ body .login-page .card .card-body .divider, body {
   font-family: "Geist-Bold", sans-serif !important;
 }
 
-.font-secondaryBold, body .modal .modal-dialog .modal-content .modal-header .modal-title, body .projects_card .card-body .task-column_section .task-column_header, body .projects_card .card-header ul#projectDropdown li.dropdown-item, body .register-page .btn-primary,
+.font-secondaryBold, body .modal .modal-dialog .modal-content .modal-header .modal-title, body table thead th, body .projects_card .card-body .task-column_section .task-column_header, body .projects_card .card-header ul#projectDropdown li.dropdown-item, body .register-page .btn-primary,
 body .login-page .btn-primary, body .register-page .card .card-title,
 body .login-page .card .card-title, body .register-page .card .card-body a.footer-text,
 body .login-page .card .card-body a.footer-text {
@@ -157,6 +157,9 @@ body.system-mode .notification-list .dropdown-item:hover {
 body.system-mode .notification-list .dropdown-item:hover .title-notification {
   color: #fff;
 }
+body.system-mode table tbody tr:nth-child(odd) > * {
+  background: rgba(10, 10, 10, 0.2);
+}
 body.system-mode .modal .modal-dialog .modal-content {
   background: #242526;
 }
@@ -223,6 +226,9 @@ body.purple-mode .notification-list .dropdown-item:hover {
 body.purple-mode .notification-list .dropdown-item:hover .title-notification {
   color: #fff;
 }
+body.purple-mode table tbody tr:nth-child(odd) > * {
+  background: rgba(12, 1, 17, 0.5);
+}
 body.purple-mode .modal .modal-dialog .modal-content {
   background: #120211;
 }
@@ -286,6 +292,9 @@ body.black-mode .notification-list .dropdown-item:hover {
 body.black-mode .notification-list .dropdown-item:hover .title-notification {
   color: #fff;
 }
+body.black-mode table tbody tr:nth-child(odd) > * {
+  background: rgba(12, 1, 17, 0.2);
+}
 body.black-mode .modal .modal-dialog .modal-content {
   background: #171717;
 }
@@ -348,6 +357,9 @@ body.brown-mode .notification-list .dropdown-item:hover {
 }
 body.brown-mode .notification-list .dropdown-item:hover .title-notification {
   color: #fff;
+}
+body.brown-mode table tbody tr:nth-child(odd) > * {
+  background: rgba(12, 1, 17, 0.2);
 }
 body.brown-mode .modal .modal-dialog .modal-content {
   background: #190404;
@@ -828,6 +840,26 @@ body .chat-pannel .card-body .message.user {
 body .chat-pannel .card-body .prompt-btn {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(248, 249, 250, 0.5);
+}
+body .table > :not(caption) > * > * {
+  background-color: transparent !important;
+  color: white !important;
+  border-width: 1px, 0px, 1px, 0px;
+  border-style: solid;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+body table thead th {
+  font-size: 1.25rem;
+  text-align: center;
+  padding: 0 0 0.5rem 0;
+}
+body table tbody tr:nth-child(odd) > * {
+  padding: 0.8rem;
+  text-align: center;
+}
+body .table tbody tr:nth-child(even) > * {
+  padding: 0.8rem;
+  text-align: center;
 }
 @media (min-width: 576px) {
   body .modal .modal-dialog:not(.modal-lg):not(.modal-xl) {

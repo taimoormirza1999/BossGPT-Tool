@@ -109,36 +109,7 @@
                 </div>
             </div>
 
-            <!-- Assign User Modal -->
-            <!-- <div class="modal fade" id="assignUserModal" tabindex="-1">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Assign User to Project</h5>
-                            <button type="button" class="btn btn-link p-0 text-white close-icon-btn" data-bs-dismiss="modal"
-                                aria-label="Close"><?php echo getCloseSquareIcon(); ?></button>
-                        </div>
-                        <div class="modal-body">
-                            <form id="assignUserForm">
-                                <div class="mb-3">
-                                    <label for="userSelect" class="form-label">Select User</label>
-                                    <select class="form-select" id="userSelect" required>
-                                        <option value="">Select a user</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="userRole" class="form-label">Role in Project</label>
-                                    <input type="text" class="form-control" id="userRole" required>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-main-primary" id="assignUserBtn">Assign User</button>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
+          
             <div class="modal fade" id="assignUserModal" tabindex="-1" aria-labelledby="assignUserModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
@@ -155,9 +126,7 @@
                                 <i class="bi bi-person-plus"></i> Add New User
                             </button>
                             <div id="userListContainer" class="mt-5">
-                                <!-- Dynamically populated users will appear here -->
                             </div>
-
                             <!-- No Users Message -->
                             <div id="noUsersMessage" class="text-center py-2 d-none">
                                 <p class="text-muted">No users assigned yet.</p>
@@ -219,8 +188,7 @@
                                 <small class="text-muted">Create a new task by setting its title, deadline, and assigning team members to keep everyone aligned.</small>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="newTaskTitle" class="form-label">Task
-                                        Title<?php echo required_field(); ?></label>
+                                    <label for="newTaskTitle" class="form-label">Task&nbsp;Title<?php echo required_field(); ?></label>
                                     <input type="text" class="form-control" id="newTaskTitle" required>
                                 </div>
                                 <div class="mb-3">
@@ -230,7 +198,6 @@
                                 </div>
                                 <div class="mb-3">
                                     <?php
-                                    // Use our custom date input component
                                     $id = 'newTaskDueDate';
                                     $name = 'due_date';
                                     $label = 'Due Date';
@@ -319,7 +286,7 @@
                 <div class="modal-dialog modal-lg modal-dialog-centered ">
                     <div class="modal-content">
                         <div class="modal-header text-white border-0 rounded-t-lg">
-                            <h5 class="modal-title">Project Activity Log</h5>
+                            <h5 class="modal-title">Recent Project Actions</h5>
                             <button type="button" class="btn btn-link p-0 text-white close-icon-btn" data-bs-dismiss="modal"
                                 aria-label="Close"><?php echo getCloseSquareIcon(); ?></button>
                         </div>
@@ -368,8 +335,7 @@
             <div class="modal fade" id="gardenStatsModal" tabindex="-1" aria-labelledby="gardenStatsModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-xl">
                     <div class="modal-content">
-                        <!-- Loading overlay removed as requested -->
-                        
+                        <!-- Loading overlay removed as requested -->            
                         <div class="modal-header text-white border-0 rounded-t-lg">
                             <h5 class="modal-title" id="gardenStatsModalLabel">Garden Statistics</h5>
                             <button type="button" class="btn btn-link p-0 text-white close-icon-btn" data-bs-dismiss="modal"
@@ -802,9 +768,9 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <?php endif; ?>
+                                    <?php endif;?>
                                 </div>
-                                <?php endforeach; ?>
+                                <?php endforeach;?>
                             </div>
                         </div>
                         <div class="modal-footer">

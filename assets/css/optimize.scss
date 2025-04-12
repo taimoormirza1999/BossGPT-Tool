@@ -213,7 +213,7 @@ $geist-fonts: (
 
 body.system-mode {
   background-image: $bg-img1-black;
-
+ 
   .nav-background {
     @include theme-bgcolor($default-mode-topbar-bgcolor);
   }
@@ -246,7 +246,7 @@ body.system-mode {
         background: rgba(24, 24, 24, 1);
       }
       .chat-loading-container {
-       @include theme-bgcolor($default-mode-main-bgcolor);
+        @include theme-bgcolor($default-mode-main-bgcolor);
       }
       .ai-message {
         .chat-loading-avatar {
@@ -274,6 +274,9 @@ body.system-mode {
     .dropdown-item:hover .title-notification {
       @include theme-text-color($white-color);
     }
+  }
+  table tbody tr:nth-child(odd) > * {
+    @include theme-bgcolor($default-mode-modal-input-bgcolor);
   }
   .modal {
     .modal-dialog {
@@ -360,6 +363,9 @@ body.purple-mode {
       @include theme-text-color($white-color);
     }
   }
+  table tbody tr:nth-child(odd) > * {
+    @include theme-bgcolor($purple-mode-modal-input-bgcolor);
+  }
   .modal {
     .modal-dialog {
       .modal-content {
@@ -440,6 +446,9 @@ body.black-mode {
     .dropdown-item:hover .title-notification {
       @include theme-text-color($white-color);
     }
+  }
+  table tbody tr:nth-child(odd) > * {
+    @include theme-bgcolor($black-mode-modal-input-bgcolor);
   }
   .modal {
     .modal-dialog {
@@ -522,6 +531,9 @@ body.brown-mode {
       @include theme-text-color($white-color);
     }
   }
+  table tbody tr:nth-child(odd) > * {
+    @include theme-bgcolor($brown-mode-modal-input-bgcolor);
+  }
   .modal {
     .modal-dialog {
       .modal-content {
@@ -537,7 +549,7 @@ body.brown-mode {
           input,
           textarea,
           .select2-container--default .select2-selection--multiple,
-          .tree-option {
+          .tree-option, {
             @include theme-bgcolor($brown-mode-modal-input-bgcolor);
           }
         }
@@ -952,7 +964,7 @@ body {
           box-shadow: 0 4px 15px $black-color-40;
           transition: all $transition-duration-40 ease;
           letter-spacing: 1px;
-          font-size: 1.18rem!important;
+          font-size: 1.18rem !important;
           @extend .font-secondaryBold;
         }
         .task-column {
@@ -983,7 +995,7 @@ body {
               background: rgba(255, 255, 255, 0.1);
               font-size: 1.3rem;
               transition: all 0.4s ease;
-              color: rgba(160, 160, 160, 1)!important;
+              color: rgba(160, 160, 160, 1) !important;
             }
             svg#calendar-icon {
               height: 1.2rem !important;
@@ -1077,7 +1089,7 @@ body {
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         border-radius: 16px;
         backdrop-filter: blur(8px);
-        color: #e4e6eb!important;
+        color: #e4e6eb !important;
       }
       .message.ai {
         margin-left: 0.5rem;
@@ -1102,6 +1114,28 @@ body {
       }
     }
   }
+  .table > :not(caption) > * > * {
+    background-color: transparent !important;
+    color: white !important;
+    border-width: 1px, 0px, 1px, 0px;
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  table thead th {
+    @extend .font-secondaryBold;
+    font-size: 1.25rem;
+    text-align: center;
+    padding: 0 0 0.5rem 0;
+  }
+  table tbody tr:nth-child(odd) > * {
+    padding: 0.8rem;
+    text-align: center;
+  }
+  .table tbody tr:nth-child(even) > * {
+    padding: 0.8rem;
+    text-align: center;
+  }
+
   .modal {
     .modal-dialog {
       @media (min-width: 576px) {

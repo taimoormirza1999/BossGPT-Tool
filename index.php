@@ -198,7 +198,8 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 ?>
 
 <body
-    style="background-color:<?php echo isset($_GET['page']) && ($_GET['page'] == 'login' || $_GET['page'] == 'register') ? '#000' : ''; ?> " class="system-mode">
+    style="background-color:<?php echo isset($_GET['page']) && ($_GET['page'] == 'login' || $_GET['page'] == 'register') ? '#000' : ''; ?> "
+    class="system-mode">
     <?php
     $auth = new Auth();
 
@@ -226,7 +227,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
     // Navigation for logged-in users
     if ($auth->isLoggedIn()):
         require_once 'components/navigation.php';
-         endif; ?>
+    endif; ?>
 
     <div class="container-fluid mt-4">
         <?php
@@ -282,7 +283,8 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                 displayGoogleLoginBtn();
                                 ?>
                                 <p class="text-center mt-3">
-                                    <a href="?page=register" class="footer-text"><span class="normal-text">Don't have an account?</span> Sign Up </a>
+                                    <a href="?page=register" class="footer-text"><span class="normal-text">Don't have an
+                                            account?</span> Sign Up </a>
                                 </p>
 
                             </div>
@@ -323,8 +325,10 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                         <input type="email" class="form-control" id="email" name="email" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="password" class="form-label" autocomplete="new-password" >Password</label>
-                                        <input type="password" class="form-control" id="password" name="password" required  autocomplete="new-password" >
+                                        <label for="password" class="form-label"
+                                            autocomplete="new-password">Password</label>
+                                        <input type="password" class="form-control" id="password" name="password" required
+                                            autocomplete="new-password">
                                     </div>
                                     <button type="submit" class="btn btn-primary w-100">Register</button>
                                 </form>
@@ -333,7 +337,8 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                 displayGoogleLoginBtn("Sign up with Google");
                                 ?>
                                 <p class="text-center mt-3">
-                                    <a href="?page=login" class="footer-text"><span class="normal-text">Already have an account?</span> Login</a>
+                                    <a href="?page=login" class="footer-text"><span class="normal-text">Already have an
+                                            account?</span> Login</a>
                                 </p>
                             </div>
                         </div>
@@ -342,7 +347,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
             </div>
         <?php }
 
-      
+
         function include_dashboard()
         {
             require_once 'components/misc.php';
@@ -350,12 +355,12 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
             <?php $projectManager = new ProjectManager();
             $projects = $projectManager->getProjects($_SESSION['user_id']);
             $gardenManager = new GardenManager();
-            
+
             try {
                 $allPlants = $gardenManager->getUserGarden($_SESSION['user_id']);
-                
+
                 // Map 'lush_tree' to 'tree' for consistency
-                $allPlants = array_map(function($plant) {
+                $allPlants = array_map(function ($plant) {
                     if ($plant['stage'] == 'lush_tree') {
                         $plant['stage'] = 'tree';
                     }
@@ -364,11 +369,11 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                     }
                     return $plant;
                 }, $allPlants);
-                
+
             } catch (Exception $e) {
                 $allPlants = [];
             }
-            
+
             ?>
 
             <div class="container-fluid pb-3">
@@ -377,9 +382,9 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 
                 <!-- Main Content Area -->
                 <div class="row sides-padding " style="width: 100%!important;">
-                <button class="btn btn-link p-0 text-white show open-icon-btn " data-bs-dismiss="modal"
-    aria-label="Close"
-    onclick="openChatPannel()"><?php echo getIconImage(0, 0, "2.5rem", "auto", "https://res.cloudinary.com/da6qujoed/image/upload/v1742656707/logoIcon_pspxgh.png", 0); ?></button>
+                    <button class="btn btn-link p-0 text-white show open-icon-btn " data-bs-dismiss="modal"
+                        aria-label="Close"
+                        onclick="openChatPannel()"><?php echo getIconImage(0, 0, "2.5rem", "auto", "https://res.cloudinary.com/da6qujoed/image/upload/v1742656707/logoIcon_pspxgh.png", 0); ?></button>
                     <!-- Tasks Panel (Board) - now spans 9 columns -->
                     <div class="col-12 col-md-9 tasks-panel">
                         <div class="card h-100 projects_card">
@@ -400,14 +405,14 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                 </div>
 
                                 <div class="d-flex align-items-end">
-                                <button type="button" class="btn btn-sm btn-main-primary me-2" data-bs-toggle="modal"
-                                    data-bs-target="#newTaskModal">
-                                    <?php echo getAddSquareIcon(); ?>Create&nbsp;New&nbsp;Task
-                                </button>
-                                <button type="button" class="btn btn-sm btn-main-primary me-2" data-bs-toggle="modal"
-                                    data-bs-target="#gardenStatsModal">
-                                    <i class="bi bi-tree"></i> My&nbsp;Garden&nbsp;Stats
-                                </button>
+                                    <button type="button" class="btn btn-sm btn-main-primary me-2" data-bs-toggle="modal"
+                                        data-bs-target="#newTaskModal">
+                                        <?php echo getAddSquareIcon(); ?>Create&nbsp;New&nbsp;Task
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-main-primary me-2" data-bs-toggle="modal"
+                                        data-bs-target="#gardenStatsModal">
+                                        <i class="bi bi-tree"></i> My&nbsp;Garden&nbsp;Stats
+                                    </button>
                                 </div>
 
                             </div>
@@ -447,51 +452,51 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                 </div>
             </div>
 
-          <?php require_once 'components/modals.php'; ?>
+            <?php require_once 'components/modals.php'; ?>
             <script>
-          
 
-                document.addEventListener('DOMContentLoaded', function() {
-    
 
-// 1) The tree images
-const treeImages = [
-    { file: 'treelv2.png', alt: 'Tree Level 2' },
-    { file: 'treelv3.png', alt: 'Tree Level 3' },
-    { file: 'treelv4.png', alt: 'Tree Level 4' },
-    { file: 'treelv5.png', alt: 'Tree Level 5' },
-    { file: 'treelv6.png', alt: 'Tree Level 6' },
-    { file: 'treelv7.png', alt: 'Tree Level 7' },
-    { file: 'treelv8.png', alt: 'Tree Level 8' },
-  ];
+                document.addEventListener('DOMContentLoaded', function () {
 
-  const container = document.getElementById('taskTreeContainer');
-  const hiddenInput = document.getElementById('selectedTreeType');
 
-  // 2) Build and insert the images
-  let html = '';
-  treeImages.forEach(({ file, alt }) => {
-    html += `
+                    // 1) The tree images
+                    const treeImages = [
+                        { file: 'treelv2.png', alt: 'Tree Level 2' },
+                        { file: 'treelv3.png', alt: 'Tree Level 3' },
+                        { file: 'treelv4.png', alt: 'Tree Level 4' },
+                        { file: 'treelv5.png', alt: 'Tree Level 5' },
+                        { file: 'treelv6.png', alt: 'Tree Level 6' },
+                        { file: 'treelv7.png', alt: 'Tree Level 7' },
+                        { file: 'treelv8.png', alt: 'Tree Level 8' },
+                    ];
+
+                    const container = document.getElementById('taskTreeContainer');
+                    const hiddenInput = document.getElementById('selectedTreeType');
+
+                    // 2) Build and insert the images
+                    let html = '';
+                    treeImages.forEach(({ file, alt }) => {
+                        html += `
       <div class="tree-option" data-tree="${file}">
         <img src="assets/images/garden/${file}" alt="${alt}">
       </div>
     `;
-  });
-  container.innerHTML = html;
+                    });
+                    container.innerHTML = html;
 
-  // 3) Attach click listeners
-  container.querySelectorAll('.tree-option').forEach(optionDiv => {
-    optionDiv.addEventListener('click', () => {
-      // Set hidden input
-      const treeValue = optionDiv.dataset.tree;
-      hiddenInput.value = treeValue;
-      console.log('Selected tree:', treeValue);
+                    // 3) Attach click listeners
+                    container.querySelectorAll('.tree-option').forEach(optionDiv => {
+                        optionDiv.addEventListener('click', () => {
+                            // Set hidden input
+                            const treeValue = optionDiv.dataset.tree;
+                            hiddenInput.value = treeValue;
+                            console.log('Selected tree:', treeValue);
 
-      // Highlight selected
-      container.querySelectorAll('.tree-option').forEach(o => o.classList.remove('selected'));
-      optionDiv.classList.add('selected');
-    });
-  });
+                            // Highlight selected
+                            container.querySelectorAll('.tree-option').forEach(o => o.classList.remove('selected'));
+                            optionDiv.classList.add('selected');
+                        });
+                    });
 
 
                     // Clean up any remnants of previous modals
@@ -499,7 +504,7 @@ const treeImages = [
                     $('body').removeClass('modal-open');
                     $('body').css('padding-right', '');
                     $('.modal').removeClass('show');
-                    
+
                     // Add Garden Stats button to the project header
                     const projectHeader = document.querySelector('.projects_card .card-header');
                     if (projectHeader) {
@@ -507,26 +512,26 @@ const treeImages = [
                         // gardenStatsBtn.className = 'btn btn-sm btn-info me-2';
                         // gardenStatsBtn.innerHTML = '<i class="bi bi-tree"></i> Garden Stats';
                         // gardenStatsBtn.id = 'openGardenStatsBtn';
-                        
+
                         // const existingBtns = projectHeader.querySelector('.btn, .dropdown');
                         // if (existingBtns) {
                         //     projectHeader.insertBefore(gardenStatsBtn, existingBtns);
                         // } else {
                         //     projectHeader.appendChild(gardenStatsBtn);
                         // }
-                        
+
                         // // Add click handler directly
                         // gardenStatsBtn.addEventListener('click', function() {
                         //     openGardenStatsModal();
                         // });
                     }
-                    
+
                     // Direct functions to ensure modal works
                     function openGardenStatsModal() {
                         $('#gardenStatsModal').modal('show');
                         // Loading overlay code removed as requested
                     }
-                    
+
                     function closeGardenStatsModal() {
                         // Multiple ways to try closing the modal
                         $('#gardenStatsModal').modal('hide');
@@ -534,61 +539,66 @@ const treeImages = [
                         $('body').removeClass('modal-open');
                         $('body').css('padding-right', '');
                     }
-                    
+
                     // Attach event handlers
-                    $('#closeGardenStats, #closeModalBtn').on('click', function() {
+                    $('#closeGardenStats, #closeModalBtn').on('click', function () {
                         closeGardenStatsModal();
                     });
-                    
-                    $('#viewGardenBtn').on('click', function(e) {
+
+                    $('#viewGardenBtn').on('click', function (e) {
                         e.preventDefault();
                         window.location.href = 'garden.php';
                     });
-                    
+
                     // Handle View 3D Garden and Close buttons in the modal
-                    document.getElementById('viewGardenBtn')?.addEventListener('click', function(e) {
+                    document.getElementById('viewGardenBtn')?.addEventListener('click', function (e) {
                         e.preventDefault();
                         window.location.href = 'garden.php';
                     });
-                    
-                    document.getElementById('closeModalBtn')?.addEventListener('click', function() {
+
+                    document.getElementById('closeModalBtn')?.addEventListener('click', function () {
                         closeGardenStatsModal();
                     });
-                    
+
                     // Close with ESC key
-                    $(document).on('keydown', function(e) {
+                    $(document).on('keydown', function (e) {
                         if (e.key === 'Escape' && $('#gardenStatsModal').hasClass('show')) {
                             closeGardenStatsModal();
                         }
                     });
                 });
             </script>
-            
+
             <style>
                 /* Override modal styles */
                 .modal-backdrop {
                     z-index: 1040 !important;
                 }
+
                 #gardenStatsModal {
                     z-index: 1050 !important;
                 }
+
                 #gardenStatsModal .modal-content {
                     z-index: 1050 !important;
                 }
-                
+
                 .garden-stat-item {
                     padding: 1rem;
                     text-align: center;
                     flex: 1;
                 }
+
                 .garden-icon {
                     font-size: 2.5rem;
                     margin-bottom: 0.5rem;
                 }
+
                 .garden-count {
                     font-weight: bold;
                     font-size: 1.8rem;
                 }
+
                 .garden-label {
                     font-size: 1rem;
                     color: #666;
@@ -624,7 +634,7 @@ const treeImages = [
                 // Skip the dashboard-specific code for garden stats page
                 return;
             }
-            
+
             const currentProject = $('#myselectedcurrentProject').val();
             // console.log(currentProject)
             // alert(currentProject);
@@ -1045,16 +1055,16 @@ const treeImages = [
                                  onerror="console.error('Image failed to load: ' + this.src); this.style.border='2px solid red';">
                         </div>
                     ` : '';
-// Get plant stage based on task status and garden data
-const getPlantImage = (task) => {
-    console.log(task);
+                    // Get plant stage based on task status and garden data
+                    const getPlantImage = (task) => {
+                        console.log(task);
                         // If we have garden data, use it
                         if (task.garden.plant_stage && task.garden.plant_type) {
                             switch (task.garden.plant_stage) {
                                 case 'dead': return 'dead.png';
                                 case 'sprout': return 'seed.png';
                                 case 'growing': return 'growing.png';
-                                case 'tree': 
+                                case 'tree':
                                     // Return the specific tree type image
                                     return `${task.garden.plant_type}.png`;
                                 default: return 'seed.png';
@@ -1065,7 +1075,7 @@ const getPlantImage = (task) => {
                         switch (task.status) {
                             case 'todo': return 'seed.png';
                             case 'in_progress': return 'growing.png';
-                            case 'done': 
+                            case 'done':
                                 // Default to treelv3 if no plant_type specified
                                 return task.garden.plant_type ? `${task.garden.plant_type}.png` : 'treelv3.png';
                             default: return 'seed.png';
@@ -1528,40 +1538,27 @@ const getPlantImage = (task) => {
                                 const noUsersMessage = document.getElementById("noUsersMessage");
                                 const addUserBtnTopRight = document.getElementById("add-user-btn-top-right");
                                 userListContainer.innerHTML = '<h6 >Users</h6>';
-
-
                                 if (data.users.length === 0) {
                                     noUsersMessage.classList.remove("d-none");
                                     userListContainer.classList.add("d-none");
-                                    // addUserBtnTopRight.classList.add("d-none");
                                 } else {
                                     noUsersMessage.classList.add("d-none");
                                     userListContainer.classList.remove("d-none");
-
                                     data.users.forEach((user) => {
                                         const userCard = document.createElement("div");
                                         userCard.className = "d-flex justify-content-between align-items-center p-2 mb-2 border rounded dark-primaryborder ";
                                         let actionButtons = "<div>";
-
-                                        //                                     actionButtons += `
-                                        //     <button class="btn btn-sm btn-outline-primary editUser" data-id="${user.id}">
-                                        //         <i class="bi bi-pencil"></i>
-                                        //     </button>
-
-                                        // `;
                                         if (user.role != "Creator") {
                                             actionButtons += `
-           
             <button class="btn btn-sm btn-outline-danger deleteUser" data-id="${user.id}">
                 <?php echo getTrashIcon(); ?>
-            </button>
-        `;
+            </button>`;
                                         }
                                         actionButtons += "</div>";
                                         userCard.innerHTML = `
                     <div>
-                        <strong>${user.username}</strong>
-                        <span class="text-muted">(${user.role})</span>
+                        <strong>@${user.username}</strong>
+                        <span class="">(${user.role})</span>
                     </div>
                     ${actionButtons}
                 `;
@@ -1716,7 +1713,7 @@ const getPlantImage = (task) => {
                     if (sender === 'user') {
                         // Get username from session
                         const username = '<?php echo isset($_SESSION["username"]) ? $_SESSION["username"] : ""; ?>';
-                        const initials = username.split(' ').map(word => word[0].toUpperCase()).join('').slice(0, 2)+username.split(' ').map(word => word[1].toUpperCase()).join('').slice(0, 2);
+                        const initials = username.split(' ').map(word => word[0].toUpperCase()).join('').slice(0, 2) + username.split(' ').map(word => word[1].toUpperCase()).join('').slice(0, 2);
 
                         div.innerHTML = `
                             <div class="message user me-2">${message}</div>
@@ -1912,12 +1909,12 @@ const getPlantImage = (task) => {
                             .then(data => {
                                 if (data.success) {
                                     document.getElementById('newTaskForm').reset();
-                                document.querySelectorAll('.tree-option').forEach(opt => 
-                                    opt.classList.remove('selected')
-                                );
+                                    document.querySelectorAll('.tree-option').forEach(opt =>
+                                        opt.classList.remove('selected')
+                                    );
                                     $('#newTaskAssignees').val(null).trigger('change');
 
-                                // Close modal and refresh
+                                    // Close modal and refresh
                                     bootstrap.Modal.getInstance(document.getElementById('newTaskModal')).hide();
                                     loadTasks(currentProject);
                                 } else {
@@ -2093,7 +2090,7 @@ const getPlantImage = (task) => {
                                 tbody.innerHTML = data.logs.map(log => `
                                 <tr>
                                     <td>${formatDateTime(log.created_at)}</td>
-                                    <td>${escapeHtml(log.username)}</td>
+                                    <td>@${escapeHtml(log.username)}</td>
                                     <td>${escapeHtml(log.action_type)}</td>
                                     <td>${escapeHtml(log.description)}</td>
                                 </tr>
@@ -2808,8 +2805,6 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                     // }
                 });
             }
-
-
             updatePopupVisibility(); // Ensure only 3 popups are shown initially
         });
         function closePopup(button) {

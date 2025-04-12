@@ -796,7 +796,7 @@
     border-radius: 6px;
   }
   
-  body.dark-mode .form-check-input:checked {
+  body .form-check-input:checked {
     background-color: rgba(46, 204, 113, 0.8);
     border-color: rgba(46, 204, 113, 0.3);
   }
