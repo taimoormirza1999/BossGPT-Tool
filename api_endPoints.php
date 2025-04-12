@@ -701,28 +701,30 @@ if (isset($_GET['api'])) {
                 break;
 
             case 'update_fcm_token':
-                $data = json_decode(file_get_contents("php://input"), true);
+                $data = json_decode(file_get_contents('php://input'), true);
                 if (!isset($data['fcm_token'])) {
-                    $response = [
-                        'success' => false,
-                        'message' => 'FCM token is required'
-                    ];
-                    break;
+                    throw new Exception('FCM token is required');
                 }
+                
+                $userId = $_SESSION['user_id'];
+                $fcmToken = $data['fcm_token'];
+                
+                // Update the user's FCM token in the database
+                $stmt = $db->prepare("UPDATE users SET fcm_token = ? WHERE id = ?");
+                $result = $stmt->execute([$fcmToken, $userId]);
+                
+                if (!$result) {
+                    throw new Exception('Failed to update FCM token');
+                }
+                
+                $response = ['success' => true, 'message' => 'FCM token updated successfully'];
+                break;
 
-                try {
-                    $auth = new Auth();
-                    $auth->updateFcmToken($_SESSION['user_id'], $data['fcm_token']);
-                    $response = [
-                        'success' => true,
-                        'message' => 'FCM token updated successfully'
-                    ];
-                } catch (Exception $e) {
-                    $response = [
-                        'success' => false,
-                        'message' => 'Failed to update FCM token: ' . $e->getMessage()
-                    ];
-                }
+            case 'get_garden_stats':
+                $userId = $_SESSION['user_id'];
+                $gardenManager = new GardenManager();
+                $stats = $gardenManager->getGardenStats($userId);
+                $response = ['success' => true, 'stats' => $stats];
                 break;
 
             default:

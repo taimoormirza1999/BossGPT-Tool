@@ -151,6 +151,26 @@ require_once './api_endPoints.php';
 
     <link rel="stylesheet" href="./assets/css/customstyle2.css">
     <link rel="stylesheet" href="./assets/css/optimize.css">
+    
+    <!-- Firebase Scripts for FCM -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js"></script>
+    <script>
+        // Initialize Firebase with your config
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        
+        // Initialize Firebase only if it's not already initialized
+        if (typeof firebase === 'undefined' || !firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+    </script>
 
 </head>
 <!-- Reuseable Stuff -->
@@ -604,6 +624,12 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                     color: #666;
                 }
             </style>
+
+    <!-- Reminder button -->
+    <button id="reminderButton" class="reminder-button">
+        <i class="bi bi-bell-fill bell-icon"></i>
+        <span>Turn on Reminders</span>
+    </button>
         <?php } ?>
     </div>
 
@@ -2526,7 +2552,7 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                     body.dark-mode .subtask-due-date:hover,
                     body.dark-mode .subtask-due-date:focus {
                         background-color: #4a4b4c;
-                        border-color: #2374e1;
+                      
                     }
 
                     .subtask-due-date:disabled {

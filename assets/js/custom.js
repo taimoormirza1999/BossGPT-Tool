@@ -645,4 +645,271 @@ document.addEventListener('DOMContentLoaded', function() {
           messageInput.focus();
       });
   });
+});
+
+// Function to handle errors
+function handleAjaxError(xhr, status, error) {
+    console.error("Ajax Error:", error);
+    Toast("error", "Error", "An error occurred: " + error, "topRight");
+}
+
+// FCM Token and Notifications
+
+let fcmTokenSaved = false;
+
+// Check if FCM is already enabled
+function checkFCMStatus() {
+    const fcmToken = localStorage.getItem('fcm_token');
+    const reminderButton = document.getElementById('reminderButton');
+    
+    if (reminderButton) {
+        if (fcmToken) {
+            reminderButton.classList.add('active');
+            reminderButton.querySelector('span').textContent = 'Reminders Active';
+            fcmTokenSaved = true;
+        } else {
+            reminderButton.classList.remove('active');
+            reminderButton.querySelector('span').textContent = 'Turn on Reminders';
+            fcmTokenSaved = false;
+        }
+    }
+}
+
+// Initialize FCM
+function initializeFCM() {
+    if (!firebase.messaging.isSupported()) {
+        console.warn('Firebase messaging is not supported in this browser');
+        return;
+    }
+
+    const messaging = firebase.messaging();
+    
+    // Request permission and get token
+    messaging.getToken({ vapidKey: 'YOUR_VAPID_KEY' })
+        .then((currentToken) => {
+            if (currentToken) {
+                saveFCMToken(currentToken);
+            } else {
+                console.log('No registration token available. Request permission to generate one.');
+            }
+        })
+        .catch((err) => {
+            console.log('An error occurred while retrieving token. ', err);
+        });
+
+    // Handle token refresh
+    messaging.onTokenRefresh(() => {
+        messaging.getToken()
+            .then((refreshedToken) => {
+                console.log('Token refreshed.');
+                saveFCMToken(refreshedToken);
+            })
+            .catch((err) => {
+                console.log('Unable to retrieve refreshed token ', err);
+            });
+    });
+
+    // Handle foreground messages
+    messaging.onMessage((payload) => {
+        console.log('Message received. ', payload);
+        showNotification(payload.notification.title, payload.notification.body);
+    });
+}
+
+// Save token to database
+function saveFCMToken(token) {
+    localStorage.setItem('fcm_token', token);
+    
+    // Update UI
+    const reminderButton = document.getElementById('reminderButton');
+    if (reminderButton) {
+        reminderButton.classList.add('active');
+        reminderButton.querySelector('span').textContent = 'Reminders Active';
+    }
+    
+    // Save to database
+    fetch('?api=update_fcm_token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fcm_token: token })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            fcmTokenSaved = true;
+            console.log('FCM token saved to database');
+        } else {
+            console.error('Failed to save FCM token to database');
+        }
+    })
+    .catch(error => {
+        console.error('Error saving FCM token:', error);
+    });
+}
+
+// Show browser notification
+function showNotification(title, body) {
+    if (!("Notification" in window)) {
+        console.log("This browser does not support desktop notification");
+        return;
+    }
+    
+    if (Notification.permission === "granted") {
+        const notification = new Notification(title, {
+            body: body,
+            icon: '/favicon.ico'
+        });
+        
+        notification.onclick = function() {
+            window.focus();
+            this.close();
+        };
+    }
+}
+
+// Request notification permission
+function requestNotificationPermission() {
+    if (!("Notification" in window)) {
+        Toast("error", "Error", "This browser does not support desktop notifications", "topRight");
+        return Promise.reject("Notifications not supported");
+    }
+    
+    if (Notification.permission === "granted") {
+        return Promise.resolve();
+    }
+    
+    // Show the modal instead of directly requesting permission
+    const notificationModal = new bootstrap.Modal(document.getElementById('notificationPermissionModal'));
+    notificationModal.show();
+    
+    // Return a promise that will be resolved when the enable button is clicked
+    return new Promise((resolve, reject) => {
+        const enableBtn = document.getElementById('enableNotificationsBtn');
+        
+        if (enableBtn) {
+            // One-time event listener for the enable button
+            const clickHandler = () => {
+                enableBtn.removeEventListener('click', clickHandler);
+                
+                // Hide the modal and request actual permission
+                notificationModal.hide();
+                
+                // Request the actual browser permission
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") {
+                        Toast("success", "Notifications Enabled", "You will now receive task reminders", "topRight");
+                        resolve();
+                    } else {
+                        Toast("error", "Permission Denied", "Please enable notifications to receive reminders", "topRight");
+                        reject("Permission denied");
+                    }
+                });
+            };
+            
+            enableBtn.addEventListener('click', clickHandler);
+            
+            // Also handle modal dismiss
+            const modalElement = document.getElementById('notificationPermissionModal');
+            modalElement.addEventListener('hidden.bs.modal', () => {
+                enableBtn.removeEventListener('click', clickHandler);
+                reject("Modal closed");
+            }, { once: true });
+        } else {
+            reject("Enable button not found");
+        }
+    });
+}
+
+// Handle reminder button click
+document.addEventListener('DOMContentLoaded', function() {
+    const reminderButton = document.getElementById('reminderButton');
+    checkFCMStatus();
+    
+    if (reminderButton) {
+        reminderButton.addEventListener('click', function() {
+            if (fcmTokenSaved) {
+                // If notifications are already enabled, show settings
+                Toast("info", "Reminders Active", "You are already receiving notifications for task reminders", "topRight");
+            } else {
+                // Request permission and initialize FCM
+                requestNotificationPermission()
+                    .then(() => {
+                        if (typeof firebase !== 'undefined' && firebase.messaging) {
+                            initializeFCM();
+                        } else {
+                            // Firebase not loaded, load it first
+                            loadFirebaseScript()
+                                .then(() => {
+                                    initializeFCM();
+                                })
+                                .catch(error => {
+                                    console.error('Error loading Firebase:', error);
+                                    Toast("error", "Error", "Failed to load notification service", "topRight");
+                                });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error requesting notification permission:', error);
+                    });
+            }
+        });
+    }
+});
+
+// Load Firebase scripts dynamically
+function loadFirebaseScript() {
+    return new Promise((resolve, reject) => {
+        // Load Firebase App
+        const firebaseAppScript = document.createElement('script');
+        firebaseAppScript.src = 'https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js';
+        firebaseAppScript.onload = () => {
+            // Load Firebase Messaging
+            const firebaseMessagingScript = document.createElement('script');
+            firebaseMessagingScript.src = 'https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js';
+            firebaseMessagingScript.onload = () => {
+                // Initialize Firebase
+                const firebaseConfig = {
+                    apiKey: "YOUR_API_KEY",
+                    authDomain: "YOUR_AUTH_DOMAIN",
+                    projectId: "YOUR_PROJECT_ID",
+                    storageBucket: "YOUR_STORAGE_BUCKET",
+                    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+                    appId: "YOUR_APP_ID"
+                };
+                
+                firebase.initializeApp(firebaseConfig);
+                resolve();
+            };
+            firebaseMessagingScript.onerror = reject;
+            document.body.appendChild(firebaseMessagingScript);
+        };
+        firebaseAppScript.onerror = reject;
+        document.body.appendChild(firebaseAppScript);
+    });
+}
+
+// Check notification permission on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Wait 3 seconds after page load to check notification permission
+    setTimeout(() => {
+        // Only show modal if permission hasn't been granted or denied yet
+        if (Notification.permission === "default") {
+            // Show the notification permission modal
+            const notificationModal = new bootstrap.Modal(document.getElementById('notificationPermissionModal'));
+            notificationModal.show();
+        } else if (Notification.permission === "granted" && !fcmTokenSaved) {
+            // If permission is already granted but token not saved
+            if (typeof firebase !== 'undefined' && firebase.messaging) {
+                initializeFCM();
+            } else {
+                loadFirebaseScript()
+                    .then(() => {
+                        initializeFCM();
+                    })
+                    .catch(error => {
+                        console.error('Error loading Firebase:', error);
+                    });
+            }
+        }
+    }, 3000); // 3 second delay
 }); 

@@ -261,6 +261,11 @@ $geist-fonts: (
     }
   }
 }
+@mixin theme-reminder-button($bgcolor) {
+  .reminder-button {
+    @include theme-bgcolor($bgcolor);
+  }
+}
 #user-add-icon {
   @include button-icon-only;
 }
@@ -316,6 +321,7 @@ body.system-mode {
     $default-mode-modal-header-bgcolor,
     $default-mode-modal-input-bgcolor
   );
+  @include theme-reminder-button($default-mode-card-task-bgcolor);
   table tbody tr:nth-child(odd) > * {
     @include theme-bgcolor($default-mode-modal-input-bgcolor);
   }
@@ -354,6 +360,7 @@ body.purple-mode {
     $purple-mode-modal-header-bgcolor,
     $purple-mode-modal-input-bgcolor
   );
+  @include theme-reminder-button($purple-mode-card-task-bgcolor);
 }
 body.black-mode {
   background-image: $bg-img2-multi;
@@ -388,6 +395,7 @@ body.black-mode {
     $black-mode-modal-header-bgcolor,
     $black-mode-modal-input-bgcolor
   );
+  @include theme-reminder-button($black-mode-card-task-bgcolor);
 }
 body.brown-mode {
   background-image: $bg-img3-brown;
@@ -422,6 +430,7 @@ body.brown-mode {
     $brown-mode-modal-header-bgcolor,
     $brown-mode-modal-input-bgcolor
   );
+  @include theme-reminder-button($brown-mode-card-task-bgcolor);
 }
 body {
   @extend .font-primary;
@@ -460,6 +469,7 @@ body {
       border: 1px solid #9c9c9c;
       border-radius: 12px;
       height: 48px;
+      color: #fff;
     }
 
     .form-label,
@@ -1028,6 +1038,37 @@ body {
         }
       }
     }
+  }
+
+  .reminder-button {
+    position: fixed;
+    left: 32px;
+    bottom: 60px;
+    z-index: 999;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: all 0.34s ease-in-out;
+    cursor: pointer;
+    font-family: "CabinetGroteskBold", sans-serif;
+    font-size: 1rem;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .reminder-button:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  }
+  
+  .reminder-button .bell-icon {
+    font-size: 1.2rem;
+    animation: bellShake 3s infinite;
   }
 }
 

@@ -800,3 +800,34 @@
                 }
             </style>
             
+            <!-- Notification Permission Modal -->
+            <div class="modal fade" id="notificationPermissionModal" tabindex="-1" aria-labelledby="notificationPermissionModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header text-white border-0 rounded-t-lg">
+                            <h5 class="modal-title" id="notificationPermissionModalLabel">Enable Task Reminders</h5>
+                            <button type="button" class="btn btn-link p-0 text-white close-icon-btn" data-bs-dismiss="modal" aria-label="Close"><?php echo getCloseSquareIcon(); ?></button>
+                        </div>
+                        <div class="modal-body">
+                
+                            <div class="ratio ratio-16x9 mb-4" style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+                                <iframe width="560" height="315" src="https://www.youtube.com/embed/-fTV9_SqnKE?si=wizXX7DUlSgTXPfZ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                            </div>
+                            
+                            <div class="alert alert-info d-flex align-items-center" role="alert">
+                                <i class="bi bi-info-circle-fill me-2"></i>
+                                <div>
+                                    You'll need to enable browser notifications to receive reminders for your tasks and deadlines.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer justify-content-center">
+                            <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">Remind me later</button>
+                            <button type="button" class="btn btn-main-primary" id="enableNotificationsBtn">
+                                <i class="bi bi-bell-fill me-2"></i>Enable Notifications
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
