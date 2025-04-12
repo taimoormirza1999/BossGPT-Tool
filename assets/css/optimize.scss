@@ -86,20 +86,93 @@ $dark-mode-prompt-btn-bgcolor: $white-color-10;
 $dark-mode-prompt-btn-border: rgba(248, 249, 250, 0.5);
 $dark-mode-bar-bgcolor: $white-color-20;
 $dark-mode-message-user-color: $white-color;
+
+$black-mode-modal-container-bgcolor: #171717;
+$purple-mode-modal-container-bgcolor: #120211;
+$brown-mode-modal-container-bgcolor: #190404;
+$default-mode-modal-container-bgcolor: #242526;
+
+$black-mode-modal-header-bgcolor: #0d0c0c;
+$purple-mode-modal-header-bgcolor: #361734;
+$brown-mode-modal-header-bgcolor: #410404;
+$default-mode-modal-header-bgcolor: #1d1d1d;
+
+$black-mode-modal-input-bgcolor: rgba(12, 1, 17, 0.2);
+$purple-mode-modal-input-bgcolor: rgba(12, 1, 17, 0.5);
+$brown-mode-modal-input-bgcolor: rgba(12, 1, 17, 0.2);
+$default-mode-modal-input-bgcolor: rgba(10, 10, 10, 0.2);
+
 $transition-duration-34: 0.34s;
 $transition-duration-40: 0.4s;
 $transition-duration-50: 0.5s;
 $notification-icon-padding: 0.5rem;
 
+// ===============================
+// 2) FONTS
+// ===============================
+// Geist Font Map
+$geist-fonts: (
+  100: "Thin",
+  200: "UltraLight",
+  400: "Regular",
+  500: "Medium",
+  700: "Bold",
+  900: "Black",
+);
+
+@each $weight, $suffix in $geist-fonts {
+  @font-face {
+    font-family: "Geist";
+    src: url("../fonts/Geist-#{$suffix}.woff2") format("woff2");
+    font-weight: #{$weight};
+    font-style: normal;
+  }
+}
+
+// CabinetGrotesk Fonts - Direct declarations without nth()
+@font-face {
+  font-family: "CabinetGroteskBold";
+  src: url("../fonts/CabinetGrotesk-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "CabinetGroteskLight";
+  src: url("../fonts/CabinetGrotesk-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+}
+
+// Utility Classes
+.font-primary {
+  font-family: "Geist", sans-serif !important;
+}
+.font-primary-bold {
+  font-family: "Geist-Bold", sans-serif !important;
+}
+.font-secondaryBold {
+  font-family: "CabinetGroteskBold", sans-serif !important;
+}
+.font-secondaryLight {
+  font-family: "CabinetGroteskLight", sans-serif !important;
+}
+.hover-up {
+  transition: all $transition-duration-34 ease-in-out;
+  &:hover {
+    transform: translateY(-5px);
+  }
+}
+
 @mixin commomtaskheader {
-  .column_todo{
-    background-color: rgb(187, 7, 10)!important;
+  .column_todo {
+    background-color: rgb(187, 7, 10) !important;
   }
-  .column_in_progress{
-    background-color: rgb(158, 17, 147)!important;
+  .column_in_progress {
+    background-color: rgb(158, 17, 147) !important;
   }
-  .column_done{
-    background-color: rgb(21, 158, 97)!important;
+  .column_done {
+    background-color: rgb(21, 158, 97) !important;
   }
 }
 @mixin theme-bgcolor($bg-color) {
@@ -140,57 +213,9 @@ $notification-icon-padding: 0.5rem;
   gap: $button-icon-gap;
   height: $button-height;
   @include flex-center-hv;
+  @extend .hover-up;
 }
-body.dark-mode {
-  background-image: url("https://trello-backgrounds.s3.amazonaws.com/53baf533e697a982248cd73f/2048x2048/22ec03aab9d36ea49139c569a62bb079/shutterstock_134707556.jpg");
 
-  .projects_card {
-    .column_todo{
-      background-color: rgb(187, 7, 10)!important;
-    }
-    .column_in_progress{
-      background-color: rgb(158, 17, 147)!important;
-    }
-    .column_done{
-      background-color: rgb(21, 158, 97)!important;
-    }
-    .card-header {
-      @include theme-bgcolor($dark-mode-bar-bgcolor);
-    }
-    .card-body {
-      .task-card {
-        @include theme-bgcolor($dark-mode-card-task-bgcolor);
-      }
-    }
-  }
-  .chat-pannel {
-    .card-header {
-      @include theme-bgcolor($dark-mode-bar-bgcolor);
-    }
-    .card-body {
-      .message.ai {
-        @include theme-bgcolor($dark-mode-bar-bgcolor);
-      }
-      .message.user {
-        @include theme-bgcolor($dark-mode-message-user-bgcolor);
-      }
-    }
-  }
-  .notification-list {
-    .dropdown-item {
-      @include theme-text-color($gray-color-e1);
-    }
-    .dropdown-item .title-notification {
-      @include theme-text-color($gray-color-92);
-    }
-    .dropdown-item:hover {
-      @include theme-bgcolor($dark-mode-card-task-bgcolor);
-    }
-    .dropdown-item:hover .title-notification {
-      @include theme-text-color($white-color);
-    }
-  }
-}
 body.system-mode {
   background-image: $bg-img1-black;
 
@@ -198,13 +223,12 @@ body.system-mode {
     @include theme-bgcolor($default-mode-topbar-bgcolor);
   }
   .projects_card {
+    .column_todo,
+    .column_in_progress,
+    .column_done {
+      background: $default-mode-main-bgcolor !important;
+    }
 
-      .column_todo,
-      .column_in_progress,
-      .column_done {
-        background: $default-mode-main-bgcolor !important;
-      }
-     
     .card-header {
       @include theme-bgcolor($default-mode-main-bgcolor);
       border-bottom: 1px solid rgba(211, 211, 211, 0.5) !important;
@@ -226,8 +250,13 @@ body.system-mode {
       .welcome-logo-container {
         background: rgba(24, 24, 24, 1);
       }
-      .message.ai {
-        background: rgba(53, 53, 53, 1);
+      .ai-message {
+        .chat-loading-avatar {
+          @include theme-bgcolor($default-mode-main-bgcolor);
+        }
+        .message.ai {
+          background: rgba(53, 53, 53, 1);
+        }
       }
       .message.user {
         @include theme-bgcolor($purple-mode-message-user-bgcolor);
@@ -246,6 +275,31 @@ body.system-mode {
     }
     .dropdown-item:hover .title-notification {
       @include theme-text-color($white-color);
+    }
+  }
+  .modal {
+    .modal-dialog {
+      .modal-content {
+        @include theme-bgcolor($default-mode-modal-container-bgcolor);
+        .close-icon-btn {
+        }
+        .modal-header {
+          @include theme-bgcolor($default-mode-modal-header-bgcolor);
+          .modal-title {
+          }
+        }
+        .modal-body {
+          input,
+          textarea,
+          .select2-container--default .select2-selection--multiple,
+          .tree-option {
+            @include theme-bgcolor($default-mode-modal-input-bgcolor);
+          }
+        }
+
+        .modal-footer {
+        }
+      }
     }
   }
 }
@@ -257,7 +311,7 @@ body.purple-mode {
   }
   .projects_card {
     @include commomtaskheader;
-   
+
     .card-header {
       @include theme-bgcolor($purple-mode-bar-bgcolor);
     }
@@ -268,18 +322,23 @@ body.purple-mode {
     }
   }
   .chat-pannel {
-    .welcome-logo-container {
-      background-color: $purple-mode-bar-bgcolor;
-    }
     .card-header {
       @include theme-bgcolor($purple-mode-bar-bgcolor);
     }
     .card-body {
+      .welcome-logo-container {
+        background-color: $purple-mode-bar-bgcolor;
+      }
       .task-column_header {
         background: auto !important;
       }
-      .message.ai {
-        @include theme-bgcolor($purple-mode-bar-bgcolor);
+      .ai-message {
+        .chat-loading-avatar {
+          @include theme-bgcolor($purple-mode-bar-bgcolor);
+        }
+        .message.ai {
+          @include theme-bgcolor($purple-mode-bar-bgcolor);
+        }
       }
       .message.user {
         @include theme-bgcolor($purple-mode-message-user-bgcolor);
@@ -298,6 +357,31 @@ body.purple-mode {
     }
     .dropdown-item:hover .title-notification {
       @include theme-text-color($white-color);
+    }
+  }
+  .modal {
+    .modal-dialog {
+      .modal-content {
+        @include theme-bgcolor($purple-mode-modal-container-bgcolor);
+        .close-icon-btn {
+        }
+        .modal-header {
+          @include theme-bgcolor($purple-mode-modal-header-bgcolor);
+          .modal-title {
+          }
+        }
+        .modal-body {
+          input,
+          textarea,
+          .select2-container--default .select2-selection--multiple,
+          .tree-option {
+            @include theme-bgcolor($purple-mode-modal-input-bgcolor);
+          }
+        }
+
+        .modal-footer {
+        }
+      }
     }
   }
 }
@@ -319,15 +403,20 @@ body.black-mode {
     }
   }
   .chat-pannel {
-    .welcome-logo-container {
-      @include theme-bgcolor($black-mode-bar-bgcolor);
-    }
     .card-header {
       @include theme-bgcolor($black-mode-bar-bgcolor);
     }
     .card-body {
-      .message.ai {
+      .welcome-logo-container {
         @include theme-bgcolor($black-mode-bar-bgcolor);
+      }
+      .ai-message {
+        .chat-loading-avatar {
+          @include theme-bgcolor($black-mode-bar-bgcolor);
+        }
+        .message.ai {
+          @include theme-bgcolor($black-mode-bar-bgcolor);
+        }
       }
       .message.user {
         @include theme-bgcolor($black-mode-message-user-bgcolor);
@@ -346,6 +435,31 @@ body.black-mode {
     }
     .dropdown-item:hover .title-notification {
       @include theme-text-color($white-color);
+    }
+  }
+  .modal {
+    .modal-dialog {
+      .modal-content {
+        @include theme-bgcolor($black-mode-modal-container-bgcolor);
+        .close-icon-btn {
+        }
+        .modal-header {
+          @include theme-bgcolor($black-mode-modal-header-bgcolor);
+          .modal-title {
+          }
+        }
+        .modal-body {
+          input,
+          textarea,
+          .select2-container--default .select2-selection--multiple,
+          .tree-option {
+            @include theme-bgcolor($black-mode-modal-input-bgcolor);
+          }
+        }
+
+        .modal-footer {
+        }
+      }
     }
   }
 }
@@ -367,15 +481,20 @@ body.brown-mode {
     }
   }
   .chat-pannel {
-    .welcome-logo-container {
-      @include theme-bgcolor($brown-mode-bar-bgcolor);
-    }
     .card-header {
       @include theme-bgcolor($brown-mode-bar-bgcolor);
     }
     .card-body {
-      .message.ai {
+      .welcome-logo-container {
         @include theme-bgcolor($brown-mode-bar-bgcolor);
+      }
+      .ai-message {
+        .chat-loading-avatar {
+          @include theme-bgcolor($brown-mode-bar-bgcolor);
+        }
+        .message.ai {
+          @include theme-bgcolor($brown-mode-bar-bgcolor);
+        }
       }
       .message.user {
         @include theme-bgcolor($brown-mode-message-user-bgcolor);
@@ -396,20 +515,212 @@ body.brown-mode {
       @include theme-text-color($white-color);
     }
   }
-}
-body.light-mode {
-  background-image: $bg-img2-multi;
-  .nav-background {
-    @include theme-bgcolor($light-mode-bar-bgcolor);
+  .modal {
+    .modal-dialog {
+      .modal-content {
+        @include theme-bgcolor($brown-mode-modal-container-bgcolor);
+        .close-icon-btn {
+        }
+        .modal-header {
+          @include theme-bgcolor($brown-mode-modal-header-bgcolor);
+          .modal-title {
+          }
+        }
+        .modal-body {
+          input,
+          textarea,
+          .select2-container--default .select2-selection--multiple,
+          .tree-option {
+            @include theme-bgcolor($brown-mode-modal-input-bgcolor);
+          }
+        }
+
+        .modal-footer {
+        }
+      }
+    }
   }
 }
+// body.light-mode {
+//   background-image: $bg-img2-multi;
+//   .nav-background {
+//     @include theme-bgcolor($light-mode-bar-bgcolor);
+//   }
+// }
+// body.dark-mode {
+//   background-image: url("https://trello-backgrounds.s3.amazonaws.com/53baf533e697a982248cd73f/2048x2048/22ec03aab9d36ea49139c569a62bb079/shutterstock_134707556.jpg");
 
+//   .projects_card {
+//     .column_todo {
+//       background-color: rgb(187, 7, 10) !important;
+//     }
+//     .column_in_progress {
+//       background-color: rgb(158, 17, 147) !important;
+//     }
+//     .column_done {
+//       background-color: rgb(21, 158, 97) !important;
+//     }
+//     .card-header {
+//       @include theme-bgcolor($dark-mode-bar-bgcolor);
+//     }
+//     .card-body {
+//       .task-card {
+//         @include theme-bgcolor($dark-mode-card-task-bgcolor);
+//       }
+//     }
+//   }
+//   .chat-pannel {
+//     .card-header {
+//       @include theme-bgcolor($dark-mode-bar-bgcolor);
+//     }
+//     .card-body {
+//       .ai-message {
+//         .chat-loading-avatar {
+//           @include theme-bgcolor($dark-mode-bar-bgcolor);
+//         }
+//         .message.ai {
+//           @include theme-bgcolor($dark-mode-bar-bgcolor);
+//         }
+//       }
+//       .message.user {
+//         @include theme-bgcolor($dark-mode-message-user-bgcolor);
+//       }
+//     }
+//   }
+//   .notification-list {
+//     .dropdown-item {
+//       @include theme-text-color($gray-color-e1);
+//     }
+//     .dropdown-item .title-notification {
+//       @include theme-text-color($gray-color-92);
+//     }
+//     .dropdown-item:hover {
+//       @include theme-bgcolor($dark-mode-card-task-bgcolor);
+//     }
+//     .dropdown-item:hover .title-notification {
+//       @include theme-text-color($white-color);
+//     }
+//   }
+// }
 body {
+  @extend .font-primary;
   background-image: $bg-img1-black;
   background-size: cover;
   background-position: top;
   background-repeat: no-repeat;
   background-attachment: fixed;
+
+  // login/register pa ges
+  .register-page,
+  .login-page {
+    background-image: url("https://res.cloudinary.com/da6qujoed/image/upload/v1744294916/siraj_Dark_background_two_clouds_in_the_shape_of_an_angle_betwe_d0bfefb0-90ab-40e6-ae57-49e815d781ee_1_dxfw6e.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    a {
+      color: var(--bs-primary-white) !important;
+      text-decoration: none !important;
+
+      &.btn.btn-outline-link {
+        border: 1px solid #9c9c9c;
+        border-radius: 12px;
+        width: 251px !important;
+        height: 48px !important;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        align-self: center;
+      }
+    }
+
+    input {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid #9c9c9c;
+      border-radius: 12px;
+      height: 48px;
+    }
+
+    .form-label,
+    .card-title {
+      color: rgba(255, 255, 255, 1);
+    }
+
+    .card {
+      .card-body {
+        background: rgba(0, 0, 0, 0.8);
+        border: 1px solid rgba(234, 234, 234, 0.2);
+        backdrop-filter: blur(6.35px);
+        border-radius: 16px;
+        display: flex !important;
+        flex-direction: column !important;
+        padding: 1.7rem 1.5rem !important;
+        .divider {
+          display: flex;
+          align-items: center;
+          text-align: center;
+          gap: 10px;
+          @extend .font-primary;
+
+          hr {
+            flex: 1;
+            height: 1px;
+            background-color: rgba(255, 255, 255, 1);
+            border: none;
+          }
+
+          span {
+            color: #646464;
+            white-space: nowrap;
+          }
+        }
+        a.footer-text {
+          color: #fff !important;
+          @extend .font-secondaryBold;
+          span.normal-text {
+            color: #646464 !important;
+            @extend .font-primary;
+            font-size: 0.9rem;
+          }
+        }
+        @media (max-width: 768px) {
+          width: 95% !important;
+          margin: 0 auto !important;
+        }
+        .text-muted {
+          font-size: 1.1rem;
+          color: #646464 !important;
+          padding: 1rem 0;
+        }
+      }
+
+      .card-title {
+        font-size: 2rem !important;
+        @extend .font-secondaryBold;
+      }
+    }
+
+    .btn-primary {
+      color: rgba(255, 255, 255, 1);
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(248, 249, 250, 0.5);
+      border-radius: 10px;
+      transition: all 0.34s ease-in-out;
+      height: 49px;
+      font-size: 1.15rem !important;
+      @extend .font-secondaryBold;
+      &:hover {
+        background-color: var(--bs-primary-white) !important;
+        filter: brightness(0.7) !important;
+        color: var(--bs-primary-black) !important;
+      }
+    }
+
+    .col-lg-12 {
+      max-width: 576px;
+    }
+  }
+
   .container-fluid > .row:first-child {
     @media (max-width: 768px) {
       border-radius: 12px;
@@ -459,6 +770,7 @@ body {
       height: 42px;
       width: 42px;
       @include flex-center-hv;
+      @extend .hover-up;
     }
     .theme-icon-container {
       @include flex-center-hv-column;
@@ -469,6 +781,7 @@ body {
       padding: 0.75rem 1.3rem;
       position: absolute;
       top: 4.2rem;
+      @extend .hover-up;
       .theme-icon-content-container {
         @include flex-center-hv;
         gap: 0.7rem;
@@ -571,9 +884,37 @@ body {
       }
       button {
         @include flex-center-hv;
+        @extend .hover-up;
       }
       #projectDropdownButton {
         text-decoration: none !important;
+        color: $white-color !important;
+      }
+      ul#projectDropdown {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(211, 211, 211, 0.5);
+        backdrop-filter: blur(4.3px);
+        li.dropdown-item {
+          color: $white-color!important;
+          @extend .font-secondaryBold;
+          @extend .hover-up;
+          &:hover{
+            background: rgba(255, 255, 255, 0.2);
+          }
+          .dropdown-item.active {
+            background: transparent!important;
+            &:parent{
+            background: rgba(255, 255, 255, 0.2)!important;
+            }
+          }
+         
+          button.dropdown-item, button.dropdown-item.active{
+            color: $white-color!important;
+            &:hover{
+              background: transparent!important;
+            }
+          }
+        }
       }
     }
     .card-body {
@@ -714,23 +1055,116 @@ body {
       background: rgba(24, 25, 28, 0.2);
       border-top: 0.666667px solid rgba(211, 211, 211, 0.5);
     }
-    .message.ai {
-      margin-left: 0.5rem;
-      @include theme-bgcolor($dark-mode-bar-bgcolor);
-      @include theme-text-color($dark-mode-message-ai-color);
-      border: $dark-mode-message-ai-border;
-      border-radius: $border-radius-16;
-      backdrop-filter: blur(8px);
-      padding: 1rem;
-      margin-bottom: 0.5rem;
+    .card-body {
+      .welcome-logo-container {
+        @extend .hover-up;
+      }
+      .chat-loading-avatar {
+        @extend .hover-up;
+      }
+      .message.ai {
+        margin-left: 0.5rem;
+        @include theme-bgcolor($dark-mode-bar-bgcolor);
+        @include theme-text-color($dark-mode-message-ai-color);
+        border: $dark-mode-message-ai-border;
+        border-radius: $border-radius-16;
+        backdrop-filter: blur(8px);
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        @extend .hover-up;
+      }
+      .message.user {
+        @include theme-bgcolor($dark-mode-bar-bgcolor);
+        @include theme-text-color($dark-mode-message-user-color);
+        @extend .hover-up;
+      }
+      .prompt-btn {
+        @include theme-bgcolor($dark-mode-prompt-btn-bgcolor);
+        border-color: $dark-mode-prompt-btn-border;
+        @extend .hover-up;
+      }
     }
-    .message.user {
-      @include theme-bgcolor($dark-mode-bar-bgcolor);
-      @include theme-text-color($dark-mode-message-user-color);
-    }
-    .prompt-btn {
-      @include theme-bgcolor($dark-mode-prompt-btn-bgcolor);
-      border-color: $dark-mode-prompt-btn-border;
+  }
+  .modal {
+    .modal-dialog {
+      @media (min-width: 576px) {
+        &:not(.modal-lg):not(.modal-xl) {
+          max-width: 650px;
+        }
+      }
+      .modal-content {
+        color: $white-color;
+        background: $dark-mode-modal-bgcolor;
+        border: $dark-mode-modal-border;
+        max-height: 60vh;
+        border-radius: 16px !important;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(211, 211, 211, 0.5);
+        backdrop-filter: blur(6.35px);
+        .close-icon-btn {
+          transform: translateY(-50%);
+          top: 50%;
+          position: absolute;
+          right: 20px;
+        }
+        .modal-header {
+          padding: 0.95rem 1.3rem !important;
+          border-radius: 16px 16px 0px 0px;
+          backdrop-filter: blur(6.35px) !important;
+          border-radius: 16px 16px 0px 0px !important;
+          .modal-title {
+            color: var(--bs-primary-white) !important;
+            font-size: 1.2rem !important;
+          }
+        }
+        .modal-body {
+          max-height: calc(60vh - 130px);
+          overflow-y: auto;
+          scrollbar-width: thin;
+          scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+          padding: 1.3rem 1.5rem;
+          &::-webkit-scrollbar-thumb {
+            width: 6px;
+          }
+          &::-webkit-scrollbar-track {
+            background: transparent;
+          }
+          &::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            border: transparent;
+          }
+          small.text-muted {
+            color: $white-color-50 !important;
+          }
+          input,
+          textarea,
+          .select2-container--default .select2-selection--multiple,
+          .tree-option {
+            border: 1px solid $white-color-20 !important;
+            @extend .hover-up;
+          }
+          .tree-option {
+            &:hover,
+            &.selected {
+              border: 1px solid #28a745 !important;
+              background-color: rgba(40, 167, 69, 0.1) !important;
+              @extend .hover-up;
+            }
+          }
+        }
+
+        .modal-footer {
+          border: 0 !important;
+          button {
+            background: $white-color-10;
+            border: 1px solid $white-color-50;
+            color: $white-color !important;
+            font-weight: 500;
+            @extend .hover-up;
+          }
+        }
+      }
     }
   }
 }
@@ -771,39 +1205,6 @@ body {
     }
     .notification-icon-subtask_updated {
       background: $notiifcationicon-color2;
-    }
-  }
-}
-
-.modal {
-  .modal-dialog {
-    @media (min-width: 576px) {
-      &:not(.modal-lg):not(.modal-xl) {
-        max-width: 650px;
-      }
-    }
-    .modal-content {
-      color: $white-color;
-      background: $dark-mode-modal-bgcolor;
-      border: $dark-mode-modal-border;
-      .close-icon-btn {
-        transform: translateY(-50%);
-        top: 50%;
-        position: absolute;
-        right: 20px;
-      }
-      .modal-footer {
-        button {
-          transition: all $transition-duration-34 ease-in-out;
-          &:hover {
-            svg {
-              path {
-                stroke: $black-color;
-              }
-            }
-          }
-        }
-      }
     }
   }
 }

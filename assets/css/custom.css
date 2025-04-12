@@ -35,62 +35,8 @@
   
   }
   
-  /* ===============================
-       2) FONTS
-       =============================== */
-  @font-face {
-    font-family: "Geist";
-    src: url("../fonts/Geist-Thin.woff2") format("woff2");
-    font-weight: 100;
-    font-style: normal;
-  }
-  @font-face {
-    font-family: "Geist";
-    src: url("../fonts/Geist-UltraLight.woff2") format("woff2");
-    font-weight: 200;
-    font-style: normal;
-  }
-  @font-face {
-    font-family: "Geist";
-    src: url("../fonts/Geist-Regular.woff2") format("woff2");
-    font-weight: 400;
-    font-style: normal;
-  }
-  @font-face {
-    font-family: "Geist";
-    src: url("../fonts/Geist-Medium.woff2") format("woff2");
-    font-weight: 500;
-    font-style: normal;
-  }
-  @font-face {
-    font-family: "Geist";
-    src: url("../fonts/Geist-Bold.woff2") format("woff2");
-    font-weight: 700;
-    font-style: normal;
-  }
-  @font-face {
-    font-family: "Geist";
-    src: url("../fonts/Geist-Black.woff2") format("woff2");
-    font-weight: 900;
-    font-style: normal;
-  }
-  @font-face {
-    font-family: "CabinetGroteskBold";
-    src: url("../fonts/CabinetGrotesk-Bold.woff2") format("woff2");
-    font-weight: 700;
-    font-style: normal;
-  }
-  @font-face {
-    font-family: "CabinetGroteskLight";
-    src: url("../fonts/CabinetGrotesk-Regular.woff2") format("woff2");
-    font-weight: 400;
-    font-style: normal;
-  }
-  
+ 
   /* Global font */
-  body {
-    font-family: "Geist", sans-serif !important;
-  }
   
   .nav-background, body.dark-mode .card-header {
     box-shadow: 0px 4px 30px rgba(0, 0, 0, 0.1) !important;
@@ -119,6 +65,8 @@
     background: rgba(21, 158, 97, 1) !important;
   }
   
+
+
   /* ===============================
        4) BUTTONS
        =============================== */
@@ -476,83 +424,7 @@
   .self-center {
     align-self: center;
   }
-  /* Register / login pages */
-  .register-page,
-  .login-page {
-    background-image: url('https://res.cloudinary.com/da6qujoed/image/upload/v1744294916/siraj_Dark_background_two_clouds_in_the_shape_of_an_angle_betwe_d0bfefb0-90ab-40e6-ae57-49e815d781ee_1_dxfw6e.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-  }
-  .register-page a,
-  .login-page a {
-    color: var(--bs-primary-white) !important;
-    text-decoration: none !important;
-  }
-  .register-page .card .card-body,
-  .login-page .card .card-body {
-    background: rgba(0, 0, 0, 0.8);
-    border: 1px solid rgba(234, 234, 234, 0.2);
-    backdrop-filter: blur(6.35px);
-    border-radius: 16px;
-  }
-  .register-page input,
-  .login-page input {
-    background: rgba(0, 0, 0, 0.5);
-    border: 1px solid #9C9C9C;
-    border-radius: 12px;
-    height: 48px;
-  }
-  .register-page .form-label,
-  .register-page .card-title,
-  .login-page .form-label,
-  .login-page .card-title {
-    color: rgba(255, 255, 255, 1);
-  }
-  .register-page .btn-primary:hover,
-  .login-page .btn-primary:hover {
-    background-color: var(--bs-primary-white) !important;
-    filter: brightness(0.7) !important;
-    color: var(--bs-primary-black) !important;
-  }
   
-  .register-page .btn-primary,
-  .login-page .btn-primary {
-    color: rgba(255, 255, 255, 1);
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(248, 249, 250, 0.5);
-    border-radius: 10px;
-    transition: all 0.34s ease-in-out;
-    height: 49px;
-    font-size: 1.15rem !important;
-  }
-  .register-page .card-title,
-  .login-page .card-title {
-    font-size: 2rem !important;
-  }
-  .register-page .card .card-body, .login-page .card .card-body{
-    display: flex!important ;
-    flex-direction: column!important;
-    padding: 1.7rem 1.5rem!important;
-  }
-  .register-page a.btn.btn-outline-link, .login-page a.btn.btn-outline-link{
-    border: 1px solid #9C9C9C;
-    border-radius: 12px;
-    width: 251px!important;
-    height: 48px!important;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    align-self: center;
-  }
-  .register-page .card .card-body .text-muted, .login-page .card .card-body .text-muted{
-    font-size: 1.1rem;
-    color: #646464!important;
-    padding: 1rem 0;
-  }
-  .register-page .col-lg-12, .login-page .col-lg-12{
-    max-width: 576px;
-  }
   /* Dark mode border styling */
   .dark-primaryborder {
     border: 1.6px solid rgb(58 59 60) !important;
@@ -566,48 +438,17 @@
   
   /* Chat loading avatar */
   .chat-loading-avatar {
-    background-color: var(--bs-primary-dark) !important;
+    /* background-color: var(--bs-primary-dark) !important; */
   }
   .dark-mode .chat-loading-avatar {
     background-color: transparent !important;
     border: 0.5px solid var(--bs-primary-stroke50percent) !important;
   }
-  
-  /* Modal headers */
-  .modal-header {
-    padding: 0.95rem 1.3rem !important;
-    background: #361734;
-    border-radius: 16px 16px 0px 0px;
-    backdrop-filter: blur(6.35px) !important;
-    border-radius: 16px 16px 0px 0px !important;
-  }
-  .modal-header .modal-title {
-    color: var(--bs-primary-white) !important;
-    font-size: 1.2rem !important;
-  }
-  
-  /* Modal content max height */
-  .modal-content {
-    max-height: 60vh;
-    border-radius: 16px !important;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(211, 211, 211, 0.5);
-    backdrop-filter: blur(6.35px);
-  }
-  
-  .modal-body {
-    max-height: calc(
-      60vh - 130px
-    ); /* Reduced height and adjusted for header/footer */
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
-    padding: 1.3rem 1.5rem;
-  }
+
   
   /* Activity log specific styles */
   .activity-log .modal-content {
-    max-height: 50vh; /* Even smaller for activity log */
+    max-height: 50vh;
   }
   
   .activity-log .modal-body {
@@ -615,26 +456,8 @@
     padding: 0.75rem;
   }
   
-  /* Custom scrollbar for modal body */
-  .modal-body::-webkit-scrollbar {
-    width: 6px;
-  }
   
-  .modal-body::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  
-  .modal-body::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.2);
-    border-radius: 20px;
-    border: transparent;
-  }
 
-  
-  body.dark-mode .modal-body::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.15);
-  }
-  
   /* Primary & Secondary border radius */
   .primary-border-radius {
     border-radius: var(--primary-border-radius);
@@ -1115,12 +938,6 @@
     height: calc(100vh - 250px);
   }
   
-  /* Hover effects */
-  .user-avatar .chat-loading-avatar:hover,
-  .ai-avatar .chat-loading-avatar:hover {
-    transform: scale(1.05);
-    transition: transform 0.2s ease;
-  }
   
   /* Notification dropdown fixes */
   .dropdown {
@@ -1598,14 +1415,10 @@
     transition: all 0.2s ease;
 }
 
-.tree-option:hover {
-  border-color: #28a745;
-  background-color: rgba(40, 167, 69, 0.1);
-}
-
-.tree-option.selected {
-    border-color: #28a745;
-    background-color: rgba(40, 167, 69, 0.1);
+.tree-option:hover, .tree-option.selected {
+  border: 1px solid #28a745!important;
+  background-color: rgba(40, 167, 69, 0.1)!important;
+  @extend .hover-up;
 }
 
 .tree-option img {

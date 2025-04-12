@@ -1,3 +1,90 @@
+@font-face {
+  font-family: "Geist";
+  src: url("../fonts/Geist-Thin.woff2") format("woff2");
+  font-weight: 100;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Geist";
+  src: url("../fonts/Geist-UltraLight.woff2") format("woff2");
+  font-weight: 200;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Geist";
+  src: url("../fonts/Geist-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Geist";
+  src: url("../fonts/Geist-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Geist";
+  src: url("../fonts/Geist-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Geist";
+  src: url("../fonts/Geist-Black.woff2") format("woff2");
+  font-weight: 900;
+  font-style: normal;
+}
+@font-face {
+  font-family: "CabinetGroteskBold";
+  src: url("../fonts/CabinetGrotesk-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: "CabinetGroteskLight";
+  src: url("../fonts/CabinetGrotesk-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+}
+.font-primary, body .register-page .card .card-body a.footer-text span.normal-text,
+body .login-page .card .card-body a.footer-text span.normal-text, body .register-page .card .card-body .divider,
+body .login-page .card .card-body .divider, body {
+  font-family: "Geist", sans-serif !important;
+}
+
+.font-primary-bold {
+  font-family: "Geist-Bold", sans-serif !important;
+}
+
+.font-secondaryBold, body .projects_card .card-header ul#projectDropdown li.dropdown-item, body .register-page .btn-primary,
+body .login-page .btn-primary, body .register-page .card .card-title,
+body .login-page .card .card-title, body .register-page .card .card-body a.footer-text,
+body .login-page .card .card-body a.footer-text {
+  font-family: "CabinetGroteskBold", sans-serif !important;
+}
+
+.font-secondaryLight {
+  font-family: "CabinetGroteskLight", sans-serif !important;
+}
+
+.hover-up, body .modal .modal-dialog .modal-content .modal-footer button, body .modal .modal-dialog .modal-content .modal-body .tree-option:hover, body .modal .modal-dialog .modal-content .modal-body .tree-option.selected, body .modal .modal-dialog .modal-content .modal-body input,
+body .modal .modal-dialog .modal-content .modal-body textarea,
+body .modal .modal-dialog .modal-content .modal-body .select2-container--default .select2-selection--multiple,
+body .modal .modal-dialog .modal-content .modal-body .tree-option, body .chat-pannel .card-body .prompt-btn, body .chat-pannel .card-body .message.user, body .chat-pannel .card-body .message.ai, body .chat-pannel .card-body .chat-loading-avatar, body .chat-pannel .card-body .welcome-logo-container, body .projects_card .card-header ul#projectDropdown li.dropdown-item, body .projects_card .card-header button, body .navbar .theme-icon-container, body .navbar button#notificationDropdown,
+body .navbar button#toggleDarkModeBtn,
+body .navbar button.btn-logout,
+body .navbar button#btn-theme, .btn-main-primary {
+  transition: all 0.34s ease-in-out;
+}
+.hover-up:hover, body .modal .modal-dialog .modal-content .modal-footer button:hover, body .modal .modal-dialog .modal-content .modal-body .tree-option:hover, body .modal .modal-dialog .modal-content .modal-body input:hover,
+body .modal .modal-dialog .modal-content .modal-body textarea:hover,
+body .modal .modal-dialog .modal-content .modal-body .select2-container--default .select2-selection--multiple:hover, body .chat-pannel .card-body .prompt-btn:hover, body .chat-pannel .card-body .message.user:hover, body .chat-pannel .card-body .message.ai:hover, body .chat-pannel .card-body .chat-loading-avatar:hover, body .chat-pannel .card-body .welcome-logo-container:hover, body .projects_card .card-header ul#projectDropdown li.dropdown-item:hover, body .projects_card .card-header button:hover, body .navbar .theme-icon-container:hover, body .navbar button#notificationDropdown:hover,
+body .navbar button#toggleDarkModeBtn:hover,
+body .navbar button.btn-logout:hover,
+body .navbar button#btn-theme:hover, .btn-main-primary:hover {
+  transform: translateY(-5px);
+}
+
 #user-add-icon {
   height: 24px;
   width: 24px;
@@ -17,46 +104,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-body.dark-mode {
-  background-image: url("https://trello-backgrounds.s3.amazonaws.com/53baf533e697a982248cd73f/2048x2048/22ec03aab9d36ea49139c569a62bb079/shutterstock_134707556.jpg");
-}
-body.dark-mode .projects_card .column_todo {
-  background-color: rgb(187, 7, 10) !important;
-}
-body.dark-mode .projects_card .column_in_progress {
-  background-color: rgb(158, 17, 147) !important;
-}
-body.dark-mode .projects_card .column_done {
-  background-color: rgb(21, 158, 97) !important;
-}
-body.dark-mode .projects_card .card-header {
-  background: rgba(255, 255, 255, 0.2);
-}
-body.dark-mode .projects_card .card-body .task-card {
-  background: linear-gradient(135deg, #240121 0%, #4f0142 100%) !important;
-}
-body.dark-mode .chat-pannel .card-header {
-  background: rgba(255, 255, 255, 0.2);
-}
-body.dark-mode .chat-pannel .card-body .message.ai {
-  background: rgba(255, 255, 255, 0.2);
-}
-body.dark-mode .chat-pannel .card-body .message.user {
-  background: rgba(255, 255, 255, 0.2);
-}
-body.dark-mode .notification-list .dropdown-item {
-  color: #e1e1e1;
-}
-body.dark-mode .notification-list .dropdown-item .title-notification {
-  color: rgb(92, 92, 92);
-}
-body.dark-mode .notification-list .dropdown-item:hover {
-  background: linear-gradient(135deg, #240121 0%, #4f0142 100%) !important;
-}
-body.dark-mode .notification-list .dropdown-item:hover .title-notification {
-  color: #fff;
 }
 
 body.system-mode {
@@ -86,7 +133,10 @@ body.system-mode .chat-pannel .card-header {
 body.system-mode .chat-pannel .card-body .welcome-logo-container {
   background: rgb(24, 24, 24);
 }
-body.system-mode .chat-pannel .card-body .message.ai {
+body.system-mode .chat-pannel .card-body .ai-message .chat-loading-avatar {
+  background: rgb(36, 37, 38);
+}
+body.system-mode .chat-pannel .card-body .ai-message .message.ai {
   background: rgb(53, 53, 53);
 }
 body.system-mode .chat-pannel .card-body .message.user {
@@ -104,7 +154,18 @@ body.system-mode .notification-list .dropdown-item:hover {
 body.system-mode .notification-list .dropdown-item:hover .title-notification {
   color: #fff;
 }
-
+body.system-mode .modal .modal-dialog .modal-content {
+  background: #242526;
+}
+body.system-mode .modal .modal-dialog .modal-content .modal-header {
+  background: #1d1d1d;
+}
+body.system-mode .modal .modal-dialog .modal-content .modal-body input,
+body.system-mode .modal .modal-dialog .modal-content .modal-body textarea,
+body.system-mode .modal .modal-dialog .modal-content .modal-body .select2-container--default .select2-selection--multiple,
+body.system-mode .modal .modal-dialog .modal-content .modal-body .tree-option {
+  background: rgba(10, 10, 10, 0.2);
+}
 body.purple-mode {
   background-image: url("https://trello-backgrounds.s3.amazonaws.com/53baf533e697a982248cd73f/2048x2048/22ec03aab9d36ea49139c569a62bb079/shutterstock_134707556.jpg");
 }
@@ -126,16 +187,19 @@ body.purple-mode .projects_card .card-header {
 body.purple-mode .projects_card .card-body .task-card {
   background: linear-gradient(135deg, #240121 0%, #4f0142 100%) !important;
 }
-body.purple-mode .chat-pannel .welcome-logo-container {
-  background-color: rgba(40, 3, 59, 0.6);
-}
 body.purple-mode .chat-pannel .card-header {
   background: rgba(40, 3, 59, 0.6);
+}
+body.purple-mode .chat-pannel .card-body .welcome-logo-container {
+  background-color: rgba(40, 3, 59, 0.6);
 }
 body.purple-mode .chat-pannel .card-body .task-column_header {
   background: auto !important;
 }
-body.purple-mode .chat-pannel .card-body .message.ai {
+body.purple-mode .chat-pannel .card-body .ai-message .chat-loading-avatar {
+  background: rgba(40, 3, 59, 0.6);
+}
+body.purple-mode .chat-pannel .card-body .ai-message .message.ai {
   background: rgba(40, 3, 59, 0.6);
 }
 body.purple-mode .chat-pannel .card-body .message.user {
@@ -153,7 +217,18 @@ body.purple-mode .notification-list .dropdown-item:hover {
 body.purple-mode .notification-list .dropdown-item:hover .title-notification {
   color: #fff;
 }
-
+body.purple-mode .modal .modal-dialog .modal-content {
+  background: #120211;
+}
+body.purple-mode .modal .modal-dialog .modal-content .modal-header {
+  background: #361734;
+}
+body.purple-mode .modal .modal-dialog .modal-content .modal-body input,
+body.purple-mode .modal .modal-dialog .modal-content .modal-body textarea,
+body.purple-mode .modal .modal-dialog .modal-content .modal-body .select2-container--default .select2-selection--multiple,
+body.purple-mode .modal .modal-dialog .modal-content .modal-body .tree-option {
+  background: rgba(12, 1, 17, 0.5);
+}
 body.black-mode {
   background-image: url("https://trello-backgrounds.s3.amazonaws.com/53baf533e697a982248cd73f/2048x2048/22ec03aab9d36ea49139c569a62bb079/shutterstock_134707556.jpg");
 }
@@ -175,13 +250,16 @@ body.black-mode .projects_card .card-header {
 body.black-mode .projects_card .card-body .task-card {
   background: rgb(9, 1, 12) !important;
 }
-body.black-mode .chat-pannel .welcome-logo-container {
-  background: rgba(36, 37, 38, 0.5);
-}
 body.black-mode .chat-pannel .card-header {
   background: rgba(36, 37, 38, 0.5);
 }
-body.black-mode .chat-pannel .card-body .message.ai {
+body.black-mode .chat-pannel .card-body .welcome-logo-container {
+  background: rgba(36, 37, 38, 0.5);
+}
+body.black-mode .chat-pannel .card-body .ai-message .chat-loading-avatar {
+  background: rgba(36, 37, 38, 0.5);
+}
+body.black-mode .chat-pannel .card-body .ai-message .message.ai {
   background: rgba(36, 37, 38, 0.5);
 }
 body.black-mode .chat-pannel .card-body .message.user {
@@ -199,7 +277,18 @@ body.black-mode .notification-list .dropdown-item:hover {
 body.black-mode .notification-list .dropdown-item:hover .title-notification {
   color: #fff;
 }
-
+body.black-mode .modal .modal-dialog .modal-content {
+  background: #171717;
+}
+body.black-mode .modal .modal-dialog .modal-content .modal-header {
+  background: #0d0c0c;
+}
+body.black-mode .modal .modal-dialog .modal-content .modal-body input,
+body.black-mode .modal .modal-dialog .modal-content .modal-body textarea,
+body.black-mode .modal .modal-dialog .modal-content .modal-body .select2-container--default .select2-selection--multiple,
+body.black-mode .modal .modal-dialog .modal-content .modal-body .tree-option {
+  background: rgba(12, 1, 17, 0.2);
+}
 body.brown-mode {
   background-image: url("https://res.cloudinary.com/da6qujoed/image/upload/v1744289266/a7190ff1f5577d8c63d61ed085165786_s6ghtx.png");
 }
@@ -221,13 +310,16 @@ body.brown-mode .projects_card .card-header {
 body.brown-mode .projects_card .card-body .task-card {
   background: rgb(65, 4, 4) !important;
 }
-body.brown-mode .chat-pannel .welcome-logo-container {
-  background: rgb(65, 4, 4);
-}
 body.brown-mode .chat-pannel .card-header {
   background: rgb(65, 4, 4);
 }
-body.brown-mode .chat-pannel .card-body .message.ai {
+body.brown-mode .chat-pannel .card-body .welcome-logo-container {
+  background: rgb(65, 4, 4);
+}
+body.brown-mode .chat-pannel .card-body .ai-message .chat-loading-avatar {
+  background: rgb(65, 4, 4);
+}
+body.brown-mode .chat-pannel .card-body .ai-message .message.ai {
   background: rgb(65, 4, 4);
 }
 body.brown-mode .chat-pannel .card-body .message.user {
@@ -245,20 +337,135 @@ body.brown-mode .notification-list .dropdown-item:hover {
 body.brown-mode .notification-list .dropdown-item:hover .title-notification {
   color: #fff;
 }
-
-body.light-mode {
-  background-image: url("https://trello-backgrounds.s3.amazonaws.com/53baf533e697a982248cd73f/2048x2048/22ec03aab9d36ea49139c569a62bb079/shutterstock_134707556.jpg");
+body.brown-mode .modal .modal-dialog .modal-content {
+  background: #190404;
 }
-body.light-mode .nav-background {
-  background: rgba(255, 255, 255, 0.6);
+body.brown-mode .modal .modal-dialog .modal-content .modal-header {
+  background: #410404;
 }
-
+body.brown-mode .modal .modal-dialog .modal-content .modal-body input,
+body.brown-mode .modal .modal-dialog .modal-content .modal-body textarea,
+body.brown-mode .modal .modal-dialog .modal-content .modal-body .select2-container--default .select2-selection--multiple,
+body.brown-mode .modal .modal-dialog .modal-content .modal-body .tree-option {
+  background: rgba(12, 1, 17, 0.2);
+}
 body {
   background-image: url("https://res.cloudinary.com/da6qujoed/image/upload/v1742653725/tool-bg_x91qyx.png");
   background-size: cover;
   background-position: top;
   background-repeat: no-repeat;
   background-attachment: fixed;
+}
+body .register-page,
+body .login-page {
+  background-image: url("https://res.cloudinary.com/da6qujoed/image/upload/v1744294916/siraj_Dark_background_two_clouds_in_the_shape_of_an_angle_betwe_d0bfefb0-90ab-40e6-ae57-49e815d781ee_1_dxfw6e.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+body .register-page a,
+body .login-page a {
+  color: var(--bs-primary-white) !important;
+  text-decoration: none !important;
+}
+body .register-page a.btn.btn-outline-link,
+body .login-page a.btn.btn-outline-link {
+  border: 1px solid #9c9c9c;
+  border-radius: 12px;
+  width: 251px !important;
+  height: 48px !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-self: center;
+}
+body .register-page input,
+body .login-page input {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid #9c9c9c;
+  border-radius: 12px;
+  height: 48px;
+}
+body .register-page .form-label,
+body .register-page .card-title,
+body .login-page .form-label,
+body .login-page .card-title {
+  color: rgb(255, 255, 255);
+}
+body .register-page .card .card-body,
+body .login-page .card .card-body {
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(234, 234, 234, 0.2);
+  backdrop-filter: blur(6.35px);
+  border-radius: 16px;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 1.7rem 1.5rem !important;
+}
+body .register-page .card .card-body .divider,
+body .login-page .card .card-body .divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+}
+body .register-page .card .card-body .divider hr,
+body .login-page .card .card-body .divider hr {
+  flex: 1;
+  height: 1px;
+  background-color: rgb(255, 255, 255);
+  border: none;
+}
+body .register-page .card .card-body .divider span,
+body .login-page .card .card-body .divider span {
+  color: #646464;
+  white-space: nowrap;
+}
+body .register-page .card .card-body a.footer-text,
+body .login-page .card .card-body a.footer-text {
+  color: #fff !important;
+}
+body .register-page .card .card-body a.footer-text span.normal-text,
+body .login-page .card .card-body a.footer-text span.normal-text {
+  color: #646464 !important;
+  font-size: 0.9rem;
+}
+@media (max-width: 768px) {
+  body .register-page .card .card-body,
+  body .login-page .card .card-body {
+    width: 95% !important;
+    margin: 0 auto !important;
+  }
+}
+body .register-page .card .card-body .text-muted,
+body .login-page .card .card-body .text-muted {
+  font-size: 1.1rem;
+  color: #646464 !important;
+  padding: 1rem 0;
+}
+body .register-page .card .card-title,
+body .login-page .card .card-title {
+  font-size: 2rem !important;
+}
+body .register-page .btn-primary,
+body .login-page .btn-primary {
+  color: rgb(255, 255, 255);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(248, 249, 250, 0.5);
+  border-radius: 10px;
+  transition: all 0.34s ease-in-out;
+  height: 49px;
+  font-size: 1.15rem !important;
+}
+body .register-page .btn-primary:hover,
+body .login-page .btn-primary:hover {
+  background-color: var(--bs-primary-white) !important;
+  filter: brightness(0.7) !important;
+  color: var(--bs-primary-black) !important;
+}
+body .register-page .col-lg-12,
+body .login-page .col-lg-12 {
+  max-width: 576px;
 }
 @media (max-width: 768px) {
   body .container-fluid > .row:first-child {
@@ -426,6 +633,30 @@ body .projects_card .card-header button {
 }
 body .projects_card .card-header #projectDropdownButton {
   text-decoration: none !important;
+  color: #fff !important;
+}
+body .projects_card .card-header ul#projectDropdown {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(211, 211, 211, 0.5);
+  backdrop-filter: blur(4.3px);
+}
+body .projects_card .card-header ul#projectDropdown li.dropdown-item {
+  color: #fff !important;
+}
+body .projects_card .card-header ul#projectDropdown li.dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+body .projects_card .card-header ul#projectDropdown li.dropdown-item .dropdown-item.active {
+  background: transparent !important;
+}
+body .projects_card .card-header ul#projectDropdown li.dropdown-item .dropdown-item.active:parent {
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+body .projects_card .card-header ul#projectDropdown li.dropdown-item button.dropdown-item, body .projects_card .card-header ul#projectDropdown li.dropdown-item button.dropdown-item.active {
+  color: #fff !important;
+}
+body .projects_card .card-header ul#projectDropdown li.dropdown-item button.dropdown-item:hover, body .projects_card .card-header ul#projectDropdown li.dropdown-item button.dropdown-item.active:hover {
+  background: transparent !important;
 }
 @media (max-width: 768px) {
   body .projects_card .card-body .row {
@@ -558,7 +789,7 @@ body .chat-pannel .chat-input {
   background: rgba(24, 25, 28, 0.2);
   border-top: 0.666667px solid rgba(211, 211, 211, 0.5);
 }
-body .chat-pannel .message.ai {
+body .chat-pannel .card-body .message.ai {
   margin-left: 0.5rem;
   background: rgba(255, 255, 255, 0.2);
   color: #e4e6eb;
@@ -568,13 +799,84 @@ body .chat-pannel .message.ai {
   padding: 1rem;
   margin-bottom: 0.5rem;
 }
-body .chat-pannel .message.user {
+body .chat-pannel .card-body .message.user {
   background: rgba(255, 255, 255, 0.2);
   color: #fff;
 }
-body .chat-pannel .prompt-btn {
+body .chat-pannel .card-body .prompt-btn {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(248, 249, 250, 0.5);
+}
+@media (min-width: 576px) {
+  body .modal .modal-dialog:not(.modal-lg):not(.modal-xl) {
+    max-width: 650px;
+  }
+}
+body .modal .modal-dialog .modal-content {
+  color: #fff;
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  max-height: 60vh;
+  border-radius: 16px !important;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(211, 211, 211, 0.5);
+  backdrop-filter: blur(6.35px);
+}
+body .modal .modal-dialog .modal-content .close-icon-btn {
+  transform: translateY(-50%);
+  top: 50%;
+  position: absolute;
+  right: 20px;
+}
+body .modal .modal-dialog .modal-content .modal-header {
+  padding: 0.95rem 1.3rem !important;
+  border-radius: 16px 16px 0px 0px;
+  backdrop-filter: blur(6.35px) !important;
+  border-radius: 16px 16px 0px 0px !important;
+}
+body .modal .modal-dialog .modal-content .modal-header .modal-title {
+  color: var(--bs-primary-white) !important;
+  font-size: 1.2rem !important;
+}
+body .modal .modal-dialog .modal-content .modal-body {
+  max-height: calc(60vh - 130px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  padding: 1.3rem 1.5rem;
+}
+body .modal .modal-dialog .modal-content .modal-body::-webkit-scrollbar-thumb {
+  width: 6px;
+}
+body .modal .modal-dialog .modal-content .modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+body .modal .modal-dialog .modal-content .modal-body::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  border: transparent;
+}
+body .modal .modal-dialog .modal-content .modal-body small.text-muted {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+body .modal .modal-dialog .modal-content .modal-body input,
+body .modal .modal-dialog .modal-content .modal-body textarea,
+body .modal .modal-dialog .modal-content .modal-body .select2-container--default .select2-selection--multiple,
+body .modal .modal-dialog .modal-content .modal-body .tree-option {
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+body .modal .modal-dialog .modal-content .modal-body .tree-option:hover, body .modal .modal-dialog .modal-content .modal-body .tree-option.selected {
+  border: 1px solid #28a745 !important;
+  background-color: rgba(40, 167, 69, 0.1) !important;
+}
+body .modal .modal-dialog .modal-content .modal-footer {
+  border: 0 !important;
+}
+body .modal .modal-dialog .modal-content .modal-footer button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  color: #fff !important;
+  font-weight: 500;
 }
 
 .notification-icon {
@@ -614,29 +916,6 @@ body .chat-pannel .prompt-btn {
 }
 .notification-list .dropdown-item .notification-icon-subtask_updated {
   background: linear-gradient(145.32deg, #ffffff -14.49%, #048a40 82.49%);
-}
-
-@media (min-width: 576px) {
-  .modal .modal-dialog:not(.modal-lg):not(.modal-xl) {
-    max-width: 650px;
-  }
-}
-.modal .modal-dialog .modal-content {
-  color: #fff;
-  background: #000;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-.modal .modal-dialog .modal-content .close-icon-btn {
-  transform: translateY(-50%);
-  top: 50%;
-  position: absolute;
-  right: 20px;
-}
-.modal .modal-dialog .modal-content .modal-footer button {
-  transition: all 0.34s ease-in-out;
-}
-.modal .modal-dialog .modal-content .modal-footer button:hover svg path {
-  stroke: #000;
 }
 
 .column_todo .task-card .btn-sm.btn-link,

@@ -24,7 +24,7 @@
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-primary" id="createProjectBtn"><?php echo getAddSquareIcon(); ?>Create Project</button>
+                            <button type="button" class="btn btn-main-primary" id="createProjectBtn"><?php echo getAddSquareIcon(); ?>Create Project</button>
                         </div>
                     </div>
                 </div>
@@ -84,7 +84,7 @@
                             <div class="mt-4">
                                 <h6 class="border-bottom pb-2 d-flex justify-content-between align-items-center">
                                     Subtasks
-                                    <button type="button" class="btn btn-sm btn-primary" id="addSubtaskInModalBtn">
+                                    <button type="button" class="btn btn-sm btn-main-primary" id="addSubtaskInModalBtn">
                                         <i class="bi bi-plus"></i> Add Subtask
                                     </button>
                                 </h6>
@@ -103,7 +103,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-primary" id="saveTaskBtn">Save Changes</button>
+                            <button type="button" class="btn btn-main-primary" id="saveTaskBtn">Save Changes</button>
                         </div>
                     </div>
                 </div>
@@ -134,7 +134,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-primary" id="assignUserBtn">Assign User</button>
+                            <button type="button" class="btn btn-main-primary" id="assignUserBtn">Assign User</button>
                         </div>
                     </div>
                 </div>
@@ -150,7 +150,7 @@
                         </div>
 
                         <div class="modal-body position-relative">
-                            <button class="btn btn-primary position-absolute top-5 add-user-btn-top-right"
+                            <button class="btn btn-main-primary position-absolute top-5 add-user-btn-top-right"
                                 style="right: 10px;" id="addUserBtn">
                                 <i class="bi bi-person-plus"></i> Add New User
                             </button>
@@ -161,7 +161,7 @@
                             <!-- No Users Message -->
                             <div id="noUsersMessage" class="text-center py-2 d-none">
                                 <p class="text-muted">No users assigned yet.</p>
-                                <button class="btn btn-primary" id="addUserBtn">
+                                <button class="btn btn-main-primary" id="addUserBtn">
                                     <?php echo getAddUserIcon(); ?> Add New User
                                 </button>
                             </div>
@@ -195,7 +195,7 @@
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-primary" id="addNewUserBtn"><i
+                            <button type="button" class="btn btn-main-primary" id="addNewUserBtn"><i
                                     class="bi bi-send"></i>&nbsp;Send Invite</button>
                         </div>
                     </div>
@@ -268,7 +268,7 @@
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-primary" id="createTaskBtn"><?php echo getAddSquareIcon(); ?>Create Task</button>
+                            <button type="button" class="btn btn-main-primary" id="createTaskBtn"><?php echo getAddSquareIcon(); ?>Create Task</button>
                         </div>
                     </div>
                 </div>
@@ -308,7 +308,7 @@
                             </form>
                         </div>
                         <div class="modal-footer">
-]                            <button type="button" class="btn btn-primary" id="saveSubtaskBtn">Add Subtask</button>
+]                            <button type="button" class="btn btn-main-primary" id="saveSubtaskBtn">Add Subtask</button>
                         </div>
                     </div>
                 </div>
@@ -808,7 +808,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <a href="garden.php" class="btn btn-primary" id="viewGardenBtn"><?php echo getTreeIcon(); ?> My Garden</a>
+                            <a href="garden.php" class="btn btn-main-primary" id="viewGardenBtn"><?php echo getTreeIcon(); ?> My Garden</a>
                         </div>
                     </div>
                 </div>

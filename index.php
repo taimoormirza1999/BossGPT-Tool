@@ -174,7 +174,11 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
         // Show the "Sign in with Google" button
         echo "
          <div class='text-center mt-2'>
-                                    <p class='text-muted mb-1'>OR</p>
+                                 <div class='divider mt-2 mb-3'>
+  <hr />
+  <span>OR</span>
+  <hr />
+</div>
                                 </div>
         <a href='$authUrl' class='btn btn-outline-link  w-100 d-flex align-items-center justify-content-center' style='gap: 8px;'>
                 <svg width='18' height='19' viewBox='0 0 16 17' fill='none' xmlns='http://www.w3.org/2000/svg'>
@@ -278,7 +282,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                 displayGoogleLoginBtn();
                                 ?>
                                 <p class="text-center mt-3">
-                                    <a href="?page=register">Don't have an account? Sign Up </a>
+                                    <a href="?page=register" class="footer-text"><span class="normal-text">Don't have an account?</span> Sign Up </a>
                                 </p>
 
                             </div>
@@ -319,8 +323,8 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                         <input type="email" class="form-control" id="email" name="email" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="password" class="form-label" autocomplete="off">Password</label>
-                                        <input type="password" class="form-control" id="password" name="password" required>
+                                        <label for="password" class="form-label" autocomplete="new-password" >Password</label>
+                                        <input type="password" class="form-control" id="password" name="password" required  autocomplete="new-password" >
                                     </div>
                                     <button type="submit" class="btn btn-primary w-100">Register</button>
                                 </form>
@@ -329,7 +333,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                 displayGoogleLoginBtn("Sign up with Google");
                                 ?>
                                 <p class="text-center mt-3">
-                                    <a href="?page=login">Already have an account? Login</a>
+                                    <a href="?page=login" class="footer-text"><span class="normal-text">Already have an account?</span> Login</a>
                                 </p>
                             </div>
                         </div>
