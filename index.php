@@ -2491,6 +2491,10 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                     }
 
                     #subtasksList .delete-subtask-btn {
+                    border: 0 !important;
+    background: transparent !important;
+    font-size: 1.2rem !important;
+    margin-top: -1.2rem;
                         opacity: 0;
                         transition: opacity 0.2s ease;
                     }

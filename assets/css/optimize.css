@@ -698,6 +698,12 @@ body .projects_card .card-body .task-column_section .task-column .task-card {
   position: relative;
   overflow: hidden;
 }
+body .projects_card .card-body .task-column_section .task-column .task-card #subtasksList .btn-sm.btn-link.delete-subtask-btn {
+  border: 0 !important;
+  background: transparent !important;
+  font-size: 1.2rem !important;
+  margin-top: -1.2rem !important;
+}
 body .projects_card .card-body .task-column_section .task-column .task-card .due-date {
   border: 1px solid #2f3031;
   background: rgba(255, 255, 255, 0.1);
@@ -718,6 +724,9 @@ body .projects_card .card-body .task-column_section .task-column .task-card .sub
   z-index: 15;
   position: relative;
   gap: 8px !important;
+}
+body .projects_card .card-body .task-column_section .task-column .task-card * {
+  transition: all 0.4s ease-in-out;
 }
 body .projects_card .card-body .task-column_section .task-column .task-card:hover .d-flex.gap-2.mt-2,
 body .projects_card .card-body .task-column_section .task-column .task-card:hover .subtasks.mt-2 .d-flex.gap-2 {

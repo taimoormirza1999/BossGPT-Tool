@@ -792,6 +792,12 @@ body {
             color: $white-color;
             position: relative;
             overflow: hidden;
+            #subtasksList .btn-sm.btn-link.delete-subtask-btn {
+              border: 0 !important;
+              background: transparent !important;
+              font-size: 1.2rem !important;
+              margin-top: -1.2rem !important;
+            }
             .due-date {
               border: 1px solid #2f3031;
               background: rgba(255, 255, 255, 0.1);
@@ -813,7 +819,9 @@ body {
               position: relative;
               gap: 8px !important;
             }
-
+            * {
+              transition: all $transition-duration-40 ease-in-out;
+            }
             &:hover {
               .d-flex.gap-2.mt-2,
               .subtasks.mt-2 .d-flex.gap-2 {
