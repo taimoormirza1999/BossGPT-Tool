@@ -2864,7 +2864,7 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
     function include_aitone_page()
     {
         ?>
-        <div class="d-flex justify-content-center align-items-center min-vh-100">
+        <div class="d-flex justify-content-center align-items-center min-vh-100 aitone-page">
             <div class="row justify-content-center w-100 position-relative">
                 <?php echo getLogoImage(); ?>
                 <div class="col-md-6 col-lg-5 mt-5">
@@ -2872,43 +2872,8 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                         <div class="card-body text-center">
                             <h2 class="card-title text-center mb-4">How do you like your<br>AI Boss to be?</h2>
                             
-                            <div class="ai-tone-options row">
-                                <div class="col-4 mb-4">
-                                    <div class="ai-tone-option" data-tone="friendly">
-                                        <img src="https://res.cloudinary.com/da6qujoed/image/upload/v1744649255/friendlyai_hy04oz.svg" alt="Friendly">
-                                        <div>Friendly</div>
-                                        <div class="tone-indicator active"></div>
-                                    </div>
-                                </div>
-                                <div class="col-4 mb-4">
-                                    <div class="ai-tone-option" data-tone="funny">
-                                        <img src="https://res.cloudinary.com/da6qujoed/image/upload/v1744650101/funny_ql6wcm.svg" alt="Funny">
-                                        <div>Funny</div>
-                                        <div class="tone-indicator"></div>
-                                    </div>
-                                </div>
-                                <div class="col-4 mb-4">
-                                    <div class="ai-tone-option" data-tone="angry">
-                                        <img src="https://res.cloudinary.com/da6qujoed/image/upload/v1744650100/angry_sye97x.svg" alt="Angry">
-                                        <div>Angry</div>
-                                        <div class="tone-indicator"></div>
-                                    </div>
-                                </div>
-                                <div class="col-4 mb-4">
-                                    <div class="ai-tone-option" data-tone="geeky">
-                                        <img src="https://res.cloudinary.com/da6qujoed/image/upload/v1744650100/geeky_cm1bmy.svg" alt="Geeky">
-                                        <div>Geeky</div>
-                                        <div class="tone-indicator"></div>
-                                    </div>
-                                </div>
-                                <div class="col-4 mb-4">
-                                    <div class="ai-tone-option" data-tone="caring">
-                                        <img src="https://res.cloudinary.com/da6qujoed/image/upload/v1744650100/caring_b4yp8e.svg" alt="Caring">
-                                        <div>Caring</div>
-                                        <div class="tone-indicator"></div>
-                                    </div>
-                                </div>
-                            </div>
+                            <!-- Replace the existing AI tone options with the helper function -->
+                            <?php echo renderAIToneOptions(); ?>
                             
                             <button id="continueToDashboard" class="btn btn-primary w-100 mt-3">Continue to Dashboard</button>
                         </div>
@@ -2948,48 +2913,34 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                 });
             });
         </script>
-        
-        <style>
-            .ai-tone-options {
-                display: flex;
-                justify-content: center;
-                flex-wrap: wrap;
-                margin: 0 auto;
-                max-width: 500px;
-            }
-            
-            .ai-tone-option {
-                cursor: pointer;
-                padding: 10px;
-                border-radius: 10px;
-                text-align: center;
-                transition: all 0.2s ease;
-                background: rgba(217, 217, 217, 10);
-            }
-            
-            .ai-tone-option:hover {
-                background-color: rgba(0,0,0,0.05);
-            }
-            
-            .ai-tone-option img {
-                width: 60px;
-                height: 60px;
-                margin-bottom: 10px;
-            }
-            
-            .tone-indicator {
-                width: 10px;
-                height: 10px;
-                border-radius: 50%;
-                background-color: #ccc;
-                margin: 5px auto 0;
-            }
-            
-            .tone-indicator.active {
-                background-color: #28a745;
-            }
-        </style>
+    
         <?php
+        echo renderCustomModal(
+            'notificationPermissionModal',
+            'Enable Task Reminders',
+            '
+            <div class="ratio ratio-16x9 mb-4" style="border-radius: 12px; overflow: hidden;">
+                <iframe width="560" height="315" src="https://www.youtube.com/embed/-fTV9_SqnKE?si=wizXX7DUlSgTXPfZ"
+                    title="YouTube video player" frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            </div>
+        
+            <div class="alert alert-info d-flex align-items-center" role="alert">
+                <i class="bi bi-info-circle-fill me-2"></i>
+                <div>
+                    You will need to enable browser notifications to receive reminders for your tasks and deadlines.
+                </div>
+            </div>
+            ',
+            '
+            <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">Remind me later</button>
+            <button type="button" class="btn btn-main-primary" id="enableNotificationsBtn">
+                <i class="bi bi-bell-fill me-2"></i>Enable Notifications
+            </button>
+            '
+        );
+        
     }
     ?>
 </body>

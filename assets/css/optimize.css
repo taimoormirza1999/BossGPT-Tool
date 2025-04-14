@@ -47,8 +47,8 @@
   font-style: normal;
 }
 .font-primary, body .register-page .card .card-body a.footer-text span.normal-text,
-body .login-page .card .card-body a.footer-text span.normal-text, body .ai .card .card-body a.footer-text span.normal-text, body .register-page .card .card-body .divider,
-body .login-page .card .card-body .divider, body .ai .card .card-body .divider, body {
+body .login-page .card .card-body a.footer-text span.normal-text, body .aitone-page .card .card-body a.footer-text span.normal-text, body .register-page .card .card-body .divider,
+body .login-page .card .card-body .divider, body .aitone-page .card .card-body .divider, body {
   font-family: "Geist", sans-serif !important;
 }
 
@@ -57,9 +57,9 @@ body .login-page .card .card-body .divider, body .ai .card .card-body .divider, 
 }
 
 .font-secondaryBold, body .modal .modal-dialog .modal-content .modal-header .modal-title, body table thead th, body .projects_card .card-body .task-column_section .task-column_header, body .projects_card .card-header ul#projectDropdown li.dropdown-item, body .register-page .btn-primary,
-body .login-page .btn-primary, body .ai .btn-primary, body .register-page .card .card-title,
-body .login-page .card .card-title, body .ai .card .card-title, body .register-page .card .card-body a.footer-text,
-body .login-page .card .card-body a.footer-text, body .ai .card .card-body a.footer-text {
+body .login-page .btn-primary, body .aitone-page .btn-primary, body .register-page .card .card-title,
+body .login-page .card .card-title, body .aitone-page .card .card-title, body .register-page .card .card-body a.footer-text,
+body .login-page .card .card-body a.footer-text, body .aitone-page .card .card-body a.footer-text {
   font-family: "CabinetGroteskBold", sans-serif !important;
 }
 
@@ -70,18 +70,20 @@ body .login-page .card .card-body a.footer-text, body .ai .card .card-body a.foo
 .hover-up, body .modal .modal-dialog .modal-content .modal-footer button, body .modal .modal-dialog .modal-content .modal-body .tree-option:hover, body .modal .modal-dialog .modal-content .modal-body .tree-option.selected, body .modal .modal-dialog .modal-content .modal-body input,
 body .modal .modal-dialog .modal-content .modal-body textarea,
 body .modal .modal-dialog .modal-content .modal-body .select2-container--default .select2-selection--multiple,
-body .modal .modal-dialog .modal-content .modal-body .tree-option, body .chat-pannel .card-body .prompt-btn, body .chat-pannel .card-body .message.user, body .chat-pannel .card-body .message.ai, body .chat-pannel .card-body .chat-loading-avatar, body .chat-pannel .card-body .welcome-logo-container, body .projects_card .card-header ul#projectDropdown li.dropdown-item, body .navbar .theme-icon-container, body .navbar button#notificationDropdown,
+body .modal .modal-dialog .modal-content .modal-body .tree-option, body .chat-pannel .card-body .prompt-btn, body .chat-pannel .card-body .message.user, body .chat-pannel .card-body .message.ai, body .chat-pannel .card-body .chat-loading-avatar, body .chat-pannel .card-body .welcome-logo-container, body .chat-pannel .my-custom-ai-tone-modal-chat-pannel .ai-tone-options .ai-tone-option:hover, body .projects_card .card-header ul#projectDropdown li.dropdown-item, body .navbar .theme-icon-container, body .navbar button#notificationDropdown,
 body .navbar button#toggleDarkModeBtn,
 body .navbar button.btn-logout,
-body .navbar button#btn-theme, .btn-main-primary {
+body .navbar button#btn-theme, body .register-page .card .card-body .ai-tone-options .ai-tone-option:hover,
+body .login-page .card .card-body .ai-tone-options .ai-tone-option:hover, body .aitone-page .card .card-body .ai-tone-options .ai-tone-option:hover, .btn-main-primary {
   transition: all 0.34s ease-in-out;
 }
 .hover-up:hover, body .modal .modal-dialog .modal-content .modal-footer button:hover, body .modal .modal-dialog .modal-content .modal-body .tree-option:hover, body .modal .modal-dialog .modal-content .modal-body input:hover,
 body .modal .modal-dialog .modal-content .modal-body textarea:hover,
-body .modal .modal-dialog .modal-content .modal-body .select2-container--default .select2-selection--multiple:hover, body .chat-pannel .card-body .prompt-btn:hover, body .chat-pannel .card-body .message.user:hover, body .chat-pannel .card-body .message.ai:hover, body .chat-pannel .card-body .chat-loading-avatar:hover, body .chat-pannel .card-body .welcome-logo-container:hover, body .projects_card .card-header ul#projectDropdown li.dropdown-item:hover, body .navbar .theme-icon-container:hover, body .navbar button#notificationDropdown:hover,
+body .modal .modal-dialog .modal-content .modal-body .select2-container--default .select2-selection--multiple:hover, body .chat-pannel .card-body .prompt-btn:hover, body .chat-pannel .card-body .message.user:hover, body .chat-pannel .card-body .message.ai:hover, body .chat-pannel .card-body .chat-loading-avatar:hover, body .chat-pannel .card-body .welcome-logo-container:hover, body .chat-pannel .my-custom-ai-tone-modal-chat-pannel .ai-tone-options .ai-tone-option:hover, body .projects_card .card-header ul#projectDropdown li.dropdown-item:hover, body .navbar .theme-icon-container:hover, body .navbar button#notificationDropdown:hover,
 body .navbar button#toggleDarkModeBtn:hover,
 body .navbar button.btn-logout:hover,
-body .navbar button#btn-theme:hover, .btn-main-primary:hover {
+body .navbar button#btn-theme:hover, body .register-page .card .card-body .ai-tone-options .ai-tone-option:hover,
+body .login-page .card .card-body .ai-tone-options .ai-tone-option:hover, body .aitone-page .card .card-body .ai-tone-options .ai-tone-option:hover, .btn-main-primary:hover {
   transform: translateY(-5px);
 }
 
@@ -107,6 +109,7 @@ body .navbar button#btn-theme:hover, .btn-main-primary:hover {
 }
 
 body.system-mode {
+  background: rgb(53, 53, 53);
   background-image: url("https://res.cloudinary.com/da6qujoed/image/upload/v1742653725/tool-bg_x91qyx.png");
 }
 body.system-mode .nav-background {
@@ -168,6 +171,7 @@ body.system-mode table tbody tr:nth-child(odd) > * {
 }
 
 body.purple-mode {
+  background-color: linear-gradient(135deg, #240121 0%, #4f0142 100%) !important;
   background-image: url("https://trello-backgrounds.s3.amazonaws.com/53baf533e697a982248cd73f/2048x2048/22ec03aab9d36ea49139c569a62bb079/shutterstock_134707556.jpg");
 }
 body.purple-mode .nav-background {
@@ -192,16 +196,16 @@ body.purple-mode .chat-pannel .card-header {
   background: rgba(40, 3, 59, 0.6);
 }
 body.purple-mode .chat-pannel .card-body .welcome-logo-container {
-  background: rgba(40, 3, 59, 0.6);
+  background: linear-gradient(135deg, #240121 0%, #4f0142 100%) !important;
 }
 body.purple-mode .chat-pannel .card-body .chat-loading-container {
-  background: rgba(40, 3, 59, 0.6);
+  background: linear-gradient(135deg, #240121 0%, #4f0142 100%) !important;
 }
 body.purple-mode .chat-pannel .card-body .ai-message .chat-loading-avatar {
-  background: rgba(40, 3, 59, 0.6);
+  background: linear-gradient(135deg, #240121 0%, #4f0142 100%) !important;
 }
 body.purple-mode .chat-pannel .card-body .ai-message .message.ai {
-  background: rgba(40, 3, 59, 0.6);
+  background: linear-gradient(135deg, #240121 0%, #4f0142 100%) !important;
 }
 body.purple-mode .chat-pannel .card-body .message.user {
   background: rgba(255, 255, 255, 0.2);
@@ -229,6 +233,7 @@ body.purple-mode .reminder-button {
 }
 
 body.black-mode {
+  background: rgb(9, 1, 12);
   background-image: url("https://trello-backgrounds.s3.amazonaws.com/53baf533e697a982248cd73f/2048x2048/22ec03aab9d36ea49139c569a62bb079/shutterstock_134707556.jpg");
 }
 body.black-mode .nav-background {
@@ -253,16 +258,16 @@ body.black-mode .chat-pannel .card-header {
   background: rgba(36, 37, 38, 0.5);
 }
 body.black-mode .chat-pannel .card-body .welcome-logo-container {
-  background: rgba(36, 37, 38, 0.5);
+  background: rgb(9, 1, 12);
 }
 body.black-mode .chat-pannel .card-body .chat-loading-container {
-  background: rgba(36, 37, 38, 0.5);
+  background: rgb(9, 1, 12);
 }
 body.black-mode .chat-pannel .card-body .ai-message .chat-loading-avatar {
-  background: rgba(36, 37, 38, 0.5);
+  background: rgb(9, 1, 12);
 }
 body.black-mode .chat-pannel .card-body .ai-message .message.ai {
-  background: rgba(36, 37, 38, 0.5);
+  background: rgb(9, 1, 12);
 }
 body.black-mode .chat-pannel .card-body .message.user {
   background: rgba(255, 255, 255, 0.2);
@@ -290,6 +295,7 @@ body.black-mode .reminder-button {
 }
 
 body.brown-mode {
+  background: rgb(65, 4, 4);
   background-image: url("https://res.cloudinary.com/da6qujoed/image/upload/v1744289266/a7190ff1f5577d8c63d61ed085165786_s6ghtx.png");
 }
 body.brown-mode .nav-background {
@@ -351,6 +357,7 @@ body.brown-mode .reminder-button {
 }
 
 body {
+  background: rgb(53, 53, 53);
   background-image: url("https://res.cloudinary.com/da6qujoed/image/upload/v1742653725/tool-bg_x91qyx.png");
   background-size: cover;
   background-position: top;
@@ -358,19 +365,19 @@ body {
   background-attachment: fixed;
 }
 body .register-page,
-body .login-page, body .ai {
+body .login-page, body .aitone-page {
   background-image: url("https://res.cloudinary.com/da6qujoed/image/upload/v1744294916/siraj_Dark_background_two_clouds_in_the_shape_of_an_angle_betwe_d0bfefb0-90ab-40e6-ae57-49e815d781ee_1_dxfw6e.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
 body .register-page a,
-body .login-page a, body .ai a {
+body .login-page a, body .aitone-page a {
   color: var(--bs-primary-white) !important;
   text-decoration: none !important;
 }
 body .register-page a.btn.btn-outline-link,
-body .login-page a.btn.btn-outline-link, body .ai a.btn.btn-outline-link {
+body .login-page a.btn.btn-outline-link, body .aitone-page a.btn.btn-outline-link {
   border: 1px solid #9c9c9c;
   border-radius: 12px;
   width: 251px !important;
@@ -381,7 +388,7 @@ body .login-page a.btn.btn-outline-link, body .ai a.btn.btn-outline-link {
   align-self: center;
 }
 body .register-page input,
-body .login-page input, body .ai input {
+body .login-page input, body .aitone-page input {
   background: rgba(0, 0, 0, 0.5);
   border: 1px solid #9c9c9c;
   border-radius: 12px;
@@ -391,67 +398,138 @@ body .login-page input, body .ai input {
 body .register-page .form-label,
 body .register-page .card-title,
 body .login-page .form-label,
-body .login-page .card-title, body .ai .form-label,
-body .ai .card-title {
+body .login-page .card-title, body .aitone-page .form-label,
+body .aitone-page .card-title {
   color: rgb(255, 255, 255);
 }
 body .register-page .card .card-body,
-body .login-page .card .card-body, body .ai .card .card-body {
+body .login-page .card .card-body, body .aitone-page .card .card-body {
   background: rgba(0, 0, 0, 0.8);
   border: 1px solid rgba(234, 234, 234, 0.2);
   backdrop-filter: blur(6.35px);
   border-radius: 16px;
   display: flex !important;
   flex-direction: column !important;
-  padding: 1.7rem 1.5rem !important;
+  padding: 2rem 1.5rem !important;
+}
+body .register-page .card .card-body .ai-tone-options,
+body .login-page .card .card-body .ai-tone-options, body .aitone-page .card .card-body .ai-tone-options {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 1.5rem auto;
+  max-width: 500px;
+}
+body .register-page .card .card-body .ai-tone-options .ai-tone-option,
+body .login-page .card .card-body .ai-tone-options .ai-tone-option, body .aitone-page .card .card-body .ai-tone-options .ai-tone-option {
+  cursor: pointer;
+  padding: 0.5rem 0.6rem;
+  border-radius: 12px;
+  text-align: center;
+  transition: all 0.34s ease;
+  background: rgba(217, 217, 217, 0.1);
+}
+body .register-page .card .card-body .ai-tone-options .ai-tone-option img,
+body .login-page .card .card-body .ai-tone-options .ai-tone-option img, body .aitone-page .card .card-body .ai-tone-options .ai-tone-option img {
+  width: 50px;
+  height: 50px;
+  margin-bottom: 10px;
+}
+body .register-page .card .card-body .ai-tone-options .ai-tone-option div,
+body .login-page .card .card-body .ai-tone-options .ai-tone-option div, body .aitone-page .card .card-body .ai-tone-options .ai-tone-option div {
+  color: #CCCCCC;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.25rem;
+  letter-spacing: 0.01em;
+  text-align: center;
+}
+body .register-page .card .card-body .ai-tone-options .tone-indicator,
+body .login-page .card .card-body .ai-tone-options .tone-indicator, body .aitone-page .card .card-body .ai-tone-options .tone-indicator {
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  background-color: #DEDEDE;
+  margin: 5px auto 0;
+  position: relative;
+}
+body .register-page .card .card-body .ai-tone-options .tone-indicator::after,
+body .login-page .card .card-body .ai-tone-options .tone-indicator::after, body .aitone-page .card .card-body .ai-tone-options .tone-indicator::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  width: 0.4rem;
+  height: 0.3rem;
+  border: 2px solid #929292;
+  border-top: none;
+  border-right: none;
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+body .register-page .card .card-body .ai-tone-options .tone-indicator.active,
+body .login-page .card .card-body .ai-tone-options .tone-indicator.active, body .aitone-page .card .card-body .ai-tone-options .tone-indicator.active {
+  background-color: #28a745;
+}
+body .register-page .card .card-body .ai-tone-options .tone-indicator.active::after,
+body .login-page .card .card-body .ai-tone-options .tone-indicator.active::after, body .aitone-page .card .card-body .ai-tone-options .tone-indicator.active::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  width: 0.4rem;
+  height: 0.3rem;
+  border: 2px solid #fff;
+  border-top: none;
+  border-right: none;
+  transform: translate(-50%, -50%) rotate(-45deg);
 }
 body .register-page .card .card-body .divider,
-body .login-page .card .card-body .divider, body .ai .card .card-body .divider {
+body .login-page .card .card-body .divider, body .aitone-page .card .card-body .divider {
   display: flex;
   align-items: center;
   text-align: center;
   gap: 10px;
 }
 body .register-page .card .card-body .divider hr,
-body .login-page .card .card-body .divider hr, body .ai .card .card-body .divider hr {
+body .login-page .card .card-body .divider hr, body .aitone-page .card .card-body .divider hr {
   flex: 1;
   height: 1px;
   background-color: rgb(255, 255, 255);
   border: none;
 }
 body .register-page .card .card-body .divider span,
-body .login-page .card .card-body .divider span, body .ai .card .card-body .divider span {
+body .login-page .card .card-body .divider span, body .aitone-page .card .card-body .divider span {
   color: #646464;
   white-space: nowrap;
 }
 body .register-page .card .card-body a.footer-text,
-body .login-page .card .card-body a.footer-text, body .ai .card .card-body a.footer-text {
+body .login-page .card .card-body a.footer-text, body .aitone-page .card .card-body a.footer-text {
   color: #fff !important;
 }
 body .register-page .card .card-body a.footer-text span.normal-text,
-body .login-page .card .card-body a.footer-text span.normal-text, body .ai .card .card-body a.footer-text span.normal-text {
+body .login-page .card .card-body a.footer-text span.normal-text, body .aitone-page .card .card-body a.footer-text span.normal-text {
   color: #646464 !important;
   font-size: 0.9rem;
 }
 @media (max-width: 768px) {
   body .register-page .card .card-body,
-  body .login-page .card .card-body, body .ai .card .card-body {
+  body .login-page .card .card-body, body .aitone-page .card .card-body {
     width: 95% !important;
     margin: 0 auto !important;
   }
 }
 body .register-page .card .card-body .text-muted,
-body .login-page .card .card-body .text-muted, body .ai .card .card-body .text-muted {
+body .login-page .card .card-body .text-muted, body .aitone-page .card .card-body .text-muted {
   font-size: 1.1rem;
   color: #646464 !important;
   padding: 1rem 0;
 }
 body .register-page .card .card-title,
-body .login-page .card .card-title, body .ai .card .card-title {
+body .login-page .card .card-title, body .aitone-page .card .card-title {
   font-size: 2rem !important;
 }
 body .register-page .btn-primary,
-body .login-page .btn-primary, body .ai .btn-primary {
+body .login-page .btn-primary, body .aitone-page .btn-primary {
   color: rgb(255, 255, 255);
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(248, 249, 250, 0.5);
@@ -461,13 +539,13 @@ body .login-page .btn-primary, body .ai .btn-primary {
   font-size: 1.15rem !important;
 }
 body .register-page .btn-primary:hover,
-body .login-page .btn-primary:hover, body .ai .btn-primary:hover {
+body .login-page .btn-primary:hover, body .aitone-page .btn-primary:hover {
   background-color: var(--bs-primary-white) !important;
   filter: brightness(0.7) !important;
   color: var(--bs-primary-black) !important;
 }
 body .register-page .col-lg-12,
-body .login-page .col-lg-12, body .ai .col-lg-12 {
+body .login-page .col-lg-12, body .aitone-page .col-lg-12 {
   max-width: 576px;
 }
 @media (max-width: 768px) {
@@ -584,19 +662,6 @@ body .navbar .theme-icon-container .theme-icon-content-container .theme-icon-con
 }
 body .navbar .theme-icon-container .theme-icon-content-container .theme-icon-content-item:nth-child(4) .theme-icon-color {
   background: linear-gradient(153.27deg, #410404 8.31%, #021415 91.69%);
-}
-@media (max-width: 768px) {
-  body .navbar {
-    border-bottom: 0px !important;
-  }
-  body .navbar button.navbar-toggler {
-    padding: 0.6rem 0.6rem 0.4rem 0.6rem;
-  }
-  body .navbar .navbar-toggler-icon {
-    width: 2rem;
-    height: 2rem;
-    background-image: none !important;
-  }
 }
 body .form-control {
   padding: 0.7rem 1rem;
@@ -774,10 +839,106 @@ body .open-icon-btn {
 }
 @media (max-width: 768px) {
   body .chat-pannel {
-    position: fixed;
+    position: fixed !important;
     bottom: 10px;
     backdrop-filter: blur(15px);
   }
+}
+body .chat-pannel .my-custom-ai-tone-modal-chat-pannel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+body .chat-pannel .my-custom-ai-tone-modal-chat-pannel .ai-tone-options {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 1.5rem auto;
+  max-width: 500px;
+}
+body .chat-pannel .my-custom-ai-tone-modal-chat-pannel .ai-tone-options .ai-tone-option {
+  cursor: pointer;
+  padding: 0.5rem 0.6rem;
+  border-radius: 12px;
+  text-align: center;
+  transition: all 0.34s ease;
+  background: rgba(217, 217, 217, 0.1);
+}
+body .chat-pannel .my-custom-ai-tone-modal-chat-pannel .ai-tone-options .ai-tone-option img {
+  width: 50px;
+  height: 50px;
+  margin-bottom: 10px;
+}
+body .chat-pannel .my-custom-ai-tone-modal-chat-pannel .ai-tone-options .ai-tone-option div {
+  color: #CCCCCC;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.25rem;
+  letter-spacing: 0.01em;
+  text-align: center;
+}
+body .chat-pannel .my-custom-ai-tone-modal-chat-pannel .ai-tone-options .tone-indicator {
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  background-color: #DEDEDE;
+  margin: 5px auto 0;
+  position: relative;
+}
+body .chat-pannel .my-custom-ai-tone-modal-chat-pannel .ai-tone-options .tone-indicator::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  width: 0.4rem;
+  height: 0.3rem;
+  border: 2px solid #929292;
+  border-top: none;
+  border-right: none;
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+body .chat-pannel .my-custom-ai-tone-modal-chat-pannel .ai-tone-options .tone-indicator.active {
+  background-color: #28a745;
+}
+body .chat-pannel .my-custom-ai-tone-modal-chat-pannel .ai-tone-options .tone-indicator.active::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  width: 0.4rem;
+  height: 0.3rem;
+  border: 2px solid #fff;
+  border-top: none;
+  border-right: none;
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+body .chat-pannel .my-custom-ai-tone-modal-chat-pannel .card-ai-tone-modal-content {
+  width: 90%;
+  background: #242526;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(6.35px);
+  border-radius: 16px;
+}
+@media (min-width: 1024px) {
+  body .chat-pannel .my-custom-ai-tone-modal-chat-pannel .card-ai-tone-modal-content {
+    width: 80%;
+  }
+}
+body .chat-pannel .my-custom-ai-tone-modal-chat-pannel .card-ai-tone-modal-content .header {
+  background: #1D1D1D;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 16px 16px 0px 0px;
+  padding: 0.8rem 1.2rem;
+  display: flex;
+  align-items: center;
+  align-content: center;
 }
 body .chat-pannel .close-icon-btn {
   display: none;

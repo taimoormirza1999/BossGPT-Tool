@@ -1,6 +1,19 @@
-
-<div class="col-md-3 chat-pannel">
-    <div class="card" style="background-color: transparent!important;">
+<div class="col-md-3 chat-pannel position-relative">
+ <!-- AI TONE Modal -->
+ <div class=" my-custom-ai-tone-modal-chat-pannel" id="AiToneModal" >
+                    <div class="card-ai-tone-modal-content">
+                        <div class="text-white border-0 rounded-t-lg header">
+                            <h5 class="" id="AiToneModalLabel">AI Tone</h5>
+                            <button type="button" class="btn btn-link p-0 text-white close-icon-btn" data-bs-dismiss="modal" aria-label="Close"><?php echo getCloseSquareIcon(); ?></button>
+                        </div>
+                        <div class="">
+                            <?php echo renderAIToneOptions(); ?>
+                        
+                    </div>
+                </div>
+            </div>
+<div class="card" style="background-color: transparent!important;">
+                
         <div class="card-header" style="
                                             display: flex;
                                             flex-direction: column;
