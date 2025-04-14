@@ -30,7 +30,7 @@
 
 .task-card:hover {
   transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); */
   border-color: rgba(13, 110, 253, 0.3);
   z-index: 1;
 }
@@ -70,9 +70,9 @@
   background: #fff;
   padding: 0;
   margin: 0;
-  border: 1px solid #dee2e6;
-  border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 12px!important;
+  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
   word-wrap: break-word;
   transition: all 0.3s ease 0.3s;
   background: rgba(255, 255, 255, 0.1) !important;
@@ -90,7 +90,7 @@
 
 .task-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
   background-color: #f8f9fa;
 }
 
@@ -138,7 +138,7 @@
 }
 
 .card {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
   border-radius: 16px;
 }
 
@@ -443,18 +443,7 @@
 }
 
 
-body.dark-mode .card {
-  border-color: var(--bs-primary-stroke50percent);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  background-color: var(--bs-primary-dark50percent);
-}
 
-body.dark-mode .projects_card {
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(211, 211, 211, 0.5);
-  backdrop-filter: blur(7.199999809265137px);
-}
 
 body.dark-mode .navbar {
   border-bottom: 1px solid #2f3031;
@@ -472,11 +461,6 @@ body.dark-mode .project-item:hover {
 body.dark-mode .project-item.active {
   background-color: #3a3b3c;
   border-left: 4px solid #2374e1;
-}
-
-body.dark-mode .task-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 3px 6px var(--bs-primary-stroke50percent);background: linear-gradient(135deg, #240121 0%, #4f0142 100%) !important;
 }
 
 body.dark-mode .task-description {
@@ -515,14 +499,6 @@ body.dark-mode textarea {
   backdrop-filter: blur(4px); */
 }
 
-body.dark-mode .form-control:focus,
-body.dark-mode .form-select:focus,
-body.dark-mode textarea:focus {
-  background-color: #3a3b3c;
-  border-color: #2374e1;
-  color: #e4e6eb;
-  box-shadow: 0 0 0 2px rgba(35, 116, 225, 0.2);
-}
 
 body .modal-content {
  
@@ -680,10 +656,10 @@ body.dark-mode .task-card:hover .ai-add-subtask-btn {
 }
 
 .nav-tabs .nav-link.active {
-  color: #0d6efd;
+  /* color: #0d6efd; */
   background-color: #fff;
   border-bottom: 2px solid #0d6efd;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); */
 }
 
 .nav-tabs .btn-primary {
@@ -1027,12 +1003,12 @@ button.btn.btn-primary:hover {
   justify-content: center;
   z-index: 1;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); */
 }
 
 .nav-scroll-btn:hover {
   background: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); */
 }
 
 .nav-scroll-btn.left {

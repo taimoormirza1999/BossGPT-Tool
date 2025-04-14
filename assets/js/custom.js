@@ -1,23 +1,23 @@
 // Initial Loader
-document.addEventListener('DOMContentLoaded', function() {
-    // Create and append loader
-    const loader = document.createElement('div');
-    loader.className = 'initial-loader';
-    loader.innerHTML = `
+document.addEventListener("DOMContentLoaded", function () {
+  // Create and append loader
+  const loader = document.createElement("div");
+  loader.className = "initial-loader";
+  loader.innerHTML = `
         <div class="loader-content">
             <div class="loader-spinner"></div>
             <div class="loader-text">Loading BossGPT...</div>
         </div>
     `;
-    document.body.appendChild(loader);
+  document.body.appendChild(loader);
 
-    // Remove loader after 3 seconds
+  // Remove loader after 3 seconds
+  setTimeout(() => {
+    loader.classList.add("fade-out");
     setTimeout(() => {
-        loader.classList.add('fade-out');
-        setTimeout(() => {
-            loader.remove();
-        }, 500);
-    }, 3000);
+      loader.remove();
+    }, 500);
+  }, 3000);
 });
 
 // Notification System
@@ -74,7 +74,6 @@ function fetchNotifications(project_id) {
       });
   });
 }
-
 
 // Toasts iziToast Helper
 function Toast(type, title, message, positionToast) {
@@ -370,11 +369,11 @@ function displayProjectCreationWelcomeMessages(title) {
   welcomeMessages.forEach((msg, index) => {
     setTimeout(() => {
       if (index === welcomeMessages.length - 1) {
-        hideChatLoading(); 
+        hideChatLoading();
       }
 
       const messageDiv = document.createElement("div");
-      
+
       messageDiv.className = aiMessageClasses;
       messageDiv.innerHTML = `
               <div class="ai-avatar">
@@ -396,41 +395,35 @@ function getActionTypeDisplay(action_type) {
   const actionTypes = {
     project_created: {
       text: "New Project Created",
-      bgColor: "bg-success bg-opacity-10",
-      textColor: "text-success-emphasis",
-      darkBgColor: "dark-mode-success",
     },
     user_assigned: {
       text: "New User Added",
-      bgColor: "bg-info bg-opacity-10",
-      textColor: "text-info-emphasis",
-      darkBgColor: "dark-mode-info",
     },
     task_created: {
       text: "New Task Created",
-      bgColor: "bg-primary bg-opacity-10",
-      textColor: "text-primary-emphasis",
-      darkBgColor: "dark-mode-primary",
     },
     user_removed: {
       text: "User Removed",
-      bgColor: "bg-opacity-10",
-      textColor: "text-primary-emphasis",
-      darkBgColor: "dark-mode-danger bg-opacity-50",
     },
     task_status_updated: {
       text: "Task Status Updated",
-      bgColor: "bg-opacity-10",
-      textColor: "text-warning-emphasis",
-      darkBgColor: "dark-mode-primary",
+    },
+    task_updated: {
+      text: "Task Updated",
+    },
+    subtask_created: {
+      text: "Subtask Created",
+    },
+    subtask_status_updated: {
+      text: "Subtask Status Updated",
+    },
+    subtask_deleted: {
+      text: "Subtask Deleted",
     },
   };
   return (
     actionTypes[action_type] || {
       text: action_type,
-      bgColor: "bg-secondary bg-opacity-10",
-      textColor: "text-secondary-emphasis",
-      darkBgColor: "dark-mode-secondary",
     }
   );
 }
@@ -491,7 +484,8 @@ function updateNotificationDropdown(notifications) {
                background: rgba(255, 255, 255, 0.8);
 backdrop-filter: blur(3.1px);
 border-radius: 12px;
-width: 300px;     
+width: 300px; 
+overflow-x: hidden;    
             }
 
             #notificationDropdownMenu.dark-mode .dropdown-menu {
@@ -511,6 +505,7 @@ width: 300px;
     badge.style.display = "none";
   }
 
+
   // Update notification list
   if (notifications.length > 0) {
     notificationList.innerHTML = notifications
@@ -524,24 +519,15 @@ width: 300px;
                 <div class="dropdown-item border-bottom pt-2">
                     <div class="d-flex align-items-start">
                         <div class="notification-icon ${iconClass} ${
-                         
-                          isDarkMode
-                            ? actionType.darkBgColor
-                            : actionType.bgColor
-                        } rounded-circle  me-3"
+          isDarkMode ? actionType.darkBgColor : actionType.bgColor
+        } rounded-circle  me-3"
                        
                         >
                         ${icon}
                         </div>
                         <div class="flex-grow-1">
                             <div class="d-flex justify-content-between align-items-center mb-1">
-                                <span class="title-notification ${
-                                  isDarkMode
-                                    ? actionType.darkBgColor
-                                    : actionType.bgColor
-                                } ${
-          actionType.textColor
-               } rounded-pill" >
+                                <span class="title-notification rounded-pill" >
                                     ${actionType.text}
                                 </span>
                                  <small class=" notification-time" style="font-size: 0.75rem;">
@@ -569,7 +555,7 @@ width: 300px;
 // Notification
 function appendNotification(notification) {
   const notificationList = document.querySelector(".notification-list");
-  const isDarkMode = document.body.classList.contains('dark-mode');
+  const isDarkMode = document.body.classList.contains("dark-mode");
   const actionType = getActionTypeDisplay(notification.action_type);
   const timeAgo = formatTimeAgo(notification.created_at);
   const icon = getNotificationIcon(notification.action_type);
@@ -577,13 +563,17 @@ function appendNotification(notification) {
   const newNotification = `
   <div class="dropdown-item border-bottom py-1">
       <div class="d-flex align-items-start">
-          <div class="notification-icon ${isDarkMode ? actionType.darkBgColor : actionType.bgColor} rounded-circle me-3"
+          <div class="notification-icon ${
+            isDarkMode ? actionType.darkBgColor : actionType.bgColor
+          } rounded-circle me-3"
               >
               <i class="bi ${icon} ${actionType.textColor}"></i>
           </div>
           <div class="flex-grow-1">
               <div class="d-flex justify-content-between align-items-center mb-1">
-                  <span class="badge ${isDarkMode ? actionType.darkBgColor : actionType.bgColor} ${actionType.textColor} rounded-pill px-3 py-1">
+                  <span class="badge ${
+                    isDarkMode ? actionType.darkBgColor : actionType.bgColor
+                  } ${actionType.textColor} rounded-pill px-3 py-1">
                       ${actionType.text}
                   </span>
                   <small class="text-muted" style="font-size: 0.75rem;">
@@ -599,57 +589,56 @@ function appendNotification(notification) {
 `;
 
   // Prepend the new notification to the list
-  notificationList.insertAdjacentHTML('afterbegin', newNotification);
+  notificationList.insertAdjacentHTML("afterbegin", newNotification);
 }
-
 
 function initPusher(currentProject) {
   Pusher.logToConsole = true;
 
-  var pusher = new Pusher('83a162dc942242f89892', {
-      cluster: 'ap2'
+  var pusher = new Pusher("83a162dc942242f89892", {
+    cluster: "ap2",
   });
   // Enable pusher logging - don't include this in production
 
-  var channel = pusher.subscribe('project_' + currentProject);
+  var channel = pusher.subscribe("project_" + currentProject);
 
-  channel.bind('project_created', function (data) {
-      appendNotification(data);
-      Toast("success", "Project Created", data.message, 'topRight');
+  channel.bind("project_created", function (data) {
+    appendNotification(data);
+    Toast("success", "Project Created", data.message, "topRight");
   });
-  channel.bind('user_assigned', function (data) {
-      appendNotification(data);
-      Toast("success", "User Joined", data.message, 'topRight');
+  channel.bind("user_assigned", function (data) {
+    appendNotification(data);
+    Toast("success", "User Joined", data.message, "topRight");
   });
-  channel.bind('task_created', function (data) {
-      appendNotification(data);
-      Toast("success", "Task Created", data.message, 'topRight');
+  channel.bind("task_created", function (data) {
+    appendNotification(data);
+    Toast("success", "Task Created", data.message, "topRight");
   });
-  channel.bind('task_updated', function (data) {
-      appendNotification(data);
-      Toast("success", "Success", data.message, 'topRight');
+  channel.bind("task_updated", function (data) {
+    appendNotification(data);
+    Toast("success", "Success", data.message, "topRight");
   });
 }
 
 // Handle prompt button clicks
-document.addEventListener('DOMContentLoaded', function() {
-  const promptButtons = document.querySelectorAll('.prompt-btn');
-  const messageInput = document.getElementById('messageInput');
+document.addEventListener("DOMContentLoaded", function () {
+  const promptButtons = document.querySelectorAll(".prompt-btn");
+  const messageInput = document.getElementById("messageInput");
 
-  promptButtons.forEach(button => {
-      button.addEventListener('click', function() {
-          // Get the text without the emoji
-          const promptText = this.textContent.replace(/^[^\w\s]+ /, '');
-          messageInput.value = promptText;
-          messageInput.focus();
-      });
+  promptButtons.forEach((button) => {
+    button.addEventListener("click", function () {
+      // Get the text without the emoji
+      const promptText = this.textContent.replace(/^[^\w\s]+ /, "");
+      messageInput.value = promptText;
+      messageInput.focus();
+    });
   });
 });
 
 // Function to handle errors
 function handleAjaxError(xhr, status, error) {
-    console.error("Ajax Error:", error);
-    Toast("error", "Error", "An error occurred: " + error, "topRight");
+  console.error("Ajax Error:", error);
+  Toast("error", "Error", "An error occurred: " + error, "topRight");
 }
 
 // FCM Token and Notifications
@@ -658,257 +647,298 @@ let fcmTokenSaved = false;
 
 // Check if FCM is already enabled
 function checkFCMStatus() {
-    const fcmToken = localStorage.getItem('fcm_token');
-    const reminderButton = document.getElementById('reminderButton');
-    
-    if (reminderButton) {
-        if (fcmToken) {
-            reminderButton.classList.add('active');
-            reminderButton.querySelector('span').textContent = 'Reminders Active';
-            fcmTokenSaved = true;
-        } else {
-            reminderButton.classList.remove('active');
-            reminderButton.querySelector('span').textContent = 'Turn on Reminders';
-            fcmTokenSaved = false;
-        }
+  const fcmToken = localStorage.getItem("fcm_token");
+  const reminderButton = document.getElementById("reminderButton");
+
+  if (reminderButton) {
+    if (fcmToken) {
+      reminderButton.classList.add("active");
+      reminderButton.querySelector("span").textContent = "Reminders Active";
+      fcmTokenSaved = true;
+    } else {
+      reminderButton.classList.remove("active");
+      reminderButton.querySelector("span").textContent = "Turn on Reminders";
+      fcmTokenSaved = false;
     }
+  }
 }
 
 // Initialize FCM
 function initializeFCM() {
-    if (!firebase.messaging.isSupported()) {
-        console.warn('Firebase messaging is not supported in this browser');
-        return;
-    }
+  if (!firebase.messaging.isSupported()) {
+    console.warn("Firebase messaging is not supported in this browser");
+    return;
+  }
 
-    const messaging = firebase.messaging();
-    
-    // Request permission and get token
-    messaging.getToken({ vapidKey: 'YOUR_VAPID_KEY' })
-        .then((currentToken) => {
-            if (currentToken) {
-                saveFCMToken(currentToken);
-            } else {
-                console.log('No registration token available. Request permission to generate one.');
-            }
-        })
-        .catch((err) => {
-            console.log('An error occurred while retrieving token. ', err);
-        });
+  const messaging = firebase.messaging();
 
-    // Handle token refresh
-    messaging.onTokenRefresh(() => {
-        messaging.getToken()
-            .then((refreshedToken) => {
-                console.log('Token refreshed.');
-                saveFCMToken(refreshedToken);
-            })
-            .catch((err) => {
-                console.log('Unable to retrieve refreshed token ', err);
-            });
+  // Request permission and get token
+  messaging
+    .getToken({ vapidKey: "YOUR_VAPID_KEY" })
+    .then((currentToken) => {
+      if (currentToken) {
+        saveFCMToken(currentToken);
+      } else {
+        console.log(
+          "No registration token available. Request permission to generate one."
+        );
+      }
+    })
+    .catch((err) => {
+      console.log("An error occurred while retrieving token. ", err);
     });
 
-    // Handle foreground messages
-    messaging.onMessage((payload) => {
-        console.log('Message received. ', payload);
-        showNotification(payload.notification.title, payload.notification.body);
-    });
+  // Handle token refresh
+  messaging.onTokenRefresh(() => {
+    messaging
+      .getToken()
+      .then((refreshedToken) => {
+        console.log("Token refreshed.");
+        saveFCMToken(refreshedToken);
+      })
+      .catch((err) => {
+        console.log("Unable to retrieve refreshed token ", err);
+      });
+  });
+
+  // Handle foreground messages
+  messaging.onMessage((payload) => {
+    console.log("Message received. ", payload);
+    showNotification(payload.notification.title, payload.notification.body);
+  });
 }
 
 // Save token to database
 function saveFCMToken(token) {
-    localStorage.setItem('fcm_token', token);
-    
-    // Update UI
-    const reminderButton = document.getElementById('reminderButton');
-    if (reminderButton) {
-        reminderButton.classList.add('active');
-        reminderButton.querySelector('span').textContent = 'Reminders Active';
-    }
-    
-    // Save to database
-    fetch('?api=update_fcm_token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fcm_token: token })
+  localStorage.setItem("fcm_token", token);
+
+  // Update UI
+  const reminderButton = document.getElementById("reminderButton");
+  if (reminderButton) {
+    reminderButton.classList.add("active");
+    reminderButton.querySelector("span").textContent = "Reminders Active";
+  }
+
+  // Save to database
+  fetch("?api=update_fcm_token", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ fcm_token: token }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        fcmTokenSaved = true;
+        console.log("FCM token saved to database");
+      } else {
+        console.error("Failed to save FCM token to database");
+      }
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            fcmTokenSaved = true;
-            console.log('FCM token saved to database');
-        } else {
-            console.error('Failed to save FCM token to database');
-        }
-    })
-    .catch(error => {
-        console.error('Error saving FCM token:', error);
+    .catch((error) => {
+      console.error("Error saving FCM token:", error);
     });
 }
 
 // Show browser notification
 function showNotification(title, body) {
-    if (!("Notification" in window)) {
-        console.log("This browser does not support desktop notification");
-        return;
-    }
-    
-    if (Notification.permission === "granted") {
-        const notification = new Notification(title, {
-            body: body,
-            icon: '/favicon.ico'
-        });
-        
-        notification.onclick = function() {
-            window.focus();
-            this.close();
-        };
-    }
+  if (!("Notification" in window)) {
+    console.log("This browser does not support desktop notification");
+    return;
+  }
+
+  if (Notification.permission === "granted") {
+    const notification = new Notification(title, {
+      body: body,
+      icon: "/favicon.ico",
+    });
+
+    notification.onclick = function () {
+      window.focus();
+      this.close();
+    };
+  }
 }
 
 // Request notification permission
 function requestNotificationPermission() {
-    if (!("Notification" in window)) {
-        Toast("error", "Error", "This browser does not support desktop notifications", "topRight");
-        return Promise.reject("Notifications not supported");
+  if (!("Notification" in window)) {
+    Toast(
+      "error",
+      "Error",
+      "This browser does not support desktop notifications",
+      "topRight"
+    );
+    return Promise.reject("Notifications not supported");
+  }
+
+  if (Notification.permission === "granted") {
+    return Promise.resolve();
+  }
+
+  // Show the modal instead of directly requesting permission
+  const notificationModal = new bootstrap.Modal(
+    document.getElementById("notificationPermissionModal")
+  );
+  notificationModal.show();
+
+  // Return a promise that will be resolved when the enable button is clicked
+  return new Promise((resolve, reject) => {
+    const enableBtn = document.getElementById("enableNotificationsBtn");
+
+    if (enableBtn) {
+      // One-time event listener for the enable button
+      const clickHandler = () => {
+        enableBtn.removeEventListener("click", clickHandler);
+
+        // Hide the modal and request actual permission
+        notificationModal.hide();
+
+        // Request the actual browser permission
+        Notification.requestPermission().then((permission) => {
+          if (permission === "granted") {
+            Toast(
+              "success",
+              "Notifications Enabled",
+              "You will now receive task reminders",
+              "topRight"
+            );
+            resolve();
+          } else {
+            Toast(
+              "error",
+              "Permission Denied",
+              "Please enable notifications to receive reminders",
+              "topRight"
+            );
+            reject("Permission denied");
+          }
+        });
+      };
+
+      enableBtn.addEventListener("click", clickHandler);
+
+      // Also handle modal dismiss
+      const modalElement = document.getElementById(
+        "notificationPermissionModal"
+      );
+      modalElement.addEventListener(
+        "hidden.bs.modal",
+        () => {
+          enableBtn.removeEventListener("click", clickHandler);
+          reject("Modal closed");
+        },
+        { once: true }
+      );
+    } else {
+      reject("Enable button not found");
     }
-    
-    if (Notification.permission === "granted") {
-        return Promise.resolve();
-    }
-    
-    // Show the modal instead of directly requesting permission
-    const notificationModal = new bootstrap.Modal(document.getElementById('notificationPermissionModal'));
-    notificationModal.show();
-    
-    // Return a promise that will be resolved when the enable button is clicked
-    return new Promise((resolve, reject) => {
-        const enableBtn = document.getElementById('enableNotificationsBtn');
-        
-        if (enableBtn) {
-            // One-time event listener for the enable button
-            const clickHandler = () => {
-                enableBtn.removeEventListener('click', clickHandler);
-                
-                // Hide the modal and request actual permission
-                notificationModal.hide();
-                
-                // Request the actual browser permission
-                Notification.requestPermission().then(permission => {
-                    if (permission === "granted") {
-                        Toast("success", "Notifications Enabled", "You will now receive task reminders", "topRight");
-                        resolve();
-                    } else {
-                        Toast("error", "Permission Denied", "Please enable notifications to receive reminders", "topRight");
-                        reject("Permission denied");
-                    }
-                });
-            };
-            
-            enableBtn.addEventListener('click', clickHandler);
-            
-            // Also handle modal dismiss
-            const modalElement = document.getElementById('notificationPermissionModal');
-            modalElement.addEventListener('hidden.bs.modal', () => {
-                enableBtn.removeEventListener('click', clickHandler);
-                reject("Modal closed");
-            }, { once: true });
-        } else {
-            reject("Enable button not found");
-        }
-    });
+  });
 }
 
 // Handle reminder button click
-document.addEventListener('DOMContentLoaded', function() {
-    const reminderButton = document.getElementById('reminderButton');
-    checkFCMStatus();
-    
-    if (reminderButton) {
-        reminderButton.addEventListener('click', function() {
-            if (fcmTokenSaved) {
-                // If notifications are already enabled, show settings
-                Toast("info", "Reminders Active", "You are already receiving notifications for task reminders", "topRight");
+document.addEventListener("DOMContentLoaded", function () {
+  const reminderButton = document.getElementById("reminderButton");
+  checkFCMStatus();
+
+  if (reminderButton) {
+    reminderButton.addEventListener("click", function () {
+      if (fcmTokenSaved) {
+        // If notifications are already enabled, show settings
+        Toast(
+          "info",
+          "Reminders Active",
+          "You are already receiving notifications for task reminders",
+          "topRight"
+        );
+      } else {
+        // Request permission and initialize FCM
+        requestNotificationPermission()
+          .then(() => {
+            if (typeof firebase !== "undefined" && firebase.messaging) {
+              initializeFCM();
             } else {
-                // Request permission and initialize FCM
-                requestNotificationPermission()
-                    .then(() => {
-                        if (typeof firebase !== 'undefined' && firebase.messaging) {
-                            initializeFCM();
-                        } else {
-                            // Firebase not loaded, load it first
-                            loadFirebaseScript()
-                                .then(() => {
-                                    initializeFCM();
-                                })
-                                .catch(error => {
-                                    console.error('Error loading Firebase:', error);
-                                    Toast("error", "Error", "Failed to load notification service", "topRight");
-                                });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error requesting notification permission:', error);
-                    });
+              // Firebase not loaded, load it first
+              loadFirebaseScript()
+                .then(() => {
+                  initializeFCM();
+                })
+                .catch((error) => {
+                  console.error("Error loading Firebase:", error);
+                  Toast(
+                    "error",
+                    "Error",
+                    "Failed to load notification service",
+                    "topRight"
+                  );
+                });
             }
-        });
-    }
+          })
+          .catch((error) => {
+            console.error("Error requesting notification permission:", error);
+          });
+      }
+    });
+  }
 });
 
 // Load Firebase scripts dynamically
 function loadFirebaseScript() {
-    return new Promise((resolve, reject) => {
-        // Load Firebase App
-        const firebaseAppScript = document.createElement('script');
-        firebaseAppScript.src = 'https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js';
-        firebaseAppScript.onload = () => {
-            // Load Firebase Messaging
-            const firebaseMessagingScript = document.createElement('script');
-            firebaseMessagingScript.src = 'https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js';
-            firebaseMessagingScript.onload = () => {
-                // Initialize Firebase
-                const firebaseConfig = {
-                    apiKey: "YOUR_API_KEY",
-                    authDomain: "YOUR_AUTH_DOMAIN",
-                    projectId: "YOUR_PROJECT_ID",
-                    storageBucket: "YOUR_STORAGE_BUCKET",
-                    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-                    appId: "YOUR_APP_ID"
-                };
-                
-                firebase.initializeApp(firebaseConfig);
-                resolve();
-            };
-            firebaseMessagingScript.onerror = reject;
-            document.body.appendChild(firebaseMessagingScript);
+  return new Promise((resolve, reject) => {
+    // Load Firebase App
+    const firebaseAppScript = document.createElement("script");
+    firebaseAppScript.src =
+      "https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js";
+    firebaseAppScript.onload = () => {
+      // Load Firebase Messaging
+      const firebaseMessagingScript = document.createElement("script");
+      firebaseMessagingScript.src =
+        "https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js";
+      firebaseMessagingScript.onload = () => {
+        // Initialize Firebase
+        const firebaseConfig = {
+          apiKey: "YOUR_API_KEY",
+          authDomain: "YOUR_AUTH_DOMAIN",
+          projectId: "YOUR_PROJECT_ID",
+          storageBucket: "YOUR_STORAGE_BUCKET",
+          messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+          appId: "YOUR_APP_ID",
         };
-        firebaseAppScript.onerror = reject;
-        document.body.appendChild(firebaseAppScript);
-    });
+
+        firebase.initializeApp(firebaseConfig);
+        resolve();
+      };
+      firebaseMessagingScript.onerror = reject;
+      document.body.appendChild(firebaseMessagingScript);
+    };
+    firebaseAppScript.onerror = reject;
+    document.body.appendChild(firebaseAppScript);
+  });
 }
 
 // Check notification permission on page load
-document.addEventListener('DOMContentLoaded', function() {
-    // Wait 3 seconds after page load to check notification permission
-    setTimeout(() => {
-        // Only show modal if permission hasn't been granted or denied yet
-        if (Notification.permission === "default") {
-            // Show the notification permission modal
-            const notificationModal = new bootstrap.Modal(document.getElementById('notificationPermissionModal'));
-            notificationModal.show();
-        } else if (Notification.permission === "granted" && !fcmTokenSaved) {
-            // If permission is already granted but token not saved
-            if (typeof firebase !== 'undefined' && firebase.messaging) {
-                initializeFCM();
-            } else {
-                loadFirebaseScript()
-                    .then(() => {
-                        initializeFCM();
-                    })
-                    .catch(error => {
-                        console.error('Error loading Firebase:', error);
-                    });
-            }
-        }
-    }, 3000); // 3 second delay
-}); 
+document.addEventListener("DOMContentLoaded", function () {
+  // Wait 3 seconds after page load to check notification permission
+  setTimeout(() => {
+    // Only show modal if permission hasn't been granted or denied yet
+    if (Notification.permission === "default") {
+      // Show the notification permission modal
+      const notificationModal = new bootstrap.Modal(
+        document.getElementById("notificationPermissionModal")
+      );
+      notificationModal.show();
+    } else if (Notification.permission === "granted" && !fcmTokenSaved) {
+      // If permission is already granted but token not saved
+      if (typeof firebase !== "undefined" && firebase.messaging) {
+        initializeFCM();
+      } else {
+        loadFirebaseScript()
+          .then(() => {
+            initializeFCM();
+          })
+          .catch((error) => {
+            console.error("Error loading Firebase:", error);
+          });
+      }
+    }
+  }, 3000); // 3 second delay
+});

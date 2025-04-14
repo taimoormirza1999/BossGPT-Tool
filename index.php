@@ -84,10 +84,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 case 'logout':
                     $auth->logout();
-                    session_start();
-                    session_unset();
-                    session_destroy();
-                    header('Location: ?page=login');
                     exit;
             }
         }
@@ -189,8 +185,8 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
         $client->setRedirectUri($_ENV['BASE_URL'] . '/callback.php');
         $client->addScope("email");
         $client->addScope("profile");
-
-        $authUrl = $client->createAuthUrl();
+        $client->setPrompt('select_account');
+        $authUrl = $client->createAuthUrl(); 
         // Show the "Sign in with Google" button
         echo "
          <div class='text-center mt-2'>
@@ -1786,23 +1782,23 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                 }
 
                 // Font size management
-                const fontSizeRange = document.getElementById('fontSizeRange');
-                const fontSizeValue = document.getElementById('fontSizeValue');
-                const mainContent = document.body;
+                // const fontSizeRange = document.getElementById('fontSizeRange');
+                // const fontSizeValue = document.getElementById('fontSizeValue');
+                // const mainContent = document.body;
 
                 // Load saved font size or use default
-                const savedFontSize = localStorage.getItem('preferredFontSize') || '16';
-                fontSizeRange.value = savedFontSize;
-                fontSizeValue.textContent = `${savedFontSize}px`;
-                mainContent.style.fontSize = `${savedFontSize}px`;
+                // const savedFontSize = localStorage.getItem('preferredFontSize') || '16';
+                // fontSizeRange.value = savedFontSize;
+                // fontSizeValue.textContent = `${savedFontSize}px`;
+                // mainContent.style.fontSize = `${savedFontSize}px`;
 
                 // Update font size when slider changes
-                fontSizeRange.addEventListener('input', function () {
-                    const newSize = this.value;
-                    fontSizeValue.textContent = `${newSize}px`;
-                    mainContent.style.fontSize = `${newSize}px`;
-                    localStorage.setItem('preferredFontSize', newSize);
-                });
+                // fontSizeRange.addEventListener('input', function () {
+                //     const newSize = this.value;
+                //     fontSizeValue.textContent = `${newSize}px`;
+                //     mainContent.style.fontSize = `${newSize}px`;
+                //     localStorage.setItem('preferredFontSize', newSize);
+                // });
 
                 // Initialize Select2 for the edit task assignees
                 $('#editTaskAssignees').select2({
@@ -2596,23 +2592,23 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
             }
 
             // Font size management - keep this outside the dashboard check since it applies to all pages
-            const fontSizeRange = document.getElementById('fontSizeRange');
-            const fontSizeValue = document.getElementById('fontSizeValue');
+            // const fontSizeRange = document.getElementById('fontSizeRange');
+            // const fontSizeValue = document.getElementById('fontSizeValue');
 
-            if (fontSizeRange && fontSizeValue) {
-                const mainContent = document.body;
-                const savedFontSize = localStorage.getItem('preferredFontSize') || '16';
-                fontSizeRange.value = savedFontSize;
-                fontSizeValue.textContent = `${savedFontSize}px`;
-                mainContent.style.fontSize = `${savedFontSize}px`;
+            // if (fontSizeRange && fontSizeValue) {
+            //     const mainContent = document.body;
+            //     const savedFontSize = localStorage.getItem('preferredFontSize') || '16';
+            //     fontSizeRange.value = savedFontSize;
+            //     fontSizeValue.textContent = `${savedFontSize}px`;
+            //     mainContent.style.fontSize = `${savedFontSize}px`;
 
-                fontSizeRange.addEventListener('input', function () {
-                    const newSize = this.value;
-                    fontSizeValue.textContent = `${newSize}px`;
-                    mainContent.style.fontSize = `${newSize}px`;
-                    localStorage.setItem('preferredFontSize', newSize);
-                });
-            }
+            //     fontSizeRange.addEventListener('input', function () {
+            //         const newSize = this.value;
+            //         fontSizeValue.textContent = `${newSize}px`;
+            //         mainContent.style.fontSize = `${newSize}px`;
+            //         localStorage.setItem('preferredFontSize', newSize);
+            //     });
+            // }
 
             // --- Dark Mode Toggle Code ---
             const toggleDarkModeBtn = document.getElementById('toggleDarkModeBtn');
@@ -2792,7 +2788,7 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
         document.addEventListener("DOMContentLoaded", function () {
             const fcmToken = "<?php echo isset($_SESSION['fcm_token']) ? $_SESSION['fcm_token'] : ''; ?>";
             // console.log("FCM Token for reminders:", fcmToken);
-            if (fcmToken) {
+            if (fcmToken && <?php echo isset($_SESSION['user_id']) ? 'true' : 'false'; ?>) {
                 interval = setInterval(getReminders, 10000); //every 10 seconds it will check for reminders
             }
         });

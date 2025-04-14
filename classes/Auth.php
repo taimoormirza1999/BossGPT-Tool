@@ -36,6 +36,30 @@ class Auth
         }
     }
 
+    public function updateUserSession($userId, $username, $proMember, $fcmToken = null) {
+        try {
+            // Update last login timestamp
+            $stmt = $this->db->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
+            $stmt->execute([$userId]);
+            
+            // Update FCM token if provided
+            if ($fcmToken && $fcmToken !== '0') {
+                $stmt = $this->db->prepare("UPDATE users SET fcm_token = ? WHERE id = ?");
+                $stmt->execute([$fcmToken, $userId]);
+            }
+            
+            // Store user info in session
+            $_SESSION['user_id'] = $userId;
+            $_SESSION['username'] = $username;
+            $_SESSION['pro_member'] = $proMember;
+            
+            return true;
+        } catch (Exception $e) {
+            error_log("Session update error: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
     public function login($email, $password)
     {
         try {
@@ -47,19 +71,12 @@ class Auth
                 throw new Exception("Invalid credentials");
             }
 
-            // Update the last_login timestamp
-            $stmt = $this->db->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
-            $stmt->execute([$user['id']]);
+            // Use the new method to update session and FCM token
+            $fcmToken = isset($_SESSION['fcm_token']) ? $_SESSION['fcm_token'] : null;
+            $this->updateUserSession($user['id'], $user['username'], $user['pro_member'], $fcmToken);
             
-            // Store user info in session
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['pro_member'] = $user['pro_member'];
-
-            // Update FCM token if available in the session
-            if (isset($_SESSION['fcm_token']) && $_SESSION['fcm_token'] !== '0') {
-                $this->updateFcmToken($user['id'], $_SESSION['fcm_token']);
-                // Clear the session token after updating
+            // Clear the session token after updating
+            if (isset($_SESSION['fcm_token'])) {
                 unset($_SESSION['fcm_token']);
             }
 
@@ -86,7 +103,7 @@ class Auth
         session_start();
         session_unset();
         session_destroy();
-        return true;
+     return header('Location: ?page=login');
     }
 
     public function isLoggedIn()
@@ -114,16 +131,5 @@ class Auth
         $stmt = $this->db->prepare("UPDATE users SET pro_plan = 1 WHERE id = ?");
         $stmt->execute([$userId]);
         return $stmt->rowCount() > 0;
-    }
-
-    public function updateFcmToken($userId, $fcmToken) {
-        try {
-            $stmt = $this->db->prepare("UPDATE users SET fcm_token = ? WHERE id = ?");
-            $stmt->execute([$fcmToken, $userId]);
-            return true;
-        } catch (Exception $e) {
-            error_log("FCM Token update error: " . $e->getMessage());
-            throw $e;
-        }
     }
 }

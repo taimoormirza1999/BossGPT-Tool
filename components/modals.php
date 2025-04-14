@@ -810,7 +810,7 @@
                         </div>
                         <div class="modal-body">
                 
-                            <div class="ratio ratio-16x9 mb-4" style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+                            <div class="ratio ratio-16x9 mb-4" style="border-radius: 12px; overflow: hidden; ">
                                 <iframe width="560" height="315" src="https://www.youtube.com/embed/-fTV9_SqnKE?si=wizXX7DUlSgTXPfZ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
                             </div>
                             

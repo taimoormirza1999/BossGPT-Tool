@@ -20,12 +20,12 @@
             </ul>
             <div class="d-flex align-items-center">
 
-                <div class="d-flex align-items-center me-4">
+                <!-- <div class="d-flex align-items-center me-4">
                     <label for="fontSizeRange" class="text-light me-2 mb-0">Font Size:</label>
                     <input type="range" class="form-range" id="fontSizeRange" min="12" max="24" step="1"
                         style="width: 100px;">
                     <span id="fontSizeValue" class="text-light ms-2" style="min-width: 45px;">16px</span>
-                </div>
+                </div> -->
 
                 <!-- Notification Icon with Red Badge -->
                 <?php

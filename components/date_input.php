@@ -56,7 +56,7 @@
     border: 1px solid var(--bs-border-color, #dee2e6);
     width: 100%;
     color: var(--bs-body-color, #fff);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    /* box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); */
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;

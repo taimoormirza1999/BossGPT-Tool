@@ -707,15 +707,12 @@ if (isset($_GET['api'])) {
                 }
                 
                 $userId = $_SESSION['user_id'];
+                $username = $_SESSION['username'];
+                $proMember = $_SESSION['pro_member'];
                 $fcmToken = $data['fcm_token'];
                 
-                // Update the user's FCM token in the database
-                $stmt = $db->prepare("UPDATE users SET fcm_token = ? WHERE id = ?");
-                $result = $stmt->execute([$fcmToken, $userId]);
-                
-                if (!$result) {
-                    throw new Exception('Failed to update FCM token');
-                }
+                // Use the centralized method to update the FCM token
+                $auth->updateUserSession($userId, $username, $proMember, $fcmToken);
                 
                 $response = ['success' => true, 'message' => 'FCM token updated successfully'];
                 break;

@@ -64,9 +64,10 @@ $purple-mode-card-task-bgcolor: linear-gradient(
 ) !important;
 $default-mode-topbar-bgcolor: rgba(24, 25, 28, 1);
 $default-mode-main-bgcolor: rgba(36, 37, 38, 1);
-$default-mode-card-task-bgcolor: rgba(53, 53, 53, 1) !important;
-$black-mode-card-task-bgcolor: rgba(9, 1, 12, 1) !important;
-$brown-mode-card-task-bgcolor: rgba(65, 4, 4, 1) !important;
+$default-mode-welcome-logo-bgcolor: rgba(24, 24, 24, 1);
+$default-mode-card-task-bgcolor: rgba(53, 53, 53, 1);
+$black-mode-card-task-bgcolor: rgba(9, 1, 12, 1) ;
+$brown-mode-card-task-bgcolor: rgba(65, 4, 4, 1);
 $dark-mode-bar-bgcolor: rgba(40, 3, 59, 0.6);
 $purple-mode-bar-bgcolor: rgba(40, 3, 59, 0.6);
 $black-mode-bar-bgcolor: rgba(36, 37, 38, 0.5);
@@ -77,6 +78,7 @@ $dark-mode-modal-border: 1px solid $white-color-20;
 $dark-mode-bar-bgcolor: var(--bs-primary-darkpurple-linear-gradient);
 $dark-mode-message-ai-border: 1px solid rgba(211, 211, 211, 0.5);
 $dark-mode-message-ai-color: #e4e6eb;
+$default-mode-message-user-bgcolor: $white-color-20;
 $dark-mode-message-user-bgcolor: $white-color-20;
 $purple-mode-message-user-bgcolor: $white-color-20;
 $black-mode-message-user-bgcolor: $white-color-20;
@@ -310,10 +312,10 @@ body.system-mode {
   }
   @include theme-common-chat-pannel(
     $default-mode-main-bgcolor,
-    $default-mode-main-bgcolor,
-    $default-mode-main-bgcolor,
-    $default-mode-main-bgcolor,
-    $default-mode-main-bgcolor
+    $default-mode-welcome-logo-bgcolor,
+    $default-mode-card-task-bgcolor,
+    $default-mode-card-task-bgcolor,
+    $default-mode-message-user-bgcolor
   );
   @include theme-common-notification-list($default-mode-card-task-bgcolor);
   @include theme-common-modal(
@@ -588,7 +590,7 @@ body {
   .navbar {
     background: rgba(20, 20, 35, 0.3) !important;
     backdrop-filter: blur(16px) !important;
-    box-shadow: 0 4px 30px $black-color-10 !important;
+    // box-shadow: 0 4px 30px $black-color-10 !important;
     border-bottom: 1px solid $gray-color-3;
     button {
       border: 1.4px solid $white-color-80 !important;
@@ -702,12 +704,12 @@ body {
     transition: all $transition-duration-40 ease-in-out !important;
   }
   .projects_card {
-    box-shadow: 0 2px 5px $black-color-20;
+    // box-shadow: 0 2px 5px $black-color-20;
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(211, 211, 211, 0.5);
     backdrop-filter: blur(7.199999809265137px);
     .card-header {
-      box-shadow: 0px 4px 30px $black-color-10 !important;
+      // box-shadow: 0px 4px 30px $black-color-10 !important;
       @media (max-width: 768px) {
         display: flex !important;
         flex-wrap: nowrap;
@@ -773,7 +775,7 @@ body {
           margin-bottom: 16px;
           font-family: "CabinetGroteskBold";
           text-transform: uppercase;
-          box-shadow: 0 4px 15px $black-color-40;
+          // box-shadow: 0 4px 15px $black-color-40;
           transition: all $transition-duration-40 ease;
           letter-spacing: 1px;
           font-size: 1.18rem !important;
@@ -782,7 +784,7 @@ body {
         .task-column {
           background: rgba(76, 76, 76, 0.25);
           backdrop-filter: blur(20px);
-          border: 1px dashed $white-color-50;
+          border: 1px solid $white-color-50;
           transition: all $transition-duration-50 ease;
           min-height: calc(100vh - 335px);
           border-radius: $border-radius-12;
@@ -798,7 +800,7 @@ body {
             backdrop-filter: blur(10px);
             margin-bottom: 16px;
             padding: 16px;
-            box-shadow: 0 4px 20px $black-color-40;
+            // box-shadow: 0 4px 20px $black-color-40;
             color: $white-color;
             position: relative;
             overflow: hidden;
@@ -887,10 +889,15 @@ body {
         right: 20px;
       }
     }
-
+.card{
+background: rgba(255, 255, 255, 0.1);
+border: 1px solid rgba(211, 211, 211, 0.5);
+backdrop-filter: blur(10px);
+border-radius: $border-radius-16;
+}
     .card-header h5 {
-      color: $white-color;
-    }
+color: $white-color;
+}
     .chat-input {
       border-bottom-left-radius: 1rem;
       border-bottom-right-radius: 1rem;
@@ -900,13 +907,17 @@ body {
     .card-body {
       .welcome-logo-container {
         @extend .hover-up;
+        margin-bottom: 1.2rem !important;
       }
       .chat-loading-avatar {
         @extend .hover-up;
+        border: 1px solid rgba(211, 211, 211, 0.5);
+        border-radius: 50%;
+        padding-bottom: 0.3rem;
       }
       .chat-loading-container {
         border: 1px solid rgba(211, 211, 211, 0.5);
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        // box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         border-radius: 16px;
         backdrop-filter: blur(8px);
         color: #e4e6eb !important;
@@ -915,7 +926,6 @@ body {
         margin-left: 0.5rem;
         @include theme-bgcolor($dark-mode-bar-bgcolor);
         @include theme-text-color($dark-mode-message-ai-color);
-        border: $dark-mode-message-ai-border;
         border-radius: $border-radius-16;
         backdrop-filter: blur(8px);
         padding: 1rem;
@@ -1052,7 +1062,7 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    // box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     transition: all 0.34s ease-in-out;
     cursor: pointer;
     font-family: "CabinetGroteskBold", sans-serif;
@@ -1063,66 +1073,67 @@ body {
   
   .reminder-button:hover {
     transform: translateY(-5px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    // box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
   }
   
   .reminder-button .bell-icon {
     font-size: 1.2rem;
     animation: bellShake 3s infinite;
   }
+  .notification-icon {
+    padding: $notification-icon-padding;
+    svg {
+      width: $icon-width;
+      height: $icon-height;
+    }
+  }
+  .notification-list {
+    .dropdown-item {
+      transition: all $transition-duration-50 ease;
+      @include theme-text-color($gray-color-e1);
+      &:hover {
+        @include theme-bgcolor($default-mode-main-bgcolor);
+        border-radius: 8px;
+      }
+      &:hover .title-notification {
+        color: $white-color !important;
+      }
+      .notification-icon-user_assigned {
+        background: $notiifcationicon-color3;
+      }
+      .notification-icon-project_created {
+        background: $notiifcationicon-color5;
+      }
+      .notification-icon-user_removed {
+        background: $notiifcationicon-color4;
+      }
+      .notification-icon-task_created {
+        background: $notiifcationicon-color1;
+      }
+      .notification-icon-task_status_updated {
+        background: $notiifcationicon-color1;
+      }
+      .notification-icon-subtask_status_updated {
+        background: $notiifcationicon-color2;
+      }
+      .notification-icon-subtask_created {
+        background: $notiifcationicon-color2;
+      }
+      .notification-icon-subtask_deleted {
+        background: $notiifcationicon-color2;
+      }
+      .notification-icon-subtask_updated {
+        background: $notiifcationicon-color2;
+      }
+    }
+    .dropdown-item .title-notification {
+      transition: all $transition-duration-34 ease-in-out;
+      @include theme-text-color($gray-color-92);
+    }
+  }
 }
 
-.notification-icon {
-  padding: $notification-icon-padding;
-  svg {
-    width: $icon-width;
-    height: $icon-height;
-  }
-}
-.notification-list {
-  .dropdown-item {
-    transition: all $transition-duration-50 ease;
-    @include theme-text-color($gray-color-e1);
-    &:hover {
-      @include theme-bgcolor($default-mode-main-bgcolor);
-      border-radius: 8px;
-    }
-    &:hover .title-notification {
-      color: $white-color !important;
-    }
-    .notification-icon-user_assigned {
-      background: $notiifcationicon-color3;
-    }
-    .notification-icon-project_created {
-      background: $notiifcationicon-color5;
-    }
-    .notification-icon-user_removed {
-      background: $notiifcationicon-color4;
-    }
-    .notification-icon-task_created {
-      background: $notiifcationicon-color1;
-    }
-    .notification-icon-task_status_updated {
-      background: $notiifcationicon-color1;
-    }
-    .notification-icon-subtask_status_updated {
-      background: $notiifcationicon-color2;
-    }
-    .notification-icon-subtask_created {
-      background: $notiifcationicon-color2;
-    }
-    .notification-icon-subtask_deleted {
-      background: $notiifcationicon-color2;
-    }
-    .notification-icon-subtask_updated {
-      background: $notiifcationicon-color2;
-    }
-  }
-  .dropdown-item .title-notification {
-    transition: all $transition-duration-34 ease-in-out;
-    @include theme-text-color($gray-color-92);
-  }
-}
+
 
 // Ensure buttons are properly styled in all columns
 .column_todo,

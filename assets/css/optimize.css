@@ -125,28 +125,28 @@ body.system-mode .projects_card .card-body .task-column_header {
   border: 1px solid rgba(211, 211, 211, 0.5) !important;
 }
 body.system-mode .projects_card .card-body .task-card {
-  background: rgb(53, 53, 53) !important;
+  background: rgb(53, 53, 53);
 }
 body.system-mode .chat-pannel .card-header {
   background: rgb(36, 37, 38);
 }
 body.system-mode .chat-pannel .card-body .welcome-logo-container {
-  background: rgb(36, 37, 38);
+  background: rgb(24, 24, 24);
 }
 body.system-mode .chat-pannel .card-body .chat-loading-container {
-  background: rgb(36, 37, 38);
+  background: rgb(53, 53, 53);
 }
 body.system-mode .chat-pannel .card-body .ai-message .chat-loading-avatar {
-  background: rgb(36, 37, 38);
+  background: rgb(53, 53, 53);
 }
 body.system-mode .chat-pannel .card-body .ai-message .message.ai {
-  background: rgb(36, 37, 38);
+  background: rgb(53, 53, 53);
 }
 body.system-mode .chat-pannel .card-body .message.user {
-  background: rgb(36, 37, 38);
+  background: rgba(255, 255, 255, 0.2);
 }
 body.system-mode .dropdown-item:hover {
-  background: rgb(53, 53, 53) !important;
+  background: rgb(53, 53, 53);
 }
 body.system-mode .modal .modal-dialog .modal-content {
   background: #242526;
@@ -161,7 +161,7 @@ body.system-mode .modal .modal-dialog .modal-content .modal-body .tree-option {
   background: rgba(10, 10, 10, 0.2);
 }
 body.system-mode .reminder-button {
-  background: rgb(53, 53, 53) !important;
+  background: rgb(53, 53, 53);
 }
 body.system-mode table tbody tr:nth-child(odd) > * {
   background: rgba(10, 10, 10, 0.2);
@@ -247,7 +247,7 @@ body.black-mode .projects_card .card-header {
   background: rgba(36, 37, 38, 0.5);
 }
 body.black-mode .projects_card .card-body .task-card {
-  background: rgb(9, 1, 12) !important;
+  background: rgb(9, 1, 12);
 }
 body.black-mode .chat-pannel .card-header {
   background: rgba(36, 37, 38, 0.5);
@@ -268,7 +268,7 @@ body.black-mode .chat-pannel .card-body .message.user {
   background: rgba(255, 255, 255, 0.2);
 }
 body.black-mode .dropdown-item:hover {
-  background: rgb(9, 1, 12) !important;
+  background: rgb(9, 1, 12);
 }
 body.black-mode table tbody tr:nth-child(odd) > * {
   background: rgba(12, 1, 17, 0.2);
@@ -286,7 +286,7 @@ body.black-mode .modal .modal-dialog .modal-content .modal-body .tree-option {
   background: rgba(12, 1, 17, 0.2);
 }
 body.black-mode .reminder-button {
-  background: rgb(9, 1, 12) !important;
+  background: rgb(9, 1, 12);
 }
 
 body.brown-mode {
@@ -308,7 +308,7 @@ body.brown-mode .projects_card .card-header {
   background: rgb(65, 4, 4);
 }
 body.brown-mode .projects_card .card-body .task-card {
-  background: rgb(65, 4, 4) !important;
+  background: rgb(65, 4, 4);
 }
 body.brown-mode .chat-pannel .card-header {
   background: rgb(65, 4, 4);
@@ -329,7 +329,7 @@ body.brown-mode .chat-pannel .card-body .message.user {
   background: rgba(255, 255, 255, 0.2);
 }
 body.brown-mode .dropdown-item:hover {
-  background: rgb(65, 4, 4) !important;
+  background: rgb(65, 4, 4);
 }
 body.brown-mode table tbody tr:nth-child(odd) > * {
   background: rgba(12, 1, 17, 0.2);
@@ -347,7 +347,7 @@ body.brown-mode .modal .modal-dialog .modal-content .modal-body .tree-option {
   background: rgba(12, 1, 17, 0.2);
 }
 body.brown-mode .reminder-button {
-  background: rgb(65, 4, 4) !important;
+  background: rgb(65, 4, 4);
 }
 
 body {
@@ -507,7 +507,6 @@ body .sides-padding {
 body .navbar {
   background: rgba(20, 20, 35, 0.3) !important;
   backdrop-filter: blur(16px) !important;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1) !important;
   border-bottom: 1px solid #2f3031;
 }
 body .navbar button {
@@ -613,13 +612,9 @@ body .btn-send-primary {
   transition: all 0.4s ease-in-out !important;
 }
 body .projects_card {
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(211, 211, 211, 0.5);
   backdrop-filter: blur(7.1999998093px);
-}
-body .projects_card .card-header {
-  box-shadow: 0px 4px 30px rgba(0, 0, 0, 0.1) !important;
 }
 @media (max-width: 768px) {
   body .projects_card .card-header {
@@ -684,7 +679,6 @@ body .projects_card .card-body .task-column_section .task-column_header {
   margin-bottom: 16px;
   font-family: "CabinetGroteskBold";
   text-transform: uppercase;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
   transition: all 0.4s ease;
   letter-spacing: 1px;
   font-size: 1.18rem !important;
@@ -692,7 +686,7 @@ body .projects_card .card-body .task-column_section .task-column_header {
 body .projects_card .card-body .task-column_section .task-column {
   background: rgba(76, 76, 76, 0.25);
   backdrop-filter: blur(20px);
-  border: 1px dashed rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.5);
   transition: all 0.5s ease;
   min-height: calc(100vh - 335px);
   border-radius: 12px;
@@ -709,7 +703,6 @@ body .projects_card .card-body .task-column_section .task-column .task-card {
   backdrop-filter: blur(10px);
   margin-bottom: 16px;
   padding: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
   color: #fff;
   position: relative;
   overflow: hidden;
@@ -794,6 +787,12 @@ body .chat-pannel .close-icon-btn {
     right: 20px;
   }
 }
+body .chat-pannel .card {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(211, 211, 211, 0.5);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+}
 body .chat-pannel .card-header h5 {
   color: #fff;
 }
@@ -803,9 +802,16 @@ body .chat-pannel .chat-input {
   background: rgba(24, 25, 28, 0.2);
   border-top: 0.666667px solid rgba(211, 211, 211, 0.5);
 }
+body .chat-pannel .card-body .welcome-logo-container {
+  margin-bottom: 1.2rem !important;
+}
+body .chat-pannel .card-body .chat-loading-avatar {
+  border: 1px solid rgba(211, 211, 211, 0.5);
+  border-radius: 50%;
+  padding-bottom: 0.3rem;
+}
 body .chat-pannel .card-body .chat-loading-container {
   border: 1px solid rgba(211, 211, 211, 0.5);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   border-radius: 16px;
   backdrop-filter: blur(8px);
   color: #e4e6eb !important;
@@ -814,7 +820,6 @@ body .chat-pannel .card-body .message.ai {
   margin-left: 0.5rem;
   background: rgba(255, 255, 255, 0.2);
   color: #e4e6eb;
-  border: 1px solid rgba(211, 211, 211, 0.5);
   border-radius: 16px;
   backdrop-filter: blur(8px);
   padding: 1rem;
@@ -931,7 +936,6 @@ body .reminder-button {
   display: flex;
   align-items: center;
   gap: 10px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   transition: all 0.34s ease-in-out;
   cursor: pointer;
   font-family: "CabinetGroteskBold", sans-serif;
@@ -941,60 +945,57 @@ body .reminder-button {
 }
 body .reminder-button:hover {
   transform: translateY(-5px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 body .reminder-button .bell-icon {
   font-size: 1.2rem;
   animation: bellShake 3s infinite;
 }
-
-.notification-icon {
+body .notification-icon {
   padding: 0.5rem;
 }
-.notification-icon svg {
+body .notification-icon svg {
   width: 24px;
   height: 24px;
 }
-
-.notification-list .dropdown-item {
+body .notification-list .dropdown-item {
   transition: all 0.5s ease;
   color: #e1e1e1;
 }
-.notification-list .dropdown-item:hover {
+body .notification-list .dropdown-item:hover {
   background: rgb(36, 37, 38);
   border-radius: 8px;
 }
-.notification-list .dropdown-item:hover .title-notification {
+body .notification-list .dropdown-item:hover .title-notification {
   color: #fff !important;
 }
-.notification-list .dropdown-item .notification-icon-user_assigned {
+body .notification-list .dropdown-item .notification-icon-user_assigned {
   background: linear-gradient(145.32deg, #fbfbfb -14.49%, #04068a 82.49%);
 }
-.notification-list .dropdown-item .notification-icon-project_created {
+body .notification-list .dropdown-item .notification-icon-project_created {
   background: linear-gradient(145.32deg, #ffffff -14.49%, #8a8304 82.49%);
 }
-.notification-list .dropdown-item .notification-icon-user_removed {
+body .notification-list .dropdown-item .notification-icon-user_removed {
   background: linear-gradient(145.32deg, #ebe5eb -14.49%, #8a5204 82.49%);
 }
-.notification-list .dropdown-item .notification-icon-task_created {
+body .notification-list .dropdown-item .notification-icon-task_created {
   background: linear-gradient(145.32deg, #240121 -14.49%, #8a047f 82.49%);
 }
-.notification-list .dropdown-item .notification-icon-task_status_updated {
+body .notification-list .dropdown-item .notification-icon-task_status_updated {
   background: linear-gradient(145.32deg, #240121 -14.49%, #8a047f 82.49%);
 }
-.notification-list .dropdown-item .notification-icon-subtask_status_updated {
+body .notification-list .dropdown-item .notification-icon-subtask_status_updated {
   background: linear-gradient(145.32deg, #ffffff -14.49%, #048a40 82.49%);
 }
-.notification-list .dropdown-item .notification-icon-subtask_created {
+body .notification-list .dropdown-item .notification-icon-subtask_created {
   background: linear-gradient(145.32deg, #ffffff -14.49%, #048a40 82.49%);
 }
-.notification-list .dropdown-item .notification-icon-subtask_deleted {
+body .notification-list .dropdown-item .notification-icon-subtask_deleted {
   background: linear-gradient(145.32deg, #ffffff -14.49%, #048a40 82.49%);
 }
-.notification-list .dropdown-item .notification-icon-subtask_updated {
+body .notification-list .dropdown-item .notification-icon-subtask_updated {
   background: linear-gradient(145.32deg, #ffffff -14.49%, #048a40 82.49%);
 }
-.notification-list .dropdown-item .title-notification {
+body .notification-list .dropdown-item .title-notification {
   transition: all 0.34s ease-in-out;
   color: rgb(92, 92, 92);
 }
