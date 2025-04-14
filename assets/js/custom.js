@@ -511,7 +511,6 @@ width: 300px;
     badge.style.display = "none";
   }
 
-
   // Update notification list
   if (notifications.length > 0) {
     notificationList.innerHTML = notifications
