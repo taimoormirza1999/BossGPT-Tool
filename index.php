@@ -242,7 +242,11 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 
     // Navigation for logged-in users
     if ($auth->isLoggedIn()):
-        require_once 'components/navigation.php';
+        if(isset($_SESSION['user_id'])){
+        if($page != 'login' && $page != 'register' && $page != 'aitone'){
+            require_once 'components/navigation.php';
+        }
+        }
     endif; ?>
 
     <div class="container-fluid mt-4">
@@ -256,7 +260,18 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                 include_register_page();
                 break;
             case 'dashboard':
+                // Check if AI tone is set
+                echo "<script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        if (!localStorage.getItem('aiToneMode')) {
+                            window.location.href = '?page=aitone';
+                        }
+                    });
+                </script>";
                 include_dashboard();
+                break;
+            case 'aitone':
+                include_aitone_page();
                 break;
             case 'garden_stats':
                 // Redirect to dashboard since we now use a modal for garden stats
@@ -316,9 +331,6 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
             ?>
             <div class="d-flex justify-content-center align-items-center min-vh-100 register-page">
                 <div class="row justify-content-center w-100 position-relative">
-                    <!-- <img src="assets/images/bossgptlogo.svg" alt="Logo"
-                        class="position-absolute top-0 start-50 translate-middle "
-                        style="margin-top: -1rem; width: 15rem; height: 10rem;position: absolute;top: 50%;left: 50%;transform: translate(-50%,-50%);"> -->
                     <?php echo getLogoImage(); ?>
                     <div class="col-md-6 col-lg-12 mt-5">
                         <div class="card">
@@ -2848,6 +2860,138 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
         }
     </script>
 
+    <?php
+    function include_aitone_page()
+    {
+        ?>
+        <div class="d-flex justify-content-center align-items-center min-vh-100">
+            <div class="row justify-content-center w-100 position-relative">
+                <?php echo getLogoImage(); ?>
+                <div class="col-md-6 col-lg-5 mt-5">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h2 class="card-title text-center mb-4">How do you like your<br>AI Boss to be?</h2>
+                            
+                            <div class="ai-tone-options row">
+                                <div class="col-4 mb-4">
+                                    <div class="ai-tone-option" data-tone="friendly">
+                                        <img src="https://res.cloudinary.com/da6qujoed/image/upload/v1744649255/friendlyai_hy04oz.svg" alt="Friendly">
+                                        <div>Friendly</div>
+                                        <div class="tone-indicator active"></div>
+                                    </div>
+                                </div>
+                                <div class="col-4 mb-4">
+                                    <div class="ai-tone-option" data-tone="funny">
+                                        <img src="https://res.cloudinary.com/da6qujoed/image/upload/v1744650101/funny_ql6wcm.svg" alt="Funny">
+                                        <div>Funny</div>
+                                        <div class="tone-indicator"></div>
+                                    </div>
+                                </div>
+                                <div class="col-4 mb-4">
+                                    <div class="ai-tone-option" data-tone="angry">
+                                        <img src="https://res.cloudinary.com/da6qujoed/image/upload/v1744650100/angry_sye97x.svg" alt="Angry">
+                                        <div>Angry</div>
+                                        <div class="tone-indicator"></div>
+                                    </div>
+                                </div>
+                                <div class="col-4 mb-4">
+                                    <div class="ai-tone-option" data-tone="geeky">
+                                        <img src="https://res.cloudinary.com/da6qujoed/image/upload/v1744650100/geeky_cm1bmy.svg" alt="Geeky">
+                                        <div>Geeky</div>
+                                        <div class="tone-indicator"></div>
+                                    </div>
+                                </div>
+                                <div class="col-4 mb-4">
+                                    <div class="ai-tone-option" data-tone="caring">
+                                        <img src="https://res.cloudinary.com/da6qujoed/image/upload/v1744650100/caring_b4yp8e.svg" alt="Caring">
+                                        <div>Caring</div>
+                                        <div class="tone-indicator"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button id="continueToDashboard" class="btn btn-primary w-100 mt-3">Continue to Dashboard</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const toneOptions = document.querySelectorAll('.ai-tone-option');
+                let selectedTone = 'friendly'; // Default selection
+                
+                // Set initial selection
+                localStorage.setItem('aiToneMode', selectedTone);
+                
+                // Handle tone selection
+                toneOptions.forEach(option => {
+                    option.addEventListener('click', function() {
+                        // Remove active class from all options
+                        toneOptions.forEach(opt => {
+                            opt.querySelector('.tone-indicator').classList.remove('active');
+                        });
+                        
+                        // Add active class to selected option
+                        this.querySelector('.tone-indicator').classList.add('active');
+                        
+                        // Update selected tone
+                        selectedTone = this.getAttribute('data-tone');
+                        localStorage.setItem('aiToneMode', selectedTone);
+                    });
+                });
+                
+                // Handle continue button
+                document.getElementById('continueToDashboard').addEventListener('click', function() {
+                    window.location.href = '?page=dashboard';
+                });
+            });
+        </script>
+        
+        <style>
+            .ai-tone-options {
+                display: flex;
+                justify-content: center;
+                flex-wrap: wrap;
+                margin: 0 auto;
+                max-width: 500px;
+            }
+            
+            .ai-tone-option {
+                cursor: pointer;
+                padding: 10px;
+                border-radius: 10px;
+                text-align: center;
+                transition: all 0.2s ease;
+                background: rgba(217, 217, 217, 10);
+            }
+            
+            .ai-tone-option:hover {
+                background-color: rgba(0,0,0,0.05);
+            }
+            
+            .ai-tone-option img {
+                width: 60px;
+                height: 60px;
+                margin-bottom: 10px;
+            }
+            
+            .tone-indicator {
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                background-color: #ccc;
+                margin: 5px auto 0;
+            }
+            
+            .tone-indicator.active {
+                background-color: #28a745;
+            }
+        </style>
+        <?php
+    }
+    ?>
 </body>
 
 </html>
