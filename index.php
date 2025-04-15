@@ -146,7 +146,7 @@ require_once './api_endPoints.php';
     <link rel="stylesheet" href="./assets/css/custom.css">
 
     <link rel="stylesheet" href="./assets/css/customstyle2.css">
-    <link rel="stylesheet" href="./assets/css/optimize.css">
+    <link rel="stylesheet" href="./assets/css/optimize.css?v=<?php echo filemtime(__DIR__ . '/assets/css/optimize.css'); ?>">
     
     <!-- Firebase Scripts for FCM -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
