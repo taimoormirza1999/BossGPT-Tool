@@ -161,7 +161,7 @@ require_once './api_endPoints.php';
             messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
             appId: "YOUR_APP_ID"
         };
-        
+
         // Initialize Firebase only if it's not already initialized
         if (typeof firebase === 'undefined' || !firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
@@ -2900,7 +2900,7 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                         
                         // Add active class to selected option
                         this.querySelector('.tone-indicator').classList.add('active');
-                        
+
                         // Update selected tone
                         selectedTone = this.getAttribute('data-tone');
                         localStorage.setItem('aiToneMode', selectedTone);
