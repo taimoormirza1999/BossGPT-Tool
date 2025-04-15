@@ -159,10 +159,10 @@ $geist-fonts: (
 }
 .smooth-fade {
   transition: all $transition-duration-50 ease;
-&.d-none{
-  opacity: 0;
-  transform: translateY(10px);
-}
+  &.d-none {
+    opacity: 0;
+    transform: translateY(10px);
+  }
   &.show {
     opacity: 1;
     transform: translateY(0);
@@ -339,9 +339,20 @@ $geist-fonts: (
   $card-body-welcome-logo-bgcolor,
   $card-body-chat-loading-container-bgcolor,
   $card-body-ai-message-bgcolor,
-  $card-body-message-user-bgcolor
+  $card-body-message-user-bgcolor,
+  $modal-bgcolor:rgba(0, 0, 0, 0.35),
+  $modal-header-bgcolor:#1d1d1d
 ) {
   .chat-pannel {
+    .my-custom-ai-tone-modal-chat-pannel {
+      background: rgba(0, 0, 0, 0.5);
+      .card-ai-tone-modal-content {
+        background: $modal-bgcolor;
+        .header {
+          background: $modal-header-bgcolor;
+        }
+      }
+    }
     .card-header {
       @include theme-bgcolor($card-header-bgcolor);
     }
@@ -358,6 +369,9 @@ $geist-fonts: (
         }
         .message.ai {
           @include theme-bgcolor($card-body-ai-message-bgcolor);
+          .suggestion-item{
+            background-color: $card-body-ai-message-bgcolor!important;
+        }
         }
       }
       .message.user {
@@ -419,7 +433,9 @@ body.system-mode {
     $default-mode-welcome-logo-bgcolor,
     $default-mode-card-task-bgcolor,
     $default-mode-card-task-bgcolor,
-    $default-mode-message-user-bgcolor
+    $default-mode-message-user-bgcolor,
+    $default-mode-modal-container-bgcolor,
+    $default-mode-modal-header-bgcolor
   );
   @include theme-common-notification-list($default-mode-card-task-bgcolor);
   @include theme-common-modal(
@@ -456,7 +472,9 @@ body.purple-mode {
     $purple-mode-card-task-bgcolor,
     $purple-mode-card-task-bgcolor,
     $purple-mode-card-task-bgcolor,
-    $purple-mode-message-user-bgcolor
+    $purple-mode-message-user-bgcolor,
+    $purple-mode-modal-container-bgcolor,
+    $purple-mode-modal-header-bgcolor
   );
   @include theme-common-notification-list($purple-mode-card-task-bgcolor);
   table tbody tr:nth-child(odd) > * {
@@ -492,7 +510,9 @@ body.black-mode {
     $black-mode-card-task-bgcolor,
     $black-mode-card-task-bgcolor,
     $black-mode-card-task-bgcolor,
-    $black-mode-message-user-bgcolor
+    $black-mode-message-user-bgcolor,
+    $black-mode-modal-container-bgcolor,
+    $black-mode-modal-header-bgcolor
   );
   @include theme-common-notification-list($black-mode-card-task-bgcolor);
   table tbody tr:nth-child(odd) > * {
@@ -528,7 +548,9 @@ body.brown-mode {
     $brown-mode-bar-bgcolor,
     $brown-mode-bar-bgcolor,
     $brown-mode-bar-bgcolor,
-    $brown-mode-message-user-bgcolor
+    $brown-mode-message-user-bgcolor,
+    $brown-mode-modal-container-bgcolor,
+    $brown-mode-modal-header-bgcolor
   );
   @include theme-common-notification-list($brown-mode-card-task-bgcolor);
   table tbody tr:nth-child(odd) > * {
@@ -724,7 +746,7 @@ body {
       padding: 0.75rem 1.3rem;
       position: absolute;
       top: 4.2rem;
-      color:#000;
+      color: #000;
       @extend .hover-up;
       .theme-icon-content-container {
         @include flex-center-hv;
@@ -1037,14 +1059,14 @@ body {
       h5 {
         color: $white-color;
       }
-      .change_aitone_btn{
-        @include position_center(false,true);
-        background-color:transparent;
+      .change_aitone_btn {
+        @include position_center(false, true);
+        background-color: transparent;
         right: 10px;
-        border: 0!important;
-        &:hover{
-          background-color:transparent;
-         @include hover-up(-10px)
+        border: 0 !important;
+        &:hover {
+          background-color: transparent;
+          @include hover-up(-10px);
         }
       }
     }
@@ -1081,6 +1103,42 @@ body {
         padding: 1rem;
         margin-bottom: 0.5rem;
         @extend .hover-up;
+        .btn-add-task {
+          background: rgba(255, 255, 255, 0.1);
+          padding: 4px;
+          font-weight: 600;
+          font-size: 0.8rem !important;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    svg{
+      height: 1.05rem !important;
+    }
+        }
+        .suggestion-item{
+          border: 0 !important;
+          padding: 0.7rem !important;
+          background-color: rgba(0, 0, 0, 0.45);
+          strong{
+            font-weight: 600;
+            font-size: 0.85rem !important;
+            font-weight: 600;
+            color: white;
+          }
+          span{
+            font-size: 0.85rem !important;
+          }
+          .suggested-task-due-date {
+            @include flex-center-hv;
+            gap: 0.1rem;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 1);
+            opacity: 0.8;
+            svg{
+              height: 1.05rem !important;
+            }
+          }
+        }
+        
       }
       .message.user {
         @include theme-bgcolor($dark-mode-bar-bgcolor);
@@ -1260,7 +1318,9 @@ body {
       .notification-icon-task_created {
         background: $notiifcationicon-color1;
       }
-      .notification-icon-task_status_updated, .notification-icon-task_updated,.notification-icon-task_picture_removed {
+      .notification-icon-task_status_updated,
+      .notification-icon-task_updated,
+      .notification-icon-task_picture_removed {
         background: $notiifcationicon-color1;
       }
       .notification-icon-subtask_status_updated {

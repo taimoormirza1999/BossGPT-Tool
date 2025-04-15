@@ -1,12 +1,9 @@
 .modal,
 .modal:focus :not(#imageModal) {
-  /* background: rgba(199, 199, 199, 0.5)!important;
-    backdrop-filter: blur(19.1px)!important; */
   z-index: 99999 !important;
 }
 .suggestion-item {
   border-radius: 16px !important;
-  border-color: gray !important;
 }
 
 .chat-container {
@@ -30,7 +27,6 @@
 
 .task-card:hover {
   transform: translateY(-4px) scale(1.02);
-  /* box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); */
   border-color: rgba(13, 110, 253, 0.3);
   z-index: 1;
 }
@@ -471,154 +467,17 @@ body.dark-mode .task-description {
 
 
 
-body.dark-mode .message,
-body.dark-mode .suggestion-item {
-  border: 1px solid rgba(211, 211, 211, 0.5);
-  border-radius: 16px;
-  margin: auto auto;
-  margin-bottom: 1rem;
-  backdrop-filter: blur(8px);
-}
-
-body.dark-mode .chat-messages {
-  background-color: var(--bs-primary-white10percent);
-  border-top: 0px;
-  backdrop-filter: blur(10px);
-}
-
-
-
-body.dark-mode .form-control,
-body.dark-mode .form-select,
-body.dark-mode textarea {
-  /* border-color: #fff;
-  color: #e4e6eb;
-  background: rgba(12, 1, 17, 0.5);
-  border: 1px solid rgba(156, 156, 156, 1);
-  border-radius: 12px;
-  backdrop-filter: blur(4px); */
-}
-
-
 body .modal-content {
  
 backdrop-filter: blur(6.35px);
 border-radius: 16px;
 }
 
-body.dark-mode .modal-header,
-body.dark-mode .modal-footer {
-  border-color: #2f3031;
-}
 body .modal-footer {
   display: flex;
   justify-content: center!important;
 }
 
-body.dark-mode .table {
-  color: #e4e6eb;
-}
-
-body.dark-mode .table-striped > tbody > tr:nth-of-type(odd) {
-  background-color: #18191c;
-}
-
-body.dark-mode .activity-log-item {
-  background-color: #18191c;
-  border: 1px solid #2f3031;
-  transition: all 0.2s ease;
-}
-
-body.dark-mode .activity-log-item:hover {
-  background-color: #242526;
-}
-
-body.dark-mode .subtask-item {
-    background: rgba(12, 1, 17, 0.5);
-    border-color: #585858;
-}
-
-body.dark-mode .subtask-item:hover {
-  background-color: #242526;
-}
-
-body.dark-mode .text-muted {
-  color: #b0b3b8 !important;
-}
-
-body.dark-mode .select2-container--default .select2-selection--multiple {
-  background: rgba(12, 1, 17, 0.5);
-  border: 1px solid rgba(156, 156, 156, 1);
-  border-radius: 12px;
-  backdrop-filter: blur(4px);
-}
-
-body.dark-mode
-  .select2-container--default
-  .select2-selection--multiple
-  .select2-selection__choice {
-  background: rgba(12, 1, 17, 0.5);
-  border: 1px solid rgba(156, 156, 156, 1);
-  border-radius: 12px;
-  backdrop-filter: blur(4px);
-  color: #e4e6eb;
-}
-
-body.dark-mode .select2-dropdown {
-  background-color: #242526;
-  border-color: #2f3031;
-}
-
-body.dark-mode .select2-search__field {
-  background-color: #3a3b3c;
-  color: #e4e6eb;
-}
-
-body.dark-mode .select2-results__option {
-  color: #e4e6eb;
-}
-
-body.dark-mode .select2-results__option[aria-selected="true"] {
-  background-color: #3a3b3c;
-}
-
-body.dark-mode .select2-results__option--highlighted[aria-selected] {
-  background-color: #2374e1;
-}
-
-body.dark-mode .loading {
-  background: rgba(0, 0, 0, 0.8);
-}
-
-body.dark-mode .btn-link {
-  color: #fff;
-  text-decoration: none !important;
-}
-
-body.dark-mode .btn-link:hover {
-  color: #4080ff;
-}
-
-
-
-body.dark-mode .due-date.overdue {
-  background-color: rgba(220, 53, 69, 0.2);
-  color: #ff6b6b;
-  transition: all 0.4s ease;
-}
-
-
-
-body.dark-mode .subtask-status {
-  background-color: #3a3b3c;
-  border-color: #2f3031;
-}
-
-body.dark-mode .task-card:hover .add-subtask-btn,
-body.dark-mode .task-card:hover .ai-add-subtask-btn {
-  opacity: 1;
-  color: #2374e1;
-}
 
 
 

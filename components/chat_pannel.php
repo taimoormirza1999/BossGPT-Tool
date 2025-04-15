@@ -1,18 +1,21 @@
 <div class="col-md-3 chat-pannel position-relative">
- <!-- AI TONE Modal -->
- <div class=" my-custom-ai-tone-modal-chat-pannel d-none" id="AiToneModal" >
-                    <div class="card-ai-tone-modal-content">
-                        <div class="text-white border-0 rounded-t-lg header">
-                            <h5 class="" id="AiToneModalLabel"><img src="https://res.cloudinary.com/da6qujoed/image/upload/v1744704440/robot_pfahvf.svg" class="w-10 h-10"> &nbsp;AI Tone</h5>
-                            <button type="button" class="btn btn-link p-0 text-white close_icon"  onclick="DynamicClose('#AiToneModal')" ><?php echo getCloseSquareIcon(); ?></button>
-                        </div>
-                        <div class="">
-                            <?php echo renderAIToneOptions(); ?>
-                    </div>
-                </div>
+    <!-- AI TONE Modal -->
+    <div class=" my-custom-ai-tone-modal-chat-pannel d-none" id="AiToneModal">
+        <div class="card-ai-tone-modal-content">
+            <div class="text-white border-0 rounded-t-lg header">
+                <h5 class="" id="AiToneModalLabel"><img
+                        src="https://res.cloudinary.com/da6qujoed/image/upload/v1744704440/robot_pfahvf.svg"
+                        class="w-10 h-10"> &nbsp;AI Tone</h5>
+                <button type="button" class="btn btn-link p-0 text-white close_icon"
+                    onclick="DynamicClose('#AiToneModal')"><?php echo getCloseSquareIcon(); ?></button>
             </div>
-<div class="card" style="background-color: transparent!important;">
-                
+            <div class="">
+                <?php echo renderAIToneOptions(); ?>
+            </div>
+        </div>
+    </div>
+    <div class="card" style="background-color: transparent!important;">
+
         <div class="card-header" style="
                                             display: flex;
                                             flex-direction: column;
@@ -27,7 +30,8 @@
                 &nbsp; Boss<span style="font-weight: 700;">GPT</span> Assistant
             </h5>
             <button class="change_aitone_btn" onclick="DynamicOpen('#AiToneModal')">
-            <img src="https://res.cloudinary.com/da6qujoed/image/upload/v1744704440/robot_pfahvf.svg"  style="width:2rem;">
+                <img src="https://res.cloudinary.com/da6qujoed/image/upload/v1744704440/robot_pfahvf.svg"
+                    style="width:2rem;">
             </button>
             <button class="btn btn-link p-0 text-white close-icon-btn position-absolute " data-bs-dismiss="modal"
                 aria-label="Close" onclick="closeChatPannel()"><?php echo getCloseSquareIcon(); ?></button>
@@ -191,6 +195,7 @@
 
 
                     $prompts = [
+                        "📑 suggest tasks for my project",
                         "🎯 Create task 'Your Task' and assign it to myself",
                         "📋 Create tasks for Your Feature",
                         "✏️ Move task #number to in_progress",

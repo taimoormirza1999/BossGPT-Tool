@@ -1,4 +1,3 @@
-/* Updated CSS - Optimized for Production - v1.0.1 */
 @font-face {
   font-family: "Geist";
   src: url("../fonts/Geist-Thin.woff2") format("woff2");
@@ -150,6 +149,15 @@ body.system-mode .projects_card .card-body .task-column_header {
 body.system-mode .projects_card .card-body .task-card {
   background: rgb(53, 53, 53);
 }
+body.system-mode .chat-pannel .my-custom-ai-tone-modal-chat-pannel {
+  background: rgba(0, 0, 0, 0.5);
+}
+body.system-mode .chat-pannel .my-custom-ai-tone-modal-chat-pannel .card-ai-tone-modal-content {
+  background: #242526;
+}
+body.system-mode .chat-pannel .my-custom-ai-tone-modal-chat-pannel .card-ai-tone-modal-content .header {
+  background: #1d1d1d;
+}
 body.system-mode .chat-pannel .card-header {
   background: rgb(36, 37, 38);
 }
@@ -164,6 +172,9 @@ body.system-mode .chat-pannel .card-body .ai-message .chat-loading-avatar {
 }
 body.system-mode .chat-pannel .card-body .ai-message .message.ai {
   background: rgb(53, 53, 53);
+}
+body.system-mode .chat-pannel .card-body .ai-message .message.ai .suggestion-item {
+  background-color: rgb(53, 53, 53) !important;
 }
 body.system-mode .chat-pannel .card-body .message.user {
   background: rgba(255, 255, 255, 0.2);
@@ -212,6 +223,15 @@ body.purple-mode .projects_card .card-header {
 body.purple-mode .projects_card .card-body .task-card {
   background: linear-gradient(135deg, #240121 0%, #4f0142 100%) !important;
 }
+body.purple-mode .chat-pannel .my-custom-ai-tone-modal-chat-pannel {
+  background: rgba(0, 0, 0, 0.5);
+}
+body.purple-mode .chat-pannel .my-custom-ai-tone-modal-chat-pannel .card-ai-tone-modal-content {
+  background: #120211;
+}
+body.purple-mode .chat-pannel .my-custom-ai-tone-modal-chat-pannel .card-ai-tone-modal-content .header {
+  background: #361734;
+}
 body.purple-mode .chat-pannel .card-header {
   background: rgba(40, 3, 59, 0.6);
 }
@@ -226,6 +246,9 @@ body.purple-mode .chat-pannel .card-body .ai-message .chat-loading-avatar {
 }
 body.purple-mode .chat-pannel .card-body .ai-message .message.ai {
   background: linear-gradient(135deg, #240121 0%, #4f0142 100%) !important;
+}
+body.purple-mode .chat-pannel .card-body .ai-message .message.ai .suggestion-item {
+  background-color: linear-gradient(135deg, #240121 0%, #4f0142 100%) !important !important;
 }
 body.purple-mode .chat-pannel .card-body .message.user {
   background: rgba(255, 255, 255, 0.2);
@@ -274,6 +297,15 @@ body.black-mode .projects_card .card-header {
 body.black-mode .projects_card .card-body .task-card {
   background: rgb(9, 1, 12);
 }
+body.black-mode .chat-pannel .my-custom-ai-tone-modal-chat-pannel {
+  background: rgba(0, 0, 0, 0.5);
+}
+body.black-mode .chat-pannel .my-custom-ai-tone-modal-chat-pannel .card-ai-tone-modal-content {
+  background: #171717;
+}
+body.black-mode .chat-pannel .my-custom-ai-tone-modal-chat-pannel .card-ai-tone-modal-content .header {
+  background: #0d0c0c;
+}
 body.black-mode .chat-pannel .card-header {
   background: rgba(36, 37, 38, 0.5);
 }
@@ -288,6 +320,9 @@ body.black-mode .chat-pannel .card-body .ai-message .chat-loading-avatar {
 }
 body.black-mode .chat-pannel .card-body .ai-message .message.ai {
   background: rgb(9, 1, 12);
+}
+body.black-mode .chat-pannel .card-body .ai-message .message.ai .suggestion-item {
+  background-color: rgb(9, 1, 12) !important;
 }
 body.black-mode .chat-pannel .card-body .message.user {
   background: rgba(255, 255, 255, 0.2);
@@ -336,6 +371,15 @@ body.brown-mode .projects_card .card-header {
 body.brown-mode .projects_card .card-body .task-card {
   background: rgb(65, 4, 4);
 }
+body.brown-mode .chat-pannel .my-custom-ai-tone-modal-chat-pannel {
+  background: rgba(0, 0, 0, 0.5);
+}
+body.brown-mode .chat-pannel .my-custom-ai-tone-modal-chat-pannel .card-ai-tone-modal-content {
+  background: #190404;
+}
+body.brown-mode .chat-pannel .my-custom-ai-tone-modal-chat-pannel .card-ai-tone-modal-content .header {
+  background: #410404;
+}
 body.brown-mode .chat-pannel .card-header {
   background: rgb(65, 4, 4);
 }
@@ -350,6 +394,9 @@ body.brown-mode .chat-pannel .card-body .ai-message .chat-loading-avatar {
 }
 body.brown-mode .chat-pannel .card-body .ai-message .message.ai {
   background: rgb(65, 4, 4);
+}
+body.brown-mode .chat-pannel .card-body .ai-message .message.ai .suggestion-item {
+  background-color: rgb(65, 4, 4) !important;
 }
 body.brown-mode .chat-pannel .card-body .message.user {
   background: rgba(255, 255, 255, 0.2);
@@ -1058,6 +1105,43 @@ body .chat-pannel .card-body .message.ai {
   padding: 1rem;
   margin-bottom: 0.5rem;
 }
+body .chat-pannel .card-body .message.ai .btn-add-task {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 4px;
+  font-weight: 600;
+  font-size: 0.8rem !important;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+body .chat-pannel .card-body .message.ai .btn-add-task svg {
+  height: 1.05rem !important;
+}
+body .chat-pannel .card-body .message.ai .suggestion-item {
+  border: 0 !important;
+  padding: 0.7rem !important;
+  background-color: rgba(0, 0, 0, 0.45);
+}
+body .chat-pannel .card-body .message.ai .suggestion-item strong {
+  font-weight: 600;
+  font-size: 0.85rem !important;
+  font-weight: 600;
+  color: white;
+}
+body .chat-pannel .card-body .message.ai .suggestion-item span {
+  font-size: 0.85rem !important;
+}
+body .chat-pannel .card-body .message.ai .suggestion-item .suggested-task-due-date {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.1rem;
+  font-size: 0.8rem;
+  color: rgb(255, 255, 255);
+  opacity: 0.8;
+}
+body .chat-pannel .card-body .message.ai .suggestion-item .suggested-task-due-date svg {
+  height: 1.05rem !important;
+}
 body .chat-pannel .card-body .message.user {
   background: rgba(255, 255, 255, 0.2);
   color: #fff;
@@ -1213,7 +1297,9 @@ body .notification-list .dropdown-item .notification-icon-user_removed {
 body .notification-list .dropdown-item .notification-icon-task_created {
   background: linear-gradient(145.32deg, #240121 -14.49%, #8a047f 82.49%);
 }
-body .notification-list .dropdown-item .notification-icon-task_status_updated, body .notification-list .dropdown-item .notification-icon-task_updated, body .notification-list .dropdown-item .notification-icon-task_picture_removed {
+body .notification-list .dropdown-item .notification-icon-task_status_updated,
+body .notification-list .dropdown-item .notification-icon-task_updated,
+body .notification-list .dropdown-item .notification-icon-task_picture_removed {
   background: linear-gradient(145.32deg, #240121 -14.49%, #8a047f 82.49%);
 }
 body .notification-list .dropdown-item .notification-icon-subtask_status_updated {

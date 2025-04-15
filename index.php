@@ -146,8 +146,9 @@ require_once './api_endPoints.php';
     <link rel="stylesheet" href="./assets/css/custom.css">
 
     <link rel="stylesheet" href="./assets/css/customstyle2.css">
-    <link rel="stylesheet" href="./assets/css/optimize.css?v=<?php echo filemtime(__DIR__ . '/assets/css/optimize.css'); ?>">
-    
+    <link rel="stylesheet"
+        href="./assets/css/optimize.css?v=<?php echo filemtime(__DIR__ . '/assets/css/optimize.css'); ?>">
+
     <!-- Firebase Scripts for FCM -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js"></script>
@@ -242,10 +243,10 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 
     // Navigation for logged-in users
     if ($auth->isLoggedIn()):
-        if(isset($_SESSION['user_id'])){
-        if($page != 'login' && $page != 'register' && $page != 'aitone'){
-            require_once 'components/navigation.php';
-        }
+        if (isset($_SESSION['user_id'])) {
+            if ($page != 'login' && $page != 'register' && $page != 'aitone') {
+                require_once 'components/navigation.php';
+            }
         }
     endif; ?>
 
@@ -633,11 +634,11 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                 }
             </style>
 
-    <!-- Reminder button -->
-    <button id="reminderButton" class="reminder-button">
-        <i class="bi bi-bell-fill bell-icon"></i>
-        <span>Turn on Reminders</span>
-    </button>
+            <!-- Reminder button -->
+            <button id="reminderButton" class="reminder-button">
+                <i class="bi bi-bell-fill bell-icon"></i>
+                <span>Turn on Reminders</span>
+            </button>
         <?php } ?>
     </div>
 
@@ -2203,25 +2204,56 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                 });
 
                 function renderSuggestedTasks(suggestions) {
-                    const suggestionsContainer = document.createElement('div');
-                    suggestionsContainer.className = 'suggestions-container mt-3';
-                    suggestionsContainer.innerHTML = '<h6 class="mb-3">Suggested Tasks & Features</h6>';
-                    suggestions.forEach(suggestion => {
-                        const suggestionDiv = document.createElement('div');
-                        suggestionDiv.className = 'suggestion-item border p-2 mb-2';
-                        suggestionDiv.innerHTML = `
-                            <strong>${escapeHtml(suggestion.title)}</strong><br>
-                            <span class="my-2">${escapeHtml(suggestion.description)}</span><br>
-                            ${suggestion.due_date ? `<?php echo getCalendarIcon(); ?><em class="text-muted"> Due: ${escapeHtml(suggestion.due_date)}</em>` : ''}<br>
-                            <button class="btn btn-sm btn-primary mt-1">Add Task</button>
-                         `;
-                        suggestionDiv.querySelector('button').addEventListener('click', () => {
-                            addSuggestedTask(suggestion);
-                        });
-                        suggestionsContainer.appendChild(suggestionDiv);
-                    });
-                    chatMessages.appendChild(suggestionsContainer);
-                }
+  const wrapper = document.createElement('div');
+  wrapper.className = 'd-flex';
+
+  // Avatar block
+  const avatarDiv = document.createElement('div');
+  avatarDiv.className = 'ai-avatar';
+  avatarDiv.innerHTML = `
+    <div class="chat-loading-avatar">
+      <img src="https://res.cloudinary.com/da6qujoed/image/upload/v1742656707/logoIcon_pspxgh.png" 
+           alt="Logo" class="logo-icon" 
+           style="filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3)); margin-top: 0; margin-bottom: 0; width: 1.8rem; height: auto">
+    </div>
+  `;
+
+  // Suggestions container
+  const suggestionsContainer = document.createElement('div');
+  suggestionsContainer.className = 'suggestions-container mt-3 message ai';
+  suggestionsContainer.innerHTML = `<h6 class="mb-3">Suggested Tasks & Features</h6>`;
+
+  suggestions.forEach(suggestion => {
+    const suggestionDiv = document.createElement('div');
+    suggestionDiv.className = 'suggestion-item border p-2 mb-2';
+    suggestionDiv.innerHTML = `
+      <strong>${escapeHtml(suggestion.title)}</strong><br>
+      <span class="my-2">${escapeHtml(suggestion.description)}</span><br>
+      <div class="d-flex mt-1" style="justify-content: space-between; flex-direction: row-reverse;">
+        <div class="suggested-task-due-date">
+          ${suggestion.due_date ? `
+            <?php echo getCalendarIcon(); ?>
+            <em class="text-muted"> Due: ${escapeHtml(suggestion.due_date)}</em>` : ''}
+        </div>
+        <button class="btn btn-sm btn-add-task mt-1">
+          <?php echo getAddIcon(); ?> Add Task
+        </button>
+      </div>
+    `;
+    suggestionDiv.querySelector('button').addEventListener('click', () => {
+      addSuggestedTask(suggestion);
+    });
+    suggestionsContainer.appendChild(suggestionDiv);
+  });
+
+  // Append avatar + container to wrapper
+  wrapper.appendChild(avatarDiv);
+  wrapper.appendChild(suggestionsContainer);
+
+  // Add to chat
+  chatMessages.appendChild(wrapper);
+}
+
 
                 function addSuggestedTask(suggestion) {
                     if (!currentProject) {
@@ -2516,13 +2548,6 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                         transform: translateX(4px);
                     }
 
-                    body.dark-mode #subtasksList .subtask-item {
-                        background-color: #2c2d2e;
-                    }
-
-                    body.dark-mode #subtasksList .subtask-item:hover {
-                        background-color: #3a3b3c;
-                    }
 
                     #subtasksList .delete-subtask-btn {
                     border: 0 !important;
@@ -2551,17 +2576,7 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                         opacity: 1;
                     }
 
-                    body.dark-mode .subtask-due-date {
-                        background-color: #3a3b3c;
-                        border-color: #2f3031;
-                        color: #e4e6eb;
-                    }
 
-                    body.dark-mode .subtask-due-date:hover,
-                    body.dark-mode .subtask-due-date:focus {
-                        background-color: #4a4b4c;
-                      
-                    }
 
                     .subtask-due-date:disabled {
                         opacity: 0.5;
@@ -2779,7 +2794,11 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                                         .replace('DESCRIPTION_PLACEHOLDER', description)
                                         .replace('REMINDER_ID_PLACEHOLDER', reminder.id);
 
-                                    popupContainer.insertAdjacentHTML('beforeend', popupHtml);
+                                    // Insert at the beginning to make the newest appear on top
+                                    popupContainer.insertAdjacentHTML('afterbegin', popupHtml);
+
+                                    // Limit visible alerts to 3
+                                    updatePopupVisibility();
                                 }
                             });
 
@@ -2831,32 +2850,37 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // alert('djfdbgjkfd'); // Removing this line which was causing issues
+            // Initial setup of popup visibility
+            updatePopupVisibility();
+        });
+
+        function updatePopupVisibility() {
             const popups = document.querySelectorAll(".popup-alert");
 
-            function updatePopupVisibility() {
-                popups.forEach((popup, index) => {
-                    // if (index < 3) {
-                    //     popup.classList.remove("hidden");
-                    // } else {
-                    //     popup.classList.add("hidden");
-                    // }
-                });
-            }
-            updatePopupVisibility(); // Ensure only 3 popups are shown initially
-        });
+            // Show only the first 3 popups, hide the rest
+            popups.forEach((popup, index) => {
+                if (index < 3) {
+                    popup.classList.remove("hidden");
+                } else {
+                    popup.classList.add("hidden");
+                }
+            });
+        }
+
         function closePopup(button) {
             let popup = button.parentElement;
-            popup.remove(); // Remove the closed popup
+            const reminderId = popup.dataset.reminderId;
 
-            // Show next hidden popup if available
-            setTimeout(() => {
-                delete_fcm_reminders(popup.dataset.reminderId);
-                let hiddenPopups = document.querySelectorAll(".popup-alert.hidden");
-                if (hiddenPopups.length > 0) {
-                    hiddenPopups[0].classList.remove("hidden");
-                }
-            }, 300); // Small delay to create a smooth transition
+            // Remove the popup
+            popup.remove();
+
+            // Delete from database/backend
+            if (reminderId) {
+                delete_fcm_reminders(reminderId);
+            }
+
+            // Update popup visibility to show the next one if available
+            updatePopupVisibility();
         }
     </script>
 

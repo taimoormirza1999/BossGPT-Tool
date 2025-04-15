@@ -44,6 +44,38 @@ function fetchNotificationsAndOpen(showDropdown = true) {
     .then(() => {
       if (showDropdown && !isDropdownOpen) {
         dropdown.show(); //toggle dropdown
+        
+        // Clear notifications after viewing
+        const fcmToken = localStorage.getItem("fcm_token");
+        if (fcmToken) {
+          // Check if there are reminders to delete
+          fetch("?api=get_fcm_reminders", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ fcm_token: fcmToken }),
+          })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success && data.reminders && data.reminders.length > 0) {
+                // Clear each reminder
+                data.reminders.forEach(reminder => {
+                  fetch("?api=delete_fcm_reminders", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                      fcm_token: fcmToken,
+                      reminder_id: reminder.id 
+                    }),
+                  }).catch(error => {
+                    console.error("Error clearing reminder:", error);
+                  });
+                });
+              }
+            })
+            .catch(error => {
+              console.error("Error checking FCM reminders:", error);
+            });
+        }
       } else if (!isDropdownOpen) {
         dropdown.hide(); //hide dropdown
       }
@@ -182,7 +214,7 @@ function initializeChatLoading() {
           width: 8px;
           height: 8px;
           border-radius: 50%;
-        //   background-color: var(--primary-color, #0d6efd);
+          background:rgba(255, 255, 255, 1);
        
           opacity: 0.6;
       }
@@ -331,7 +363,6 @@ document.addEventListener('DOMContentLoaded', function() {
        padding: 0.8rem;
     transition: all 0.3s ease;
     background: var(--bs-primary-darkpurple-linear-gradient);
-    border: 1px solid rgba(211, 211, 211, 0.5);
     border-radius: 50%;
     width: 5.5rem;
     height: 5.5rem;
@@ -558,7 +589,30 @@ overflow-x: hidden;
 // Notification
 function appendNotification(notification) {
   const notificationList = document.querySelector(".notification-list");
+  const badge = document.getElementById("notificationBadge");
   const isDarkMode = document.body.classList.contains("dark-mode");
+  
+  // Check if this notification is already in the list (avoid duplicates)
+  const existingNotifications = notificationList.querySelectorAll('.dropdown-item');
+  let isDuplicate = false;
+  
+  existingNotifications.forEach(item => {
+    const description = item.querySelector('.notification-text')?.textContent?.trim();
+    const actionSpan = item.querySelector('.title-notification')?.textContent?.trim();
+    const actionTypeText = getActionTypeDisplay(notification.action_type).text;
+    
+    // If both the description and action type match, consider it a duplicate
+    if (description === notification.description.trim() && 
+        actionSpan === actionTypeText) {
+      isDuplicate = true;
+    }
+  });
+  
+  // Don't add duplicate notifications
+  if (isDuplicate) {
+    return;
+  }
+  
   const actionType = getActionTypeDisplay(notification.action_type);
   const timeAgo = formatTimeAgo(notification.created_at);
   const icon = getNotificationIcon(notification.action_type);
@@ -593,15 +647,26 @@ function appendNotification(notification) {
 
   // Prepend the new notification to the list
   notificationList.insertAdjacentHTML("afterbegin", newNotification);
+  
+  // Update badge count
+  const currentCount = badge.style.display === 'none' ? 0 : parseInt(badge.textContent || '0');
+  badge.textContent = currentCount + 1;
+  badge.style.display = 'inline-block';
+  
+  // If "No notifications" message is showing, remove it
+  const emptyNotification = notificationList.querySelector('.dropdown-item.text-center');
+  if (emptyNotification) {
+    emptyNotification.remove();
+  }
 }
 
 function initPusher(currentProject) {
-  Pusher.logToConsole = true;
+  // Disable pusher logging
+  Pusher.logToConsole = false;
 
   var pusher = new Pusher("83a162dc942242f89892", {
     cluster: "ap2",
   });
-  // Enable pusher logging - don't include this in production
 
   var channel = pusher.subscribe("project_" + currentProject);
 
