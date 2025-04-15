@@ -10,6 +10,7 @@ const notificationIcons = {
   user_assigned: `<?= getProfileIcon(); ?>`,
   task_created: `<?= getclipboardIcon(); ?>`,
   task_status_updated: `<?= getclipboardIcon(); ?>`,
+  task_picture_removed: `<?= getclipboardIcon(); ?>`,
   task_updated: `<?= getclipboardIcon(); ?>`,
   subtask_status_updated: `<?= getPaperclipIcon(); ?>`,
   subtask_created: `<?= getPaperclipIcon(); ?>`,
@@ -41,6 +42,18 @@ function closeChatPannel() {
   $('.open-icon-btn').removeClass('d-none');
   console.log($('.open-icon-btn'));
 }
+function DynamicClose(targetSelector) {
+  const TargetElement = document.querySelector(targetSelector);
+  TargetElement.classList.add('d-none');
+}
+function DynamicOpen(targetSelector) {
+  const TargetElement = document.querySelector(targetSelector);
+  if (TargetElement) {
+    TargetElement.classList.remove('d-none');
+    TargetElement.classList.add('show');
+  }
+}
+
 function openChatPannel() {
   const openIconBtn = document.querySelector('.open-icon-btn');
   $(openIconBtn).toggleClass('d-none');

@@ -10,12 +10,10 @@ if (!class_exists('Database')) {
 class GoogleAuth 
 {
     private $db;
-    private $auth;
 
     public function __construct() 
     {
         $this->db = Database::getInstance()->getConnection();
-        $this->auth = new Auth();
     }
 
     /**
@@ -35,14 +33,8 @@ class GoogleAuth
 
             if ($existingUser) {
                 // User exists, just log them in
-                $fcmToken = isset($_SESSION['fcm_token']) ? $_SESSION['fcm_token'] : null;
-                $this->auth->updateUserSession($existingUser['id'], $existingUser['username'], $existingUser['pro_plan'], $fcmToken);
-                
-                // Clear FCM token from session after using it
-                if (isset($_SESSION['fcm_token'])) {
-                    unset($_SESSION['fcm_token']);
-                }
-                
+                $_SESSION['user_id'] = $existingUser['id'];
+                $_SESSION['username'] = $existingUser['username'];
                 return [
                     'success' => true,
                     'user_id' => $existingUser['id'],
@@ -56,28 +48,26 @@ class GoogleAuth
                 
                 // Insert the new user
                 $stmt = $this->db->prepare(
-                    "INSERT INTO users (username, email, password_hash, google_id, created_at) 
-                     VALUES (?, ?, ?, ?, NOW())"
+                    "INSERT INTO users (username, email, password_hash, fcm_token, pro_plan) 
+                     VALUES (?, ?, ?, ?, ?)"
                 );
                 
                 // Generate a random password for the account (user won't need it with Google login)
                 $randomPassword = bin2hex(random_bytes(16));
                 $hashedPassword = password_hash($randomPassword, PASSWORD_DEFAULT);
                 
-                // Get Google ID if available
-                $googleId = isset($google_account_info->id) ? $google_account_info->id : null;
-                
-                $stmt->execute([$username, $email, $hashedPassword, $googleId]);
+                $stmt->execute([$username, $email, $hashedPassword, $_SESSION['fcm_token'], 0]);
                 $userId = $this->db->lastInsertId();
                 
-                // Set up session via the common method
-                $fcmToken = isset($_SESSION['fcm_token']) ? $_SESSION['fcm_token'] : null;
-                $this->auth->updateUserSession($userId, $username, 0, $fcmToken);
+                // Set session variables
+                $_SESSION['user_id'] = $userId;
+                $_SESSION['username'] = $username;
                 
-                // Clear FCM token from session after using it
-                if (isset($_SESSION['fcm_token'])) {
-                    unset($_SESSION['fcm_token']);
-                }
+                // Send welcome email (if you have this functionality)
+                // if (function_exists('sendWelcomeEmail')) {
+                //     $user = new UserManager();
+                //     $user->sendWelcomeEmail($email, $username, $_ENV['BASE_URL'] ?? 'https://bossgpt.com');
+                // }
                 
                 return [
                     'success' => true,
@@ -146,56 +136,5 @@ class GoogleAuth
         
         // If all attempts fail, use timestamp as last resort
         return $baseUsername . time();
-    }
-
-    public function handleGoogleAuth($googleUser)
-    {
-        try {
-            $email = $googleUser['email'];
-            $name = $googleUser['name'];
-            $googleId = $googleUser['sub'];
-
-            // Check if user exists
-            $stmt = $this->db->prepare("SELECT id, username, pro_plan as pro_member FROM users WHERE email = ?");
-            $stmt->execute([$email]);
-            $user = $stmt->fetch();
-
-            if ($user) {
-                // User exists, log them in
-                $fcmToken = isset($_SESSION['fcm_token']) ? $_SESSION['fcm_token'] : null;
-                $this->auth->updateUserSession($user['id'], $user['username'], $user['pro_member'], $fcmToken);
-                
-                // Clear the session token after updating
-                if (isset($_SESSION['fcm_token'])) {
-                    unset($_SESSION['fcm_token']);
-                }
-                
-                return true;
-            } else {
-                // Register new user
-                $username = $this->generateUsername($name);
-                $password = bin2hex(random_bytes(8)); // Generate random password
-                $passwordHash = password_hash($password, PASSWORD_DEFAULT);
-                
-                $stmt = $this->db->prepare("INSERT INTO users (username, email, password_hash, google_id, created_at) VALUES (?, ?, ?, ?, NOW())");
-                $stmt->execute([$username, $email, $passwordHash, $googleId]);
-                
-                $userId = $this->db->lastInsertId();
-                
-                // Use the new method to update session and FCM token
-                $fcmToken = isset($_SESSION['fcm_token']) ? $_SESSION['fcm_token'] : null;
-                $this->auth->updateUserSession($userId, $username, false, $fcmToken);
-                
-                // Clear the session token after updating
-                if (isset($_SESSION['fcm_token'])) {
-                    unset($_SESSION['fcm_token']);
-                }
-                
-                return true;
-            }
-        } catch (Exception $e) {
-            error_log("Google auth error: " . $e->getMessage());
-            throw $e;
-        }
     }
 } 

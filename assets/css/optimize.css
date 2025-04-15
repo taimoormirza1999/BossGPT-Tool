@@ -47,8 +47,10 @@
   font-style: normal;
 }
 .font-primary, body .register-page .card .card-body a.footer-text span.normal-text,
-body .login-page .card .card-body a.footer-text span.normal-text, body .aitone-page .card .card-body a.footer-text span.normal-text, body .register-page .card .card-body .divider,
-body .login-page .card .card-body .divider, body .aitone-page .card .card-body .divider, body {
+body .login-page .card .card-body a.footer-text span.normal-text,
+body .aitone-page .card .card-body a.footer-text span.normal-text, body .register-page .card .card-body .divider,
+body .login-page .card .card-body .divider,
+body .aitone-page .card .card-body .divider, body {
   font-family: "Geist", sans-serif !important;
 }
 
@@ -57,14 +59,29 @@ body .login-page .card .card-body .divider, body .aitone-page .card .card-body .
 }
 
 .font-secondaryBold, body .modal .modal-dialog .modal-content .modal-header .modal-title, body table thead th, body .projects_card .card-body .task-column_section .task-column_header, body .projects_card .card-header ul#projectDropdown li.dropdown-item, body .register-page .btn-primary,
-body .login-page .btn-primary, body .aitone-page .btn-primary, body .register-page .card .card-title,
-body .login-page .card .card-title, body .aitone-page .card .card-title, body .register-page .card .card-body a.footer-text,
-body .login-page .card .card-body a.footer-text, body .aitone-page .card .card-body a.footer-text {
+body .login-page .btn-primary,
+body .aitone-page .btn-primary, body .register-page .card .card-title,
+body .login-page .card .card-title,
+body .aitone-page .card .card-title, body .register-page .card .card-body a.footer-text,
+body .login-page .card .card-body a.footer-text,
+body .aitone-page .card .card-body a.footer-text {
   font-family: "CabinetGroteskBold", sans-serif !important;
 }
 
 .font-secondaryLight {
   font-family: "CabinetGroteskLight", sans-serif !important;
+}
+
+.smooth-fade, body .chat-pannel .my-custom-ai-tone-modal-chat-pannel {
+  transition: all 0.5s ease;
+}
+.smooth-fade.d-none, body .chat-pannel .d-none.my-custom-ai-tone-modal-chat-pannel {
+  opacity: 0;
+  transform: translateY(10px);
+}
+.smooth-fade.show, body .chat-pannel .show.my-custom-ai-tone-modal-chat-pannel {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .hover-up, body .modal .modal-dialog .modal-content .modal-footer button, body .modal .modal-dialog .modal-content .modal-body .tree-option:hover, body .modal .modal-dialog .modal-content .modal-body .tree-option.selected, body .modal .modal-dialog .modal-content .modal-body input,
@@ -74,7 +91,8 @@ body .modal .modal-dialog .modal-content .modal-body .tree-option, body .chat-pa
 body .navbar button#toggleDarkModeBtn,
 body .navbar button.btn-logout,
 body .navbar button#btn-theme, body .register-page .card .card-body .ai-tone-options .ai-tone-option:hover,
-body .login-page .card .card-body .ai-tone-options .ai-tone-option:hover, body .aitone-page .card .card-body .ai-tone-options .ai-tone-option:hover, .btn-main-primary {
+body .login-page .card .card-body .ai-tone-options .ai-tone-option:hover,
+body .aitone-page .card .card-body .ai-tone-options .ai-tone-option:hover, .btn-main-primary {
   transition: all 0.34s ease-in-out;
 }
 .hover-up:hover, body .modal .modal-dialog .modal-content .modal-footer button:hover, body .modal .modal-dialog .modal-content .modal-body .tree-option:hover, body .modal .modal-dialog .modal-content .modal-body input:hover,
@@ -83,7 +101,8 @@ body .modal .modal-dialog .modal-content .modal-body .select2-container--default
 body .navbar button#toggleDarkModeBtn:hover,
 body .navbar button.btn-logout:hover,
 body .navbar button#btn-theme:hover, body .register-page .card .card-body .ai-tone-options .ai-tone-option:hover,
-body .login-page .card .card-body .ai-tone-options .ai-tone-option:hover, body .aitone-page .card .card-body .ai-tone-options .ai-tone-option:hover, .btn-main-primary:hover {
+body .login-page .card .card-body .ai-tone-options .ai-tone-option:hover,
+body .aitone-page .card .card-body .ai-tone-options .ai-tone-option:hover, .btn-main-primary:hover {
   transform: translateY(-5px);
 }
 
@@ -365,19 +384,22 @@ body {
   background-attachment: fixed;
 }
 body .register-page,
-body .login-page, body .aitone-page {
+body .login-page,
+body .aitone-page {
   background-image: url("https://res.cloudinary.com/da6qujoed/image/upload/v1744294916/siraj_Dark_background_two_clouds_in_the_shape_of_an_angle_betwe_d0bfefb0-90ab-40e6-ae57-49e815d781ee_1_dxfw6e.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
 body .register-page a,
-body .login-page a, body .aitone-page a {
+body .login-page a,
+body .aitone-page a {
   color: var(--bs-primary-white) !important;
   text-decoration: none !important;
 }
 body .register-page a.btn.btn-outline-link,
-body .login-page a.btn.btn-outline-link, body .aitone-page a.btn.btn-outline-link {
+body .login-page a.btn.btn-outline-link,
+body .aitone-page a.btn.btn-outline-link {
   border: 1px solid #9c9c9c;
   border-radius: 12px;
   width: 251px !important;
@@ -388,7 +410,8 @@ body .login-page a.btn.btn-outline-link, body .aitone-page a.btn.btn-outline-lin
   align-self: center;
 }
 body .register-page input,
-body .login-page input, body .aitone-page input {
+body .login-page input,
+body .aitone-page input {
   background: rgba(0, 0, 0, 0.5);
   border: 1px solid #9c9c9c;
   border-radius: 12px;
@@ -398,12 +421,14 @@ body .login-page input, body .aitone-page input {
 body .register-page .form-label,
 body .register-page .card-title,
 body .login-page .form-label,
-body .login-page .card-title, body .aitone-page .form-label,
+body .login-page .card-title,
+body .aitone-page .form-label,
 body .aitone-page .card-title {
   color: rgb(255, 255, 255);
 }
 body .register-page .card .card-body,
-body .login-page .card .card-body, body .aitone-page .card .card-body {
+body .login-page .card .card-body,
+body .aitone-page .card .card-body {
   background: rgba(0, 0, 0, 0.8);
   border: 1px solid rgba(234, 234, 234, 0.2);
   backdrop-filter: blur(6.35px);
@@ -413,7 +438,8 @@ body .login-page .card .card-body, body .aitone-page .card .card-body {
   padding: 2rem 1.5rem !important;
 }
 body .register-page .card .card-body .ai-tone-options,
-body .login-page .card .card-body .ai-tone-options, body .aitone-page .card .card-body .ai-tone-options {
+body .login-page .card .card-body .ai-tone-options,
+body .aitone-page .card .card-body .ai-tone-options {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
@@ -421,7 +447,8 @@ body .login-page .card .card-body .ai-tone-options, body .aitone-page .card .car
   max-width: 500px;
 }
 body .register-page .card .card-body .ai-tone-options .ai-tone-option,
-body .login-page .card .card-body .ai-tone-options .ai-tone-option, body .aitone-page .card .card-body .ai-tone-options .ai-tone-option {
+body .login-page .card .card-body .ai-tone-options .ai-tone-option,
+body .aitone-page .card .card-body .ai-tone-options .ai-tone-option {
   cursor: pointer;
   padding: 0.5rem 0.6rem;
   border-radius: 12px;
@@ -430,14 +457,16 @@ body .login-page .card .card-body .ai-tone-options .ai-tone-option, body .aitone
   background: rgba(217, 217, 217, 0.1);
 }
 body .register-page .card .card-body .ai-tone-options .ai-tone-option img,
-body .login-page .card .card-body .ai-tone-options .ai-tone-option img, body .aitone-page .card .card-body .ai-tone-options .ai-tone-option img {
+body .login-page .card .card-body .ai-tone-options .ai-tone-option img,
+body .aitone-page .card .card-body .ai-tone-options .ai-tone-option img {
   width: 50px;
   height: 50px;
   margin-bottom: 10px;
 }
 body .register-page .card .card-body .ai-tone-options .ai-tone-option div,
-body .login-page .card .card-body .ai-tone-options .ai-tone-option div, body .aitone-page .card .card-body .ai-tone-options .ai-tone-option div {
-  color: #CCCCCC;
+body .login-page .card .card-body .ai-tone-options .ai-tone-option div,
+body .aitone-page .card .card-body .ai-tone-options .ai-tone-option div {
+  color: #cccccc;
   font-size: 0.875rem;
   font-weight: 400;
   line-height: 1.25rem;
@@ -445,16 +474,18 @@ body .login-page .card .card-body .ai-tone-options .ai-tone-option div, body .ai
   text-align: center;
 }
 body .register-page .card .card-body .ai-tone-options .tone-indicator,
-body .login-page .card .card-body .ai-tone-options .tone-indicator, body .aitone-page .card .card-body .ai-tone-options .tone-indicator {
+body .login-page .card .card-body .ai-tone-options .tone-indicator,
+body .aitone-page .card .card-body .ai-tone-options .tone-indicator {
   width: 1.2rem;
   height: 1.2rem;
   border-radius: 50%;
-  background-color: #DEDEDE;
+  background-color: #dedede;
   margin: 5px auto 0;
   position: relative;
 }
 body .register-page .card .card-body .ai-tone-options .tone-indicator::after,
-body .login-page .card .card-body .ai-tone-options .tone-indicator::after, body .aitone-page .card .card-body .ai-tone-options .tone-indicator::after {
+body .login-page .card .card-body .ai-tone-options .tone-indicator::after,
+body .aitone-page .card .card-body .ai-tone-options .tone-indicator::after {
   content: "";
   position: absolute;
   left: 50%;
@@ -467,11 +498,13 @@ body .login-page .card .card-body .ai-tone-options .tone-indicator::after, body 
   transform: translate(-50%, -50%) rotate(-45deg);
 }
 body .register-page .card .card-body .ai-tone-options .tone-indicator.active,
-body .login-page .card .card-body .ai-tone-options .tone-indicator.active, body .aitone-page .card .card-body .ai-tone-options .tone-indicator.active {
+body .login-page .card .card-body .ai-tone-options .tone-indicator.active,
+body .aitone-page .card .card-body .ai-tone-options .tone-indicator.active {
   background-color: #28a745;
 }
 body .register-page .card .card-body .ai-tone-options .tone-indicator.active::after,
-body .login-page .card .card-body .ai-tone-options .tone-indicator.active::after, body .aitone-page .card .card-body .ai-tone-options .tone-indicator.active::after {
+body .login-page .card .card-body .ai-tone-options .tone-indicator.active::after,
+body .aitone-page .card .card-body .ai-tone-options .tone-indicator.active::after {
   content: "";
   position: absolute;
   left: 50%;
@@ -484,52 +517,61 @@ body .login-page .card .card-body .ai-tone-options .tone-indicator.active::after
   transform: translate(-50%, -50%) rotate(-45deg);
 }
 body .register-page .card .card-body .divider,
-body .login-page .card .card-body .divider, body .aitone-page .card .card-body .divider {
+body .login-page .card .card-body .divider,
+body .aitone-page .card .card-body .divider {
   display: flex;
   align-items: center;
   text-align: center;
   gap: 10px;
 }
 body .register-page .card .card-body .divider hr,
-body .login-page .card .card-body .divider hr, body .aitone-page .card .card-body .divider hr {
+body .login-page .card .card-body .divider hr,
+body .aitone-page .card .card-body .divider hr {
   flex: 1;
   height: 1px;
   background-color: rgb(255, 255, 255);
   border: none;
 }
 body .register-page .card .card-body .divider span,
-body .login-page .card .card-body .divider span, body .aitone-page .card .card-body .divider span {
+body .login-page .card .card-body .divider span,
+body .aitone-page .card .card-body .divider span {
   color: #646464;
   white-space: nowrap;
 }
 body .register-page .card .card-body a.footer-text,
-body .login-page .card .card-body a.footer-text, body .aitone-page .card .card-body a.footer-text {
+body .login-page .card .card-body a.footer-text,
+body .aitone-page .card .card-body a.footer-text {
   color: #fff !important;
 }
 body .register-page .card .card-body a.footer-text span.normal-text,
-body .login-page .card .card-body a.footer-text span.normal-text, body .aitone-page .card .card-body a.footer-text span.normal-text {
+body .login-page .card .card-body a.footer-text span.normal-text,
+body .aitone-page .card .card-body a.footer-text span.normal-text {
   color: #646464 !important;
   font-size: 0.9rem;
 }
 @media (max-width: 768px) {
   body .register-page .card .card-body,
-  body .login-page .card .card-body, body .aitone-page .card .card-body {
+  body .login-page .card .card-body,
+  body .aitone-page .card .card-body {
     width: 95% !important;
     margin: 0 auto !important;
   }
 }
 body .register-page .card .card-body .text-muted,
-body .login-page .card .card-body .text-muted, body .aitone-page .card .card-body .text-muted {
+body .login-page .card .card-body .text-muted,
+body .aitone-page .card .card-body .text-muted {
   font-size: 1.1rem;
   color: #646464 !important;
   padding: 1rem 0;
 }
 body .register-page .card .card-title,
-body .login-page .card .card-title, body .aitone-page .card .card-title {
+body .login-page .card .card-title,
+body .aitone-page .card .card-title {
   font-size: 2rem !important;
 }
 body .register-page .btn-primary,
-body .login-page .btn-primary, body .aitone-page .btn-primary {
+body .login-page .btn-primary,
+body .aitone-page .btn-primary {
   color: rgb(255, 255, 255);
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(248, 249, 250, 0.5);
@@ -539,13 +581,15 @@ body .login-page .btn-primary, body .aitone-page .btn-primary {
   font-size: 1.15rem !important;
 }
 body .register-page .btn-primary:hover,
-body .login-page .btn-primary:hover, body .aitone-page .btn-primary:hover {
+body .login-page .btn-primary:hover,
+body .aitone-page .btn-primary:hover {
   background-color: var(--bs-primary-white) !important;
   filter: brightness(0.7) !important;
   color: var(--bs-primary-black) !important;
 }
 body .register-page .col-lg-12,
-body .login-page .col-lg-12, body .aitone-page .col-lg-12 {
+body .login-page .col-lg-12,
+body .aitone-page .col-lg-12 {
   max-width: 576px;
 }
 @media (max-width: 768px) {
@@ -614,6 +658,7 @@ body .navbar .theme-icon-container {
   padding: 0.75rem 1.3rem;
   position: absolute;
   top: 4.2rem;
+  color: #000;
 }
 body .navbar .theme-icon-container .theme-icon-content-container {
   display: flex;
@@ -877,7 +922,7 @@ body .chat-pannel .my-custom-ai-tone-modal-chat-pannel .ai-tone-options .ai-tone
   margin-bottom: 10px;
 }
 body .chat-pannel .my-custom-ai-tone-modal-chat-pannel .ai-tone-options .ai-tone-option div {
-  color: #CCCCCC;
+  color: #cccccc;
   font-size: 0.875rem;
   font-weight: 400;
   line-height: 1.25rem;
@@ -888,7 +933,7 @@ body .chat-pannel .my-custom-ai-tone-modal-chat-pannel .ai-tone-options .tone-in
   width: 1.2rem;
   height: 1.2rem;
   border-radius: 50%;
-  background-color: #DEDEDE;
+  background-color: #dedede;
   margin: 5px auto 0;
   position: relative;
 }
@@ -932,13 +977,20 @@ body .chat-pannel .my-custom-ai-tone-modal-chat-pannel .card-ai-tone-modal-conte
   }
 }
 body .chat-pannel .my-custom-ai-tone-modal-chat-pannel .card-ai-tone-modal-content .header {
-  background: #1D1D1D;
+  background: #1d1d1d;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
   border-radius: 16px 16px 0px 0px;
   padding: 0.8rem 1.2rem;
   display: flex;
   align-items: center;
   align-content: center;
+  position: relative;
+}
+body .chat-pannel .my-custom-ai-tone-modal-chat-pannel .card-ai-tone-modal-content .header .close_icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 10px;
 }
 body .chat-pannel .close-icon-btn {
   display: none;
@@ -955,8 +1007,26 @@ body .chat-pannel .card {
   backdrop-filter: blur(10px);
   border-radius: 16px;
 }
+body .chat-pannel .card-header {
+  position: relative;
+}
 body .chat-pannel .card-header h5 {
   color: #fff;
+}
+body .chat-pannel .card-header .change_aitone_btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: transparent;
+  right: 10px;
+  border: 0 !important;
+}
+body .chat-pannel .card-header .change_aitone_btn:hover {
+  background-color: transparent;
+  transition: all 0.3s ease-in-out;
+}
+body .chat-pannel .card-header .change_aitone_btn:hover:hover {
+  transform: translateY(-10px);
 }
 body .chat-pannel .chat-input {
   border-bottom-left-radius: 1rem;
@@ -1142,7 +1212,7 @@ body .notification-list .dropdown-item .notification-icon-user_removed {
 body .notification-list .dropdown-item .notification-icon-task_created {
   background: linear-gradient(145.32deg, #240121 -14.49%, #8a047f 82.49%);
 }
-body .notification-list .dropdown-item .notification-icon-task_status_updated {
+body .notification-list .dropdown-item .notification-icon-task_status_updated, body .notification-list .dropdown-item .notification-icon-task_updated, body .notification-list .dropdown-item .notification-icon-task_picture_removed {
   background: linear-gradient(145.32deg, #240121 -14.49%, #8a047f 82.49%);
 }
 body .notification-list .dropdown-item .notification-icon-subtask_status_updated {

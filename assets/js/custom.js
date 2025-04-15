@@ -405,6 +405,9 @@ function getActionTypeDisplay(action_type) {
     user_removed: {
       text: "User Removed",
     },
+    task_picture_removed: {
+      text: "Task Status Updated",
+    },
     task_status_updated: {
       text: "Task Status Updated",
     },
