@@ -73,18 +73,22 @@ if (isset($_GET['api'])) {
                 ]);
                 exit;
 
-            case 'send_message':
-                $data = json_decode(file_get_contents('php://input'), true);
-                if (!isset($data['message']) || !isset($data['project_id'])) {
-                    throw new Exception('Message and project ID are required');
-                }
+case 'send_message':
+    $data = json_decode(file_get_contents('php://input'), true);
+    if (!isset($data['message']) || !isset($data['project_id'])) {
+        throw new Exception('Message and project ID are required');
+    }
 
-                $result = $ai_assistant->processMessage(
-                    $data['message'],
-                    $data['project_id']
-                );
-                $response = ['success' => true] + $result;
-                break;
+    // Pass the aiTone value to the processMessage method if provided
+    $aiTone = isset($data['aiTone']) ? $data['aiTone'] : 'demanding';
+    $_REQUEST['aiTone'] = $aiTone; // Set in $_REQUEST so it's accessible to AIAssistant
+    
+    $result = $ai_assistant->processMessage(
+        $data['message'],
+        $data['project_id']
+    );
+    $response = ['success' => true] + $result;
+    break;
 
             case 'create_project':
                 $data = json_decode(file_get_contents('php://input'), true);

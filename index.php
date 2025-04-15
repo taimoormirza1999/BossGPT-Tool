@@ -1280,7 +1280,8 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             message: message,
-                            project_id: currentProject
+                            project_id: currentProject,
+                            aiTone: getCurrentAITone()
                         })
                     })
                         .then(response => response.json())
@@ -2168,7 +2169,8 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             message: prompt,
-                            project_id: currentProject
+                            project_id: currentProject,
+                            aiTone: getCurrentAITone()
                         })
                     })
                         .then(response => response.json())
@@ -2428,7 +2430,8 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             message: prompt,
-                            project_id: currentProject
+                            project_id: currentProject,
+                            aiTone: getCurrentAITone()
                         })
                     })
                         .then(response => response.json())
@@ -2911,8 +2914,25 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                 const toneOptions = document.querySelectorAll('.ai-tone-option');
                 let selectedTone = 'friendly'; // Default selection
                 
-                // Set initial selection
+                // Get existing settings from localStorage if available
+                const savedTone = localStorage.getItem('userAITone') || localStorage.getItem('aiToneMode');
+                if (savedTone) {
+                    selectedTone = savedTone;
+                }
+                
+                // Set initial selection in both storage keys for compatibility
                 localStorage.setItem('aiToneMode', selectedTone);
+                localStorage.setItem('userAITone', selectedTone);
+                
+                // Set initial active indicators based on saved tone
+                toneOptions.forEach(option => {
+                    const optionTone = option.getAttribute('data-tone');
+                    if (optionTone === selectedTone) {
+                        option.querySelector('.tone-indicator').classList.add('active');
+                    } else {
+                        option.querySelector('.tone-indicator').classList.remove('active');
+                    }
+                });
                 
                 // Handle tone selection
                 toneOptions.forEach(option => {

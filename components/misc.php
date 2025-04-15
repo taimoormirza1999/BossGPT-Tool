@@ -111,31 +111,37 @@ function changeAITone(tone) {
     selectedToneIndicator.classList.add('active');
   }
   
-  // Store the selected tone in localStorage
-  localStorage.setItem('userAITone', tone);
+  // Store the selected tone in localStorage - using only aiToneMode
+  localStorage.setItem('aiToneMode', tone);
   
   // Close the AI Tone modal
   const aiToneModal = document.getElementById('AiToneModal');
   if (aiToneModal) {
-    // aiToneModal.style.display = 'none';
+    DynamicClose('#AiToneModal');
   }
 }
 
 // Function to initialize AI tone from localStorage
 function initializeAITone() {
-  const savedTone = localStorage.getItem('userAITone');
+  // Check for the tone in localStorage
+  const savedTone = localStorage.getItem('aiToneMode');
   if (savedTone) {
     changeAITone(savedTone);
   } else {
-    // Set default tone to 'Friendly' if none is saved
-    changeAITone('Friendly');
+    // Default to friendly if no tone is set
+    changeAITone('friendly');
   }
+}
+
+// Function to get the current AI tone from localStorage
+function getCurrentAITone() {
+  // Only use aiToneMode
+  return localStorage.getItem('aiToneMode') || 'friendly'; // Default to friendly if not set
 }
 
 // Initialize AI tone when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
   initializeAITone();
-  
   // Add click event listeners to tone options
   document.querySelectorAll('.ai-tone-option').forEach(option => {
     option.addEventListener('click', function() {
