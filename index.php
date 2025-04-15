@@ -242,7 +242,11 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 
     // Navigation for logged-in users
     if ($auth->isLoggedIn()):
-        require_once 'components/navigation.php';
+        if(isset($_SESSION['user_id'])){
+        if($page != 'login' && $page != 'register' && $page != 'aitone'){
+            require_once 'components/navigation.php';
+        }
+        }
     endif; ?>
 
     <div class="container-fluid mt-4">
@@ -256,7 +260,18 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                 include_register_page();
                 break;
             case 'dashboard':
+                // Check if AI tone is set
+                echo "<script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        if (!localStorage.getItem('aiToneMode')) {
+                            window.location.href = '?page=aitone';
+                        }
+                    });
+                </script>";
                 include_dashboard();
+                break;
+            case 'aitone':
+                include_aitone_page();
                 break;
             case 'garden_stats':
                 // Redirect to dashboard since we now use a modal for garden stats
@@ -316,9 +331,6 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
             ?>
             <div class="d-flex justify-content-center align-items-center min-vh-100 register-page">
                 <div class="row justify-content-center w-100 position-relative">
-                    <!-- <img src="assets/images/bossgptlogo.svg" alt="Logo"
-                        class="position-absolute top-0 start-50 translate-middle "
-                        style="margin-top: -1rem; width: 15rem; height: 10rem;position: absolute;top: 50%;left: 50%;transform: translate(-50%,-50%);"> -->
                     <?php echo getLogoImage(); ?>
                     <div class="col-md-6 col-lg-12 mt-5">
                         <div class="card">
@@ -2848,6 +2860,89 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
         }
     </script>
 
+    <?php
+    function include_aitone_page()
+    {
+        ?>
+        <div class="d-flex justify-content-center align-items-center min-vh-100 aitone-page">
+            <div class="row justify-content-center w-100 position-relative">
+                <?php echo getLogoImage(); ?>
+                <div class="col-md-6 col-lg-5 mt-5">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h2 class="card-title text-center mb-4">How do you like your<br>AI Boss to be?</h2>
+                            
+                            <!-- Replace the existing AI tone options with the helper function -->
+                            <?php echo renderAIToneOptions(); ?>
+                            
+                            <button id="continueToDashboard" class="btn btn-primary w-100 mt-3">Continue to Dashboard</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const toneOptions = document.querySelectorAll('.ai-tone-option');
+                let selectedTone = 'friendly'; // Default selection
+                
+                // Set initial selection
+                localStorage.setItem('aiToneMode', selectedTone);
+                
+                // Handle tone selection
+                toneOptions.forEach(option => {
+                    option.addEventListener('click', function() {
+                        // Remove active class from all options
+                        toneOptions.forEach(opt => {
+                            opt.querySelector('.tone-indicator').classList.remove('active');
+                        });
+                        
+                        // Add active class to selected option
+                        this.querySelector('.tone-indicator').classList.add('active');
+                        
+                        // Update selected tone
+                        selectedTone = this.getAttribute('data-tone');
+                        localStorage.setItem('aiToneMode', selectedTone);
+                    });
+                });
+                
+                // Handle continue button
+                document.getElementById('continueToDashboard').addEventListener('click', function() {
+                    window.location.href = '?page=dashboard';
+                });
+            });
+        </script>
+    
+        <?php
+        echo renderCustomModal(
+            'notificationPermissionModal',
+            'Enable Task Reminders',
+            '
+            <div class="ratio ratio-16x9 mb-4" style="border-radius: 12px; overflow: hidden;">
+                <iframe width="560" height="315" src="https://www.youtube.com/embed/-fTV9_SqnKE?si=wizXX7DUlSgTXPfZ"
+                    title="YouTube video player" frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            </div>
+        
+            <div class="alert alert-info d-flex align-items-center" role="alert">
+                <i class="bi bi-info-circle-fill me-2"></i>
+                <div>
+                    You will need to enable browser notifications to receive reminders for your tasks and deadlines.
+                </div>
+            </div>
+            ',
+            '
+            <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">Remind me later</button>
+            <button type="button" class="btn btn-main-primary" id="enableNotificationsBtn">
+                <i class="bi bi-bell-fill me-2"></i>Enable Notifications
+            </button>
+            '
+        );
+        
+    }
+    ?>
 </body>
 
 </html>

@@ -66,7 +66,7 @@ $default-mode-topbar-bgcolor: rgba(24, 25, 28, 1);
 $default-mode-main-bgcolor: rgba(36, 37, 38, 1);
 $default-mode-welcome-logo-bgcolor: rgba(24, 24, 24, 1);
 $default-mode-card-task-bgcolor: rgba(53, 53, 53, 1);
-$black-mode-card-task-bgcolor: rgba(9, 1, 12, 1) ;
+$black-mode-card-task-bgcolor: rgba(9, 1, 12, 1);
 $brown-mode-card-task-bgcolor: rgba(65, 4, 4, 1);
 $dark-mode-bar-bgcolor: rgba(40, 3, 59, 0.6);
 $purple-mode-bar-bgcolor: rgba(40, 3, 59, 0.6);
@@ -157,13 +157,48 @@ $geist-fonts: (
 .font-secondaryLight {
   font-family: "CabinetGroteskLight", sans-serif !important;
 }
+.smooth-fade {
+  transition: all $transition-duration-50 ease;
+&.d-none{
+  opacity: 0;
+  transform: translateY(10px);
+}
+  &.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .hover-up {
   transition: all $transition-duration-34 ease-in-out;
   &:hover {
     transform: translateY(-5px);
   }
 }
+@mixin hover-up($translateValue: -5px, $duration: 0.3s) {
+  transition: all $duration ease-in-out;
+  &:hover {
+    transform: translateY($translateValue);
+  }
+}
+@mixin position_center($x: false, $y: false) {
+  position: absolute;
 
+  @if $x {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  @if $y {
+    top: 50%;
+    // If $x is also true, we combine transforms
+    @if $x {
+      transform: translate(-50%, -50%);
+    } @else {
+      transform: translateY(-50%);
+    }
+  }
+}
 @mixin commomtaskheader {
   .column_todo {
     background-color: rgb(187, 7, 10) !important;
@@ -195,6 +230,74 @@ $geist-fonts: (
 @mixin button-icon-only {
   height: $icon-height;
   width: $icon-width;
+}
+@mixin ai-tone-common-styles {
+  .ai-tone-options {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 1.5rem auto;
+    max-width: 500px;
+    .ai-tone-option {
+      cursor: pointer;
+      padding: 0.5rem 0.6rem;
+      border-radius: $border-radius-12;
+      text-align: center;
+      transition: all $transition-duration-34 ease;
+      background: rgba(217, 217, 217, 0.1);
+      &:hover {
+        @extend .hover-up;
+      }
+      img {
+        width: 50px;
+        height: 50px;
+        margin-bottom: 10px;
+      }
+      div {
+        color: #cccccc;
+        font-size: 0.875rem;
+        font-weight: 400;
+        line-height: 1.25rem;
+        letter-spacing: 0.01em;
+        text-align: center;
+      }
+    }
+    .tone-indicator {
+      width: 1.2rem;
+      height: 1.2rem;
+      border-radius: 50%;
+      background-color: #dedede;
+      margin: 5px auto 0;
+      position: relative;
+      &::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 45%;
+        width: 0.4rem;
+        height: 0.3rem;
+        border: 2px solid #929292;
+        border-top: none;
+        border-right: none;
+        transform: translate(-50%, -50%) rotate(-45deg);
+      }
+      &.active {
+        background-color: #28a745;
+        &::after {
+          content: "";
+          position: absolute;
+          left: 50%;
+          top: 45%;
+          width: 0.4rem;
+          height: 0.3rem;
+          border: 2px solid #fff;
+          border-top: none;
+          border-right: none;
+          transform: translate(-50%, -50%) rotate(-45deg);
+        }
+      }
+    }
+  }
 }
 
 @mixin theme-common-notification-list($bgcolor) {
@@ -285,6 +388,7 @@ $geist-fonts: (
 }
 
 body.system-mode {
+  @include theme-bgcolor($default-mode-card-task-bgcolor);
   background-image: $bg-img1-black;
 
   .nav-background {
@@ -329,6 +433,7 @@ body.system-mode {
   }
 }
 body.purple-mode {
+  background-color: $purple-mode-card-task-bgcolor;
   background-image: $bg-img2-multi;
 
   .nav-background {
@@ -348,9 +453,9 @@ body.purple-mode {
   }
   @include theme-common-chat-pannel(
     $purple-mode-bar-bgcolor,
-    $purple-mode-bar-bgcolor,
-    $purple-mode-bar-bgcolor,
-    $purple-mode-bar-bgcolor,
+    $purple-mode-card-task-bgcolor,
+    $purple-mode-card-task-bgcolor,
+    $purple-mode-card-task-bgcolor,
     $purple-mode-message-user-bgcolor
   );
   @include theme-common-notification-list($purple-mode-card-task-bgcolor);
@@ -365,6 +470,7 @@ body.purple-mode {
   @include theme-reminder-button($purple-mode-card-task-bgcolor);
 }
 body.black-mode {
+  @include theme-bgcolor($black-mode-card-task-bgcolor);
   background-image: $bg-img2-multi;
 
   .nav-background {
@@ -383,9 +489,9 @@ body.black-mode {
   }
   @include theme-common-chat-pannel(
     $black-mode-bar-bgcolor,
-    $black-mode-bar-bgcolor,
-    $black-mode-bar-bgcolor,
-    $black-mode-bar-bgcolor,
+    $black-mode-card-task-bgcolor,
+    $black-mode-card-task-bgcolor,
+    $black-mode-card-task-bgcolor,
     $black-mode-message-user-bgcolor
   );
   @include theme-common-notification-list($black-mode-card-task-bgcolor);
@@ -400,6 +506,7 @@ body.black-mode {
   @include theme-reminder-button($black-mode-card-task-bgcolor);
 }
 body.brown-mode {
+  @include theme-bgcolor($brown-mode-card-task-bgcolor);
   background-image: $bg-img3-brown;
 
   .nav-background {
@@ -435,6 +542,7 @@ body.brown-mode {
   @include theme-reminder-button($brown-mode-card-task-bgcolor);
 }
 body {
+  @include theme-bgcolor($default-mode-card-task-bgcolor);
   @extend .font-primary;
   background-image: $bg-img1-black;
   background-size: cover;
@@ -444,7 +552,8 @@ body {
 
   // login/register pa ges
   .register-page,
-  .login-page {
+  .login-page,
+  .aitone-page {
     background-image: url("https://res.cloudinary.com/da6qujoed/image/upload/v1744294916/siraj_Dark_background_two_clouds_in_the_shape_of_an_angle_betwe_d0bfefb0-90ab-40e6-ae57-49e815d781ee_1_dxfw6e.png");
     background-size: cover;
     background-position: center;
@@ -487,7 +596,8 @@ body {
         border-radius: 16px;
         display: flex !important;
         flex-direction: column !important;
-        padding: 1.7rem 1.5rem !important;
+        padding: 2rem 1.5rem !important;
+        @include ai-tone-common-styles;
         .divider {
           display: flex;
           align-items: center;
@@ -614,6 +724,7 @@ body {
       padding: 0.75rem 1.3rem;
       position: absolute;
       top: 4.2rem;
+      color:#000;
       @extend .hover-up;
       .theme-icon-content-container {
         @include flex-center-hv;
@@ -674,17 +785,6 @@ body {
             );
           }
         }
-      }
-    }
-    @media (max-width: 768px) {
-      border-bottom: 0px !important;
-      button.navbar-toggler {
-        padding: 0.6rem 0.6rem 0.4rem 0.6rem;
-      }
-      .navbar-toggler-icon {
-        width: 2rem;
-        height: 2rem;
-        background-image: none !important;
       }
     }
   }
@@ -878,10 +978,47 @@ body {
 
   .chat-pannel {
     @media (max-width: 768px) {
-      position: fixed;
+      position: fixed !important;
       bottom: 10px;
       backdrop-filter: blur(15px);
     }
+    .my-custom-ai-tone-modal-chat-pannel {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 5;
+      @include ai-tone-common-styles;
+      @include flex-center-hv;
+      @extend .smooth-fade;
+      .card-ai-tone-modal-content {
+        width: 90%;
+        background: #242526;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(6.35px);
+        border-radius: 16px;
+        @media (min-width: 1024px) {
+          width: 80%;
+        }
+        .header {
+          background: #1d1d1d;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+          border-radius: 16px 16px 0px 0px;
+          padding: 0.8rem 1.2rem;
+          display: flex;
+          align-items: center;
+          align-content: center;
+          position: relative;
+          .close_icon {
+            @include position_center(false, true);
+            right: 10px;
+          }
+        }
+      }
+    }
+
     .close-icon-btn {
       display: none;
       @media (max-width: 768px) {
@@ -889,15 +1026,28 @@ body {
         right: 20px;
       }
     }
-.card{
-background: rgba(255, 255, 255, 0.1);
-border: 1px solid rgba(211, 211, 211, 0.5);
-backdrop-filter: blur(10px);
-border-radius: $border-radius-16;
-}
-    .card-header h5 {
-color: $white-color;
-}
+    .card {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(211, 211, 211, 0.5);
+      backdrop-filter: blur(10px);
+      border-radius: $border-radius-16;
+    }
+    .card-header {
+      position: relative;
+      h5 {
+        color: $white-color;
+      }
+      .change_aitone_btn{
+        @include position_center(false,true);
+        background-color:transparent;
+        right: 10px;
+        border: 0!important;
+        &:hover{
+          background-color:transparent;
+         @include hover-up(-10px)
+        }
+      }
+    }
     .chat-input {
       border-bottom-left-radius: 1rem;
       border-bottom-right-radius: 1rem;
@@ -1070,12 +1220,12 @@ color: $white-color;
     backdrop-filter: blur(4px);
     border: 1px solid rgba(255, 255, 255, 0.2);
   }
-  
+
   .reminder-button:hover {
     transform: translateY(-5px);
     // box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
   }
-  
+
   .reminder-button .bell-icon {
     font-size: 1.2rem;
     animation: bellShake 3s infinite;
@@ -1110,7 +1260,7 @@ color: $white-color;
       .notification-icon-task_created {
         background: $notiifcationicon-color1;
       }
-      .notification-icon-task_status_updated {
+      .notification-icon-task_status_updated, .notification-icon-task_updated,.notification-icon-task_picture_removed {
         background: $notiifcationicon-color1;
       }
       .notification-icon-subtask_status_updated {
@@ -1132,8 +1282,6 @@ color: $white-color;
     }
   }
 }
-
-
 
 // Ensure buttons are properly styled in all columns
 .column_todo,

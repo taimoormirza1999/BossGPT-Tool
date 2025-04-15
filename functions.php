@@ -182,5 +182,70 @@ function getLogoImage($bottomMargin = "0", $topMargin = "-1rem", $width = "15rem
         <button class="close-button" onclick="closePopup(this)">×</button>
       </div>';
     }
-
+    function renderAIToneOptions($tones = [
+        [
+            'value' => 'friendly',
+            'image' => 'https://res.cloudinary.com/da6qujoed/image/upload/v1744649255/friendlyai_hy04oz.svg',
+            'label' => 'Friendly',
+            'active' => true
+        ],
+        [
+            'value' => 'funny',
+            'image' => 'https://res.cloudinary.com/da6qujoed/image/upload/v1744650101/funny_ql6wcm.svg',
+            'label' => 'Funny'
+        ],
+        [
+            'value' => 'angry',
+            'image' => 'https://res.cloudinary.com/da6qujoed/image/upload/v1744650100/angry_sye97x.svg',
+            'label' => 'Angry'
+        ],
+        [
+            'value' => 'geeky',
+            'image' => 'https://res.cloudinary.com/da6qujoed/image/upload/v1744650100/geeky_cm1bmy.svg',
+            'label' => 'Geeky'
+        ],
+        [
+            'value' => 'caring',
+            'image' => 'https://res.cloudinary.com/da6qujoed/image/upload/v1744650100/caring_b4yp8e.svg',
+            'label' => 'Caring'
+        ]
+    ]) {
+        $html = '<div class="ai-tone-options row">';
+        foreach ($tones as $tone) {
+            $html .= '
+            <div class="col-4 mb-4">
+                <div class="ai-tone-option" data-tone="' . $tone['value'] . '">
+                    <img src="' . $tone['image'] . '" alt="' . $tone['label'] . '">
+                    <div>' . $tone['label'] . '</div>
+                    <div class="tone-indicator' . (isset($tone['active']) && $tone['active'] ? ' active' : '') . '"></div>
+                </div>
+            </div>';
+        }
+        $html .= '</div>';
+        return $html;
+    } 
+    function renderCustomModal($modalId, $headerText, $bodyContent, $footerButtons = '') {
+    return '
+    <h2>'.$modalId.'</h2>
+        <div class="modal fade" id="'.$modalId.'" tabindex="-1" aria-labelledby="'.$modalId.'Label" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header text-white border-0 rounded-t-lg">
+                        <h5 class="modal-title" id="'.$modalId.'Label">
+                            '.$headerText.'
+                        </h5>
+                        <button type="button" class="btn btn-link p-0 text-white close-icon-btn" data-bs-dismiss="modal" aria-label="Close">
+                            '.getCloseSquareIcon().'
+                        </button>
+                    </div>
+    
+                    <div class="modal-body">
+                        '.$bodyContent.'
+                    </div>
+    
+                    '.$footerButtons.'
+                </div>
+            </div>
+        </div>';
+    }
     
