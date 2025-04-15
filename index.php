@@ -2914,33 +2914,7 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
             });
         </script>
     
-        <?php
-        // echo renderCustomModal(
-        //     'notificationPermissionModal',
-        //     'Enable Task Reminders',
-        //     '
-        //     <div class="ratio ratio-16x9 mb-4" style="border-radius: 12px; overflow: hidden;">
-        //         <iframe width="560" height="315" src="https://www.youtube.com/embed/-fTV9_SqnKE?si=wizXX7DUlSgTXPfZ"
-        //             title="YouTube video player" frameborder="0"
-        //             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        //             referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-        //     </div>
-        
-        //     <div class="alert alert-info d-flex align-items-center" role="alert">
-        //         <i class="bi bi-info-circle-fill me-2"></i>
-        //         <div>
-        //             You will need to enable browser notifications to receive reminders for your tasks and deadlines.
-        //         </div>
-        //     </div>
-        //     ',
-        //     '
-        //     <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">Remind me later</button>
-        //     <button type="button" class="btn btn-main-primary" id="enableNotificationsBtn">
-        //         <i class="bi bi-bell-fill me-2"></i>Enable Notifications
-        //     </button>
-        //     '
-        // );
-        
+        <?php 
     }
     ?>
 </body>
