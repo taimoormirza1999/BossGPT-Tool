@@ -92,7 +92,7 @@ body .navbar button#toggleDarkModeBtn,
 body .navbar button.btn-logout,
 body .navbar button#btn-theme, body .register-page .card .card-body .ai-tone-options .ai-tone-option:hover,
 body .login-page .card .card-body .ai-tone-options .ai-tone-option:hover,
-body .aitone-page .card .card-body .ai-tone-options .ai-tone-option:hover, .btn-main-primary {
+body .aitone-page .card .card-body .ai-tone-options .ai-tone-option:hover, .cta-message, .btn-main-primary {
   transition: all 0.34s ease-in-out;
 }
 .hover-up:hover, body .modal .modal-dialog .modal-content .modal-footer button:hover, body .modal .modal-dialog .modal-content .modal-body .tree-option:hover, body .modal .modal-dialog .modal-content .modal-body input:hover,
@@ -102,7 +102,7 @@ body .navbar button#toggleDarkModeBtn:hover,
 body .navbar button.btn-logout:hover,
 body .navbar button#btn-theme:hover, body .register-page .card .card-body .ai-tone-options .ai-tone-option:hover,
 body .login-page .card .card-body .ai-tone-options .ai-tone-option:hover,
-body .aitone-page .card .card-body .ai-tone-options .ai-tone-option:hover, .btn-main-primary:hover {
+body .aitone-page .card .card-body .ai-tone-options .ai-tone-option:hover, .cta-message:hover, .btn-main-primary:hover {
   transform: translateY(-5px);
 }
 
@@ -125,6 +125,26 @@ body .aitone-page .card .card-body .ai-tone-options .ai-tone-option:hover, .btn-
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.cta-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.due-date_size, body .projects_card .card-body .task-column_section .task-column .task-card .due-date {
+  font-size: 0.7rem !important;
+}
+
+.due-date {
+  border: 1px solid #2f3031;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+svg.calendar-icons {
+  height: 1.2rem !important;
+  width: 1.2rem !important;
 }
 
 body.system-mode {
@@ -889,11 +909,14 @@ body .projects_card .card-body .task-column_section .task-column .task-card #sub
   margin-top: -1.2rem !important;
 }
 body .projects_card .card-body .task-column_section .task-column .task-card .due-date {
-  border: 1px solid #2f3031;
-  background: rgba(255, 255, 255, 0.1);
-  font-size: 1.3rem;
   transition: all 0.4s ease;
   color: rgb(160, 160, 160) !important;
+}
+body .projects_card .card-body .task-column_section .task-column .task-card .due-date.overdue {
+  color: #dc3545 !important;
+}
+body .projects_card .card-body .task-column_section .task-column .task-card .due-date.overdue svg path {
+  stroke: #dc3545 !important;
 }
 body .projects_card .card-body .task-column_section .task-column .task-card svg#calendar-icon {
   height: 1.2rem !important;
@@ -1100,6 +1123,7 @@ body .chat-pannel .chat-input {
 }
 body .chat-pannel .card-body .welcome-logo-container {
   margin-bottom: 1.2rem !important;
+  border: 1px solid rgba(211, 211, 211, 0.5);
 }
 body .chat-pannel .card-body .chat-loading-avatar {
   border: 1px solid rgba(211, 211, 211, 0.5);

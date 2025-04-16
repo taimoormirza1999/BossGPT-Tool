@@ -229,16 +229,10 @@
   align-items: center;
   gap: 4px;
   padding: 0.25rem 0.75rem;
-  background-color: #f8f9fa;
   border-radius: 20px;
-  font-size: 0.8rem;
   cursor: help;
 }
 
-.due-date.overdue {
-  color: #dc3545;
-  background-color: #f8d7da;
-}
 
 .due-date i {
   font-size: 0.9rem;

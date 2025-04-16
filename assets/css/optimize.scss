@@ -175,6 +175,8 @@ $geist-fonts: (
     transform: translateY(-5px);
   }
 }
+
+
 @mixin hover-up($translateValue: -5px, $duration: 0.3s) {
   transition: all $duration ease-in-out;
   &:hover {
@@ -404,6 +406,22 @@ $geist-fonts: (
   @include flex-center-hv;
   @extend .hover-up;
 }
+.cta-message{
+  @include flex-center-hv;
+  @extend .hover-up;
+}
+
+.due-date_size{
+  font-size: 0.7rem!important;
+}
+.due-date {
+  border: 1px solid #2f3031;
+  background: rgba(255, 255, 255, 0.1);
+}
+svg.calendar-icons {
+  height: 1.2rem !important;
+  width: 1.2rem !important;
+} 
 
 body.system-mode {
   @include theme-bgcolor($default-mode-card-task-bgcolor);
@@ -936,11 +954,15 @@ body {
               margin-top: -1.2rem !important;
             }
             .due-date {
-              border: 1px solid #2f3031;
-              background: rgba(255, 255, 255, 0.1);
-              font-size: 1.3rem;
+            @extend .due-date_size;
               transition: all 0.4s ease;
               color: rgba(160, 160, 160, 1) !important;
+              &.overdue{
+                color:  #dc3545!important;
+                svg path{
+                  stroke:  #dc3545!important;
+                }
+              }
             }
             svg#calendar-icon {
               height: 1.2rem !important;
@@ -1083,6 +1105,7 @@ body {
       .welcome-logo-container {
         @extend .hover-up;
         margin-bottom: 1.2rem !important;
+        border: 1px solid rgba(211, 211, 211, 0.5)
       }
       .chat-loading-avatar {
         @extend .hover-up;

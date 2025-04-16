@@ -198,12 +198,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 </div>
                                 </div>
         <a href='$authUrl' class='btn btn-outline-link  w-100 d-flex align-items-center justify-content-center' style='gap: 8px;'>
-                <svg width='18' height='19' viewBox='0 0 16 17' fill='none' xmlns='http://www.w3.org/2000/svg'>
-                  <path d='M13.8824 7.41113H8.11768V9.72516H11.4231C11.3564 10.0945 11.2134 10.4465 11.0029 10.7595C10.7925 11.0726 10.5191 11.34 10.1995 11.5454V13.051H12.1665C12.7703 12.4802 13.2452 11.7912 13.5605 11.0286C14.0327 9.88636 14.0878 8.62111 13.8824 7.41113Z' fill='#4285F4'></path>
-                  <path d='M8.11765 14.4996C9.76488 14.4996 11.1599 13.9718 12.1665 13.0506L10.1995 11.545C9.58012 11.9375 8.85452 12.1373 8.11765 12.1181C7.35471 12.1088 6.61379 11.8656 5.99848 11.4224C5.38317 10.9793 4.92424 10.3584 4.68585 9.64648H2.65015V11.1856C3.15915 12.1814 3.94 13.0187 4.9055 13.604C5.87099 14.1892 6.98311 14.4992 8.11765 14.4996Z' fill='#34A853'></path>
-                  <path d='M4.68589 9.64706C4.42873 8.90009 4.42873 8.09081 4.68589 7.34384V5.79395H2.65019C2.22264 6.63065 2 7.55387 2 8.49004C2 9.42621 2.22264 10.3494 2.65019 11.1861L4.68589 9.64706Z' fill='#FBBC04'></path>
-                  <path d='M8.11765 4.87211C8.98898 4.85751 9.83116 5.18027 10.4621 5.77064L12.2126 4.05185C11.5147 3.43218 10.6808 2.9789 9.77551 2.72723C8.87026 2.47556 7.91812 2.43227 6.99307 2.60073C6.06803 2.76919 5.19498 3.14487 4.44177 3.69857C3.68856 4.25226 3.07548 4.96907 2.65015 5.7933L4.68585 7.34371C4.92424 6.63182 5.38317 6.0109 5.99848 5.56776C6.61379 5.12461 7.35471 4.8814 8.11765 4.87211Z' fill='#EA4335'></path>
-                </svg>
+               " . getGoogleIcon() . "
                " . $text . "
               </a>";
     }
@@ -502,11 +497,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                     const container = document.getElementById('taskTreeContainer');
                     const hiddenInput = document.getElementById('selectedTreeType');
 
-                    // Also set up the edit task tree container
-                    const editContainer = document.getElementById('editTaskTreeContainer');
-                    const editHiddenInput = document.getElementById('editPlantType');
-
-                    // 2) Build and insert the images for both containers
+                    // 2) Build and insert the images
                     let html = '';
                     treeImages.forEach(({ file, alt }) => {
                         html += `
@@ -516,9 +507,8 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
     `;
                     });
                     container.innerHTML = html;
-                    editContainer.innerHTML = html;
 
-                    // 3) Attach click listeners for new task modal
+                    // 3) Attach click listeners
                     container.querySelectorAll('.tree-option').forEach(optionDiv => {
                         optionDiv.addEventListener('click', () => {
                             // Set hidden input
@@ -528,20 +518,6 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 
                             // Highlight selected
                             container.querySelectorAll('.tree-option').forEach(o => o.classList.remove('selected'));
-                            optionDiv.classList.add('selected');
-                        });
-                    });
-
-                    // 4) Attach click listeners for edit task modal
-                    editContainer.querySelectorAll('.tree-option').forEach(optionDiv => {
-                        optionDiv.addEventListener('click', () => {
-                            // Set hidden input
-                            const treeValue = optionDiv.dataset.tree;
-                            editHiddenInput.value = treeValue;
-                            console.log('Selected tree for edit:', treeValue);
-
-                            // Highlight selected
-                            editContainer.querySelectorAll('.tree-option').forEach(o => o.classList.remove('selected'));
                             optionDiv.classList.add('selected');
                         });
                     });
@@ -1116,7 +1092,7 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                     ` : '';
                     // Get plant stage based on task status and garden data
                     const getPlantImage = (task) => {
-                        console.log(task);
+                        // console.log(task);
                         // If we have garden data, use it
                         if (task.garden.plant_stage && task.garden.plant_type) {
                             switch (task.garden.plant_stage) {
@@ -1369,14 +1345,6 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                     document.getElementById('editTaskTitle').value = task.title;
                     document.getElementById('editTaskDescription').value = task.description || '';
                     document.getElementById('editTaskDueDate').value = task.due_date || '';
-                    
-                    // Show/hide the remove picture button based on whether task has a picture
-                    const taskPictureContainer = document.getElementById('taskPictureContainer');
-                    if (task.picture) {
-                        taskPictureContainer.style.display = 'block';
-                    } else {
-                        taskPictureContainer.style.display = 'none';
-                    }
 
                     const editTaskAssignees = document.getElementById('editTaskAssignees');
                     $(editTaskAssignees).empty();  // Clear using jQuery
@@ -1529,9 +1497,7 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                     const dueDate = document.getElementById('editTaskDueDate').value || null; // Convert empty string to null
                     const assignees = $('#editTaskAssignees').val().map(value => parseInt(value));
                     const pictureInput = document.getElementById('editTaskPicture');
-                    const plantType = document.getElementById('editPlantType')?.value || 'sprout';
-                    // Show loading indicator
-                    showLoading();
+                    const plantType = document.getElementById('editPlantType').value;
                     function sendUpdateTask(pictureData) {
                         let payload = {
                             task_id: taskId,
@@ -1540,21 +1506,9 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                             due_date: dueDate, // This will now be null instead of empty string
                             assignees: assignees
                         };
-                        
-                        // Only include picture in payload if we have new picture data
                         if (pictureData !== null) {
                             payload.picture = pictureData;
                         }
-                        
-                        // Add plant type if selected
-                        const plantType = document.getElementById('editPlantType').value;
-                        if (plantType) {
-                            // Remove .png extension from the plant type value
-                            payload.plant_type = plantType.replace('.png', '');
-                        }
-                        
-                        console.log('Sending update task with payload:', payload);
-                        
                         fetch('?api=update_task', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -1575,8 +1529,6 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                             })
                             .finally(hideLoading);
                     }
-                    
-                    // If we have a file selected in the input, process it
                     if (pictureInput.files && pictureInput.files[0]) {
                         const reader = new FileReader();
                         reader.onload = function (e) {
@@ -1585,17 +1537,7 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                         };
                         reader.readAsDataURL(pictureInput.files[0]);
                     } else {
-                        // Check if we're using the preview from an existing image
-                        const imagePreview = document.getElementById('editImagePreview');
-                        if (imagePreview && imagePreview.src && 
-                            imagePreview.src.startsWith('data:image') && 
-                            document.getElementById('editImagePreviewContainer').style.display !== 'none') {
-                            // Use the existing preview image if it's visible
-                            sendUpdateTask(imagePreview.src);
-                        } else {
-                            // No new image and no existing preview visible
-                            sendUpdateTask(null);
-                        }
+                        sendUpdateTask(null);
                     }
                 });
 
@@ -1786,6 +1728,42 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                 });
                 // Helper functions
                 function appendMessage(message, sender) {
+                    // Check if message is a raw JSON response for subtask dates
+                    if (sender === 'ai' && typeof message === 'string' && 
+                        (message.includes('"task_id":') && message.includes('"subtasks":') && message.includes('"due_date":'))) {
+                        try {
+                            // Parse the JSON and format it using our formatter
+                            const jsonMatch = message.match(/\{[\s\S]*\}/);
+                            if (jsonMatch) {
+                                const jsonStr = jsonMatch[0];
+                                const jsonData = JSON.parse(jsonStr);
+                                
+                                // Try to find the task details
+                                let taskDetails = null;
+                                if (jsonData.task_id) {
+                                    const taskCards = document.querySelectorAll(`.task-card[data-id="${jsonData.task_id}"]`);
+                                    if (taskCards.length > 0) {
+                                        const taskCard = taskCards[0];
+                                        taskDetails = {
+                                            id: jsonData.task_id,
+                                            title: taskCard.querySelector('h6').textContent,
+                                            subtasks: Array.from(taskCard.querySelectorAll('.subtask-item')).map(item => ({
+                                                id: item.dataset.id,
+                                                title: item.querySelector('.subtask-title').textContent
+                                            }))
+                                        };
+                                    }
+                                }
+                                
+                                // Replace the message with formatted HTML
+                                message = formatAIResponse(jsonData, taskDetails);
+                            }
+                        } catch (e) {
+                            console.error('Error formatting JSON response:', e);
+                            message = '<div class="alert alert-success">Subtask dates have been updated successfully.</div>';
+                        }
+                    }
+                    
                     const div = document.createElement('div');
                     div.className = sender === 'user' ? 'user-message d-flex align-items-start justify-content-end' : 'ai-message d-flex align-items-start';
                     const iconImage = `<?php echo getIconImage(0, 0, '1.93rem'); ?>`;
@@ -2333,14 +2311,14 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                 }
 
                 // Add this new code to handle image clicks (add it where other event listeners are defined)
-                // document.addEventListener('click', function (e) {
-                //     if (e.target.classList.contains('enlarge-image')) {
-                //         const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
-                //         const enlargedImage = document.getElementById('enlargedImage');
-                //         enlargedImage.src = e.target.src;
-                //         imageModal.show();
-                //     }
-                // });
+                document.addEventListener('click', function (e) {
+                    if (e.target.classList.contains('enlarge-image')) {
+                        const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+                        const enlargedImage = document.getElementById('enlargedImage');
+                        enlargedImage.src = e.target.src;
+                        imageModal.show();
+                    }
+                });
 
                 // Add this event delegation handler before the closing of isDashboard block
                 document.addEventListener('click', function (e) {
@@ -2411,6 +2389,82 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                         })
                         .finally(() => hideLoading());
                 });
+
+                // Function to format AI JSON responses into user-friendly HTML
+                function formatAIResponse(jsonData, taskDetails) {
+                    if (!jsonData || !jsonData.subtasks || !Array.isArray(jsonData.subtasks) || jsonData.subtasks.length === 0) {
+                        return "<p>No subtask updates available.</p>";
+                    }
+                    
+                    // Create a map of subtask IDs to their titles
+                    const subtaskMap = {};
+                    if (taskDetails && taskDetails.subtasks) {
+                        taskDetails.subtasks.forEach(subtask => {
+                            subtaskMap[subtask.id] = subtask.title;
+                        });
+                    }
+                    
+                    // Group subtasks by due date for better organization
+                    const subtasksByDate = {};
+                    jsonData.subtasks.forEach(subtask => {
+                        if (!subtasksByDate[subtask.due_date]) {
+                            subtasksByDate[subtask.due_date] = [];
+                        }
+                        subtasksByDate[subtask.due_date].push(subtask);
+                    });
+                    
+                    // Sort dates for chronological order
+                    const sortedDates = Object.keys(subtasksByDate).sort();
+                    
+                    let html = `
+                        <div class="ai-schedule-response">
+                            <h6 class="mb-3">📅 Optimized Task Schedule</h6>
+                            <div class="timeline-container">
+                    `;
+                    
+                    sortedDates.forEach(date => {
+                        // Format date for display (from YYYY-MM-DD to more readable format)
+                        const dateObj = new Date(date);
+                        const displayDate = dateObj.toLocaleDateString(undefined, { 
+                            weekday: 'short', 
+                            month: 'short', 
+                            day: 'numeric',
+                            year: 'numeric'
+                        });
+                        
+                        // Get day of month for calendar icon
+                        const dayOfMonth = dateObj.getDate();
+                        
+                        html += `
+                            <div class="date-group mb-3">
+                                <div class="date-header">
+                                    <div class="calendar-day-icon">
+                                        <div class="day-number">${dayOfMonth}</div>
+                                    </div>
+                                    <span class="due-date"><?php echo getCalendarIcon(); ?> ${displayDate}</span>
+                                </div>
+                                <ul class="task-list list-unstyled ps-3 pt-2">
+                        `;
+                        
+                        subtasksByDate[date].forEach(subtask => {
+                            const subtaskTitle = subtaskMap[subtask.id] || `Subtask #${subtask.id}`;
+                            html += `<li class="mb-1">• <strong>${subtaskTitle}</strong></li>`;
+                        });
+                        
+                        html += `
+                                </ul>
+                            </div>
+                        `;
+                    });
+                    
+                    html += `
+                            </div>
+                            <p class="mt-3 text-success small">✓ All deadlines have been optimized to ensure completion before the main task deadline.</p>
+                        </div>
+                    `;
+                    
+                    return html;
+                }
 
                 // Add this new function to handle AI date updates
                 function updateSubtaskDatesWithAI(task) {
@@ -2501,6 +2555,10 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                                         throw new Error('Response missing required fields');
                                     }
 
+                                    // Convert the response to a user-friendly format and display it
+                                    const formattedResponse = formatAIResponse(args, task);
+                                    appendMessage(formattedResponse, 'ai');
+
                                     // Update each subtask's date individually
                                     const updatePromises = args.subtasks.map(subtask => {
                                         if (!subtask.id || !subtask.due_date) {
@@ -2528,7 +2586,8 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                             }
                         })
                         .then(() => {
-                            appendMessage("Subtask dates have been aggressively updated to ensure tight deadlines.", 'ai');
+                            // Remove the generic message as we now show a formatted response
+                            // appendMessage("Subtask dates have been aggressively updated to ensure tight deadlines.", 'ai');
                             loadTasks(currentProject);
                         })
                         .catch(error => {
@@ -2608,6 +2667,59 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                     #subtasksList .subtask-item:hover .delete-subtask-btn {
                         opacity: 1;
                     }
+                    
+                   
+                   
+                    .timeline-container {
+                        position: relative;
+                    }
+                    
+                    .timeline-container:before {
+                        content: '';
+                        position: absolute;
+                        left: 4px;
+                        top: 8px;
+                        bottom: 8px;
+                        width: 2px;
+                        background: rgba(255, 255, 255, 0.2);
+                        border-radius: 1px;
+                    }
+                    
+                    .date-group {
+                        position: relative;
+                        padding-left: 20px;
+                    }
+                    
+                    .date-header {
+                        margin-bottom: 5px;
+                    }
+                    
+                    .date-header:before {
+                        content: '';
+                        position: absolute;
+                        left: -1px;
+                        top: 8px;
+                        width: 10px;
+                        height: 10px;
+                        background: #ffffff;
+                        border-radius: 50%;
+                        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+                    }
+                    
+                    .task-list {
+                        margin-left: 10px;
+                    }
+                    
+                    .task-list li {
+                        border-radius: 5px;
+                        padding: 2px 8px;
+                        font-size: 0.9rem;
+                        transition: all 0.2s ease;
+                    }
+                    
+                    .task-list li:hover {
+                        background: rgba(255, 255, 255, 0.1);
+                    }
                 `;
                 document.head.appendChild(style);
 
@@ -2617,6 +2729,7 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                         opacity: 0.7;
                         transition: all 0.2s ease;
                     }
+
                     .subtask-due-date:hover,
                     .subtask-due-date:focus {
                         opacity: 1;
