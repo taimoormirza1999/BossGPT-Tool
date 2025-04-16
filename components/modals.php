@@ -799,7 +799,7 @@
                     color: #666;
                 }
             </style>
-            
+            <?php if(!isset($_SESSION['fcm_token']) || $_SESSION['fcm_token'] == '0'): ?>
             <!-- Notification Permission Modal -->
             <div class="modal fade" id="notificationPermissionModal" tabindex="-1" aria-labelledby="notificationPermissionModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
@@ -830,4 +830,4 @@
                     </div>
                 </div>
             </div>
-            
+            <?php endif; ?>

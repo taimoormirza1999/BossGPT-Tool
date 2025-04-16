@@ -642,7 +642,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
             <?php 
             if(!isset($_SESSION['fcm_token'])) {
             echo getPopupAlert('Enable Notifications', 'Stay updated! Enable browser notifications to get the 
-latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold button-text" id="enableNowBtn" onclick="handleEnableNowBtn()">Enable Now</h6>'); 
+latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold button-text" id="enableNowBtn" onclick="DynamicOpen(\'#notificationPermissionModal\')">Enable Now</h6>'); 
             } ?>
         <?php } ?>
     </div>
@@ -2860,18 +2860,6 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
         document.addEventListener("DOMContentLoaded", function () {
             // Initial setup of popup visibility
             updatePopupVisibility();
-            
-            // Set up event handler for the enable notifications button in the modal
-            const enableNotificationsBtn = document.getElementById('enableNotificationsBtn');
-            if (enableNotificationsBtn) {
-                enableNotificationsBtn.addEventListener('click', function() {
-                    // After permissions are granted, remove the notification popup permanently
-                    const notificationPopup = document.getElementById('reminderButton');
-                    if (notificationPopup) {
-                        notificationPopup.remove();
-                    }
-                });
-            }
         });
 
         function updatePopupVisibility() {
