@@ -36,7 +36,8 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">Edit Task</h5>
-                            <button type="button" class="btn-close close-icon-btn" data-bs-dismiss="modal"></button>
+                            <button type="button" class="btn btn-link p-0 text-white close-icon-btn" data-bs-dismiss="modal"
+                                aria-label="Close"><?php echo getCloseSquareIcon(); ?></button>
                         </div>
                         <div class="modal-body">
                             <form id="editTaskForm">
@@ -70,13 +71,40 @@
                                 </div>
                                 
                                 <div class="mb-3">
-                                    <label for="editTaskPicture" class="form-label">Task Picture</label>
-                                    <input type="file" class="form-control" id="editTaskPicture" accept="image/*">
+                                    <label for="editTaskPicture" class="form-label"><?php echo getFileIcon(); ?> <!-- Bootstrap Icon -->
+                                    <span class="mx-2">Task Picture</span></label>
+                                    <input type="file" class="d-none" id="editTaskPicture" accept="image/*">
+                                    
+                                    <!-- Image preview container -->
+                                    <div id="editImagePreviewContainer" style="display: none; margin-top: 10px;">
+                                        <div style="position: relative; display: inline-block;">
+                                            <img id="editImagePreview" src="" alt="Image Preview" style="max-width: 100%; max-height: 200px; border-radius: 8px; object-fit: contain; border: 1px solid #e0e0e0; cursor: pointer;">
+                                            <button type="button" id="editRemovePreviewBtn" style="position: absolute; top: -10px; right: -10px; background: #fff; border: 1px solid #e0e0e0; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M18 6L6 18" stroke="#FF0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                    <path d="M6 6L18 18" stroke="#FF0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <!-- New: Remove Picture Button -->
-                                <div class="mb-3">
+                                <!-- Remove Picture Button - only shown when a picture exists -->
+                                <div class="mb-3" id="taskPictureContainer" style="display:none;">
                                     <button type="button" class="btn btn-danger" id="removeTaskPictureBtn">Remove
                                         Picture</button>
+                                </div>
+                                
+                                <!-- Add Tree Selection for Edit Task -->
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        Choose Tree Type
+                                    </label>
+                                    <!-- A hidden input to store the chosen file -->
+                                    <input type="hidden" id="editPlantType" name="editPlantType">
+                                    
+                                    <!-- Where the tree images will go -->
+                                    <div id="editTaskTreeContainer" class="tree-select-grid">
+                                    </div>
                                 </div>
                             </form>
 
@@ -228,9 +256,23 @@
   </div>
 </div>
                                 <div class="mb-3">
-                                    <label for="newTaskPicture" class="form-label"> <?php echo getFileIcon(); ?> <!-- Bootstrap Icon -->
-                                    <span>Choose Files</span><?php echo required_field(); ?></label>
+                                    <label for="newTaskPicture" class="form-label"> <?php echo getFileIcon(); ?>
+ <!-- Bootstrap Icon -->
+                                    <span class="mx-2">Choose Files</span><span class="required-asterisk">*</span></label>
                                     <input type="file" class="d-none" id="newTaskPicture" accept="image/*">
+                                    
+                                    <!-- Image preview container -->
+                                    <div id="imagePreviewContainer" style="display: none; margin-top: 10px;">
+                                        <div style="position: relative; display: inline-block;">
+                                            <img id="imagePreview" src="" alt="Image Preview" style="max-width: 100%; max-height: 200px; border-radius: 8px; object-fit: contain; border: 1px solid #e0e0e0; cursor: pointer;">
+                                            <button type="button" id="removePreviewBtn" style="position: absolute; top: -10px; right: -10px; background: #fff; border: 1px solid #e0e0e0; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M18 6L6 18" stroke="#FF0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                    <path d="M6 6L18 18" stroke="#FF0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -314,18 +356,16 @@
                 </div>
             </div>
 
-            <!-- Add this new modal for enlarged images after your other modals -->
-            <div class="modal fade" id="imageModal" tabindex="-1">
-                <div class="modal-dialog modal-lg modal-dialog-centered">
+            <!-- Image Modal for Enlarged Task Images -->
+            <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
                     <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Task Image</h5>
-                            <button type="button" class="btn btn-link p-0 text-white close-icon-btn" data-bs-dismiss="modal"
-                                aria-label="Close"><?php echo getCloseSquareIcon(); ?></button>
+                        <div class="modal-header text-white border-0 rounded-t-lg">
+                            <h5 class="modal-title" id="imageModalLabel">Task Image</h5>
+                            <button type="button" class="btn btn-link p-0 text-white close-icon-btn" data-bs-dismiss="modal" aria-label="Close"><?php echo getCloseSquareIcon(); ?></button>
                         </div>
-                        <div class="modal-body text-center">
-                            <img id="enlargedImage" src="" alt="Enlarged task image"
-                                style="max-width: 100%; max-height: 80vh;">
+                        <div class="modal-body text-center p-0">
+                            <img id="enlargedImage" src="" alt="Enlarged Image" style="max-width: 100%; max-height: 80vh; object-fit: contain;">
                         </div>
                     </div>
                 </div>

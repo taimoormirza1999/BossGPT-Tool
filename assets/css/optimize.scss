@@ -315,6 +315,7 @@ $geist-fonts: (
         .close-icon-btn {
         }
         .modal-header {
+          border-bottom: 1px solid rgb(151 151 151 / 50%)!important;
           @include theme-bgcolor($header-bgcolor);
           .modal-title {
           }
@@ -325,6 +326,9 @@ $geist-fonts: (
           .select2-container--default .select2-selection--multiple,
           .tree-option {
             @include theme-bgcolor($input-bgcolor);
+          }
+          .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: $container-bgcolor!important;
           }
         }
 
@@ -897,10 +901,9 @@ body {
           margin-bottom: 16px;
           font-family: "CabinetGroteskBold";
           text-transform: uppercase;
-          // box-shadow: 0 4px 15px $black-color-40;
           transition: all $transition-duration-40 ease;
           letter-spacing: 1px;
-          font-size: 1.18rem !important;
+          font-size: 1.145rem !important;
           @extend .font-secondaryBold;
         }
         .task-column {
@@ -1232,6 +1235,7 @@ body {
           .select2-container--default .select2-selection--multiple,
           .tree-option {
             border: 1px solid $white-color-20 !important;
+            color: $white-color !important;
             @extend .hover-up;
           }
           .tree-option {

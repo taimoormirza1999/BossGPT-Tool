@@ -1113,64 +1113,80 @@
   }
   
 
-  /* Tree Selection Styles */
+  /* Tree selection grid */
   .tree-select-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
     gap: 10px;
     margin-top: 10px;
-}
+  }
 
-
-.tree-option {
-    position: relative;
+  .tree-option {
     cursor: pointer;
-    text-align: center;
-    padding: 8px;
     border: 2px solid transparent;
     border-radius: 8px;
+    padding: 5px;
     transition: all 0.2s ease;
-}
-
-.tree-option:hover, .tree-option.selected {
-  border: 1px solid #28a745!important;
-  background-color: rgba(40, 167, 69, 0.1)!important;
-  @extend .hover-up;
-}
-
-.tree-option img {
-    width: 100%;
-    height: auto;
-    max-height: 80px;
-    object-fit: contain;
-}
-
-.tree-option .tree-name {
-    font-size: 0.8rem;
-    margin-top: 5px;
-    color: #666;
-}
-
-
-
-@keyframes bellShake {
-  0% { transform: rotate(0); }
-  5% { transform: rotate(15deg); }
-  10% { transform: rotate(-15deg); }
-  15% { transform: rotate(0); }
-  100% { transform: rotate(0); }
-}
-
-.reminder-button.active {
-  background: linear-gradient(145.32deg, #048a40 -14.49%, #04068a 82.49%);
-}
-
-/* For small screens, make it more compact */
-@media (max-width: 768px) {
-  .reminder-button {
-    left: 10px;
-    bottom: 70px;
-    padding: 10px 14px;
-    font-size: 0.9rem;
+    text-align: center;
   }
-}
+
+  .tree-option img {
+    max-width: 100%;
+    height: 60px;
+    object-fit: contain;
+  }
+
+  .tree-option:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    transform: translateY(-3px);
+  }
+
+  .tree-option.selected {
+    border-color: var(--bs-primary);
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Additional styles for edit task modal tree selection */
+  #editTaskTreeContainer .tree-option {
+    position: relative;
+  }
+
+  #editTaskTreeContainer .tree-option.selected::after {
+    content: '✓';
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: var(--bs-primary);
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  @keyframes bellShake {
+    0% { transform: rotate(0); }
+    5% { transform: rotate(15deg); }
+    10% { transform: rotate(-15deg); }
+    15% { transform: rotate(0); }
+    100% { transform: rotate(0); }
+  }
+
+  .reminder-button.active {
+    background: linear-gradient(145.32deg, #048a40 -14.49%, #04068a 82.49%);
+  }
+
+  /* For small screens, make it more compact */
+  @media (max-width: 768px) {
+    .reminder-button {
+      left: 10px;
+      bottom: 70px;
+      padding: 10px 14px;
+      font-size: 0.9rem;
+    }
+  }

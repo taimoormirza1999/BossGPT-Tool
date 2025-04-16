@@ -292,17 +292,21 @@
 /* Button container */
 .task-card .d-flex.gap-2.mt-2,
 .subtasks.mt-2 .d-flex.gap-2 {
-    display: none !important;  /* Hide by default */
+    display: flex !important;  /* Changed from 'none' to 'flex' */
+    opacity: 0;  /* Use opacity instead of display:none for smooth transitions */
     margin-top: 8px;
     z-index: 15;
     position: relative;
     gap: 8px !important;
+    flex-wrap: wrap;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 /* Show buttons container on hover */
 .task-card:hover .d-flex.gap-2.mt-2 {
-    display: flex !important;
-    flex-wrap: wrap;
+    opacity: 1;
+    visibility: visible;
 }
 
 /* Individual button styling */
@@ -314,16 +318,14 @@
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.1);
     margin: 2px;
-    display: none;  /* Hide by default */
+    display: flex;  /* Changed from 'none' to 'flex' */
     align-items: center;
     gap: 6px;
     font-size: 0.875rem;
     transition: all 0.3s ease;
     white-space: nowrap;
-}/* Show buttons on hover */
-.task-card:hover .btn-sm.btn-link {
-    display: inline-flex;
 }
+
 .task-card.dragging {
   opacity: 0.5;
   transform: scale(0.95);
@@ -342,13 +344,10 @@
 
 .activity-log-item {
   padding: 12px;
-  border-radius: 12px;
-  background-color: #f8f9fa;
+  border-radius: 16px;
+  border: 1px solid rgb(151 151 151 / 50%);
 }
 
-.activity-log-item:hover {
-  background-color: #e9ecef;
-}
 
 .ai-add-subtask-btn {
   font-size: 0.9em;

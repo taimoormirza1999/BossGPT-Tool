@@ -616,28 +616,27 @@ function appendNotification(notification) {
   const actionType = getActionTypeDisplay(notification.action_type);
   const timeAgo = formatTimeAgo(notification.created_at);
   const icon = getNotificationIcon(notification.action_type);
+  const iconClass = getNotificationIconClass(notification.action_type);
 
   const newNotification = `
-  <div class="dropdown-item border-bottom py-1">
+  <div class="dropdown-item border-bottom pt-2">
       <div class="d-flex align-items-start">
-          <div class="notification-icon ${
+          <div class="notification-icon ${iconClass} ${
             isDarkMode ? actionType.darkBgColor : actionType.bgColor
           } rounded-circle me-3"
               >
-              <i class="bi ${icon} ${actionType.textColor}"></i>
+              ${icon}
           </div>
           <div class="flex-grow-1">
               <div class="d-flex justify-content-between align-items-center mb-1">
-                  <span class="badge ${
-                    isDarkMode ? actionType.darkBgColor : actionType.bgColor
-                  } ${actionType.textColor} rounded-pill px-3 py-1">
+                  <span class="title-notification rounded-pill">
                       ${actionType.text}
                   </span>
-                  <small class="text-muted" style="font-size: 0.75rem;">
+                  <small class="notification-time" style="font-size: 0.75rem;">
                       ${timeAgo}
                   </small>
               </div>
-              <div class="notification-text" style="font-size: 0.8rem;">
+              <div class="notification-text" style="font-size: 0.8rem;text-wrap: auto;">
                   ${notification.description}
               </div>
           </div>

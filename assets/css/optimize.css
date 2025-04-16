@@ -186,6 +186,7 @@ body.system-mode .modal .modal-dialog .modal-content {
   background: #242526;
 }
 body.system-mode .modal .modal-dialog .modal-content .modal-header {
+  border-bottom: 1px solid rgba(151, 151, 151, 0.5) !important;
   background: #1d1d1d;
 }
 body.system-mode .modal .modal-dialog .modal-content .modal-body input,
@@ -193,6 +194,9 @@ body.system-mode .modal .modal-dialog .modal-content .modal-body textarea,
 body.system-mode .modal .modal-dialog .modal-content .modal-body .select2-container--default .select2-selection--multiple,
 body.system-mode .modal .modal-dialog .modal-content .modal-body .tree-option {
   background: rgba(10, 10, 10, 0.2);
+}
+body.system-mode .modal .modal-dialog .modal-content .modal-body .select2-container--default .select2-selection--multiple .select2-selection__choice {
+  background-color: #242526 !important;
 }
 body.system-mode .reminder-button {
   background: rgb(53, 53, 53);
@@ -263,6 +267,7 @@ body.purple-mode .modal .modal-dialog .modal-content {
   background: #120211;
 }
 body.purple-mode .modal .modal-dialog .modal-content .modal-header {
+  border-bottom: 1px solid rgba(151, 151, 151, 0.5) !important;
   background: #361734;
 }
 body.purple-mode .modal .modal-dialog .modal-content .modal-body input,
@@ -270,6 +275,9 @@ body.purple-mode .modal .modal-dialog .modal-content .modal-body textarea,
 body.purple-mode .modal .modal-dialog .modal-content .modal-body .select2-container--default .select2-selection--multiple,
 body.purple-mode .modal .modal-dialog .modal-content .modal-body .tree-option {
   background: rgba(12, 1, 17, 0.5);
+}
+body.purple-mode .modal .modal-dialog .modal-content .modal-body .select2-container--default .select2-selection--multiple .select2-selection__choice {
+  background-color: #120211 !important;
 }
 body.purple-mode .reminder-button {
   background: linear-gradient(135deg, #240121 0%, #4f0142 100%) !important;
@@ -337,6 +345,7 @@ body.black-mode .modal .modal-dialog .modal-content {
   background: #171717;
 }
 body.black-mode .modal .modal-dialog .modal-content .modal-header {
+  border-bottom: 1px solid rgba(151, 151, 151, 0.5) !important;
   background: #0d0c0c;
 }
 body.black-mode .modal .modal-dialog .modal-content .modal-body input,
@@ -344,6 +353,9 @@ body.black-mode .modal .modal-dialog .modal-content .modal-body textarea,
 body.black-mode .modal .modal-dialog .modal-content .modal-body .select2-container--default .select2-selection--multiple,
 body.black-mode .modal .modal-dialog .modal-content .modal-body .tree-option {
   background: rgba(12, 1, 17, 0.2);
+}
+body.black-mode .modal .modal-dialog .modal-content .modal-body .select2-container--default .select2-selection--multiple .select2-selection__choice {
+  background-color: #171717 !important;
 }
 body.black-mode .reminder-button {
   background: rgb(9, 1, 12);
@@ -411,6 +423,7 @@ body.brown-mode .modal .modal-dialog .modal-content {
   background: #190404;
 }
 body.brown-mode .modal .modal-dialog .modal-content .modal-header {
+  border-bottom: 1px solid rgba(151, 151, 151, 0.5) !important;
   background: #410404;
 }
 body.brown-mode .modal .modal-dialog .modal-content .modal-body input,
@@ -418,6 +431,9 @@ body.brown-mode .modal .modal-dialog .modal-content .modal-body textarea,
 body.brown-mode .modal .modal-dialog .modal-content .modal-body .select2-container--default .select2-selection--multiple,
 body.brown-mode .modal .modal-dialog .modal-content .modal-body .tree-option {
   background: rgba(12, 1, 17, 0.2);
+}
+body.brown-mode .modal .modal-dialog .modal-content .modal-body .select2-container--default .select2-selection--multiple .select2-selection__choice {
+  background-color: #190404 !important;
 }
 body.brown-mode .reminder-button {
   background: rgb(65, 4, 4);
@@ -840,7 +856,7 @@ body .projects_card .card-body .task-column_section .task-column_header {
   text-transform: uppercase;
   transition: all 0.4s ease;
   letter-spacing: 1px;
-  font-size: 1.18rem !important;
+  font-size: 1.145rem !important;
 }
 body .projects_card .card-body .task-column_section .task-column {
   background: rgba(76, 76, 76, 0.25);
@@ -1227,6 +1243,7 @@ body .modal .modal-dialog .modal-content .modal-body textarea,
 body .modal .modal-dialog .modal-content .modal-body .select2-container--default .select2-selection--multiple,
 body .modal .modal-dialog .modal-content .modal-body .tree-option {
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #fff !important;
 }
 body .modal .modal-dialog .modal-content .modal-body .tree-option:hover, body .modal .modal-dialog .modal-content .modal-body .tree-option.selected {
   border: 1px solid #28a745 !important;

@@ -502,7 +502,11 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                     const container = document.getElementById('taskTreeContainer');
                     const hiddenInput = document.getElementById('selectedTreeType');
 
-                    // 2) Build and insert the images
+                    // Also set up the edit task tree container
+                    const editContainer = document.getElementById('editTaskTreeContainer');
+                    const editHiddenInput = document.getElementById('editPlantType');
+
+                    // 2) Build and insert the images for both containers
                     let html = '';
                     treeImages.forEach(({ file, alt }) => {
                         html += `
@@ -512,8 +516,9 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
     `;
                     });
                     container.innerHTML = html;
+                    editContainer.innerHTML = html;
 
-                    // 3) Attach click listeners
+                    // 3) Attach click listeners for new task modal
                     container.querySelectorAll('.tree-option').forEach(optionDiv => {
                         optionDiv.addEventListener('click', () => {
                             // Set hidden input
@@ -523,6 +528,20 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 
                             // Highlight selected
                             container.querySelectorAll('.tree-option').forEach(o => o.classList.remove('selected'));
+                            optionDiv.classList.add('selected');
+                        });
+                    });
+
+                    // 4) Attach click listeners for edit task modal
+                    editContainer.querySelectorAll('.tree-option').forEach(optionDiv => {
+                        optionDiv.addEventListener('click', () => {
+                            // Set hidden input
+                            const treeValue = optionDiv.dataset.tree;
+                            editHiddenInput.value = treeValue;
+                            console.log('Selected tree for edit:', treeValue);
+
+                            // Highlight selected
+                            editContainer.querySelectorAll('.tree-option').forEach(o => o.classList.remove('selected'));
                             optionDiv.classList.add('selected');
                         });
                     });
@@ -1262,8 +1281,6 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                     e.preventDefault();
 
                     if (!currentProject) {
-                        // alert('Please select a project first');
-                        // return;
                         showToastAndHideModal(
                             'assignUserModal',
                             'error',
@@ -1352,6 +1369,14 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                     document.getElementById('editTaskTitle').value = task.title;
                     document.getElementById('editTaskDescription').value = task.description || '';
                     document.getElementById('editTaskDueDate').value = task.due_date || '';
+                    
+                    // Show/hide the remove picture button based on whether task has a picture
+                    const taskPictureContainer = document.getElementById('taskPictureContainer');
+                    if (task.picture) {
+                        taskPictureContainer.style.display = 'block';
+                    } else {
+                        taskPictureContainer.style.display = 'none';
+                    }
 
                     const editTaskAssignees = document.getElementById('editTaskAssignees');
                     $(editTaskAssignees).empty();  // Clear using jQuery
@@ -1504,7 +1529,9 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                     const dueDate = document.getElementById('editTaskDueDate').value || null; // Convert empty string to null
                     const assignees = $('#editTaskAssignees').val().map(value => parseInt(value));
                     const pictureInput = document.getElementById('editTaskPicture');
-                    const plantType = document.getElementById('editPlantType').value;
+                    const plantType = document.getElementById('editPlantType')?.value || 'sprout';
+                    // Show loading indicator
+                    showLoading();
                     function sendUpdateTask(pictureData) {
                         let payload = {
                             task_id: taskId,
@@ -1513,9 +1540,21 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                             due_date: dueDate, // This will now be null instead of empty string
                             assignees: assignees
                         };
+                        
+                        // Only include picture in payload if we have new picture data
                         if (pictureData !== null) {
                             payload.picture = pictureData;
                         }
+                        
+                        // Add plant type if selected
+                        const plantType = document.getElementById('editPlantType').value;
+                        if (plantType) {
+                            // Remove .png extension from the plant type value
+                            payload.plant_type = plantType.replace('.png', '');
+                        }
+                        
+                        console.log('Sending update task with payload:', payload);
+                        
                         fetch('?api=update_task', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -1536,6 +1575,8 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                             })
                             .finally(hideLoading);
                     }
+                    
+                    // If we have a file selected in the input, process it
                     if (pictureInput.files && pictureInput.files[0]) {
                         const reader = new FileReader();
                         reader.onload = function (e) {
@@ -1544,7 +1585,17 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                         };
                         reader.readAsDataURL(pictureInput.files[0]);
                     } else {
-                        sendUpdateTask(null);
+                        // Check if we're using the preview from an existing image
+                        const imagePreview = document.getElementById('editImagePreview');
+                        if (imagePreview && imagePreview.src && 
+                            imagePreview.src.startsWith('data:image') && 
+                            document.getElementById('editImagePreviewContainer').style.display !== 'none') {
+                            // Use the existing preview image if it's visible
+                            sendUpdateTask(imagePreview.src);
+                        } else {
+                            // No new image and no existing preview visible
+                            sendUpdateTask(null);
+                        }
                     }
                 });
 
@@ -1662,18 +1713,7 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                         }
                     }
 
-                    // if (editBtn) {
-                    //     const userId = editBtn.getAttribute("data-id");
-                    //     const username = editBtn.getAttribute("data-username");
-                    //     const email = editBtn.getAttribute("data-email");
-                    //     const role = editBtn.getAttribute("data-role");
-                    //     // Populate the Add/Edit Modal with User Data
-                    //     document.getElementById("newUserName").value = username;
-                    //     document.getElementById("newUserEmail").value = email;
-                    //     document.getElementById("newUserRole").value = role;
-                    //     // Show the modal
-                    //     addUserModal.show();
-                    // }
+                
                 });
 
                 // Handle "New User" selection
@@ -1724,7 +1764,6 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                             if (data.success) {
                                 // Close the add user modal
                                 bootstrap.Modal.getInstance(document.getElementById('addUserModal')).hide();
-
                                 // Clear the form
                                 document.getElementById('newUserEmail').value = '';
                                 document.getElementById('newUserRole').value = '';
@@ -2294,14 +2333,14 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                 }
 
                 // Add this new code to handle image clicks (add it where other event listeners are defined)
-                document.addEventListener('click', function (e) {
-                    if (e.target.classList.contains('enlarge-image')) {
-                        const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
-                        const enlargedImage = document.getElementById('enlargedImage');
-                        enlargedImage.src = e.target.src;
-                        imageModal.show();
-                    }
-                });
+                // document.addEventListener('click', function (e) {
+                //     if (e.target.classList.contains('enlarge-image')) {
+                //         const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+                //         const enlargedImage = document.getElementById('enlargedImage');
+                //         enlargedImage.src = e.target.src;
+                //         imageModal.show();
+                //     }
+                // });
 
                 // Add this event delegation handler before the closing of isDashboard block
                 document.addEventListener('click', function (e) {
@@ -2578,14 +2617,10 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                         opacity: 0.7;
                         transition: all 0.2s ease;
                     }
-
                     .subtask-due-date:hover,
                     .subtask-due-date:focus {
                         opacity: 1;
                     }
-
-
-
                     .subtask-due-date:disabled {
                         opacity: 0.5;
                         cursor: not-allowed;
@@ -2600,6 +2635,141 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                     }
                 });
 
+                // Add this event delegation handler before the closing of isDashboard block
+                document.addEventListener('click', function (e) {
+                    if (e.target.closest('.delete-task-btn')) {
+                        e.stopPropagation(); // Prevent task card click event
+                        const taskId = e.target.closest('.delete-task-btn').dataset.id;
+                        if (confirm('Are you sure you want to delete this task?')) {
+                            deleteTask(taskId);
+                        }
+                    }
+                });
+
+                // Image preview for new task modal
+                document.getElementById('newTaskPicture').addEventListener('change', function(e) {
+                    const file = this.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        const previewContainer = document.getElementById('imagePreviewContainer');
+                        const imagePreview = document.getElementById('imagePreview');
+                        
+                        reader.onload = function(e) {
+                            imagePreview.src = e.target.result;
+                            previewContainer.style.display = 'block';
+                        }
+                        
+                        reader.readAsDataURL(file);
+                    }
+                });
+
+                // Remove preview button for new task modal
+                document.getElementById('removePreviewBtn').addEventListener('click', function() {
+                    const previewContainer = document.getElementById('imagePreviewContainer');
+                    const fileInput = document.getElementById('newTaskPicture');
+                    
+                    // Clear the file input
+                    fileInput.value = '';
+                    // Hide the preview
+                    previewContainer.style.display = 'none';
+                });
+                
+                // Image preview for edit task modal
+                document.getElementById('editTaskPicture').addEventListener('change', function(e) {
+                    const file = this.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        const previewContainer = document.getElementById('editImagePreviewContainer');
+                        const imagePreview = document.getElementById('editImagePreview');
+                        
+                        reader.onload = function(e) {
+                            imagePreview.src = e.target.result;
+                            previewContainer.style.display = 'block';
+                            
+                            // Hide the remove picture button when showing preview
+                            document.getElementById('taskPictureContainer').style.display = 'none';
+                        }
+                        
+                        reader.readAsDataURL(file);
+                    }
+                });
+
+                // Remove preview button for edit task modal
+                document.getElementById('editRemovePreviewBtn').addEventListener('click', function() {
+                    const previewContainer = document.getElementById('editImagePreviewContainer');
+                    const fileInput = document.getElementById('editTaskPicture');
+                    
+                    // Clear the file input
+                    fileInput.value = '';
+                    // Hide the preview
+                    previewContainer.style.display = 'none';
+                    
+                    // Show the remove picture button if task had an existing picture
+                    const taskId = document.getElementById('editTaskId').value;
+                    const taskCards = document.querySelectorAll('.task-card');
+                    taskCards.forEach(card => {
+                        if (card.dataset.id === taskId && card.querySelector('.task-picture')) {
+                            document.getElementById('taskPictureContainer').style.display = 'block';
+                        }
+                    });
+                });
+                
+                // Modify openEditTaskModal to handle image preview for existing task picture
+                const originalOpenEditTaskModal = openEditTaskModal;
+                openEditTaskModal = function(task) {
+                    // Call the original function first
+                    originalOpenEditTaskModal(task);
+                    
+                    // Reset file input and hide preview container
+                    document.getElementById('editTaskPicture').value = '';
+                    document.getElementById('editImagePreviewContainer').style.display = 'none';
+                    
+                    // If task has an existing picture, show it in the preview
+                    if (task.picture) {
+                        const imagePreview = document.getElementById('editImagePreview');
+                        imagePreview.src = task.picture;
+                        document.getElementById('editImagePreviewContainer').style.display = 'block';
+                        // Hide the remove button since we're showing the preview
+                        document.getElementById('taskPictureContainer').style.display = 'none';
+                    }
+                    
+                    // Set the plant type in the edit tree selection
+                    if (task.garden && task.garden.plant_type) {
+                        const plantType = task.garden.plant_type;
+                        document.getElementById('editPlantType').value = plantType + '.png';
+                        
+                        // Highlight the selected tree
+                        const treeOptions = document.querySelectorAll('#editTaskTreeContainer .tree-option');
+                        treeOptions.forEach(option => {
+                            option.classList.remove('selected');
+                            if (option.dataset.tree === plantType + '.png') {
+                                option.classList.add('selected');
+                            }
+                        });
+                    }
+                };
+
+                // Uncomment this code and modify it to create a reusable function for showing enlarged images
+                function openEnlargedImage(imageSrc) {
+                    const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+                    const enlargedImage = document.getElementById('enlargedImage');
+                    enlargedImage.src = imageSrc;
+                    imageModal.show();
+                }
+                
+                // Add event delegation for enlarging images when clicked
+                document.addEventListener('click', function (e) {
+                    // Check if the clicked element is an image preview in either modal
+                    if (e.target.id === 'imagePreview' || e.target.id === 'editImagePreview') {
+                        openEnlargedImage(e.target.src);
+                    }
+                    
+                    // Also handle task pictures in the task cards
+                    if (e.target.classList.contains('enlarge-image')) {
+                        openEnlargedImage(e.target.src);
+                    }
+                });
+                
                 // Add this event delegation handler before the closing of isDashboard block
                 document.addEventListener('click', function (e) {
                     if (e.target.closest('.delete-task-btn')) {
@@ -2626,24 +2796,6 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                 }
             }
 
-            // Font size management - keep this outside the dashboard check since it applies to all pages
-            // const fontSizeRange = document.getElementById('fontSizeRange');
-            // const fontSizeValue = document.getElementById('fontSizeValue');
-
-            // if (fontSizeRange && fontSizeValue) {
-            //     const mainContent = document.body;
-            //     const savedFontSize = localStorage.getItem('preferredFontSize') || '16';
-            //     fontSizeRange.value = savedFontSize;
-            //     fontSizeValue.textContent = `${savedFontSize}px`;
-            //     mainContent.style.fontSize = `${savedFontSize}px`;
-
-            //     fontSizeRange.addEventListener('input', function () {
-            //         const newSize = this.value;
-            //         fontSizeValue.textContent = `${newSize}px`;
-            //         mainContent.style.fontSize = `${newSize}px`;
-            //         localStorage.setItem('preferredFontSize', newSize);
-            //     });
-            // }
 
             // --- Dark Mode Toggle Code ---
             const toggleDarkModeBtn = document.getElementById('toggleDarkModeBtn');

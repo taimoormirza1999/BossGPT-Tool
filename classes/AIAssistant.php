@@ -1,4 +1,6 @@
 <?php
+// Required for direct task updates
+require_once __DIR__ . '/ProjectManager.php';
 
 class AIAssistant
 {
@@ -114,6 +116,20 @@ class AIAssistant
             // Get the AI tone from the parameter instead of $_REQUEST
             $aiTone = isset($_REQUEST['aiTone']) ? $_REQUEST['aiTone'] : 'demanding';
             
+            // Check if this is a task status update request
+            $enhanced_message = $message;
+            if (preg_match('/move\s+task\s+[\'"]?([^\'"]*)[\'"]\s+from\s+todo\s+to\s+in\s+progress/i', $message, $matches)) {
+                $task_title = $matches[1];
+                error_log("Detected task status update request for: $task_title");
+                
+                // Find the task ID
+                $task_id = $this->findTaskIdByTitle($project_id, $task_title);
+                if ($task_id) {
+                    $enhanced_message = "$message (Task ID: $task_id)";
+                    error_log("Enhanced message with task ID: $enhanced_message");
+                }
+            }
+            
             // Map tone values to different system messages
             $toneMessages = [
                 'friendly' => "You are a friendly and supportive project manager. Your communication style is warm, encouraging, and focused on team morale. Use phrases like 'Let's try', 'We can', 'I think', and offer positive reinforcement. Be supportive and understanding while still maintaining progress.\n\nWhen responding:\n1. Be warm and approachable\n2. Offer encouragement\n3. Be understanding of challenges\n4. Focus on teamwork\n5. Celebrate progress\n6. Use collaborative language\n7. Balance goals with wellbeing\n8. Give constructive feedback\n\nProject Context:\n",
@@ -139,7 +155,7 @@ class AIAssistant
 
             $messages[] = [
                 'role' => 'user',
-                'content' => $message
+                'content' => $enhanced_message
             ];
 
             // Existing functions for tasks and updates
@@ -332,7 +348,7 @@ class AIAssistant
             );
             $stmt->execute([
                 $project_id,
-                $message,
+                $enhanced_message,
                 'user',
                 null
             ]);
@@ -381,6 +397,47 @@ class AIAssistant
                 break;
 
             case 'update_task':
+                error_log("==== AI ASSISTANT: UPDATING TASK ====");
+                error_log("Task ID: " . $arguments['task_id']);
+                
+                if (isset($arguments['status'])) {
+                    error_log("Requested status change to: " . $arguments['status']);
+                    
+                    // Get task info
+                    $taskStmt = $this->db->prepare("SELECT title, project_id, status FROM tasks WHERE id = ?");
+                    $taskStmt->execute([$arguments['task_id']]);
+                    $task = $taskStmt->fetch();
+                    error_log("Current task status: " . ($task ? $task['status'] : 'unknown'));
+                    
+                    // Use ProjectManager to update status directly
+                    try {
+                        $projectManager = new ProjectManager();
+                        if ($arguments['status'] == 'in_progress') {
+                            error_log("Using updateTaskStatus for in_progress");
+                            $projectManager->updateTaskStatus($arguments['task_id'], 'in_progress');
+                            error_log("Status updated successfully");
+                        } else {
+                            error_log("Using normal status update for: " . $arguments['status']);
+                            $projectManager->updateTaskStatus($arguments['task_id'], $arguments['status']);
+                        }
+                        
+                        // Log the activity regardless of other updates
+                        if ($task) {
+                            $this->logActivity(
+                                $task['project_id'],
+                                'task_status_updated',
+                                "AI Assistant updated status of task '{$task['title']}' from '{$task['status']}' to '{$arguments['status']}'"
+                            );
+                        }
+                        
+                        break; // Exit the case if we handled the status update
+                    } catch (Exception $e) {
+                        error_log("Error updating task status: " . $e->getMessage());
+                        // Continue with normal update as fallback
+                    }
+                }
+                
+                // Normal update path continues
                 $updates = [];
                 $params = [];
 
@@ -392,9 +449,11 @@ class AIAssistant
                     $updates[] = "description = ?";
                     $params[] = $arguments['description'];
                 }
-                if (isset($arguments['status'])) {
+                // Only handle status updates here if we didn't handle it with ProjectManager above
+                if (isset($arguments['status']) && count($updates) > 0) {
                     $updates[] = "status = ?";
                     $params[] = $arguments['status'];
+                    error_log("Adding status update to batch update");
                 }
                 if (isset($arguments['due_date'])) {
                     $updates[] = "due_date = ?";
@@ -404,8 +463,25 @@ class AIAssistant
                 if (!empty($updates)) {
                     $params[] = $arguments['task_id'];
                     $sql = "UPDATE tasks SET " . implode(", ", $updates) . " WHERE id = ?";
+                    error_log("SQL query: " . $sql . " with parameters: " . implode(", ", $params));
                     $stmt = $this->db->prepare($sql);
                     $stmt->execute($params);
+                    
+                    // Log activity for status changes
+                    if (isset($arguments['status'])) {
+                        // Get task info for activity log
+                        $taskStmt = $this->db->prepare("SELECT title, project_id FROM tasks WHERE id = ?");
+                        $taskStmt->execute([$arguments['task_id']]);
+                        $task = $taskStmt->fetch();
+                        
+                        if ($task) {
+                            $this->logActivity(
+                                $task['project_id'],
+                                'task_status_updated',
+                                "AI Assistant updated status of task '{$task['title']}' to " . $arguments['status']
+                            );
+                        }
+                    }
                 }
 
                 // Update task assignees if provided
@@ -493,5 +569,57 @@ class AIAssistant
         $stmt = $this->db->prepare("SELECT username FROM users WHERE id IN ($placeholders)");
         $stmt->execute($userIds);
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    // Add this function if it doesn't exist
+    private function logActivity($project_id, $action_type, $description)
+    {
+        try {
+            $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+            
+            $stmt = $this->db->prepare(
+                "INSERT INTO activity_log (project_id, user_id, action_type, description) 
+                 VALUES (?, ?, ?, ?)"
+            );
+            $stmt->execute([
+                $project_id,
+                $user_id,
+                $action_type,
+                $description
+            ]);
+            
+            error_log("Activity logged: $action_type - $description");
+            return true;
+        } catch (Exception $e) {
+            error_log("Error logging activity: " . $e->getMessage());
+            // Don't throw exception to avoid breaking functionality
+            return false;
+        }
+    }
+
+    // Add helper function to find task ID by name
+    private function findTaskIdByTitle($project_id, $task_title)
+    {
+        try {
+            // Use LIKE query for fuzzy matching
+            $stmt = $this->db->prepare("
+                SELECT id, title FROM tasks 
+                WHERE project_id = ? AND title LIKE ? 
+                ORDER BY created_at DESC
+            ");
+            $stmt->execute([$project_id, "%$task_title%"]);
+            $tasks = $stmt->fetchAll();
+            
+            if (count($tasks) > 0) {
+                error_log("Found task with title '$task_title': " . $tasks[0]['id']);
+                return $tasks[0]['id'];
+            }
+            
+            error_log("No task found with title like '$task_title'");
+            return null;
+        } catch (Exception $e) {
+            error_log("Error finding task ID by title: " . $e->getMessage());
+            return null;
+        }
     }
 }
