@@ -79,6 +79,7 @@ function getLogoImage($bottomMargin = "0", $topMargin = "-1rem", $width = "15rem
                 class="logo-icon"
                 style=" filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3)); margin-top: ' . $topMargin . '; margin-bottom: ' . $bottomMargin . '; width: ' . $width . '; height: ' . $height . '">';
     }
+
     function getCalendarIcon($color = 'rgba(160, 160, 160, 1)') {
         $svg = file_get_contents('assets/icons/calendar.svg');
     
@@ -93,11 +94,15 @@ function getLogoImage($bottomMargin = "0", $topMargin = "-1rem", $width = "15rem
         }, $svg);
     
         // Optional: add an ID to the SVG root
-        $svg = preg_replace('/<svg /', '<svg id="calendar-icon" ', $svg, 1);
+        $svg = preg_replace('/<svg /', '<svg class="calendar-icons" id="calendar-icon" ', $svg, 1);
     
         return $svg;
     }
     
+    function getGoogleIcon()
+    {
+        return file_get_contents('assets/icons/googleIcon.svg');
+    }
     function getMenuIcon()
     {
         return file_get_contents('assets/icons/category.svg');

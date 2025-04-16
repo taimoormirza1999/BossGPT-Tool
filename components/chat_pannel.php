@@ -240,6 +240,14 @@
                                 this.style.height = 'auto';
                                 this.style.height = (this.scrollHeight) + 'px';
                             });
+                            
+                            // Add event listener for Enter key press
+                            messageInput.addEventListener('keypress', function(event) {
+                                if (event.key === 'Enter' && !event.shiftKey) {
+                                    event.preventDefault();
+                                    document.getElementById('chatForm').dispatchEvent(new Event('submit'));
+                                }
+                            });
 
                             // Reset height when form is submitted
                             document.getElementById('chatForm').addEventListener('submit', function () {
