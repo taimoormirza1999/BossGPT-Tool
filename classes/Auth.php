@@ -79,14 +79,15 @@ class Auth
 
     public function logout()
     {
-        echo "<script>
-            localStorage.removeItem('lastSelectedProject');
-    </script>";
+    //     echo "<script>
+    //         localStorage.removeItem('lastSelectedProject');
+    // </script>";
         session_destroy();
         session_start();
         session_unset();
         session_destroy();
-        return true;
+        header("Location: " . $_ENV['BASE_URL']);
+        exit;
     }
 
     public function isLoggedIn()

@@ -1,5 +1,9 @@
 <script>
   document.addEventListener('DOMContentLoaded', function () {
+    var enableNotificationsBtn =false;
+    <?php if(!isset($_SESSION['fcm_token']) || $_SESSION['fcm_token'] == '0'): ?>
+      enableNotificationsBtn = true;
+    <?php endif; ?>
     const openIconBtn = document.querySelector('.open-icon-btn');
     $(openIconBtn).toggleClass('d-none');
     $(openIconBtn).toggleClass('show');

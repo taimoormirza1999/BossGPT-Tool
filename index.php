@@ -635,10 +635,15 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
             </style>
 
             <!-- Reminder button -->
-            <button id="reminderButton" class="reminder-button">
+            <!-- <button id="reminderButton" class="reminder-button">
                 <i class="bi bi-bell-fill bell-icon"></i>
                 <span>Turn on Reminders</span>
-            </button>
+            </button> -->
+            <?php 
+            if(!isset($_SESSION['fcm_token'])) {
+            echo getPopupAlert('Enable Notifications', 'Stay updated! Enable browser notifications to get the 
+latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold button-text" id="enableNowBtn" onclick="handleEnableNowBtn()">Enable Now</h6>'); 
+            } ?>
         <?php } ?>
     </div>
 
@@ -2855,6 +2860,18 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
         document.addEventListener("DOMContentLoaded", function () {
             // Initial setup of popup visibility
             updatePopupVisibility();
+            
+            // Set up event handler for the enable notifications button in the modal
+            const enableNotificationsBtn = document.getElementById('enableNotificationsBtn');
+            if (enableNotificationsBtn) {
+                enableNotificationsBtn.addEventListener('click', function() {
+                    // After permissions are granted, remove the notification popup permanently
+                    const notificationPopup = document.getElementById('reminderButton');
+                    if (notificationPopup) {
+                        notificationPopup.remove();
+                    }
+                });
+            }
         });
 
         function updatePopupVisibility() {
@@ -2873,17 +2890,57 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
         function closePopup(button) {
             let popup = button.parentElement;
             const reminderId = popup.dataset.reminderId;
-
-            // Remove the popup
+            
+            // Check if this is the notification reminder or enable now button
+            const isNotificationReminder = popup.id === 'reminderButton';
+            const isEnableNowBtn = button.id === 'enableNowBtn';
+            
+            if (isEnableNowBtn) {
+                // Handle the Enable Now button click
+                handleEnableNowBtn();
+                return;
+            }
+            
+            // For other reminders
             popup.remove();
-
-            // Delete from database/backend
-            if (reminderId) {
+            
+            // Delete from database/backend for regular reminders
+            if (reminderId && !isNotificationReminder) {
                 delete_fcm_reminders(reminderId);
             }
-
+            
             // Update popup visibility to show the next one if available
             updatePopupVisibility();
+        }
+
+        // Add this new function after the closePopup function
+        function handleEnableNowBtn() {
+            // Hide the notification popup
+            const notificationPopup = document.getElementById('reminderButton');
+            if (notificationPopup) {
+                notificationPopup.style.display = 'none';
+            }
+            
+            // Show the notification permission modal
+            const notificationModal = new bootstrap.Modal(
+                document.getElementById("notificationPermissionModal")
+            );
+            notificationModal.show();
+            
+            // Add event listener to show the popup again if the modal is dismissed
+            const notificationModalEl = document.getElementById("notificationPermissionModal");
+            notificationModalEl.addEventListener('hidden.bs.modal', function onHidden() {
+                // Only show the popup again if we don't have FCM token yet
+                const fcmToken = localStorage.getItem('fcm_token');
+                if (!fcmToken && notificationPopup) {
+                    notificationPopup.style.display = '';
+                } else if (notificationPopup) {
+                    // If we now have FCM token, permanently remove the popup
+                    notificationPopup.remove();
+                }
+                // Remove this listener to prevent multiple bindings
+                notificationModalEl.removeEventListener('hidden.bs.modal', onHidden);
+            });
         }
     </script>
 

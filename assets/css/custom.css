@@ -1049,6 +1049,15 @@
     margin: 0;
     line-height: 1.5;
   }
+  .popup-alert .content .button-text {
+    font-size: 0.89rem;
+    margin-top: 0.2rem;
+    margin-bottom: 0rem;
+    line-height: 1.5;
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: 400;
+  }
   
   .popup-alert .close-button {
     background: none;
