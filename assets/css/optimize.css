@@ -171,6 +171,7 @@ body.system-mode .projects_card .card-body .task-card {
 }
 body.system-mode .chat-pannel .my-custom-ai-tone-modal-chat-pannel {
   background: rgba(0, 0, 0, 0.5);
+  border-radius: 16px;
 }
 body.system-mode .chat-pannel .my-custom-ai-tone-modal-chat-pannel .card-ai-tone-modal-content {
   background: #242526;
@@ -249,6 +250,7 @@ body.purple-mode .projects_card .card-body .task-card {
 }
 body.purple-mode .chat-pannel .my-custom-ai-tone-modal-chat-pannel {
   background: rgba(0, 0, 0, 0.5);
+  border-radius: 16px;
 }
 body.purple-mode .chat-pannel .my-custom-ai-tone-modal-chat-pannel .card-ai-tone-modal-content {
   background: #120211;
@@ -327,6 +329,7 @@ body.black-mode .projects_card .card-body .task-card {
 }
 body.black-mode .chat-pannel .my-custom-ai-tone-modal-chat-pannel {
   background: rgba(0, 0, 0, 0.5);
+  border-radius: 16px;
 }
 body.black-mode .chat-pannel .my-custom-ai-tone-modal-chat-pannel .card-ai-tone-modal-content {
   background: #171717;
@@ -405,6 +408,7 @@ body.brown-mode .projects_card .card-body .task-card {
 }
 body.brown-mode .chat-pannel .my-custom-ai-tone-modal-chat-pannel {
   background: rgba(0, 0, 0, 0.5);
+  border-radius: 16px;
 }
 body.brown-mode .chat-pannel .my-custom-ai-tone-modal-chat-pannel .card-ai-tone-modal-content {
   background: #190404;

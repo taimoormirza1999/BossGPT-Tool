@@ -352,6 +352,7 @@ $geist-fonts: (
   .chat-pannel {
     .my-custom-ai-tone-modal-chat-pannel {
       background: rgba(0, 0, 0, 0.5);
+      border-radius: $border-radius-16;
       .card-ai-tone-modal-content {
         background: $modal-bgcolor;
         .header {

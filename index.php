@@ -1926,8 +1926,9 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                     const assignees = $('#newTaskAssignees').val().map(value => parseInt(value));
                     const pictureInput = document.getElementById('newTaskPicture');
                     const selectedTree = document.querySelector('.tree-option.selected');
-                    const plantType = selectedTree ? selectedTree.dataset.tree : '';
-
+                    // const plantType = selectedTree ? selectedTree.dataset.tree : '';
+                    const plantTypeRaw = selectedTree ? selectedTree.dataset.tree : '';
+                    const plantType = plantTypeRaw.replace('.png', '');
                     // console.warn(selectedTree)
                     if (!title) {
                         showToastAndHideModal(
@@ -2317,17 +2318,6 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                         const enlargedImage = document.getElementById('enlargedImage');
                         enlargedImage.src = e.target.src;
                         imageModal.show();
-                    }
-                });
-
-                // Add this event delegation handler before the closing of isDashboard block
-                document.addEventListener('click', function (e) {
-                    if (e.target.closest('.delete-task-btn')) {
-                        e.stopPropagation(); // Prevent task card click event
-                        const taskId = e.target.closest('.delete-task-btn').dataset.id;
-                        if (confirm('Are you sure you want to delete this task?')) {
-                            deleteTask(taskId);
-                        }
                     }
                 });
 
@@ -2748,16 +2738,7 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                     }
                 });
 
-                // Add this event delegation handler before the closing of isDashboard block
-                document.addEventListener('click', function (e) {
-                    if (e.target.closest('.delete-task-btn')) {
-                        e.stopPropagation(); // Prevent task card click event
-                        const taskId = e.target.closest('.delete-task-btn').dataset.id;
-                        if (confirm('Are you sure you want to delete this task?')) {
-                            deleteTask(taskId);
-                        }
-                    }
-                });
+             
 
                 // Image preview for new task modal
                 document.getElementById('newTaskPicture').addEventListener('change', function(e) {

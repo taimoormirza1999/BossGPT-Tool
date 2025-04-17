@@ -1,6 +1,8 @@
 <div class="col-md-3 chat-pannel position-relative">
-    <!-- AI TONE Modal -->
-    <div class=" my-custom-ai-tone-modal-chat-pannel d-none" id="AiToneModal">
+   
+    <div class="card" style="background-color: transparent!important;">
+ <!-- AI TONE Modal -->
+ <div class=" my-custom-ai-tone-modal-chat-pannel d-none" id="AiToneModal">
         <div class="card-ai-tone-modal-content">
             <div class="text-white border-0 rounded-t-lg header">
                 <h5 class="" id="AiToneModalLabel"><img
@@ -14,8 +16,6 @@
             </div>
         </div>
     </div>
-    <div class="card" style="background-color: transparent!important;">
-
         <div class="card-header" style="
                                             display: flex;
                                             flex-direction: column;

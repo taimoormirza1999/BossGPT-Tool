@@ -530,7 +530,7 @@ case 'send_message':
 
                     // Plant seeds for each assignee
                     foreach ($assignees as $user_id) {
-                        $gardenManager->plantSeed($task_id, $user_id, $taskSize);
+                        $gardenManager->plantSeed($task_id, $user_id, $taskSize, $data['plant_type']);
                     }
                     if ($emailSent) {
                         echo json_encode($response = [

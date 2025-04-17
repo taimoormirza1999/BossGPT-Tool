@@ -25,7 +25,7 @@ class GardenManager
                  FROM user_garden g
                  JOIN tasks t ON g.task_id = t.id
                  LEFT JOIN projects p ON t.project_id = p.id
-                 WHERE g.user_id = ?
+                 WHERE g.user_id = ? AND t.status = 'done'
                  ORDER BY g.updated_at DESC"
             );
             $stmt->execute([$userId]);
@@ -44,13 +44,15 @@ class GardenManager
      * @param string $size Task size (small, medium, large)
      * @return int Garden entry ID
      */
-    public function plantSeed($taskId, $userId, $size = 'medium')
+    public function plantSeed($taskId, $userId, $size = 'medium', $plantType = null)
     {
         try {
             $this->db->beginTransaction();
 
             // Determine plant type based on size
-            $plantType = $this->getPlantTypeBySize($size);
+            if ($plantType === null) {
+                $plantType = $this->getPlantTypeBySize($size);
+            }
             
             $stmt = $this->db->prepare(
                 "INSERT INTO user_garden (user_id, task_id, stage, plant_type, size) 
