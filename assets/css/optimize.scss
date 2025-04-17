@@ -1202,7 +1202,9 @@ body {
   }
 
   .modal {
+    background-color: transparent !important;
     .modal-dialog {
+      background-color: transparent !important;
       @media (min-width: 576px) {
         &:not(.modal-lg):not(.modal-xl) {
           max-width: 650px;
