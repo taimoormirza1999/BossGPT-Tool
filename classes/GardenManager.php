@@ -25,7 +25,7 @@ class GardenManager
                  FROM user_garden g
                  JOIN tasks t ON g.task_id = t.id
                  LEFT JOIN projects p ON t.project_id = p.id
-                 WHERE g.user_id = ? AND t.status = 'done'
+                 WHERE g.user_id = ? 
                  ORDER BY g.updated_at DESC"
             );
             $stmt->execute([$userId]);

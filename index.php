@@ -638,7 +638,8 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
             if(!isset($_SESSION['fcm_token'])) {
             echo getPopupAlert('Enable Notifications', 'Stay updated! Enable browser notifications to get the 
 latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold button-text" id="enableNowBtn" onclick="DynamicOpen(\'#notificationPermissionModal\')">Enable Now</h6>'); 
-            } ?>
+            } 
+?>
         <?php } ?>
     </div>
 

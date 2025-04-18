@@ -1,11 +1,9 @@
 <?php
-
 require_once 'env.php';
 loadEnv();
 require_once 'config/constants.php';
 session_start();
 require_once 'classes/GardenManager.php';
-
 // Redirect if not logged in
 if (!isset($_SESSION['user_id'])) {
     header('Location: index.php?page=login');
@@ -345,7 +343,7 @@ try {
         const plantTypes = [
             'seed', 'flower', 'treelv2', 'treelv3', 'treelv4',
             'treelv5', 'treelv6', 'treelv7', 'treelv8', 'treebig',
-            'dead', 'lush', 'treedead'
+            'dead', 'lush', 'treedead','flower1','flower3'
         ];
 
         plantTypes.forEach(type => {
@@ -434,18 +432,21 @@ try {
         // --- CREATE PLANT MATERIALS ---
         const createPlantMesh = (plantType, stage) => {
             let textureKey = plantType;
-
+            let texture = "";
             // Determine which texture to use based on stage and plantType
-            if (stage === 'seed') {
-                textureKey = 'seed';
-            } else if (stage === 'growing' || stage === 'sprout') {
-                if (plantType === 'lush') {
-                    textureKey = 'treelv3';
-                }
+            if (stage === 'sprout') {
+                texture = plantTextures['seed']
+            } 
+            else if (stage === 'growing') {
+              
+                    texture = plantTextures['flower3'];
+            
+            }else {
+                texture = plantTextures[textureKey];
             }
 
             // Use the actual texture or default to seed if not found
-            const texture = plantTextures[textureKey] || plantTextures['seed'];
+          
 
             const plantMaterial = new THREE.MeshLambertMaterial({
                 map: texture,
@@ -458,12 +459,15 @@ try {
             let width = 10;
             let height = 15;
 
-            if (stage === 'seed') {
-                width = 5;
-                height = 10;
+            if (stage === 'sprout') {
+                width = 9;
+                height = 11;
+            } else if (stage === 'growing') {
+                width = 10;
+                height = 16;
             } else if (stage === 'lush_tree') {
-                width = 12;
-                height = 18;
+                width = 13;
+                height = 19;
             }
 
             const geometry = new THREE.PlaneGeometry(width, height);
@@ -503,13 +507,7 @@ try {
                     scene.add(plantMesh);
                 }
             });
-        } else {
-            // If no plants, add a seed in the center to show something
-            const seedMesh = createPlantMesh('seed', 'seed');
-            seedMesh.position.set(0, tileHeight + 5, 0);
-            seedMesh.rotation.y = Math.PI / 3.4;
-            scene.add(seedMesh);
-        }
+        } 
 
         // --- RESIZE HANDLER ---
         window.addEventListener('resize', () => {

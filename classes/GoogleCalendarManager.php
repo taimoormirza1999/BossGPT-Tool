@@ -40,6 +40,10 @@ class GoogleCalendarManager
         header('Location: ' . $authUrl);
         exit;
     }
+    public function getClient()
+    {
+        return $this->client;
+    }
 
     public function createFixedEvent($summary, $description, $eventDate)
     {

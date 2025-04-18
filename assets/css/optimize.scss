@@ -175,8 +175,6 @@ $geist-fonts: (
     transform: translateY(-5px);
   }
 }
-
-
 @mixin hover-up($translateValue: -5px, $duration: 0.3s) {
   transition: all $duration ease-in-out;
   &:hover {
@@ -708,7 +706,6 @@ body {
       max-width: 576px;
     }
   }
-
   .container-fluid > .row:first-child {
     @media (max-width: 768px) {
       border-radius: 12px;

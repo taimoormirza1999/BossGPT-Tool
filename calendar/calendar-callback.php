@@ -20,11 +20,11 @@ if (isset($_GET['code'])) {
     $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
     $client->setAccessToken($token);
 
-    // ✅ Store token in session or DB (for now, using session)
+    // Store token in session
     $_SESSION['access_token'] = $token;
 
-    // Redirect to event creation form
-    header('Location: create-event.php');
+    // Redirect back to dashboard instead of create-event form
+    header('Location: ../dashboard.php');
     exit;
 } else {
     echo "Failed to authenticate with Google Calendar.";
