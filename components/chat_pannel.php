@@ -195,6 +195,10 @@
 
 
                     $prompts = [
+                        "what is my name?",
+                        "what is today's date?",
+                        "what is the time?",
+                        "📑 book a meeting with Taimoor by tomorrow at 10am",
                         "📑 suggest tasks for my project",
                         "🎯 Create task 'Your Task' and assign it to myself",
                         "📋 Create tasks for Your Feature",

@@ -428,22 +428,22 @@
                                                 <div class="card-body">
                                                     <div class="d-flex justify-content-between text-center mb-4">
                                                         <div class="garden-stat-item">
-                                                            <div class="garden-icon">🌱</div>
+                                                            <div class="garden-icon"><img src="assets/images/garden/seed.png" alt="Seed" style="width: 4rem; height: 4rem;"></div>
                                                             <div class="garden-count"><?= count($sproutPlants) ?></div>
                                                             <div class="garden-label">Seeds</div>
                                                         </div>
                                                         <div class="garden-stat-item">
-                                                            <div class="garden-icon">🌿</div>
+                                                            <div class="garden-icon"><img src="assets/images/garden/flower3.png" alt="Flower" style="width: 4rem; height: 4rem;"></div>
                                                             <div class="garden-count"><?= count($growingPlants) ?></div>
                                                             <div class="garden-label">Growing</div>
                                                         </div>
                                                         <div class="garden-stat-item">
-                                                            <div class="garden-icon">🌳</div>
+                                                            <div class="garden-icon"><img src="assets/images/garden/growing.png" alt="Tree" style="width: 4rem; height: 4rem;"></div>
                                                             <div class="garden-count"><?= count($completedPlants) ?></div>
                                                             <div class="garden-label">Flourishing</div>
                                                         </div>
                                                         <div class="garden-stat-item">
-                                                            <div class="garden-icon">🥀</div>
+                                                            <div class="garden-icon"><img src="assets/images/garden/dead.png" alt="Dead" style="width: 4rem; height: 4rem;"></div>
                                                             <div class="garden-count"><?= count($deadPlants) ?></div>
                                                             <div class="garden-label">Dead</div>
                                                         </div>
@@ -556,7 +556,7 @@
                                                                 <tr>
                                                                     <th>Project</th>
                                                                     <th>Task</th>
-                                                                    <th>Plant Type</th>
+                                                                    <th>Selected Plant Type</th>
                                                                     <th>Growth Stage</th>
                                                                     <th>Size</th>
                                                                     <th>Status</th>
@@ -565,9 +565,9 @@
                                                             <tbody>
                                                                 <?php foreach ($plants as $plant): ?>
                                                                     <tr>
-                                                                        <td><?= htmlspecialchars($plant['project_title'] ?? 'No Project') ?></td>
-                                                                        <td><?= htmlspecialchars($plant['task_title'] ?? 'Unnamed Task') ?></td>
-                                                                        <td><?= htmlspecialchars($plant['plant_type'] ?? 'Unknown') ?></td>
+                                                                        <td class="text-capitalize"><?= htmlspecialchars($plant['project_title'] ?? 'No Project') ?></td>
+                                                                        <td class="text-capitalize"><?= htmlspecialchars($plant['task_title'] ?? 'Unnamed Task') ?></td>
+                                                                        <td><img src="assets/images/garden/<?= $plant['plant_type'] ?>.png" alt="<?= $plant['plant_type'].".png" ?>" style="width: 4rem; height: 4rem;"></td>
                                                                         <td>
                                                                             <?php 
                                                                                 $stageIcons = [

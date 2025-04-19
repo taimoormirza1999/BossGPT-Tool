@@ -24,7 +24,7 @@ if (isset($_GET['code'])) {
     $_SESSION['access_token'] = $token;
 
     // Redirect back to dashboard instead of create-event form
-    header('Location: ../dashboard.php');
+    header('Location: ../');
     exit;
 } else {
     echo "Failed to authenticate with Google Calendar.";

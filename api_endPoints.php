@@ -43,7 +43,7 @@ if (isset($_GET['api'])) {
                     FROM chat_history 
                     WHERE project_id = ? 
                     ORDER BY timestamp
-                    LIMIT 20
+                   
                 ");
                 $stmt->execute([$data['project_id']]);
                 $history = $stmt->fetchAll(PDO::FETCH_ASSOC);

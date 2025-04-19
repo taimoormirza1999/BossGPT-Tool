@@ -41,7 +41,6 @@ class AIAssistant
                 FROM chat_history 
                 WHERE project_id = ? 
                 ORDER BY timestamp
-                LIMIT 20
             ");
             $stmt->execute([$project_id]);
             $chat_history = $stmt->fetchAll();
@@ -119,9 +118,31 @@ class AIAssistant
             // Get the AI tone from the parameter instead of $_REQUEST
             $aiTone = isset($_REQUEST['aiTone']) ? $_REQUEST['aiTone'] : 'demanding';
 
+            // Save user message first
+            $stmt = $this->db->prepare(
+                "INSERT INTO chat_history (project_id, message, sender, function_call) 
+                 VALUES (?, ?, ?, ?)"
+            );
+            $stmt->execute([
+                $project_id,
+                $message,
+                'user',
+                null
+            ]);
+
             // Check if this is a calendar-related request
             if ($this->isCalendarRequest($message)) {
-                return $this->handleCalendarRequest($message);
+                $calendarResponse = $this->handleCalendarRequest($message);
+                
+                // Save AI response for calendar request
+                $stmt->execute([
+                    $project_id,
+                    $calendarResponse['message'],
+                    'ai',
+                    null
+                ]);
+                
+                return $calendarResponse;
             }
 
             // Check if this is a task status update request
@@ -675,7 +696,7 @@ class AIAssistant
         try {
             if (!$this->calendar->isAuthenticated()) {
                 return [
-                    'message' => "Please connect your Google Calendar first. I'll help you schedule events once you're connected.",
+                    'message' => 'Please connect your Google Calendar first. I\'ll help you schedule events once you\'re connected. <button class="btn btn-primary" onclick="window.location.href=\'calendar/connect-calendar.php\'">Connect Calendar</button>',
                     'action' => 'connect_calendar'
                 ];
             }
@@ -686,22 +707,42 @@ class AIAssistant
             // If no date is specified, default to tomorrow
             if (!isset($eventDetails['date']) || empty($eventDetails['date'])) {
                 $eventDetails['date'] = date('Y-m-d', strtotime('+1 day'));
+            } else {
+                // Parse the date and ensure it uses the current year if not specified
+                $parsedDate = new DateTime($eventDetails['date']);
+                $currentYear = (int)date('Y');
+                $dateYear = (int)$parsedDate->format('Y');
+                
+                // If the year is different from current year, update it
+                if ($dateYear !== $currentYear) {
+                    $parsedDate->setDate($currentYear, $parsedDate->format('n'), $parsedDate->format('j'));
+                    $eventDetails['date'] = $parsedDate->format('Y-m-d');
+                }
             }
 
-            // Default time to 3:00 PM if not specified
-            $startTime = $eventDetails['date'] . ' 15:00:00';
-            $endTime = $eventDetails['date'] . ' 16:00:00';
+            // Set timezone to Dubai
+            $dubaiTz = new DateTimeZone('Asia/Dubai');
+            
+            // Create DateTime object for start time
+            $startDateTime = new DateTime(
+                $eventDetails['date'] . ' ' . ($eventDetails['time'] ?? '10:00:00'),
+                $dubaiTz
+            );
+            
+            // Create end time (1 hour later)
+            $endDateTime = clone $startDateTime;
+            $endDateTime->modify('+1 hour');
 
-            // Create the event with fixed time
+            // Create the event with specified time
             $event = new Google_Service_Calendar_Event([
                 'summary' => $eventDetails['summary'],
                 'description' => $eventDetails['description'],
                 'start' => [
-                    'dateTime' => date('c', strtotime($startTime)),
+                    'dateTime' => $startDateTime->format('c'),
                     'timeZone' => 'Asia/Dubai',
                 ],
                 'end' => [
-                    'dateTime' => date('c', strtotime($endTime)),
+                    'dateTime' => $endDateTime->format('c'),
                     'timeZone' => 'Asia/Dubai',
                 ],
             ]);
@@ -710,13 +751,16 @@ class AIAssistant
             $service = new Google_Service_Calendar($this->calendar->getClient());
             $createdEvent = $service->events->insert($calendarId, $event);
 
+            // Format time for display using the Dubai timezone
+            $displayTime = $startDateTime->format('g:i A') . ' - ' . $endDateTime->format('g:i A');
+
             return [
                 'message' => "✅ Event scheduled successfully!\n\n" .
                     "📅 Event: {$eventDetails['summary']}\n" .
-                    "📆 Date: " . date('l, F j, Y', strtotime($eventDetails['date'])) . "\n" .
-                    "⏰ Time: 3:00 PM - 4:00 PM\n" .
+                    "📆 Date: " . $startDateTime->format('l, F j, Y') . "\n" .
+                    "⏰ Time: {$displayTime} (Dubai Time)\n" .
                     "📝 Description: {$eventDetails['description']}\n\n" .
-                    "View in Calendar: " . $createdEvent->htmlLink,
+                    "View in Calendar: <a href='{$createdEvent->htmlLink}' target='_blank'>Open in Google Calendar</a>",
                 'event' => $eventDetails,
                 'success' => true
             ];
@@ -730,19 +774,16 @@ class AIAssistant
         }
     }
 
-    /**
-     * Extract event details from user message using GPT
-     */
     private function extractEventDetails($message)
     {
         $messages = [
             [
                 'role' => 'system',
-                'content' => "You are a calendar assistant. Extract event details from the user's message and respond ONLY with a JSON object in this exact format: {\"summary\": \"event title\", \"description\": \"event description\", \"date\": \"YYYY-MM-DD\"} - If date is not specified, omit the date field. Keep the description brief and relevant."
+                'content' => "You are a calendar assistant. Extract event details from the user's message and respond ONLY with a JSON object in this exact format: {\"summary\": \"event title\", \"description\": \"event description\", \"date\": \"YYYY-MM-DD\", \"time\": \"HH:MM:SS\"} - If date or time is not specified, omit those fields. Keep the description brief and relevant. For time, use 24-hour format. For relative dates like 'tomorrow', 'next week', etc., convert them to actual dates using today's date (" . date('Y-m-d') . ") as reference. Always use the current year (" . date('Y') . ") unless a different year is explicitly specified."
             ],
             [
                 'role' => 'user',
-                'content' => $message
+                'content' => $message . "\nToday's date is " . date('Y-m-d') . "."
             ]
         ];
 
