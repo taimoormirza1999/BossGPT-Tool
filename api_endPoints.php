@@ -73,22 +73,22 @@ if (isset($_GET['api'])) {
                 ]);
                 exit;
 
-case 'send_message':
-    $data = json_decode(file_get_contents('php://input'), true);
-    if (!isset($data['message']) || !isset($data['project_id'])) {
-        throw new Exception('Message and project ID are required');
-    }
+            case 'send_message':
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (!isset($data['message']) || !isset($data['project_id'])) {
+                    throw new Exception('Message and project ID are required');
+                }
 
-    // Pass the aiTone value to the processMessage method if provided
-    $aiTone = isset($data['aiTone']) ? $data['aiTone'] : 'demanding';
-    $_REQUEST['aiTone'] = $aiTone; // Set in $_REQUEST so it's accessible to AIAssistant
-    
-    $result = $ai_assistant->processMessage(
-        $data['message'],
-        $data['project_id']
-    );
-    $response = ['success' => true] + $result;
-    break;
+                // Pass the aiTone value to the processMessage method if provided
+                $aiTone = isset($data['aiTone']) ? $data['aiTone'] : 'demanding';
+                $_REQUEST['aiTone'] = $aiTone; // Set in $_REQUEST so it's accessible to AIAssistant
+
+                $result = $ai_assistant->processMessage(
+                    $data['message'],
+                    $data['project_id']
+                );
+                $response = ['success' => true] + $result;
+                break;
 
             case 'create_project':
                 $data = json_decode(file_get_contents('php://input'), true);
@@ -129,11 +129,11 @@ case 'send_message':
                     $data['task_id'],
                     $data['status']
                 );
-                
+
                 // Update plant growth in the garden
                 $gardenManager = new GardenManager();
                 $gardenManager->updatePlantStage($data['task_id'], $data['status']);
-                
+
                 $response = ['success' => true];
                 break;
 
@@ -523,7 +523,7 @@ case 'send_message':
                 $logedinUser = $Auth->getCurrentUser();
                 $projectTilte = $project_manager->getProjectName($data['project_id']);
                 try {
-                    $emailSent = $userManager->projectUsersTaskAssignedEmail($logedinUser['username'], $projectTilte, $data['title'], $allAssignees );
+                    $emailSent = $userManager->projectUsersTaskAssignedEmail($logedinUser['username'], $projectTilte, $data['title'], $allAssignees);
                     // Initialize garden integration
                     $gardenManager = new GardenManager();
                     $taskSize = isset($data['size']) ? $data['size'] : 'medium'; // Default to medium if size not specified
@@ -551,7 +551,7 @@ case 'send_message':
                     ];
                 }
 
-               
+
 
                 $response = ['success' => true, 'task_id' => $task_id];
                 break;
@@ -709,18 +709,18 @@ case 'send_message':
                 if (!isset($data['fcm_token'])) {
                     throw new Exception('FCM token is required');
                 }
-                
+
                 $userId = $_SESSION['user_id'];
                 $fcmToken = $data['fcm_token'];
-                
+
                 // Update the user's FCM token in the database
                 $stmt = $db->prepare("UPDATE users SET fcm_token = ? WHERE id = ?");
                 $result = $stmt->execute([$fcmToken, $userId]);
-                
+
                 if (!$result) {
                     throw new Exception('Failed to update FCM token');
                 }
-                
+
                 $response = ['success' => true, 'message' => 'FCM token updated successfully'];
                 break;
 

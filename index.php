@@ -187,7 +187,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
         $client->addScope("email");
         $client->addScope("profile");
         $client->setPrompt('select_account');
-        $authUrl = $client->createAuthUrl(); 
+        $authUrl = $client->createAuthUrl();
         // Show the "Sign in with Google" button
         echo "
          <div class='text-center mt-2'>
@@ -634,12 +634,12 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                 <i class="bi bi-bell-fill bell-icon"></i>
                 <span>Turn on Reminders</span>
             </button> -->
-            <?php 
-            if(!isset($_SESSION['fcm_token'])) {
-            echo getPopupAlert('Enable Notifications', 'Stay updated! Enable browser notifications to get the 
-latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold button-text" id="enableNowBtn" onclick="DynamicOpen(\'#notificationPermissionModal\')">Enable Now</h6>'); 
-            } 
-?>
+            <?php
+            if (!isset($_SESSION['fcm_token'])) {
+                echo getPopupAlert('Enable Notifications', 'Stay updated! Enable browser notifications to get the 
+latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold button-text" id="enableNowBtn" onclick="DynamicOpen(\'#notificationPermissionModal\')">Enable Now</h6>');
+            }
+            ?>
         <?php } ?>
     </div>
 
@@ -1117,7 +1117,7 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                             default: return 'seed.png';
                         }
                     };
-                    // Updated innerHTML now includes the due date in the task-meta section
+
                     const plantBallHtml = `<div class="plant-ball-container" >
     <img src="assets/images/garden/plant-ball.png" alt="Plant Ball" class="plant-ball" 
     data-bs-toggle="tooltip" data-bs-placement="bottom" title="Plant Stage"
@@ -1656,7 +1656,7 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                         }
                     }
 
-                
+
                 });
 
                 // Handle "New User" selection
@@ -1730,7 +1730,7 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                 // Helper functions
                 function appendMessage(message, sender) {
                     // Check if message is a raw JSON response for subtask dates
-                    if (sender === 'ai' && typeof message === 'string' && 
+                    if (sender === 'ai' && typeof message === 'string' &&
                         (message.includes('"task_id":') && message.includes('"subtasks":') && message.includes('"due_date":'))) {
                         try {
                             // Parse the JSON and format it using our formatter
@@ -1738,7 +1738,7 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                             if (jsonMatch) {
                                 const jsonStr = jsonMatch[0];
                                 const jsonData = JSON.parse(jsonStr);
-                                
+
                                 // Try to find the task details
                                 let taskDetails = null;
                                 if (jsonData.task_id) {
@@ -1755,7 +1755,7 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                                         };
                                     }
                                 }
-                                
+
                                 // Replace the message with formatted HTML
                                 message = formatAIResponse(jsonData, taskDetails);
                             }
@@ -1764,7 +1764,7 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                             message = '<div class="alert alert-success">Subtask dates have been updated successfully.</div>';
                         }
                     }
-                    
+
                     const div = document.createElement('div');
                     div.className = sender === 'user' ? 'user-message d-flex align-items-start justify-content-end' : 'ai-message d-flex align-items-start';
                     const iconImage = `<?php echo getIconImage(0, 0, '1.93rem'); ?>`;
@@ -2230,13 +2230,13 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                 });
 
                 function renderSuggestedTasks(suggestions) {
-  const wrapper = document.createElement('div');
-  wrapper.className = 'd-flex';
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'd-flex';
 
-  // Avatar block
-  const avatarDiv = document.createElement('div');
-  avatarDiv.className = 'ai-avatar';
-  avatarDiv.innerHTML = `
+                    // Avatar block
+                    const avatarDiv = document.createElement('div');
+                    avatarDiv.className = 'ai-avatar';
+                    avatarDiv.innerHTML = `
     <div class="chat-loading-avatar">
       <img src="https://res.cloudinary.com/da6qujoed/image/upload/v1742656707/logoIcon_pspxgh.png" 
            alt="Logo" class="logo-icon" 
@@ -2244,15 +2244,15 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
     </div>
   `;
 
-  // Suggestions container
-  const suggestionsContainer = document.createElement('div');
-  suggestionsContainer.className = 'suggestions-container mt-3 message ai';
-  suggestionsContainer.innerHTML = `<h6 class="mb-3">Suggested Tasks & Features</h6>`;
+                    // Suggestions container
+                    const suggestionsContainer = document.createElement('div');
+                    suggestionsContainer.className = 'suggestions-container mt-3 message ai';
+                    suggestionsContainer.innerHTML = `<h6 class="mb-3">Suggested Tasks & Features</h6>`;
 
-  suggestions.forEach(suggestion => {
-    const suggestionDiv = document.createElement('div');
-    suggestionDiv.className = 'suggestion-item border p-2 mb-2';
-    suggestionDiv.innerHTML = `
+                    suggestions.forEach(suggestion => {
+                        const suggestionDiv = document.createElement('div');
+                        suggestionDiv.className = 'suggestion-item border p-2 mb-2';
+                        suggestionDiv.innerHTML = `
       <strong>${escapeHtml(suggestion.title)}</strong><br>
       <span class="my-2">${escapeHtml(suggestion.description)}</span><br>
       <div class="d-flex mt-1" style="justify-content: space-between; flex-direction: row-reverse;">
@@ -2266,19 +2266,19 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
         </button>
       </div>
     `;
-    suggestionDiv.querySelector('button').addEventListener('click', () => {
-      addSuggestedTask(suggestion);
-    });
-    suggestionsContainer.appendChild(suggestionDiv);
-  });
+                        suggestionDiv.querySelector('button').addEventListener('click', () => {
+                            addSuggestedTask(suggestion);
+                        });
+                        suggestionsContainer.appendChild(suggestionDiv);
+                    });
 
-  // Append avatar + container to wrapper
-  wrapper.appendChild(avatarDiv);
-  wrapper.appendChild(suggestionsContainer);
+                    // Append avatar + container to wrapper
+                    wrapper.appendChild(avatarDiv);
+                    wrapper.appendChild(suggestionsContainer);
 
-  // Add to chat
-  chatMessages.appendChild(wrapper);
-}
+                    // Add to chat
+                    chatMessages.appendChild(wrapper);
+                }
 
 
                 function addSuggestedTask(suggestion) {
@@ -2386,7 +2386,7 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                     if (!jsonData || !jsonData.subtasks || !Array.isArray(jsonData.subtasks) || jsonData.subtasks.length === 0) {
                         return "<p>No subtask updates available.</p>";
                     }
-                    
+
                     // Create a map of subtask IDs to their titles
                     const subtaskMap = {};
                     if (taskDetails && taskDetails.subtasks) {
@@ -2394,7 +2394,7 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                             subtaskMap[subtask.id] = subtask.title;
                         });
                     }
-                    
+
                     // Group subtasks by due date for better organization
                     const subtasksByDate = {};
                     jsonData.subtasks.forEach(subtask => {
@@ -2403,29 +2403,29 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                         }
                         subtasksByDate[subtask.due_date].push(subtask);
                     });
-                    
+
                     // Sort dates for chronological order
                     const sortedDates = Object.keys(subtasksByDate).sort();
-                    
+
                     let html = `
                         <div class="ai-schedule-response">
                             <h6 class="mb-3">📅 Optimized Task Schedule</h6>
                             <div class="timeline-container">
                     `;
-                    
+
                     sortedDates.forEach(date => {
                         // Format date for display (from YYYY-MM-DD to more readable format)
                         const dateObj = new Date(date);
-                        const displayDate = dateObj.toLocaleDateString(undefined, { 
-                            weekday: 'short', 
-                            month: 'short', 
+                        const displayDate = dateObj.toLocaleDateString(undefined, {
+                            weekday: 'short',
+                            month: 'short',
                             day: 'numeric',
                             year: 'numeric'
                         });
-                        
+
                         // Get day of month for calendar icon
                         const dayOfMonth = dateObj.getDate();
-                        
+
                         html += `
                             <div class="date-group mb-3">
                                 <div class="date-header">
@@ -2436,24 +2436,24 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                                 </div>
                                 <ul class="task-list list-unstyled ps-3 pt-2">
                         `;
-                        
+
                         subtasksByDate[date].forEach(subtask => {
                             const subtaskTitle = subtaskMap[subtask.id] || `Subtask #${subtask.id}`;
                             html += `<li class="mb-1">• <strong>${subtaskTitle}</strong></li>`;
                         });
-                        
+
                         html += `
                                 </ul>
                             </div>
                         `;
                     });
-                    
+
                     html += `
                             </div>
                             <p class="mt-3 text-success small">✓ All deadlines have been optimized to ensure completion before the main task deadline.</p>
                         </div>
                     `;
-                    
+
                     return html;
                 }
 
@@ -2739,66 +2739,66 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                     }
                 });
 
-             
+
 
                 // Image preview for new task modal
-                document.getElementById('newTaskPicture').addEventListener('change', function(e) {
+                document.getElementById('newTaskPicture').addEventListener('change', function (e) {
                     const file = this.files[0];
                     if (file) {
                         const reader = new FileReader();
                         const previewContainer = document.getElementById('imagePreviewContainer');
                         const imagePreview = document.getElementById('imagePreview');
-                        
-                        reader.onload = function(e) {
+
+                        reader.onload = function (e) {
                             imagePreview.src = e.target.result;
                             previewContainer.style.display = 'block';
                         }
-                        
+
                         reader.readAsDataURL(file);
                     }
                 });
 
                 // Remove preview button for new task modal
-                document.getElementById('removePreviewBtn').addEventListener('click', function() {
+                document.getElementById('removePreviewBtn').addEventListener('click', function () {
                     const previewContainer = document.getElementById('imagePreviewContainer');
                     const fileInput = document.getElementById('newTaskPicture');
-                    
+
                     // Clear the file input
                     fileInput.value = '';
                     // Hide the preview
                     previewContainer.style.display = 'none';
                 });
-                
+
                 // Image preview for edit task modal
-                document.getElementById('editTaskPicture').addEventListener('change', function(e) {
+                document.getElementById('editTaskPicture').addEventListener('change', function (e) {
                     const file = this.files[0];
                     if (file) {
                         const reader = new FileReader();
                         const previewContainer = document.getElementById('editImagePreviewContainer');
                         const imagePreview = document.getElementById('editImagePreview');
-                        
-                        reader.onload = function(e) {
+
+                        reader.onload = function (e) {
                             imagePreview.src = e.target.result;
                             previewContainer.style.display = 'block';
-                            
+
                             // Hide the remove picture button when showing preview
                             document.getElementById('taskPictureContainer').style.display = 'none';
                         }
-                        
+
                         reader.readAsDataURL(file);
                     }
                 });
 
                 // Remove preview button for edit task modal
-                document.getElementById('editRemovePreviewBtn').addEventListener('click', function() {
+                document.getElementById('editRemovePreviewBtn').addEventListener('click', function () {
                     const previewContainer = document.getElementById('editImagePreviewContainer');
                     const fileInput = document.getElementById('editTaskPicture');
-                    
+
                     // Clear the file input
                     fileInput.value = '';
                     // Hide the preview
                     previewContainer.style.display = 'none';
-                    
+
                     // Show the remove picture button if task had an existing picture
                     const taskId = document.getElementById('editTaskId').value;
                     const taskCards = document.querySelectorAll('.task-card');
@@ -2808,17 +2808,17 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                         }
                     });
                 });
-                
+
                 // Modify openEditTaskModal to handle image preview for existing task picture
                 const originalOpenEditTaskModal = openEditTaskModal;
-                openEditTaskModal = function(task) {
+                openEditTaskModal = function (task) {
                     // Call the original function first
                     originalOpenEditTaskModal(task);
-                    
+
                     // Reset file input and hide preview container
                     document.getElementById('editTaskPicture').value = '';
                     document.getElementById('editImagePreviewContainer').style.display = 'none';
-                    
+
                     // If task has an existing picture, show it in the preview
                     if (task.picture) {
                         const imagePreview = document.getElementById('editImagePreview');
@@ -2827,12 +2827,12 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                         // Hide the remove button since we're showing the preview
                         document.getElementById('taskPictureContainer').style.display = 'none';
                     }
-                    
+
                     // Set the plant type in the edit tree selection
                     if (task.garden && task.garden.plant_type) {
                         const plantType = task.garden.plant_type;
                         document.getElementById('editPlantType').value = plantType + '.png';
-                        
+
                         // Highlight the selected tree
                         const treeOptions = document.querySelectorAll('#editTaskTreeContainer .tree-option');
                         treeOptions.forEach(option => {
@@ -2851,20 +2851,20 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                     enlargedImage.src = imageSrc;
                     imageModal.show();
                 }
-                
+
                 // Add event delegation for enlarging images when clicked
                 document.addEventListener('click', function (e) {
                     // Check if the clicked element is an image preview in either modal
                     if (e.target.id === 'imagePreview' || e.target.id === 'editImagePreview') {
                         openEnlargedImage(e.target.src);
                     }
-                    
+
                     // Also handle task pictures in the task cards
                     if (e.target.classList.contains('enlarge-image')) {
                         openEnlargedImage(e.target.src);
                     }
                 });
-                
+
                 // Add this event delegation handler before the closing of isDashboard block
                 document.addEventListener('click', function (e) {
                     if (e.target.closest('.delete-task-btn')) {
@@ -3125,25 +3125,25 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
         function closePopup(button) {
             let popup = button.parentElement;
             const reminderId = popup.dataset.reminderId;
-            
+
             // Check if this is the notification reminder or enable now button
             const isNotificationReminder = popup.id === 'reminderButton';
             const isEnableNowBtn = button.id === 'enableNowBtn';
-            
+
             if (isEnableNowBtn) {
                 // Handle the Enable Now button click
                 handleEnableNowBtn();
                 return;
             }
-            
+
             // For other reminders
             popup.remove();
-            
+
             // Delete from database/backend for regular reminders
             if (reminderId && !isNotificationReminder) {
                 delete_fcm_reminders(reminderId);
             }
-            
+
             // Update popup visibility to show the next one if available
             updatePopupVisibility();
         }
@@ -3155,13 +3155,13 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
             if (notificationPopup) {
                 notificationPopup.style.display = 'none';
             }
-            
+
             // Show the notification permission modal
             const notificationModal = new bootstrap.Modal(
                 document.getElementById("notificationPermissionModal")
             );
             notificationModal.show();
-            
+
             // Add event listener to show the popup again if the modal is dismissed
             const notificationModalEl = document.getElementById("notificationPermissionModal");
             notificationModalEl.addEventListener('hidden.bs.modal', function onHidden() {
@@ -3190,32 +3190,33 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                     <div class="card">
                         <div class="card-body text-center">
                             <h2 class="card-title text-center mb-4">How do you like your<br>AI Boss to be?</h2>
-                            
+
                             <!-- Replace the existing AI tone options with the helper function -->
                             <?php echo renderAIToneOptions(); ?>
-                            
-                            <button id="continueToDashboard" class="btn btn-primary w-100 mt-3">Continue to Dashboard</button>
+
+                            <button id="continueToDashboard" class="btn btn-primary w-100 mt-3">Continue to
+                                Dashboard</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
+
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function () {
                 const toneOptions = document.querySelectorAll('.ai-tone-option');
                 let selectedTone = 'friendly'; // Default selection
-                
+
                 // Get existing settings from localStorage if available
                 const savedTone = localStorage.getItem('userAITone') || localStorage.getItem('aiToneMode');
                 if (savedTone) {
                     selectedTone = savedTone;
                 }
-                
+
                 // Set initial selection in both storage keys for compatibility
                 localStorage.setItem('aiToneMode', selectedTone);
                 localStorage.setItem('userAITone', selectedTone);
-                
+
                 // Set initial active indicators based on saved tone
                 toneOptions.forEach(option => {
                     const optionTone = option.getAttribute('data-tone');
@@ -3225,15 +3226,15 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                         option.querySelector('.tone-indicator').classList.remove('active');
                     }
                 });
-                
+
                 // Handle tone selection
                 toneOptions.forEach(option => {
-                    option.addEventListener('click', function() {
+                    option.addEventListener('click', function () {
                         // Remove active class from all options
                         toneOptions.forEach(opt => {
                             opt.querySelector('.tone-indicator').classList.remove('active');
                         });
-                        
+
                         // Add active class to selected option
                         this.querySelector('.tone-indicator').classList.add('active');
 
@@ -3242,15 +3243,15 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                         localStorage.setItem('aiToneMode', selectedTone);
                     });
                 });
-                
+
                 // Handle continue button
-                document.getElementById('continueToDashboard').addEventListener('click', function() {
+                document.getElementById('continueToDashboard').addEventListener('click', function () {
                     window.location.href = '?page=dashboard';
                 });
             });
         </script>
-    
-        <?php 
+
+    <?php
     }
     ?>
 </body>

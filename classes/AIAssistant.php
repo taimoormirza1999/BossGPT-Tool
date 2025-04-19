@@ -118,7 +118,7 @@ class AIAssistant
 
             // Get the AI tone from the parameter instead of $_REQUEST
             $aiTone = isset($_REQUEST['aiTone']) ? $_REQUEST['aiTone'] : 'demanding';
-            
+
             // Check if this is a calendar-related request
             if ($this->isCalendarRequest($message)) {
                 return $this->handleCalendarRequest($message);
@@ -129,7 +129,7 @@ class AIAssistant
             if (preg_match('/move\s+task\s+[\'"]?([^\'"]*)[\'"]\s+from\s+todo\s+to\s+in\s+progress/i', $message, $matches)) {
                 $task_title = $matches[1];
                 error_log("Detected task status update request for: $task_title");
-                
+
                 // Find the task ID
                 $task_id = $this->findTaskIdByTitle($project_id, $task_title);
                 if ($task_id) {
@@ -137,18 +137,18 @@ class AIAssistant
                     error_log("Enhanced message with task ID: $enhanced_message");
                 }
             }
-            
+
             // Map tone values to different system messages
             $toneMessages = [
                 'friendly' => "You are a friendly and supportive project manager. Your communication style is warm, encouraging, and focused on team morale. Use phrases like 'Let's try', 'We can', 'I think', and offer positive reinforcement. Be supportive and understanding while still maintaining progress.\n\nWhen responding:\n1. Be warm and approachable\n2. Offer encouragement\n3. Be understanding of challenges\n4. Focus on teamwork\n5. Celebrate progress\n6. Use collaborative language\n7. Balance goals with wellbeing\n8. Give constructive feedback\n\nProject Context:\n",
-                
+
                 'professional' => "You are a professional and methodical project manager. Your communication style is clear, balanced, and focused on process and quality. Use phrases like 'We should', 'The data shows', 'Our timeline requires', and emphasize best practices. Be logical and systematic while maintaining high standards.\n\nWhen responding:\n1. Be clear and objective\n2. Present information logically\n3. Remain neutral in tone\n4. Focus on process and quality\n5. Refer to data and evidence\n6. Use professional terminology\n7. Emphasize consistency\n8. Give balanced feedback\n\nProject Context:\n",
-                
+
                 'demanding' => "You are a demanding and results-driven executive manager. Your communication style is direct, authoritative, and focused on performance and deadlines. Use phrases like 'I expect', 'You need to', 'This must be done', and emphasize urgency and accountability. Be stern but fair, always pushing for excellence.\n\nWhen responding:\n1. Be direct and concise\n2. Set clear expectations and deadlines\n3. Show zero tolerance for excuses\n4. Emphasize accountability\n5. Push for high performance\n6. Use authoritative language\n7. Focus on results and metrics\n8. Give direct feedback\n\nProject Context:\n",
-                
+
                 'casual' => "You are a casual and relatable project coordinator. Your communication style is conversational, laid-back, and focused on maintaining a positive atmosphere. Use phrases like 'Hey team', 'Let's chat about', 'How's it going with', and keep things light but productive. Be approachable while still getting things done.\n\nWhen responding:\n1. Use casual, everyday language\n2. Be conversational in tone\n3. Show empathy and understanding\n4. Focus on human connection\n5. Balance work with team dynamics\n6. Use relaxed expressions\n7. Keep communication open\n8. Give friendly feedback\n\nProject Context:\n"
             ];
-            
+
             // Set the content based on the tone or default to demanding if tone is not recognized
             $systemContent = ($toneMessages[$aiTone] ?? $toneMessages['demanding']) . $formatted_context;
 
@@ -369,14 +369,14 @@ class AIAssistant
 
             // Save AI response
             $ai_message = $result['choices'][0]['message']['content'] ?? 'Tasks have been created successfully.';
-            
+
             // Check if the message is a JSON response for subtask dates and clean it
             if ($ai_message && preg_match('/\{\s*"task_id":\s*\d+,\s*"subtasks":\s*\[\s*\{\s*"id":\s*\d+,\s*"due_date":/i', $ai_message)) {
                 // This appears to be a raw JSON response for subtask dates
                 // We'll store it but let the front-end handle formatting
                 $ai_message = "Your subtask dates have been updated successfully. The schedule has been optimized for maximum efficiency.";
             }
-            
+
             $stmt->execute([
                 $project_id,
                 $ai_message,
@@ -415,16 +415,16 @@ class AIAssistant
             case 'update_task':
                 error_log("==== AI ASSISTANT: UPDATING TASK ====");
                 error_log("Task ID: " . $arguments['task_id']);
-                
+
                 if (isset($arguments['status'])) {
                     error_log("Requested status change to: " . $arguments['status']);
-                    
+
                     // Get task info
                     $taskStmt = $this->db->prepare("SELECT title, project_id, status FROM tasks WHERE id = ?");
                     $taskStmt->execute([$arguments['task_id']]);
                     $task = $taskStmt->fetch();
                     error_log("Current task status: " . ($task ? $task['status'] : 'unknown'));
-                    
+
                     // Use ProjectManager to update status directly
                     try {
                         $projectManager = new ProjectManager();
@@ -436,7 +436,7 @@ class AIAssistant
                             error_log("Using normal status update for: " . $arguments['status']);
                             $projectManager->updateTaskStatus($arguments['task_id'], $arguments['status']);
                         }
-                        
+
                         // Log the activity regardless of other updates
                         if ($task) {
                             $this->logActivity(
@@ -445,14 +445,14 @@ class AIAssistant
                                 "AI Assistant updated status of task '{$task['title']}' from '{$task['status']}' to '{$arguments['status']}'"
                             );
                         }
-                        
+
                         break; // Exit the case if we handled the status update
                     } catch (Exception $e) {
                         error_log("Error updating task status: " . $e->getMessage());
                         // Continue with normal update as fallback
                     }
                 }
-                
+
                 // Normal update path continues
                 $updates = [];
                 $params = [];
@@ -482,14 +482,14 @@ class AIAssistant
                     error_log("SQL query: " . $sql . " with parameters: " . implode(", ", $params));
                     $stmt = $this->db->prepare($sql);
                     $stmt->execute($params);
-                    
+
                     // Log activity for status changes
                     if (isset($arguments['status'])) {
                         // Get task info for activity log
                         $taskStmt = $this->db->prepare("SELECT title, project_id FROM tasks WHERE id = ?");
                         $taskStmt->execute([$arguments['task_id']]);
                         $task = $taskStmt->fetch();
-                        
+
                         if ($task) {
                             $this->logActivity(
                                 $task['project_id'],
@@ -592,7 +592,7 @@ class AIAssistant
     {
         try {
             $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
-            
+
             $stmt = $this->db->prepare(
                 "INSERT INTO activity_log (project_id, user_id, action_type, description) 
                  VALUES (?, ?, ?, ?)"
@@ -603,7 +603,7 @@ class AIAssistant
                 $action_type,
                 $description
             ]);
-            
+
             error_log("Activity logged: $action_type - $description");
             return true;
         } catch (Exception $e) {
@@ -625,12 +625,12 @@ class AIAssistant
             ");
             $stmt->execute([$project_id, "%$task_title%"]);
             $tasks = $stmt->fetchAll();
-            
+
             if (count($tasks) > 0) {
                 error_log("Found task with title '$task_title': " . $tasks[0]['id']);
                 return $tasks[0]['id'];
             }
-            
+
             error_log("No task found with title like '$task_title'");
             return null;
         } catch (Exception $e) {
@@ -645,8 +645,17 @@ class AIAssistant
     private function isCalendarRequest($message)
     {
         $calendarKeywords = [
-            'schedule', 'book', 'appointment', 'meeting', 'calendar', 'event',
-            'remind', 'reminder', 'set up', 'arrange', 'plan'
+            'schedule',
+            'book',
+            'appointment',
+            'meeting',
+            'calendar',
+            'event',
+            'remind',
+            'reminder',
+            'set up',
+            'arrange',
+            'plan'
         ];
 
         $message = strtolower($message);
@@ -703,11 +712,11 @@ class AIAssistant
 
             return [
                 'message' => "✅ Event scheduled successfully!\n\n" .
-                            "📅 Event: {$eventDetails['summary']}\n" .
-                            "📆 Date: " . date('l, F j, Y', strtotime($eventDetails['date'])) . "\n" .
-                            "⏰ Time: 3:00 PM - 4:00 PM\n" .
-                            "📝 Description: {$eventDetails['description']}\n\n" .
-                            "View in Calendar: " . $createdEvent->htmlLink,
+                    "📅 Event: {$eventDetails['summary']}\n" .
+                    "📆 Date: " . date('l, F j, Y', strtotime($eventDetails['date'])) . "\n" .
+                    "⏰ Time: 3:00 PM - 4:00 PM\n" .
+                    "📝 Description: {$eventDetails['description']}\n\n" .
+                    "View in Calendar: " . $createdEvent->htmlLink,
                 'event' => $eventDetails,
                 'success' => true
             ];
@@ -774,7 +783,7 @@ class AIAssistant
         if (!$eventDetails) {
             throw new Exception("Failed to parse event details from AI response");
         }
-        
+
         // Set defaults if missing
         if (!isset($eventDetails['summary']) || empty($eventDetails['summary'])) {
             $eventDetails['summary'] = 'New Event';

@@ -167,7 +167,7 @@ try {
                 <p>Total Plants: <span id="totalPlants"><?= count($plants) ?></span></p>
                 <p>Completed Tasks (Lush Trees): <span
                         id="completedTasks"><?= count(array_filter($plants, function ($p) {
-                            return $p['stage'] == 'lush_tree'; })) ?></span>
+                            return $p['stage'] == 'tree'; })) ?></span>
                 </p>
                 <p>Growing Plants: <span
                         id="growingPlants"><?= count(array_filter($plants, function ($p) {
@@ -175,7 +175,7 @@ try {
                 </p>
                 <p>Seeds Planted: <span
                         id="seedsPlanted"><?= count(array_filter($plants, function ($p) {
-                            return $p['stage'] == 'seed'; })) ?></span>
+                            return $p['stage'] == 'sprout'; })) ?></span>
                 </p>
             </div>
 
@@ -275,7 +275,6 @@ try {
         // --- SCENE ---
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x51a387);
-
         // --- CAMERA (Orthographic for isometric) ---
         const width = window.innerWidth;
         const height = window.innerHeight;
