@@ -1099,7 +1099,7 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                             switch (task.garden.plant_stage) {
                                 case 'dead': return 'dead.png';
                                 case 'sprout': return 'seed.png';
-                                case 'growing': return 'growing.png';
+                                case 'growing': return 'flower3.png';
                                 case 'tree':
                                     // Return the specific tree type image
                                     return `${task.garden.plant_type}.png`;
@@ -1110,7 +1110,7 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                         // Fallback to status-based images if no garden data
                         switch (task.status) {
                             case 'todo': return 'seed.png';
-                            case 'in_progress': return 'growing.png';
+                            case 'in_progress': return 'flower3.png';
                             case 'done':
                                 // Default to treelv3 if no plant_type specified
                                 return task.garden.plant_type ? `${task.garden.plant_type}.png` : 'treelv3.png';
