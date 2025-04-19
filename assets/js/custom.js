@@ -1,75 +1,118 @@
+// Initial Loader
+document.addEventListener("DOMContentLoaded", function () {
+  // Create and append loader
+  const loader = document.createElement("div");
+  loader.className = "initial-loader";
+  loader.innerHTML = `
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <div class="loader-text">Loading BossGPT...</div>
+        </div>
+    `;
+  document.body.appendChild(loader);
+
+  // Remove loader after 3 seconds
+  setTimeout(() => {
+    loader.classList.add("fade-out");
+    setTimeout(() => {
+      loader.remove();
+    }, 500);
+  }, 3000);
+});
+
 // Notification System
 let isFetchingNotifications = false;
 let isDropdownOpen = false;
 
 function fetchNotificationsAndOpen(showDropdown = true) {
-    if (isFetchingNotifications) return;
-    isFetchingNotifications = true;
-    isDropdownOpen = true;
+  if (isFetchingNotifications) return;
+  isFetchingNotifications = true;
+  isDropdownOpen = true;
 
-    const dropdown = new bootstrap.Dropdown(document.getElementById('notificationDropdown'));
-    const currentProject = $('#myselectedcurrentProject').val();
+  const dropdown = new bootstrap.Dropdown(
+    document.getElementById("notificationDropdown")
+  );
+  const currentProject = $("#myselectedcurrentProject").val();
 
-    if (!currentProject || currentProject == undefined) {
-        Toast("error", "Error", "Please select a project first");
-        isFetchingNotifications = false;
-        return;
-    }
-    
+  if (!currentProject || currentProject == undefined) {
+    Toast("error", "Error", "Please select a project first");
+    isFetchingNotifications = false;
+    return;
+  }
 
-    fetchNotifications(currentProject)
-        .then(() => {
-            if (showDropdown && !isDropdownOpen) {
-                dropdown.show(); //toggle dropdown
-            }else if (!isDropdownOpen){
-                dropdown.hide(); //hide dropdown
-            }
-            isFetchingNotifications = false;
-        })
-        .catch(error => {
-            console.error("Error fetching notifications:", error);
-            isFetchingNotifications = false;
-        });
-}
-
-function fetchNotifications(project_id) {
-    return new Promise((resolve, reject) => {
-        fetch('?api=get_unreadnotifications&project_id='+project_id)
+  fetchNotifications(currentProject)
+    .then(() => {
+      if (showDropdown && !isDropdownOpen) {
+        dropdown.show(); //toggle dropdown
+        
+        // Clear notifications after viewing
+        const fcmToken = localStorage.getItem("fcm_token");
+        if (fcmToken) {
+          // Check if there are reminders to delete
+          fetch("?api=get_fcm_reminders", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ fcm_token: fcmToken }),
+          })
             .then(response => response.json())
             .then(data => {
-                if (data.success) {
-                    updateNotificationDropdown(data.logs || []);
-                    resolve();
-                } else {
-                    console.error("Error fetching notifications:", data.message);
-                    reject(new Error(data.message));
-                }
+              if (data.success && data.reminders && data.reminders.length > 0) {
+                // Clear each reminder
+                data.reminders.forEach(reminder => {
+                  fetch("?api=delete_fcm_reminders", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                      fcm_token: fcmToken,
+                      reminder_id: reminder.id 
+                    }),
+                  }).catch(error => {
+                    console.error("Error clearing reminder:", error);
+                  });
+                });
+              }
             })
             .catch(error => {
-                console.error("Request failed:", error);
-                reject(error);
+              console.error("Error checking FCM reminders:", error);
             });
+        }
+      } else if (!isDropdownOpen) {
+        dropdown.hide(); //hide dropdown
+      }
+      isFetchingNotifications = false;
+    })
+    .catch((error) => {
+      console.error("Error fetching notifications:", error);
+      isFetchingNotifications = false;
     });
 }
 
-// Initialize notification system when DOM is loaded
-// document.addEventListener('DOMContentLoaded', function() {
-//     const notificationDropdown = document.getElementById('notificationDropdown');
-//     if (notificationDropdown) {
-//         notificationDropdown.addEventListener('click', fetchNotificationsAndOpen);
-//         // Initial fetch
-//         // fetchNotifications();
-//         // Set up periodic refresh
-//         setInterval(fetchNotifications, 30000); // Refresh every 30 seconds
-//     }
-// });
+function fetchNotifications(project_id) {
+  return new Promise((resolve, reject) => {
+    fetch("?api=get_unreadnotifications&project_id=" + project_id)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          updateNotificationDropdown(data.logs || []);
+          resolve();
+        } else {
+          console.error("Error fetching notifications:", data.message);
+          reject(new Error(data.message));
+        }
+      })
+      .catch((error) => {
+        console.error("Request failed:", error);
+        reject(error);
+      });
+  });
+}
 
 // Toasts iziToast Helper
 function Toast(type, title, message, positionToast) {
   const toastOptions = {
     title: title,
     message: message,
-    position: positionToast?positionToast:"bottomCenter",
+    position: positionToast ? positionToast : "bottomCenter",
   };
   switch (type) {
     case "info":
@@ -116,26 +159,32 @@ function Toast(type, title, message, positionToast) {
 
 function hideModalWithDelay(modalId, delay = 1500) {
   setTimeout(() => {
-      // Try both jQuery and Bootstrap methods for maximum compatibility
-      try {
-          // Using jQuery if available
-          if (typeof $ !== 'undefined') {
-              $(`#${modalId}`).modal('hide');
-          } else {
-              // Using Bootstrap native
-              const modalElement = document.getElementById(modalId);
-              const modalInstance = bootstrap.Modal.getInstance(modalElement);
-              if (modalInstance) {
-                  modalInstance.hide();
-              }
-          }
-      } catch (error) {
-          console.error('Error hiding modal:', error);
+    // Try both jQuery and Bootstrap methods for maximum compatibility
+    try {
+      // Using jQuery if available
+      if (typeof $ !== "undefined") {
+        $(`#${modalId}`).modal("hide");
+      } else {
+        // Using Bootstrap native
+        const modalElement = document.getElementById(modalId);
+        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+        if (modalInstance) {
+          modalInstance.hide();
+        }
       }
+    } catch (error) {
+      console.error("Error hiding modal:", error);
+    }
   }, delay);
 }
 
-function showToastAndHideModal(modalId, toastType, toastTitle, toastMessage, delay = 1500) {
+function showToastAndHideModal(
+  modalId,
+  toastType,
+  toastTitle,
+  toastMessage,
+  delay = 1500
+) {
   // Show toast first
   Toast(toastType, toastTitle, toastMessage);
   // Hide modal with delay
@@ -145,7 +194,7 @@ function showToastAndHideModal(modalId, toastType, toastTitle, toastMessage, del
 // Chat Loading Animation
 function initializeChatLoading() {
   // Add the CSS for loading animation
-  const style = document.createElement('style');
+  const style = document.createElement("style");
   style.textContent = `
       .chat-loading {
           display: flex;
@@ -165,8 +214,8 @@ function initializeChatLoading() {
           width: 8px;
           height: 8px;
           border-radius: 50%;
-        //   background-color: var(--primary-color, #0d6efd);
-         background: #3a3b3c;
+          background:rgba(255, 255, 255, 1);
+       
           opacity: 0.6;
       }
 
@@ -212,22 +261,13 @@ function initializeChatLoading() {
           display: flex;
           align-items: center;
           gap: 10px;
-          background: var(--message-bg, #f0f2f5);
           padding: 10px 20px;
           border-radius: 18px;
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
       }
-
-      body.dark-mode .chat-loading-container {
-          background: #3a3b3c;
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-      }
-
       .chat-loading-avatar {
           width: 32px;
           height: 32px;
           border-radius: 50%;
-        //   background: var(--primary-color, #0d6efd);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -237,7 +277,8 @@ function initializeChatLoading() {
       }
 
       body.dark-mode .chat-loading-avatar {
-          background: rgba(255,255,255,0.4);
+       background: var(--bs-primary-darkpurple-linear-gradient);
+backdrop-filter: blur(8px);
           color: #fff;
           
       }
@@ -247,14 +288,18 @@ function initializeChatLoading() {
 
 // Show Chat Loading Animation
 function showChatLoading() {
-  const chatMessages = document.querySelector('.chat-messages');
+  const chatMessages = document.querySelector(".chat-messages");
   if (!chatMessages) return;
 
-  const loadingElement = document.createElement('div');
-  loadingElement.className = 'chat-loading';
+  const loadingElement = document.createElement("div");
+  loadingElement.className = "chat-loading";
   loadingElement.innerHTML = `
       <div class="chat-loading-container">
-          <div class="chat-loading-avatar"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 640 512" class="text-5xl" height="1.5em" width="1.5em" xmlns="http://www.w3.org/2000/svg"><path d="M32,224H64V416H32A31.96166,31.96166,0,0,1,0,384V256A31.96166,31.96166,0,0,1,32,224Zm512-48V448a64.06328,64.06328,0,0,1-64,64H160a64.06328,64.06328,0,0,1-64-64V176a79.974,79.974,0,0,1,80-80H288V32a32,32,0,0,1,64,0V96H464A79.974,79.974,0,0,1,544,176ZM264,256a40,40,0,1,0-40,40A39.997,39.997,0,0,0,264,256Zm-8,128H192v32h64Zm96,0H288v32h64ZM456,256a40,40,0,1,0-40,40A39.997,39.997,0,0,0,456,256Zm-8,128H384v32h64ZM640,256V384a31.96166,31.96166,0,0,1-32,32H576V224h32A31.96166,31.96166,0,0,1,640,256Z"></path></svg></div>
+        <div class="chat-loading-avatar">
+         <img src='https://res.cloudinary.com/da6qujoed/image/upload/v1742656707/logoIcon_pspxgh.png' alt="Logo"
+            class="logo-icon"
+            style="margin-top: 0; margin-bottom: 0; width: 1.5rem; height:auto">
+          </div>
           <div class="dots">
               <div class="dot"></div>
               <div class="dot"></div>
@@ -268,304 +313,699 @@ function showChatLoading() {
 
 // Hide Chat Loading Animation
 function hideChatLoading() {
-  const loadingElement = document.querySelector('.chat-loading');
+  const loadingElement = document.querySelector(".chat-loading");
   if (loadingElement) {
-      loadingElement.remove();
+    loadingElement.remove();
   }
 }
 
-
 function openNewProjectModal() {
   // Get your existing new project modal
-  const modal = new bootstrap.Modal(document.getElementById('newProjectModal'));
+  const modal = new bootstrap.Modal(document.getElementById("newProjectModal"));
   modal.show();
 }
 function scrollToBottom() {
-    if(welcomeThread){
-        welcomeThread.scrollTop = welcomeThread.scrollHeight;
-    }
+  if (welcomeThread) {
+    welcomeThread.scrollTop = welcomeThread.scrollHeight;
+  }
+}
+const aiMessageClasses = "ai-message d-flex align-items-start intro-message";
+
+// Add this new function to append a welcome logo
+function appendWelcomeLogo() {
+  const chatMessages = document.getElementById("chatMessages");
+  if (!chatMessages) return;
+  
+  // Remove any existing logo to avoid duplicates
+  const existingLogo = chatMessages.querySelector('.welcome-logo-container');
+  if (existingLogo) {
+    existingLogo.remove();
+  }
+  
+  // Create a centered logo container at the top
+  const logoContainer = document.createElement("div");
+  logoContainer.className = "welcome-logo-container text-center mb-2 mt-2";
+  logoContainer.innerHTML = `${welcomeLogoImage}  `;
+  
+  // Always insert at the beginning of the chat container
+  chatMessages.insertBefore(logoContainer, chatMessages.firstChild);
+  
+  // Log to verify it's being called
+  console.log("Welcome logo added to chat container");
 }
 
+// Add styles for the welcome logo
+document.addEventListener('DOMContentLoaded', function() {
+  const style = document.createElement('style');
+  style.textContent = `
+    .welcome-logo-container {
+        margin-bottom: 1.5rem;
+       padding: 0.8rem;
+    transition: all 0.3s ease;
+    background: var(--bs-primary-darkpurple-linear-gradient);
+    border-radius: 50%;
+    width: 5.5rem;
+    height: 5.5rem;
+    margin:auto;
+    }
+  
+    
+  `;
+  document.head.appendChild(style);
+});
 
-// Welcome AI Messages 
+// Welcome AI Messages - modified to add the logo
 function displayProjectCreationWelcomeMessages(title) {
-  const chatMessages = document.getElementById('chatMessages');
+  const chatMessages = document.getElementById("chatMessages");
   if (!chatMessages) return;
 
-  chatMessages.innerHTML = '';
+  chatMessages.innerHTML = "";
+  // Add welcome logo first
+  appendWelcomeLogo();
 
   const welcomeMessages = [
-      {
-          message: `👋 Hi! I'm here to help you with your project`,
-          delay: 1000
-      },
-      {
-          message: "You can ask me to:\n• Create new tasks of your project\n• Assign or subTasks\n• Get project insights\n• Manage team assignments",
-          delay: 2500
-      }
+    {
+      message: `👋 Hi! I'm here to help you with your project`,
+      delay: 900,
+    },
+    {
+      message:
+        "You can ask me to:\n• Create new tasks of your project\n• Assign or subTasks\n• Get project insights\n• Manage team assignments",
+      delay: 2500,
+    },
   ];
 
   showChatLoading(); // Show loading animation
 
   welcomeMessages.forEach((msg, index) => {
-      setTimeout(() => {
-          if (index === welcomeMessages.length - 1) {
-              hideChatLoading(); // Hide loading animation when last message is displayed
-          }
+    setTimeout(() => {
+      if (index === welcomeMessages.length - 1) {
+        hideChatLoading();
+      }
 
-          const messageDiv = document.createElement('div');
-          messageDiv.className = 'ai-message';
-          messageDiv.innerHTML = `
+      const messageDiv = document.createElement("div");
+
+      messageDiv.className = aiMessageClasses;
+      messageDiv.innerHTML = `
               <div class="ai-avatar">
                   <div class="chat-loading-avatar">
-                      <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 640 512" height="1.5em" width="1.5em" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M32,224H64V416H32A31.96166,31.96166,0,0,1,0,384V256A31.96166,31.96166,0,0,1,32,224Zm512-48V448a64.06328,64.06328,0,0,1-64,64H160a64.06328,64.06328,0,0,1-64-64V176a79.974,79.974,0,0,1,80-80H288V32a32,32,0,0,1,64,0V96H464A79.974,79.974,0,0,1,544,176ZM264,256a40,40,0,1,0-40,40A39.997,39.997,0,0,0,264,256Zm-8,128H192v32h64Zm96,0H288v32h64ZM456,256a40,40,0,1,0-40,40A39.997,39.997,0,0,0,456,256Zm-8,128H384v32h64ZM640,256V384a31.96166,31.96166,0,0,1-32,32H576V224h32A31.96166,31.96166,0,0,1,640,256Z"></path>
-                      </svg>
+                    ${iconImage}
                   </div>
               </div>
               <div class="message ai">
-                  <p>${msg.message.replace(/\n/g, '<br>')}</p>
+                  <p>${msg.message.replace(/\n/g, "<br>")}</p>
               </div>
           `;
-          chatMessages.appendChild(messageDiv);
-          scrollToBottom();
-      }, msg.delay);
+      chatMessages.appendChild(messageDiv);
+      scrollToBottom();
+    }, msg.delay);
   });
 }
 
 function getActionTypeDisplay(action_type) {
-    const actionTypes = {
-        'project_created': { 
-            text: 'New Project Created', 
-            bgColor: 'bg-success bg-opacity-10',
-            textColor: 'text-success-emphasis text-success-emphasis-light',
-            darkBgColor: 'dark-mode-success'
-        },
-        'user_assigned': { 
-            text: 'New User Added', 
-            bgColor: 'bg-info bg-opacity-10',
-            textColor: 'text-info-emphasis text-success-emphasis-light',
-            darkBgColor: 'dark-mode-info'
-        },
-        'task_created': { 
-            text: 'New Task Created', 
-            bgColor: 'bg-primary bg-opacity-10',
-            textColor: 'text-primary-emphasis text-success-emphasis-light',
-            darkBgColor: 'dark-mode-primary'
-        },
-        'user_removed': { 
-            text: 'User Removed', 
-            bgColor: 'bg-danger bg-opacity-10',
-            textColor: 'text-primary-emphasis text-success-emphasis-light',
-            darkBgColor: 'dark-mode-danger bg-danger bg-opacity-50'
-        },
-        'task_status_updated': { 
-            text: 'Task Status Updated', 
-            bgColor: 'bg-warning bg-opacity-10',
-            textColor: 'text-warning-emphasis text-success-emphasis-light',
-            darkBgColor: 'dark-mode-primary'
-        }
-    };
-    return actionTypes[action_type] || { 
-        text: action_type, 
-        bgColor: 'bg-secondary bg-opacity-10',
-        textColor: 'text-secondary-emphasis text-success-emphasis-light',
-        darkBgColor: 'dark-mode-secondary'
-    };
+  const actionTypes = {
+    project_created: {
+      text: "New Project Created",
+    },
+    user_assigned: {
+      text: "New User Added",
+    },
+    task_created: {
+      text: "New Task Created",
+    },
+    user_removed: {
+      text: "User Removed",
+    },
+    task_picture_removed: {
+      text: "Task Status Updated",
+    },
+    task_status_updated: {
+      text: "Task Status Updated",
+    },
+    task_updated: {
+      text: "Task Updated",
+    },
+    subtask_created: {
+      text: "Subtask Created",
+    },
+    subtask_status_updated: {
+      text: "Subtask Status Updated",
+    },
+    subtask_deleted: {
+      text: "Subtask Deleted",
+    },
+  };
+  return (
+    actionTypes[action_type] || {
+      text: action_type,
+    }
+  );
 }
 
 function formatTimeAgo(dateString) {
-    // Create date objects
-    const date = new Date(dateString + ' UTC'); // Treat the server time as UTC
-    const now = new Date();
-    
-    // Calculate time differences
-    const diffInMs = now - date;
-    const diffInSeconds = Math.floor(diffInMs / 1000);
-    const diffInMinutes = Math.floor(diffInSeconds / 60);
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    const diffInDays = Math.floor(diffInHours / 24);
+  // Create date objects
+  const date = new Date(dateString + " UTC"); // Treat the server time as UTC
+  const now = new Date();
 
-    // Return appropriate time format
-    if (diffInDays > 0) {
-        if (diffInDays === 1) return 'yesterday';
-        if (diffInDays <= 7) return `${diffInDays} days ago`;
-        return date.toLocaleDateString('en-US', { 
-            month: 'short', 
-            day: 'numeric',
-            year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
-        });
-    } else if (diffInHours > 0) {
-        return `${diffInHours} ${diffInHours === 1 ? 'hour' : 'hours'} ago`;
-    } else if (diffInMinutes > 0) {
-        return `${diffInMinutes} ${diffInMinutes === 1 ? 'minute' : 'minutes'} ago`;
-    } else {
-        return 'just now';
-    }
-}
+  // Calculate time differences
+  const diffInMs = now - date;
+  const diffInSeconds = Math.floor(diffInMs / 1000);
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  const diffInDays = Math.floor(diffInHours / 24);
 
-function getNotificationIcon(action_type) {
-    const icons = {
-        'project_created': 'bi-folder-plus',
-        'user_removed': 'bi-person-dash',
-        'user_assigned': 'bi-person-plus',
-        'task_created': 'bi-list-check',
-        'task_status_updated': 'bi-arrow-repeat'
-    };
-    return icons[action_type] || 'bi-bell';
+  // Return appropriate time format
+  if (diffInDays > 0) {
+    if (diffInDays === 1) return "yesterday";
+    if (diffInDays <= 7) return `${diffInDays} days ago`;
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: date.getFullYear() !== now.getFullYear() ? "numeric" : undefined,
+    });
+  } else if (diffInHours > 0) {
+    return `${diffInHours} ${diffInHours === 1 ? "hour" : "hours"} ago`;
+  } else if (diffInMinutes > 0) {
+    return `${diffInMinutes} ${diffInMinutes === 1 ? "minute" : "minutes"} ago`;
+  } else {
+    return "just now";
+  }
 }
 
 function updateNotificationDropdown(notifications) {
-    const notificationList = document.querySelector(".notification-list");
-    const badge = document.getElementById('notificationBadge');
-    const isDarkMode = document.body.classList.contains('dark-mode');
-    
-    if (!notificationList || !badge) return;
+  const notificationList = document.querySelector(".notification-list");
+  const badge = document.getElementById("notificationBadge");
+  const isDarkMode = document.body.classList.contains("dark-mode");
 
-    // Add styles for dark mode if not already added
-    if (!document.getElementById('notification-dark-mode-styles')) {
-        const styleSheet = document.createElement('style');
-        styleSheet.id = 'notification-dark-mode-styles';
-        styleSheet.textContent = `
-            .dark-mode .notification-dropdown {
-                background-color: #1a1a1a !important;
-                border-color: #2d2d2d !important;
-              
+  if (!notificationList || !badge) return;
+
+  // Add styles for dark mode if not already added
+  if (!document.getElementById("notification-dark-mode-styles")) {
+    const styleSheet = document.createElement("style");
+    styleSheet.id = "notification-dark-mode-styles";
+    styleSheet.textContent = `
+            
+            .notification-text {
+               color: rgba(131, 131, 131, 1);
+               white-space: normal;
             }
-            .text-success-emphasis-light{
-                color: #212121 !important;
-            }
-            .dark-mode .text-success-emphasis-light{
-                color: #fff !important;
-            }
-            .dark-mode .dropdown-item {
-                color: #e1e1e1;
-                border-color: #2d2d2d !important;
-                background-color: #1a1a1a !important;
-            }
-            .dark-mode .dropdown-item:hover {
-                background-color: #2d2d2d !important;
-            }
-            .dark-mode .dropdown-header {
-                border-color: #2d2d2d;
-                color: #ffffff;
-                background-color: #1a1a1a !important;
-            }
-            .dropdown-header {
-               border-bottom: 0.3rem #d3d4d5 solid;
-            }
-            .dark-mode .notification-text {
-                color: #e1e1e1 !important;
-            }
-            .dark-mode .text-muted {
+           .text-muted {
                 color: #a0a0a0 !important;
             }
-            .dark-mode-success { background-color: rgba(25, 135, 84, 0.35) !important;  }
-            .dark-mode-info { background-color: rgba(13, 202, 240, 0.35) !important; }
-            .dark-mode-primary { background-color: rgba(13, 110, 253,.35) !important; }
-            .dark-mode-warning { background-color: rgba(255, 193, 7, 0.35) !important; }
-            .dark-mode-secondary { background-color: rgba(108, 117, 125, 0.35) !important; }
-            .dark-mode .notification-icon {
-                background-color: rgba(255, 255, 255, 0.15) !important;
-            }
-            .dark-mode .dropdown-menu {
-                background-color: #1a1a1a !important;
-                border-color: #2d2d2d !important;
-                border-width: 0.25rem !important;
-            }
+            
+           
             #notificationDropdownMenu.dropdown-menu {
-                border-width: 0.25rem !important;
-                border-radius: 0.5rem !important;
+               background: rgba(255, 255, 255, 0.8);
+backdrop-filter: blur(3.1px);
+border-radius: 12px;
+width: 300px; 
+overflow-x: hidden;    
             }
 
             #notificationDropdownMenu.dark-mode .dropdown-menu {
-                background-color: #1a1a1a !important;
-                border-color: #2d2d2d !important;
                 border-width: 0.25rem !important;
             }
-            .dark-mode .dropdown-item:active,
-            .dark-mode .dropdown-item:focus {
-                background-color: #2d2d2d !important;
-            }
+           
+       
         `;
-        document.head.appendChild(styleSheet);
-    }
+    document.head.appendChild(styleSheet);
+  }
 
-    // Update badge
-    if (notifications.length > 0) {
-        badge.textContent = notifications.length;
-        badge.style.display = "inline-block";
-    } else {
-        badge.style.display = "none";
-    }
+  // Update badge
+  if (notifications.length > 0) {
+    badge.textContent = notifications.length;
+    badge.style.display = "inline-block";
+  } else {
+    badge.style.display = "none";
+  }
 
-    // Update notification list
-    if (notifications.length > 0) {
-        notificationList.innerHTML = notifications.map(notification => {
-            const actionType = getActionTypeDisplay(notification.action_type);
-            const timeAgo = formatTimeAgo(notification.created_at);
-            const icon = getNotificationIcon(notification.action_type);
-            
-            return `
-                <div class="dropdown-item border-bottom py-3">
+
+  // Update notification list
+  if (notifications.length > 0) {
+    notificationList.innerHTML = notifications
+      .map((notification) => {
+        const actionType = getActionTypeDisplay(notification.action_type);
+        const timeAgo = formatTimeAgo(notification.created_at);
+        const icon = getNotificationIcon(notification.action_type);
+        const iconClass = getNotificationIconClass(notification.action_type);
+
+        return `
+                <div class="dropdown-item border-bottom pt-2">
                     <div class="d-flex align-items-start">
-                        <div class="notification-icon ${isDarkMode ? actionType.darkBgColor : actionType.bgColor} rounded-circle  me-3"
-                        style="padding:0.6rem 0.8rem !important;"
+                        <div class="notification-icon ${iconClass} ${
+          isDarkMode ? actionType.darkBgColor : actionType.bgColor
+        } rounded-circle  me-3"
+                       
                         >
-                            <i class="bi ${icon} ${actionType.textColor}"></i>
+                        ${icon}
                         </div>
                         <div class="flex-grow-1">
                             <div class="d-flex justify-content-between align-items-center mb-1">
-                                <span class="badge ${isDarkMode ? actionType.darkBgColor : actionType.bgColor} ${actionType.textColor} rounded-pill px-3 py-1" >
+                                <span class="title-notification rounded-pill" >
                                     ${actionType.text}
                                 </span>
-                                <small class="text-muted" style="font-size: 0.75rem;">
+                                 <small class=" notification-time" style="font-size: 0.75rem;">
                                     ${timeAgo}
                                 </small>
                             </div>
-                            <div class="notification-text" style="font-size: 0.8rem;">
+                            <div class="notification-text" style="font-size: 0.8rem;text-wrap: auto;">
                                 ${notification.description}
                             </div>
                         </div>
                     </div>
                 </div>
             `;
-        }).join('');
-    } else {
-        notificationList.innerHTML = `
+      })
+      .join("");
+  } else {
+    notificationList.innerHTML = `
             <div class="dropdown-item text-center py-4">
                 <i class="bi bi-bell text-muted mb-2 d-block" style="font-size: 1.5rem;"></i>
                 <p class="text-muted mb-0">No new notifications</p>
             </div>`;
-    }
+  }
 }
 
-function sendNotificationTest(projectId, title, body) {
-    fetch('?api=send_notification_test', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            project_id: projectId,
-            title: title,
-            body: body
-        })
+// Notification
+function appendNotification(notification) {
+  const notificationList = document.querySelector(".notification-list");
+  const badge = document.getElementById("notificationBadge");
+  const isDarkMode = document.body.classList.contains("dark-mode");
+  
+  // Check if this notification is already in the list (avoid duplicates)
+  const existingNotifications = notificationList.querySelectorAll('.dropdown-item');
+  let isDuplicate = false;
+  
+  existingNotifications.forEach(item => {
+    const description = item.querySelector('.notification-text')?.textContent?.trim();
+    const actionSpan = item.querySelector('.title-notification')?.textContent?.trim();
+    const actionTypeText = getActionTypeDisplay(notification.action_type).text;
+    
+    // If both the description and action type match, consider it a duplicate
+    if (description === notification.description.trim() && 
+        actionSpan === actionTypeText) {
+      isDuplicate = true;
+    }
+  });
+  
+  // Don't add duplicate notifications
+  if (isDuplicate) {
+    return;
+  }
+  
+  const actionType = getActionTypeDisplay(notification.action_type);
+  const timeAgo = formatTimeAgo(notification.created_at);
+  const icon = getNotificationIcon(notification.action_type);
+  const iconClass = getNotificationIconClass(notification.action_type);
+
+  const newNotification = `
+  <div class="dropdown-item border-bottom pt-2">
+      <div class="d-flex align-items-start">
+          <div class="notification-icon ${iconClass} ${
+            isDarkMode ? actionType.darkBgColor : actionType.bgColor
+          } rounded-circle me-3"
+              >
+              ${icon}
+          </div>
+          <div class="flex-grow-1">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="title-notification rounded-pill">
+                      ${actionType.text}
+                  </span>
+                  <small class="notification-time" style="font-size: 0.75rem;">
+                      ${timeAgo}
+                  </small>
+              </div>
+              <div class="notification-text" style="font-size: 0.8rem;text-wrap: auto;">
+                  ${notification.description}
+              </div>
+          </div>
+      </div>
+  </div>
+`;
+
+  // Prepend the new notification to the list
+  notificationList.insertAdjacentHTML("afterbegin", newNotification);
+  
+  // Update badge count
+  const currentCount = badge.style.display === 'none' ? 0 : parseInt(badge.textContent || '0');
+  badge.textContent = currentCount + 1;
+  badge.style.display = 'inline-block';
+  
+  // If "No notifications" message is showing, remove it
+  const emptyNotification = notificationList.querySelector('.dropdown-item.text-center');
+  if (emptyNotification) {
+    emptyNotification.remove();
+  }
+}
+
+function initPusher(currentProject) {
+  // Disable pusher logging
+  Pusher.logToConsole = false;
+
+  var pusher = new Pusher("83a162dc942242f89892", {
+    cluster: "ap2",
+  });
+
+  var channel = pusher.subscribe("project_" + currentProject);
+
+  channel.bind("project_created", function (data) {
+    appendNotification(data);
+    Toast("success", "Project Created", data.message, "topRight");
+  });
+  channel.bind("user_assigned", function (data) {
+    appendNotification(data);
+    Toast("success", "User Joined", data.message, "topRight");
+  });
+  channel.bind("task_created", function (data) {
+    appendNotification(data);
+    Toast("success", "Task Created", data.message, "topRight");
+  });
+  channel.bind("task_updated", function (data) {
+    appendNotification(data);
+    Toast("success", "Success", data.message, "topRight");
+  });
+}
+
+// Handle prompt button clicks
+document.addEventListener("DOMContentLoaded", function () {
+  const promptButtons = document.querySelectorAll(".prompt-btn");
+  const messageInput = document.getElementById("messageInput");
+
+  promptButtons.forEach((button) => {
+    button.addEventListener("click", function () {
+      // Get the text without the emoji
+      const promptText = this.textContent.replace(/^[^\w\s]+ /, "");
+      messageInput.value = promptText;
+      messageInput.focus();
+    });
+  });
+});
+
+// Function to handle errors
+function handleAjaxError(xhr, status, error) {
+  console.error("Ajax Error:", error);
+  Toast("error", "Error", "An error occurred: " + error, "topRight");
+}
+
+// FCM Token and Notifications
+
+let fcmTokenSaved = false;
+
+// Check if FCM is already enabled
+function checkFCMStatus() {
+  const fcmToken = localStorage.getItem("fcm_token");
+  const reminderButton = document.getElementById("reminderButton");
+
+  if (reminderButton) {
+    if (fcmToken) {
+      reminderButton.classList.add("active");
+      reminderButton.querySelector("span").textContent = "Reminders Active";
+      fcmTokenSaved = true;
+    } else {
+      reminderButton.classList.remove("active");
+      reminderButton.querySelector("span").textContent = "Turn on Reminders";
+      fcmTokenSaved = false;
+    }
+  }
+}
+
+// Initialize FCM
+function initializeFCM() {
+  if (!firebase.messaging.isSupported()) {
+    console.warn("Firebase messaging is not supported in this browser");
+    return;
+  }
+
+  const messaging = firebase.messaging();
+
+  // Request permission and get token
+  messaging
+    .getToken({ vapidKey: "YOUR_VAPID_KEY" })
+    .then((currentToken) => {
+      if (currentToken) {
+        saveFCMToken(currentToken);
+      } else {
+        console.log(
+          "No registration token available. Request permission to generate one."
+        );
+      }
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            Toast("success", "Success", "Notification sent successfully");
-            // Refresh notifications after sending
-            fetchNotifications();
-        } else {
-            Toast("error", "Error", data.message || "Failed to send notification");
-        }
+    .catch((err) => {
+      console.log("An error occurred while retrieving token. ", err);
+    });
+
+  // Handle token refresh
+  messaging.onTokenRefresh(() => {
+    messaging
+      .getToken()
+      .then((refreshedToken) => {
+        console.log("Token refreshed.");
+        saveFCMToken(refreshedToken);
+      })
+      .catch((err) => {
+        console.log("Unable to retrieve refreshed token ", err);
+      });
+  });
+
+  // Handle foreground messages
+  messaging.onMessage((payload) => {
+    console.log("Message received. ", payload);
+    showNotification(payload.notification.title, payload.notification.body);
+  });
+}
+
+// Save token to database
+function saveFCMToken(token) {
+  localStorage.setItem("fcm_token", token);
+
+  // Update UI
+  const reminderButton = document.getElementById("reminderButton");
+  if (reminderButton) {
+    reminderButton.classList.add("active");
+    reminderButton.querySelector("span").textContent = "Reminders Active";
+  }
+
+  // Save to database
+  fetch("?api=update_fcm_token", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ fcm_token: token }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        fcmTokenSaved = true;
+        console.log("FCM token saved to database");
+      } else {
+        console.error("Failed to save FCM token to database");
+      }
     })
-    .catch(error => {
-        console.error("Request failed:", error);
-        Toast("error", "Error", "Failed to send notification");
+    .catch((error) => {
+      console.error("Error saving FCM token:", error);
     });
 }
 
+// Show browser notification
+function showNotification(title, body) {
+  if (!("Notification" in window)) {
+    console.log("This browser does not support desktop notification");
+    return;
+  }
 
+  if (Notification.permission === "granted") {
+    const notification = new Notification(title, {
+      body: body,
+      icon: "/favicon.ico",
+    });
+
+    notification.onclick = function () {
+      window.focus();
+      this.close();
+    };
+  }
+}
+
+// Request notification permission
+function requestNotificationPermission() {
+  if (!("Notification" in window)) {
+    Toast(
+      "error",
+      "Error",
+      "This browser does not support desktop notifications",
+      "topRight"
+    );
+    return Promise.reject("Notifications not supported");
+  }
+
+  if (Notification.permission === "granted") {
+    return Promise.resolve();
+  }
+
+  // Show the modal instead of directly requesting permission
+  const notificationModal = new bootstrap.Modal(
+    document.getElementById("notificationPermissionModal")
+  );
+  notificationModal.show();
+
+  // Return a promise that will be resolved when the enable button is clicked
+  return new Promise((resolve, reject) => {
+    const enableBtn = document.getElementById("enableNotificationsBtn");
+
+    if (enableBtn) {
+      // One-time event listener for the enable button
+      const clickHandler = () => {
+        enableBtn.removeEventListener("click", clickHandler);
+
+        // Hide the modal and request actual permission
+        notificationModal.hide();
+
+        // Request the actual browser permission
+        Notification.requestPermission().then((permission) => {
+          if (permission === "granted") {
+            Toast(
+              "success",
+              "Notifications Enabled",
+              "You will now receive task reminders",
+              "topRight"
+            );
+            resolve();
+          } else {
+            Toast(
+              "error",
+              "Permission Denied",
+              "Please enable notifications to receive reminders",
+              "topRight"
+            );
+            reject("Permission denied");
+          }
+        });
+      };
+
+      enableBtn.addEventListener("click", clickHandler);
+
+      // Also handle modal dismiss
+      const modalElement = document.getElementById(
+        "notificationPermissionModal"
+      );
+      modalElement.addEventListener(
+        "hidden.bs.modal",
+        () => {
+          enableBtn.removeEventListener("click", clickHandler);
+          reject("Modal closed");
+        },
+        { once: true }
+      );
+    } else {
+      reject("Enable button not found");
+    }
+  });
+}
+
+// Handle reminder button click
+document.addEventListener("DOMContentLoaded", function () {
+  const reminderButton = document.getElementById("reminderButton");
+  checkFCMStatus();
+
+  if (reminderButton) {
+    reminderButton.addEventListener("click", function () {
+      if (fcmTokenSaved) {
+        // If notifications are already enabled, show settings
+        Toast(
+          "info",
+          "Reminders Active",
+          "You are already receiving notifications for task reminders",
+          "topRight"
+        );
+      } else {
+        // Request permission and initialize FCM
+        requestNotificationPermission()
+          .then(() => {
+            if (typeof firebase !== "undefined" && firebase.messaging) {
+              initializeFCM();
+            } else {
+              // Firebase not loaded, load it first
+              loadFirebaseScript()
+                .then(() => {
+                  initializeFCM();
+                })
+                .catch((error) => {
+                  console.error("Error loading Firebase:", error);
+                  Toast(
+                    "error",
+                    "Error",
+                    "Failed to load notification service",
+                    "topRight"
+                  );
+                });
+            }
+          })
+          .catch((error) => {
+            console.error("Error requesting notification permission:", error);
+          });
+      }
+    });
+  }
+});
+
+// Load Firebase scripts dynamically
+function loadFirebaseScript() {
+  return new Promise((resolve, reject) => {
+    // Load Firebase App
+    const firebaseAppScript = document.createElement("script");
+    firebaseAppScript.src =
+      "https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js";
+    firebaseAppScript.onload = () => {
+      // Load Firebase Messaging
+      const firebaseMessagingScript = document.createElement("script");
+      firebaseMessagingScript.src =
+        "https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js";
+      firebaseMessagingScript.onload = () => {
+        // Initialize Firebase
+        const firebaseConfig = {
+          apiKey: "YOUR_API_KEY",
+          authDomain: "YOUR_AUTH_DOMAIN",
+          projectId: "YOUR_PROJECT_ID",
+          storageBucket: "YOUR_STORAGE_BUCKET",
+          messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+          appId: "YOUR_APP_ID",
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        resolve();
+      };
+      firebaseMessagingScript.onerror = reject;
+      document.body.appendChild(firebaseMessagingScript);
+    };
+    firebaseAppScript.onerror = reject;
+    document.body.appendChild(firebaseAppScript);
+  });
+}
+
+// Check notification permission on page load
+document.addEventListener("DOMContentLoaded", function () {
+  // Wait 3 seconds after page load to check notification permission
+  setTimeout(() => {
+    // Only show modal if permission hasn't been granted or denied yet
+    if (Notification.permission === "default") {
+      // Show the notification permission modal
+      const notificationModal = new bootstrap.Modal(
+        document.getElementById("notificationPermissionModal")
+      );
+      notificationModal.show();
+    } else if (Notification.permission === "granted" && !fcmTokenSaved) {
+      // If permission is already granted but token not saved
+      if (typeof firebase !== "undefined" && firebase.messaging) {
+        initializeFCM();
+      } else {
+        loadFirebaseScript()
+          .then(() => {
+            initializeFCM();
+          })
+          .catch((error) => {
+            console.error("Error loading Firebase:", error);
+          });
+      }
+    }
+  }, 3000); // 3 second delay
+});

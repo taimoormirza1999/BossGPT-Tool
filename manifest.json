@@ -1,0 +1,27 @@
+{
+  "name": "BossGPT - Project Management AI",
+  "short_name": "BossGPT",
+  "description": "AI-powered project management tool with task tracking and reminders",
+  "start_url": "/index.php?page=dashboard",
+  "display": "standalone",
+  "background_color": "#240121",
+  "theme_color": "#8a047f",
+  "icons": [
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    }
+  ],
+  "gcm_sender_id": "YOUR_SENDER_ID"
+} 

@@ -32,7 +32,7 @@ span.im {
     padding: 30px; 
     border-radius: 10px; 
     text-align: center; 
-    box-shadow: 0 4px 15px rgba(1, 1, 1, 1);
+    /* box-shadow: 0 4px 15px rgba(1, 1, 1, 1); */
     width: 100%;
 }
 .logo { 

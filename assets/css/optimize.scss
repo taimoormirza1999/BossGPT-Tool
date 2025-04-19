@@ -1,0 +1,1402 @@
+$black-color: #000;
+$black-color-10: rgba(0, 0, 0, 0.1);
+$black-color-20: rgba(0, 0, 0, 0.2);
+$black-color-40: rgba(0, 0, 0, 0.4);
+$black-color-70: rgba(0, 0, 0, 0.7);
+$black-color-80: rgba(0, 0, 0, 0.8);
+$white-color: #fff;
+$white-color-05: rgba(255, 255, 255, 0.05);
+$white-color-10: rgba(255, 255, 255, 0.1);
+$white-color-20: rgba(255, 255, 255, 0.2);
+$white-color-50: rgba(255, 255, 255, 0.5);
+$white-color-60: rgba(255, 255, 255, 0.6);
+$white-color-80: rgba(255, 255, 255, 0.8);
+$gray-color-e1: #e1e1e1;
+$gray-color-92: rgba(92, 92, 92, 1);
+$gray-color-3: #2f3031;
+$border-radius-8: 8px;
+$border-radius-12: 12px;
+$border-radius-16: 16px;
+$bg-img1-black: url("https://res.cloudinary.com/da6qujoed/image/upload/v1742653725/tool-bg_x91qyx.png");
+$bg-img2-multi: url("https://trello-backgrounds.s3.amazonaws.com/53baf533e697a982248cd73f/2048x2048/22ec03aab9d36ea49139c569a62bb079/shutterstock_134707556.jpg");
+$bg-img3-brown: url("https://res.cloudinary.com/da6qujoed/image/upload/v1744289266/a7190ff1f5577d8c63d61ed085165786_s6ghtx.png");
+
+$notiifcationicon-color1: linear-gradient(
+  145.32deg,
+  #240121 -14.49%,
+  #8a047f 82.49%
+);
+$notiifcationicon-color2: linear-gradient(
+  145.32deg,
+  #ffffff -14.49%,
+  #048a40 82.49%
+);
+$notiifcationicon-color3: linear-gradient(
+  145.32deg,
+  #fbfbfb -14.49%,
+  #04068a 82.49%
+);
+$notiifcationicon-color4: linear-gradient(
+  145.32deg,
+  #ebe5eb -14.49%,
+  #8a5204 82.49%
+);
+$notiifcationicon-color5: linear-gradient(
+  145.32deg,
+  #ffffff -14.49%,
+  #8a8304 82.49%
+);
+
+$icon-height: 24px;
+$icon-width: 24px;
+$icon-font-size: 1.25rem;
+$button-icon-gap: 0.5rem;
+$button-height: 42px;
+$dark-mode-card-task-bgcolor: linear-gradient(
+  135deg,
+  #240121 0%,
+  #4f0142 100%
+) !important;
+$purple-mode-card-task-bgcolor: linear-gradient(
+  135deg,
+  #240121 0%,
+  #4f0142 100%
+) !important;
+$default-mode-topbar-bgcolor: rgba(24, 25, 28, 1);
+$default-mode-main-bgcolor: rgba(36, 37, 38, 1);
+$default-mode-welcome-logo-bgcolor: rgba(24, 24, 24, 1);
+$default-mode-card-task-bgcolor: rgba(53, 53, 53, 1);
+$black-mode-card-task-bgcolor: rgba(9, 1, 12, 1);
+$brown-mode-card-task-bgcolor: rgba(65, 4, 4, 1);
+$dark-mode-bar-bgcolor: rgba(40, 3, 59, 0.6);
+$purple-mode-bar-bgcolor: rgba(40, 3, 59, 0.6);
+$black-mode-bar-bgcolor: rgba(36, 37, 38, 0.5);
+$brown-mode-bar-bgcolor: rgba(65, 4, 4, 1);
+$light-mode-bar-bgcolor: rgba(255, 255, 255, 0.6);
+$dark-mode-modal-bgcolor: $black-color;
+$dark-mode-modal-border: 1px solid $white-color-20;
+$dark-mode-bar-bgcolor: var(--bs-primary-darkpurple-linear-gradient);
+$dark-mode-message-ai-border: 1px solid rgba(211, 211, 211, 0.5);
+$dark-mode-message-ai-color: #e4e6eb;
+$default-mode-message-user-bgcolor: $white-color-20;
+$dark-mode-message-user-bgcolor: $white-color-20;
+$purple-mode-message-user-bgcolor: $white-color-20;
+$black-mode-message-user-bgcolor: $white-color-20;
+$brown-mode-message-user-bgcolor: $white-color-20;
+$light-mode-message-user-bgcolor: $white-color-20;
+$dark-mode-prompt-btn-bgcolor: $white-color-10;
+$dark-mode-prompt-btn-border: rgba(248, 249, 250, 0.5);
+$dark-mode-bar-bgcolor: $white-color-20;
+$dark-mode-message-user-color: $white-color;
+
+$black-mode-modal-container-bgcolor: #171717;
+$purple-mode-modal-container-bgcolor: #120211;
+$brown-mode-modal-container-bgcolor: #190404;
+$default-mode-modal-container-bgcolor: #242526;
+
+$black-mode-modal-header-bgcolor: #0d0c0c;
+$purple-mode-modal-header-bgcolor: #361734;
+$brown-mode-modal-header-bgcolor: #410404;
+$default-mode-modal-header-bgcolor: #1d1d1d;
+
+$black-mode-modal-input-bgcolor: rgba(12, 1, 17, 0.2);
+$purple-mode-modal-input-bgcolor: rgba(12, 1, 17, 0.5);
+$brown-mode-modal-input-bgcolor: rgba(12, 1, 17, 0.2);
+$default-mode-modal-input-bgcolor: rgba(10, 10, 10, 0.2);
+
+$transition-duration-34: 0.34s;
+$transition-duration-40: 0.4s;
+$transition-duration-50: 0.5s;
+$notification-icon-padding: 0.5rem;
+
+// ===============================
+// 2) FONTS
+// ===============================
+// Geist Font Map
+$geist-fonts: (
+  100: "Thin",
+  200: "UltraLight",
+  400: "Regular",
+  500: "Medium",
+  700: "Bold",
+  900: "Black",
+);
+
+@each $weight, $suffix in $geist-fonts {
+  @font-face {
+    font-family: "Geist";
+    src: url("../fonts/Geist-#{$suffix}.woff2") format("woff2");
+    font-weight: #{$weight};
+    font-style: normal;
+  }
+}
+// CabinetGrotesk Fonts - Direct declarations without nth()
+@font-face {
+  font-family: "CabinetGroteskBold";
+  src: url("../fonts/CabinetGrotesk-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: "CabinetGroteskLight";
+  src: url("../fonts/CabinetGrotesk-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+}
+
+// Utility Classes
+.font-primary {
+  font-family: "Geist", sans-serif !important;
+}
+.font-primary-bold {
+  font-family: "Geist-Bold", sans-serif !important;
+}
+.font-secondaryBold {
+  font-family: "CabinetGroteskBold", sans-serif !important;
+}
+.font-secondaryLight {
+  font-family: "CabinetGroteskLight", sans-serif !important;
+}
+.smooth-fade {
+  transition: all $transition-duration-50 ease;
+  &.d-none {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  &.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hover-up {
+  transition: all $transition-duration-34 ease-in-out;
+  &:hover {
+    transform: translateY(-5px);
+  }
+}
+@mixin hover-up($translateValue: -5px, $duration: 0.3s) {
+  transition: all $duration ease-in-out;
+  &:hover {
+    transform: translateY($translateValue);
+  }
+}
+@mixin position_center($x: false, $y: false) {
+  position: absolute;
+
+  @if $x {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  @if $y {
+    top: 50%;
+    // If $x is also true, we combine transforms
+    @if $x {
+      transform: translate(-50%, -50%);
+    } @else {
+      transform: translateY(-50%);
+    }
+  }
+}
+@mixin commomtaskheader {
+  .column_todo {
+    background-color: rgb(187, 7, 10) !important;
+  }
+  .column_in_progress {
+    background-color: rgb(158, 17, 147) !important;
+  }
+  .column_done {
+    background-color: rgb(21, 158, 97) !important;
+  }
+}
+@mixin theme-bgcolor($bg-color) {
+  background: $bg-color;
+}
+@mixin theme-text-color($text-color) {
+  color: $text-color;
+}
+@mixin flex-center-hv {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+@mixin flex-center-hv-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+@mixin button-icon-only {
+  height: $icon-height;
+  width: $icon-width;
+}
+@mixin ai-tone-common-styles {
+  .ai-tone-options {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 1.5rem auto;
+    max-width: 500px;
+    .ai-tone-option {
+      cursor: pointer;
+      padding: 0.5rem 0.6rem;
+      border-radius: $border-radius-12;
+      text-align: center;
+      transition: all $transition-duration-34 ease;
+      background: rgba(217, 217, 217, 0.1);
+      &:hover {
+        @extend .hover-up;
+      }
+      img {
+        width: 50px;
+        height: 50px;
+        margin-bottom: 10px;
+      }
+      div {
+        color: #cccccc;
+        font-size: 0.875rem;
+        font-weight: 400;
+        line-height: 1.25rem;
+        letter-spacing: 0.01em;
+        text-align: center;
+      }
+    }
+    .tone-indicator {
+      width: 1.2rem;
+      height: 1.2rem;
+      border-radius: 50%;
+      background-color: #dedede;
+      margin: 5px auto 0;
+      position: relative;
+      &::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 45%;
+        width: 0.4rem;
+        height: 0.3rem;
+        border: 2px solid #929292;
+        border-top: none;
+        border-right: none;
+        transform: translate(-50%, -50%) rotate(-45deg);
+      }
+      &.active {
+        background-color: #28a745;
+        &::after {
+          content: "";
+          position: absolute;
+          left: 50%;
+          top: 45%;
+          width: 0.4rem;
+          height: 0.3rem;
+          border: 2px solid #fff;
+          border-top: none;
+          border-right: none;
+          transform: translate(-50%, -50%) rotate(-45deg);
+        }
+      }
+    }
+  }
+}
+
+@mixin theme-common-notification-list($bgcolor) {
+  .dropdown-item {
+    &:hover {
+      @include theme-bgcolor($bgcolor);
+    }
+  }
+}
+@mixin theme-common-modal($container-bgcolor, $header-bgcolor, $input-bgcolor) {
+  .modal {
+    .modal-dialog {
+      .modal-content {
+        @include theme-bgcolor($container-bgcolor);
+        .close-icon-btn {
+        }
+        .modal-header {
+          border-bottom: 1px solid rgb(151 151 151 / 50%)!important;
+          @include theme-bgcolor($header-bgcolor);
+          .modal-title {
+          }
+        }
+        .modal-body {
+          input,
+          textarea,
+          .select2-container--default .select2-selection--multiple,
+          .tree-option {
+            @include theme-bgcolor($input-bgcolor);
+          }
+          .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: $container-bgcolor!important;
+          }
+        }
+
+        .modal-footer {
+        }
+      }
+    }
+  }
+}
+@mixin theme-common-chat-pannel(
+  $card-header-bgcolor,
+  $card-body-welcome-logo-bgcolor,
+  $card-body-chat-loading-container-bgcolor,
+  $card-body-ai-message-bgcolor,
+  $card-body-message-user-bgcolor,
+  $modal-bgcolor:rgba(0, 0, 0, 0.35),
+  $modal-header-bgcolor:#1d1d1d
+) {
+  .chat-pannel {
+    .my-custom-ai-tone-modal-chat-pannel {
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: $border-radius-16;
+      .card-ai-tone-modal-content {
+        background: $modal-bgcolor;
+        .header {
+          background: $modal-header-bgcolor;
+        }
+      }
+    }
+    .card-header {
+      @include theme-bgcolor($card-header-bgcolor);
+    }
+    .card-body {
+      .welcome-logo-container {
+        @include theme-bgcolor($card-body-welcome-logo-bgcolor);
+      }
+      .chat-loading-container {
+        @include theme-bgcolor($card-body-chat-loading-container-bgcolor);
+      }
+      .ai-message {
+        .chat-loading-avatar {
+          @include theme-bgcolor($card-body-ai-message-bgcolor);
+        }
+        .message.ai {
+          @include theme-bgcolor($card-body-ai-message-bgcolor);
+          .suggestion-item{
+            background-color: $card-body-ai-message-bgcolor!important;
+        }
+        }
+      }
+      .message.user {
+        @include theme-bgcolor($card-body-message-user-bgcolor);
+      }
+    }
+  }
+}
+@mixin theme-reminder-button($bgcolor) {
+  .reminder-button {
+    @include theme-bgcolor($bgcolor);
+  }
+}
+#user-add-icon {
+  @include button-icon-only;
+}
+#user-add-icon path {
+  stroke: $white-color;
+}
+.bi {
+  font-size: $icon-font-size;
+}
+.btn-main-primary {
+  gap: $button-icon-gap;
+  height: $button-height;
+  @include flex-center-hv;
+  @extend .hover-up;
+}
+.cta-message{
+  @include flex-center-hv;
+  @extend .hover-up;
+}
+
+.due-date_size{
+  font-size: 0.7rem!important;
+}
+.due-date {
+  border: 1px solid #2f3031;
+  background: rgba(255, 255, 255, 0.1);
+}
+svg.calendar-icons {
+  height: 1.2rem !important;
+  width: 1.2rem !important;
+} 
+
+body.system-mode {
+  @include theme-bgcolor($default-mode-card-task-bgcolor);
+  background-image: $bg-img1-black;
+
+  .nav-background {
+    @include theme-bgcolor($default-mode-topbar-bgcolor);
+  }
+  .projects_card {
+    .column_todo,
+    .column_in_progress,
+    .column_done {
+      background: $default-mode-main-bgcolor !important;
+    }
+
+    .card-header {
+      @include theme-bgcolor($default-mode-main-bgcolor);
+      border-bottom: 1px solid rgba(211, 211, 211, 0.5) !important;
+    }
+    .card-body {
+      .task-column_header {
+        border: 1px solid rgba(211, 211, 211, 0.5) !important;
+      }
+      .task-card {
+        @include theme-bgcolor($default-mode-card-task-bgcolor);
+      }
+    }
+  }
+  @include theme-common-chat-pannel(
+    $default-mode-main-bgcolor,
+    $default-mode-welcome-logo-bgcolor,
+    $default-mode-card-task-bgcolor,
+    $default-mode-card-task-bgcolor,
+    $default-mode-message-user-bgcolor,
+    $default-mode-modal-container-bgcolor,
+    $default-mode-modal-header-bgcolor
+  );
+  @include theme-common-notification-list($default-mode-card-task-bgcolor);
+  @include theme-common-modal(
+    $default-mode-modal-container-bgcolor,
+    $default-mode-modal-header-bgcolor,
+    $default-mode-modal-input-bgcolor
+  );
+  @include theme-reminder-button($default-mode-card-task-bgcolor);
+  table tbody tr:nth-child(odd) > * {
+    @include theme-bgcolor($default-mode-modal-input-bgcolor);
+  }
+}
+body.purple-mode {
+  background-color: $purple-mode-card-task-bgcolor;
+  background-image: $bg-img2-multi;
+
+  .nav-background {
+    @include theme-bgcolor($purple-mode-bar-bgcolor);
+  }
+  .projects_card {
+    @include commomtaskheader;
+
+    .card-header {
+      @include theme-bgcolor($purple-mode-bar-bgcolor);
+    }
+    .card-body {
+      .task-card {
+        @include theme-bgcolor($purple-mode-card-task-bgcolor);
+      }
+    }
+  }
+  @include theme-common-chat-pannel(
+    $purple-mode-bar-bgcolor,
+    $purple-mode-card-task-bgcolor,
+    $purple-mode-card-task-bgcolor,
+    $purple-mode-card-task-bgcolor,
+    $purple-mode-message-user-bgcolor,
+    $purple-mode-modal-container-bgcolor,
+    $purple-mode-modal-header-bgcolor
+  );
+  @include theme-common-notification-list($purple-mode-card-task-bgcolor);
+  table tbody tr:nth-child(odd) > * {
+    @include theme-bgcolor($purple-mode-modal-input-bgcolor);
+  }
+  @include theme-common-modal(
+    $purple-mode-modal-container-bgcolor,
+    $purple-mode-modal-header-bgcolor,
+    $purple-mode-modal-input-bgcolor
+  );
+  @include theme-reminder-button($purple-mode-card-task-bgcolor);
+}
+body.black-mode {
+  @include theme-bgcolor($black-mode-card-task-bgcolor);
+  background-image: $bg-img2-multi;
+
+  .nav-background {
+    @include theme-bgcolor($black-mode-bar-bgcolor);
+  }
+  .projects_card {
+    @include commomtaskheader;
+    .card-header {
+      @include theme-bgcolor($black-mode-bar-bgcolor);
+    }
+    .card-body {
+      .task-card {
+        @include theme-bgcolor($black-mode-card-task-bgcolor);
+      }
+    }
+  }
+  @include theme-common-chat-pannel(
+    $black-mode-bar-bgcolor,
+    $black-mode-card-task-bgcolor,
+    $black-mode-card-task-bgcolor,
+    $black-mode-card-task-bgcolor,
+    $black-mode-message-user-bgcolor,
+    $black-mode-modal-container-bgcolor,
+    $black-mode-modal-header-bgcolor
+  );
+  @include theme-common-notification-list($black-mode-card-task-bgcolor);
+  table tbody tr:nth-child(odd) > * {
+    @include theme-bgcolor($black-mode-modal-input-bgcolor);
+  }
+  @include theme-common-modal(
+    $black-mode-modal-container-bgcolor,
+    $black-mode-modal-header-bgcolor,
+    $black-mode-modal-input-bgcolor
+  );
+  @include theme-reminder-button($black-mode-card-task-bgcolor);
+}
+body.brown-mode {
+  @include theme-bgcolor($brown-mode-card-task-bgcolor);
+  background-image: $bg-img3-brown;
+
+  .nav-background {
+    @include theme-bgcolor($brown-mode-bar-bgcolor);
+  }
+  .projects_card {
+    @include commomtaskheader;
+    .card-header {
+      @include theme-bgcolor($brown-mode-bar-bgcolor);
+    }
+    .card-body {
+      .task-card {
+        @include theme-bgcolor($brown-mode-card-task-bgcolor);
+      }
+    }
+  }
+  @include theme-common-chat-pannel(
+    $brown-mode-bar-bgcolor,
+    $brown-mode-bar-bgcolor,
+    $brown-mode-bar-bgcolor,
+    $brown-mode-bar-bgcolor,
+    $brown-mode-message-user-bgcolor,
+    $brown-mode-modal-container-bgcolor,
+    $brown-mode-modal-header-bgcolor
+  );
+  @include theme-common-notification-list($brown-mode-card-task-bgcolor);
+  table tbody tr:nth-child(odd) > * {
+    @include theme-bgcolor($brown-mode-modal-input-bgcolor);
+  }
+  @include theme-common-modal(
+    $brown-mode-modal-container-bgcolor,
+    $brown-mode-modal-header-bgcolor,
+    $brown-mode-modal-input-bgcolor
+  );
+  @include theme-reminder-button($brown-mode-card-task-bgcolor);
+}
+body {
+  @include theme-bgcolor($default-mode-card-task-bgcolor);
+  @extend .font-primary;
+  background-image: $bg-img1-black;
+  background-size: cover;
+  background-position: top;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+
+  // login/register pa ges
+  .register-page,
+  .login-page,
+  .aitone-page {
+    background-image: url("https://res.cloudinary.com/da6qujoed/image/upload/v1744294916/siraj_Dark_background_two_clouds_in_the_shape_of_an_angle_betwe_d0bfefb0-90ab-40e6-ae57-49e815d781ee_1_dxfw6e.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    a {
+      color: var(--bs-primary-white) !important;
+      text-decoration: none !important;
+
+      &.btn.btn-outline-link {
+        border: 1px solid #9c9c9c;
+        border-radius: 12px;
+        width: 251px !important;
+        height: 48px !important;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        align-self: center;
+      }
+    }
+
+    input {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid #9c9c9c;
+      border-radius: 12px;
+      height: 48px;
+      color: #fff;
+    }
+
+    .form-label,
+    .card-title {
+      color: rgba(255, 255, 255, 1);
+    }
+
+    .card {
+      .card-body {
+        background: rgba(0, 0, 0, 0.8);
+        border: 1px solid rgba(234, 234, 234, 0.2);
+        backdrop-filter: blur(6.35px);
+        border-radius: 16px;
+        display: flex !important;
+        flex-direction: column !important;
+        padding: 2rem 1.5rem !important;
+        @include ai-tone-common-styles;
+        .divider {
+          display: flex;
+          align-items: center;
+          text-align: center;
+          gap: 10px;
+          @extend .font-primary;
+
+          hr {
+            flex: 1;
+            height: 1px;
+            background-color: rgba(255, 255, 255, 1);
+            border: none;
+          }
+
+          span {
+            color: #646464;
+            white-space: nowrap;
+          }
+        }
+        a.footer-text {
+          color: #fff !important;
+          @extend .font-secondaryBold;
+          span.normal-text {
+            color: #646464 !important;
+            @extend .font-primary;
+            font-size: 0.9rem;
+          }
+        }
+        @media (max-width: 768px) {
+          width: 95% !important;
+          margin: 0 auto !important;
+        }
+        .text-muted {
+          font-size: 1.1rem;
+          color: #646464 !important;
+          padding: 1rem 0;
+        }
+      }
+
+      .card-title {
+        font-size: 2rem !important;
+        @extend .font-secondaryBold;
+      }
+    }
+
+    .btn-primary {
+      color: rgba(255, 255, 255, 1);
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(248, 249, 250, 0.5);
+      border-radius: 10px;
+      transition: all 0.34s ease-in-out;
+      height: 49px;
+      font-size: 1.15rem !important;
+      @extend .font-secondaryBold;
+      &:hover {
+        background-color: var(--bs-primary-white) !important;
+        filter: brightness(0.7) !important;
+        color: var(--bs-primary-black) !important;
+      }
+    }
+
+    .col-lg-12 {
+      max-width: 576px;
+    }
+  }
+  .container-fluid > .row:first-child {
+    @media (max-width: 768px) {
+      border-radius: 12px;
+      margin: 0 0.5rem;
+    }
+  }
+  .nav-container {
+    h4 {
+      @media (max-width: 768px) {
+        font-size: 1.3rem !important;
+      }
+    }
+    @media (max-width: 768px) {
+      border-radius: 12px;
+      margin: 0 0.5rem;
+      padding: 0.5rem;
+      margin-bottom: 0.5rem !important;
+    }
+  }
+  .sides-padding {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    @media (max-width: 768px) {
+      padding-left: 0.2rem !important;
+      padding-right: 0.2rem !important;
+    }
+  }
+  .tasks-panel {
+    @media (max-width: 768px) {
+      padding-left: 0.2rem;
+      padding-right: 0.2rem;
+    }
+  }
+  .navbar {
+    background: rgba(20, 20, 35, 0.3) !important;
+    backdrop-filter: blur(16px) !important;
+    // box-shadow: 0 4px 30px $black-color-10 !important;
+    border-bottom: 1px solid $gray-color-3;
+    button {
+      border: 1.4px solid $white-color-80 !important;
+    }
+    button#notificationDropdown,
+    button#toggleDarkModeBtn,
+    button.btn-logout,
+    button#btn-theme {
+      padding: 0px !important;
+      height: 42px;
+      width: 42px;
+      @include flex-center-hv;
+      @extend .hover-up;
+    }
+    .theme-icon-container {
+      @include flex-center-hv-column;
+      gap: 0.3rem;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(3.1px);
+      border-radius: $border-radius-12;
+      padding: 0.75rem 1.3rem;
+      position: absolute;
+      top: 4.2rem;
+      color: #000;
+      @extend .hover-up;
+      .theme-icon-content-container {
+        @include flex-center-hv;
+        gap: 0.7rem;
+        h6 {
+          font-family: "Cabinet Grotesk";
+          font-style: normal;
+          font-weight: 800;
+          font-size: 1.3rem;
+          line-height: 11px;
+          letter-spacing: 0.5px;
+          color: #121212;
+        }
+        .theme-icon-content-item {
+          @include flex-center-hv-column;
+          gap: 0.5rem;
+          span {
+            font-family: "Cabinet Grotesk";
+            font-style: normal;
+            font-weight: 400;
+            font-size: 0.9rem;
+            line-height: 11px;
+            color: #240121;
+            letter-spacing: 0.5px;
+          }
+          .theme-icon-color {
+            width: 1.9rem;
+            height: 1.9rem;
+            border-radius: 50%;
+            // background-color: #000;
+          }
+          &:nth-child(1) .theme-icon-color {
+            background: linear-gradient(
+              152.14deg,
+              #240121 8.15%,
+              #8a047f 91.85%
+            );
+          }
+          &:nth-child(2) .theme-icon-color {
+            background: linear-gradient(
+              156.22deg,
+              #0b020f 8.55%,
+              #561075 91.45%
+            );
+          }
+          &:nth-child(3) .theme-icon-color {
+            background: linear-gradient(
+              153.27deg,
+              #410404 8.31%,
+              #a70a0a 91.69%
+            );
+          }
+          &:nth-child(4) .theme-icon-color {
+            background: linear-gradient(
+              153.27deg,
+              #410404 8.31%,
+              #021415 91.69%
+            );
+          }
+        }
+      }
+    }
+  }
+  .form-control {
+    padding: 0.7rem 1rem;
+    box-sizing: border-box;
+    border: 1px solid $white-color-20;
+    border-radius: $border-radius-12;
+  }
+
+  .btn-main-primary,
+  .btn-send-primary {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(248, 249, 250, 0.5) !important;
+    border-radius: $border-radius-8 !important;
+    color: white !important;
+    transition: all $transition-duration-40 ease-in-out !important;
+  }
+  .projects_card {
+    // box-shadow: 0 2px 5px $black-color-20;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(211, 211, 211, 0.5);
+    backdrop-filter: blur(7.199999809265137px);
+    .card-header {
+      // box-shadow: 0px 4px 30px $black-color-10 !important;
+      @media (max-width: 768px) {
+        display: flex !important;
+        flex-wrap: nowrap;
+        overflow-x: scroll;
+      }
+      button {
+        @include flex-center-hv;
+        // @extend .hover-up;
+      }
+      #projectDropdownButton {
+        text-decoration: none !important;
+        color: $white-color !important;
+      }
+      ul#projectDropdown {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(211, 211, 211, 0.5);
+        backdrop-filter: blur(4.3px);
+        li.dropdown-item {
+          color: $white-color !important;
+          @extend .font-secondaryBold;
+          @extend .hover-up;
+          &:hover {
+            background: rgba(255, 255, 255, 0.2);
+          }
+          .dropdown-item.active {
+            background: transparent !important;
+            &:parent {
+              background: rgba(255, 255, 255, 0.2) !important;
+            }
+          }
+
+          button.dropdown-item,
+          button.dropdown-item.active {
+            color: $white-color !important;
+            &:hover {
+              background: transparent !important;
+            }
+          }
+        }
+      }
+    }
+    .card-body {
+      .row {
+        @media (max-width: 768px) {
+          overflow-x: scroll;
+          flex-wrap: nowrap;
+          gap: 0.7rem;
+        }
+        .col-10 {
+          @media (max-width: 768px) {
+            padding: 0% !important;
+          }
+        }
+      }
+      .task-column_section {
+        .task-column_header {
+          backdrop-filter: blur(4px);
+          border: 1px solid $white-color-05;
+          color: $white-color;
+          font-weight: 800;
+          border-radius: $border-radius-12;
+          padding: 14px;
+          margin-bottom: 16px;
+          font-family: "CabinetGroteskBold";
+          text-transform: uppercase;
+          transition: all $transition-duration-40 ease;
+          letter-spacing: 1px;
+          font-size: 1.145rem !important;
+          @extend .font-secondaryBold;
+        }
+        .task-column {
+          background: rgba(76, 76, 76, 0.25);
+          backdrop-filter: blur(20px);
+          border: 1px solid $white-color-50;
+          transition: all $transition-duration-50 ease;
+          min-height: calc(100vh - 335px);
+          border-radius: $border-radius-12;
+          padding: 1rem;
+          overflow-y: auto;
+          .task-card {
+            transition: all $transition-duration-34;
+            transform-origin: center;
+            backface-visibility: hidden;
+            will-change: transform, box-shadow;
+            transition: all $transition-duration-34 cubic-bezier(0.2, 1, 0.3, 1);
+            border-radius: $border-radius-12;
+            backdrop-filter: blur(10px);
+            margin-bottom: 16px;
+            padding: 16px;
+            // box-shadow: 0 4px 20px $black-color-40;
+            color: $white-color;
+            position: relative;
+            overflow: hidden;
+            #subtasksList .btn-sm.btn-link.delete-subtask-btn {
+              border: 0 !important;
+              background: transparent !important;
+              font-size: 1.2rem !important;
+              margin-top: -1.2rem !important;
+            }
+            .due-date {
+            @extend .due-date_size;
+              transition: all 0.4s ease;
+              color: rgba(160, 160, 160, 1) !important;
+              &.overdue{
+                color:  #dc3545!important;
+                svg path{
+                  stroke:  #dc3545!important;
+                }
+              }
+            }
+            svg#calendar-icon {
+              height: 1.2rem !important;
+              width: 1.2rem !important;
+            }
+            .d-flex.gap-2.mt-2,
+            .subtasks.mt-2 .d-flex.gap-2 {
+              opacity: 0;
+              visibility: hidden;
+              transition: all $transition-duration-34 ease;
+              margin-top: 8px;
+              z-index: 15;
+              position: relative;
+              gap: 8px !important;
+            }
+            * {
+              transition: all $transition-duration-40 ease-in-out;
+            }
+            &:hover {
+              .d-flex.gap-2.mt-2,
+              .subtasks.mt-2 .d-flex.gap-2 {
+                opacity: 1;
+                visibility: visible;
+                display: flex !important;
+                flex-wrap: wrap;
+              }
+
+              .add-subtask-btn,
+              .ai-add-subtask-btn,
+              .ai-update-dates-btn {
+                opacity: 1;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+              }
+
+              .btn-sm.btn-link {
+                display: inline-flex;
+                opacity: 1;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  .open-icon-btn {
+    display: none;
+    @media (max-width: 768px) {
+      background: var(--bs-primary-darkpurple-linear-gradient);
+      display: inline-block;
+      width: auto;
+      padding: 0.7rem 0.5rem !important;
+      border-radius: 50%;
+      position: fixed;
+      bottom: 15px;
+      right: 15px;
+    }
+  }
+
+  .chat-pannel {
+    @media (max-width: 768px) {
+      position: fixed !important;
+      bottom: 10px;
+      backdrop-filter: blur(15px);
+    }
+    .my-custom-ai-tone-modal-chat-pannel {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 5;
+      @include ai-tone-common-styles;
+      @include flex-center-hv;
+      @extend .smooth-fade;
+      .card-ai-tone-modal-content {
+        width: 90%;
+        background: #242526;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(6.35px);
+        border-radius: 16px;
+        @media (min-width: 1024px) {
+          width: 80%;
+        }
+        .header {
+          background: #1d1d1d;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+          border-radius: 16px 16px 0px 0px;
+          padding: 0.8rem 1.2rem;
+          display: flex;
+          align-items: center;
+          align-content: center;
+          position: relative;
+          .close_icon {
+            @include position_center(false, true);
+            right: 10px;
+          }
+        }
+      }
+    }
+
+    .close-icon-btn {
+      display: none;
+      @media (max-width: 768px) {
+        display: block;
+        right: 20px;
+      }
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(211, 211, 211, 0.5);
+      backdrop-filter: blur(10px);
+      border-radius: $border-radius-16;
+    }
+    .card-header {
+      position: relative;
+      h5 {
+        color: $white-color;
+      }
+      .change_aitone_btn {
+        @include position_center(false, true);
+        background-color: transparent;
+        right: 10px;
+        border: 0 !important;
+        &:hover {
+          background-color: transparent;
+          @include hover-up(-10px);
+        }
+      }
+    }
+    .chat-input {
+      border-bottom-left-radius: 1rem;
+      border-bottom-right-radius: 1rem;
+      background: rgba(24, 25, 28, 0.2);
+      border-top: 0.666667px solid rgba(211, 211, 211, 0.5);
+    }
+    .card-body {
+      .welcome-logo-container {
+        @extend .hover-up;
+        margin-bottom: 1.2rem !important;
+        border: 1px solid rgba(211, 211, 211, 0.5)
+      }
+      .chat-loading-avatar {
+        @extend .hover-up;
+        border: 1px solid rgba(211, 211, 211, 0.5);
+        border-radius: 50%;
+        padding-bottom: 0.3rem;
+      }
+      .chat-loading-container {
+        border: 1px solid rgba(211, 211, 211, 0.5);
+        // box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        border-radius: 16px;
+        backdrop-filter: blur(8px);
+        color: #e4e6eb !important;
+      }
+      .message.ai {
+        margin-left: 0.5rem;
+        @include theme-bgcolor($dark-mode-bar-bgcolor);
+        @include theme-text-color($dark-mode-message-ai-color);
+        border-radius: $border-radius-16;
+        backdrop-filter: blur(8px);
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        @extend .hover-up;
+        .btn-add-task {
+          background: rgba(255, 255, 255, 0.1);
+          padding: 4px;
+          font-weight: 600;
+          font-size: 0.8rem !important;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    svg{
+      height: 1.05rem !important;
+    }
+        }
+        .suggestion-item{
+          border: 0 !important;
+          padding: 0.7rem !important;
+          background-color: rgba(0, 0, 0, 0.45);
+          strong{
+            font-weight: 600;
+            font-size: 0.85rem !important;
+            font-weight: 600;
+            color: white;
+          }
+          span{
+            font-size: 0.85rem !important;
+          }
+          .suggested-task-due-date {
+            @include flex-center-hv;
+            gap: 0.1rem;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 1);
+            opacity: 0.8;
+            svg{
+              height: 1.05rem !important;
+            }
+          }
+        }
+        
+      }
+      .message.user {
+        @include theme-bgcolor($dark-mode-bar-bgcolor);
+        @include theme-text-color($dark-mode-message-user-color);
+        @extend .hover-up;
+      }
+      .prompt-btn {
+        @include theme-bgcolor($dark-mode-prompt-btn-bgcolor);
+        border-color: $dark-mode-prompt-btn-border;
+        @extend .hover-up;
+      }
+    }
+  }
+  .table > :not(caption) > * > * {
+    background-color: transparent !important;
+    color: white !important;
+    border-width: 1px, 0px, 1px, 0px;
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  table thead th {
+    @extend .font-secondaryBold;
+    font-size: 1.25rem;
+    text-align: center;
+    padding: 0 0 0.5rem 0;
+  }
+  table tbody tr:nth-child(odd) > * {
+    padding: 0.8rem;
+    text-align: center;
+  }
+  .table tbody tr:nth-child(even) > * {
+    padding: 0.8rem;
+    text-align: center;
+  }
+
+  .modal {
+    background-color: transparent !important;
+    .modal-dialog {
+      background-color: transparent !important;
+      @media (min-width: 576px) {
+        &:not(.modal-lg):not(.modal-xl) {
+          max-width: 650px;
+        }
+      }
+      .modal-content {
+        color: $white-color;
+        background: $dark-mode-modal-bgcolor;
+        border: $dark-mode-modal-border;
+        max-height: 60vh;
+        border-radius: 16px !important;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(211, 211, 211, 0.5);
+        backdrop-filter: blur(6.35px);
+        .close-icon-btn {
+          transform: translateY(-50%);
+          top: 50%;
+          position: absolute;
+          right: 20px;
+        }
+        .modal-header {
+          padding: 0.95rem 1.3rem !important;
+          border-radius: 16px 16px 0px 0px;
+          backdrop-filter: blur(6.35px) !important;
+          border-radius: 16px 16px 0px 0px !important;
+          .modal-title {
+            color: var(--bs-primary-white) !important;
+            font-size: 1.35rem !important;
+            @extend .font-secondaryBold;
+          }
+        }
+        .modal-body {
+          max-height: calc(60vh - 130px);
+          overflow-y: auto;
+          scrollbar-width: thin;
+          scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+          padding: 1.3rem 1.5rem;
+          &::-webkit-scrollbar-thumb {
+            width: 6px;
+          }
+          &::-webkit-scrollbar-track {
+            background: transparent;
+          }
+          &::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            border: transparent;
+          }
+          small.text-muted {
+            color: $white-color-50 !important;
+          }
+          input,
+          textarea,
+          .select2-container--default .select2-selection--multiple,
+          .tree-option {
+            border: 1px solid $white-color-20 !important;
+            color: $white-color !important;
+            @extend .hover-up;
+          }
+          .tree-option {
+            &:hover,
+            &.selected {
+              border: 1px solid #28a745 !important;
+              background-color: rgba(40, 167, 69, 0.1) !important;
+              @extend .hover-up;
+            }
+          }
+        }
+
+        .modal-footer {
+          border: 0 !important;
+          button {
+            background: $white-color-10;
+            border: 1px solid $white-color-50;
+            color: $white-color !important;
+            font-weight: 500;
+            @extend .hover-up;
+          }
+        }
+      }
+    }
+  }
+
+  .reminder-button {
+    position: fixed;
+    left: 32px;
+    bottom: 60px;
+    z-index: 999;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    // box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: all 0.34s ease-in-out;
+    cursor: pointer;
+    font-family: "CabinetGroteskBold", sans-serif;
+    font-size: 1rem;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .reminder-button:hover {
+    transform: translateY(-5px);
+    // box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  }
+
+  .reminder-button .bell-icon {
+    font-size: 1.2rem;
+    animation: bellShake 3s infinite;
+  }
+  .notification-icon {
+    padding: $notification-icon-padding;
+    svg {
+      width: $icon-width;
+      height: $icon-height;
+    }
+  }
+  .notification-list {
+    .dropdown-item {
+      transition: all $transition-duration-50 ease;
+      @include theme-text-color($gray-color-e1);
+      &:hover {
+        @include theme-bgcolor($default-mode-main-bgcolor);
+        border-radius: 8px;
+      }
+      &:hover .title-notification {
+        color: $white-color !important;
+      }
+      .notification-icon-user_assigned {
+        background: $notiifcationicon-color3;
+      }
+      .notification-icon-project_created {
+        background: $notiifcationicon-color5;
+      }
+      .notification-icon-user_removed {
+        background: $notiifcationicon-color4;
+      }
+      .notification-icon-task_created {
+        background: $notiifcationicon-color1;
+      }
+      .notification-icon-task_status_updated,
+      .notification-icon-task_updated,
+      .notification-icon-task_picture_removed {
+        background: $notiifcationicon-color1;
+      }
+      .notification-icon-subtask_status_updated {
+        background: $notiifcationicon-color2;
+      }
+      .notification-icon-subtask_created {
+        background: $notiifcationicon-color2;
+      }
+      .notification-icon-subtask_deleted {
+        background: $notiifcationicon-color2;
+      }
+      .notification-icon-subtask_updated {
+        background: $notiifcationicon-color2;
+      }
+    }
+    .dropdown-item .title-notification {
+      transition: all $transition-duration-34 ease-in-out;
+      @include theme-text-color($gray-color-92);
+    }
+  }
+}
+
+// Ensure buttons are properly styled in all columns
+.column_todo,
+.column_in_progress,
+.column_done {
+  .task-card {
+    .btn-sm.btn-link,
+    .add-subtask-btn,
+    .ai-add-subtask-btn,
+    .ai-update-dates-btn {
+      color: $white-color !important;
+      text-decoration: none !important;
+      padding: 6px 12px;
+      border-radius: $border-radius-8;
+      background: $white-color-10;
+      border: 1px solid $white-color-10;
+      margin: 2px;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.875rem;
+      transition: all $transition-duration-34 ease;
+      white-space: nowrap;
+
+      &:hover {
+        background: $white-color-20;
+        transform: translateY(-1px);
+      }
+    }
+  }
+}

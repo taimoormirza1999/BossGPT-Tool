@@ -6,3 +6,5 @@ config/bossgpt-367ab-firebase-adminsdk-fbsvc-fdd178828e.json
 composer.lock
 config/bossgpt-367ab-firebase-adminsdk-fbsvc-363f3ef6b7.json
 config/bossgpt-367ab-firebase-adminsdk-fbsvc-fdd178828e.jsonconfig/*.json
+uploads/
+.DS_Store

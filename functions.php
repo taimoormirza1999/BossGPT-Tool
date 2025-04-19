@@ -67,9 +67,194 @@ function sendProjectUpdateEmail($email, $username, $projectTitle, $updateMessage
     return sendTemplateEmail($email, $subject, $template, $data);
 }
 
-function getLogoImage($bottomMargin = "0", $topMargin = "-1rem", $width = "15rem", $height = "auto", $positionClass = "position-absolute top-0 start-50 translate-middle", $positionStyle = "position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);", $src="https://res.cloudinary.com/da6qujoed/image/upload/v1742824680/boss-gptold_zti8gh.png")
-{
-    return '<img src=' . $src . ' alt="Logo"
-            class="' . $positionClass . '" 
-            style="margin-top: ' . $topMargin . '; margin-bottom: ' . $bottomMargin . '; width: ' . $width . '; height: ' . $height . '; position: ' . $positionStyle . '">';
-}
+function getLogoImage($bottomMargin = "0", $topMargin = "-1rem", $width = "15rem", $height = "auto", $positionClass = "position-absolute top-0 start-50 translate-middle", $positionStyle = "position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);", $src="https://res.cloudinary.com/da6qujoed/image/upload/v1742651528/bossgpt-transparent_n4axv7.png")
+    {
+        return '<img src=' . $src . ' alt="Logo"
+                class="' . $positionClass . '" 
+                style="margin-top: ' . $topMargin . '; margin-bottom: ' . $bottomMargin . '; width: ' . $width . '; height: ' . $height . '; position: ' . $positionStyle . '">';
+    }
+    function getIconImage($bottomMargin = "0", $topMargin = "0", $width = "3.4rem", $height = "auto", $src="https://res.cloudinary.com/da6qujoed/image/upload/v1742656707/logoIcon_pspxgh.png")
+    {
+        return '<img src=' . $src . ' alt="Logo"
+                class="logo-icon"
+                style=" filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3)); margin-top: ' . $topMargin . '; margin-bottom: ' . $bottomMargin . '; width: ' . $width . '; height: ' . $height . '">';
+    }
+
+    function getCalendarIcon($color = 'rgba(160, 160, 160, 1)') {
+        $svg = file_get_contents('assets/icons/calendar.svg');
+    
+        // Target only path stroke attributes
+        $svg = preg_replace('/(<path[^>]*?)stroke="[^"]*"/i', "$1stroke=\"$color\"", $svg);
+    
+        // If stroke doesn't exist at all, inject it
+        $svg = preg_replace_callback('/<path([^>]*)>/i', function($matches) use ($color) {
+            return (strpos($matches[1], 'stroke=') === false)
+                ? '<path stroke="' . $color . '"' . $matches[1] . '>'
+                : '<path' . $matches[1] . '>';
+        }, $svg);
+    
+        // Optional: add an ID to the SVG root
+        $svg = preg_replace('/<svg /', '<svg class="calendar-icons" id="calendar-icon" ', $svg, 1);
+    
+        return $svg;
+    }
+    
+    function getGoogleIcon()
+    {
+        return file_get_contents('assets/icons/googleIcon.svg');
+    }
+    function getMenuIcon()
+    {
+        return file_get_contents('assets/icons/category.svg');
+    }
+    function getThemeIcon()
+    {
+        return file_get_contents('assets/icons/brush.svg');
+    }
+    function getCloseSquareIcon()
+    {
+        return file_get_contents('assets/icons/close-square.svg');
+    }
+    function getTreeIcon()
+    {
+        return file_get_contents('assets/icons/tree.svg');
+    }
+    function getLogoutIcon()
+    {
+        return file_get_contents('assets/icons/logout.svg');
+    }
+    function getFolderIcon()
+    {
+        return file_get_contents('assets/icons/folder.svg');
+    }
+    function getProfileIcon()
+    {
+        return file_get_contents('assets/icons/profile.svg');
+    }
+    function getProfileDeleteIcon()
+    {
+        return file_get_contents('assets/icons/profile-delete.svg');
+    }
+    function getclipboardIcon()
+    {
+        return file_get_contents('assets/icons/clipboard.svg');
+    }
+    function getPaperclipIcon()
+    {
+        return file_get_contents('assets/icons/paperclip.svg');
+    }
+
+    function getClockIcon()
+    {
+        return file_get_contents('assets/icons/clock.svg');
+    }
+    function getAddUserIcon()
+    {
+        return file_get_contents('assets/icons/user-add.svg');
+    }
+    function getFileIcon()
+    {
+        return file_get_contents('assets/icons/file.svg');
+    }
+    function getTrashIcon()
+    {
+        return file_get_contents('assets/icons/trash.svg');
+    }
+    function getAddSquareIcon()
+    {
+        return file_get_contents('assets/icons/add-square.svg');
+    }
+    function getAddIcon()
+    {
+        return file_get_contents('assets/icons/add_normal.svg');
+    }
+    function getPlantBall()
+    {
+        return '<img src="assets/images/garden/plant-ball.png" alt="Plant Ball" class="plant-ball">';
+    }
+    function getPopupAlert($title, $description, $reminder_id, $button = false)
+    {
+        return '<div class="popup-alert" data-reminder-id="'.$reminder_id.'" id="'.$reminder_id.'">
+        <div class="bell-icon">
+          <img
+            src="https://res.cloudinary.com/da6qujoed/image/upload/v1743687520/belliconImage_vnxkhi.png"
+            alt="Bell icon"
+          />
+        </div>
+        <div class="content font-secondaryBold">
+          <h2 class="title">'.$title.'</h2>
+          <p class="description">
+            '.$description.'
+          </p>
+          '.$button.'
+        </div>
+        <button class="close-button" onclick="closePopup(this)">×</button>
+      </div>';
+    }
+    function renderAIToneOptions($tones = [
+        [
+            'value' => 'friendly',
+            'image' => 'https://res.cloudinary.com/da6qujoed/image/upload/v1744649255/friendlyai_hy04oz.svg',
+            'label' => 'Friendly',
+            'active' => true
+        ],
+        [
+            'value' => 'funny',
+            'image' => 'https://res.cloudinary.com/da6qujoed/image/upload/v1744650101/funny_ql6wcm.svg',
+            'label' => 'Funny'
+        ],
+        [
+            'value' => 'angry',
+            'image' => 'https://res.cloudinary.com/da6qujoed/image/upload/v1744650100/angry_sye97x.svg',
+            'label' => 'Angry'
+        ],
+        [
+            'value' => 'geeky',
+            'image' => 'https://res.cloudinary.com/da6qujoed/image/upload/v1744650100/geeky_cm1bmy.svg',
+            'label' => 'Geeky'
+        ],
+        [
+            'value' => 'caring',
+            'image' => 'https://res.cloudinary.com/da6qujoed/image/upload/v1744650100/caring_b4yp8e.svg',
+            'label' => 'Caring'
+        ]
+    ]) {
+        $html = '<div class="ai-tone-options row">';
+        foreach ($tones as $tone) {
+            $html .= '
+            <div class="col-4 mb-4">
+                <div class="ai-tone-option" data-tone="' . $tone['value'] . '">
+                    <img src="' . $tone['image'] . '" alt="' . $tone['label'] . '">
+                    <div>' . $tone['label'] . '</div>
+                    <div class="tone-indicator' . (isset($tone['active']) && $tone['active'] ? ' active' : '') . '"></div>
+                </div>
+            </div>';
+        }
+        $html .= '</div>';
+        return $html;
+    } 
+    function renderCustomModal($modalId, $headerText, $bodyContent, $footerButtons = '') {
+    return '
+    <h2>'.$modalId.'</h2>
+        <div class="modal fade" id="'.$modalId.'" tabindex="-1" aria-labelledby="'.$modalId.'Label" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header text-white border-0 rounded-t-lg">
+                        <h5 class="modal-title" id="'.$modalId.'Label">
+                            '.$headerText.'
+                        </h5>
+                        <button type="button" class="btn btn-link p-0 text-white close-icon-btn" data-bs-dismiss="modal" aria-label="Close">
+                            '.getCloseSquareIcon().'
+                        </button>
+                    </div>
+    
+                    <div class="modal-body">
+                        '.$bodyContent.'
+                    </div>
+    
+                    '.$footerButtons.'
+                </div>
+            </div>
+        </div>';
+    }
+    
