@@ -1,16 +1,19 @@
 <?php
 // Required for direct task updates
 require_once __DIR__ . '/ProjectManager.php';
+require_once __DIR__ . '/GoogleCalendarManager.php';
 
 class AIAssistant
 {
     private $api_key;
     private $db;
+    private $calendar;
 
     public function __construct()
     {
         $this->api_key = OPENAI_API_KEY;
         $this->db = Database::getInstance()->getConnection();
+        $this->calendar = new GoogleCalendarManager();
     }
 
     private function getProjectContext($project_id)
@@ -116,6 +119,11 @@ class AIAssistant
             // Get the AI tone from the parameter instead of $_REQUEST
             $aiTone = isset($_REQUEST['aiTone']) ? $_REQUEST['aiTone'] : 'demanding';
             
+            // Check if this is a calendar-related request
+            if ($this->isCalendarRequest($message)) {
+                return $this->handleCalendarRequest($message);
+            }
+
             // Check if this is a task status update request
             $enhanced_message = $message;
             if (preg_match('/move\s+task\s+[\'"]?([^\'"]*)[\'"]\s+from\s+todo\s+to\s+in\s+progress/i', $message, $matches)) {
@@ -629,5 +637,152 @@ class AIAssistant
             error_log("Error finding task ID by title: " . $e->getMessage());
             return null;
         }
+    }
+
+    /**
+     * Check if the message is a calendar-related request
+     */
+    private function isCalendarRequest($message)
+    {
+        $calendarKeywords = [
+            'schedule', 'book', 'appointment', 'meeting', 'calendar', 'event',
+            'remind', 'reminder', 'set up', 'arrange', 'plan'
+        ];
+
+        $message = strtolower($message);
+        foreach ($calendarKeywords as $keyword) {
+            if (strpos($message, $keyword) !== false) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Handle calendar-related requests
+     */
+    private function handleCalendarRequest($message)
+    {
+        try {
+            if (!$this->calendar->isAuthenticated()) {
+                return [
+                    'message' => "Please connect your Google Calendar first. I'll help you schedule events once you're connected.",
+                    'action' => 'connect_calendar'
+                ];
+            }
+
+            // Use GPT to extract event details from the message
+            $eventDetails = $this->extractEventDetails($message);
+
+            // If no date is specified, default to tomorrow
+            if (!isset($eventDetails['date']) || empty($eventDetails['date'])) {
+                $eventDetails['date'] = date('Y-m-d', strtotime('+1 day'));
+            }
+
+            // Default time to 3:00 PM if not specified
+            $startTime = $eventDetails['date'] . ' 15:00:00';
+            $endTime = $eventDetails['date'] . ' 16:00:00';
+
+            // Create the event with fixed time
+            $event = new Google_Service_Calendar_Event([
+                'summary' => $eventDetails['summary'],
+                'description' => $eventDetails['description'],
+                'start' => [
+                    'dateTime' => date('c', strtotime($startTime)),
+                    'timeZone' => 'Asia/Dubai',
+                ],
+                'end' => [
+                    'dateTime' => date('c', strtotime($endTime)),
+                    'timeZone' => 'Asia/Dubai',
+                ],
+            ]);
+
+            $calendarId = 'primary';
+            $service = new Google_Service_Calendar($this->calendar->getClient());
+            $createdEvent = $service->events->insert($calendarId, $event);
+
+            return [
+                'message' => "✅ Event scheduled successfully!\n\n" .
+                            "📅 Event: {$eventDetails['summary']}\n" .
+                            "📆 Date: " . date('l, F j, Y', strtotime($eventDetails['date'])) . "\n" .
+                            "⏰ Time: 3:00 PM - 4:00 PM\n" .
+                            "📝 Description: {$eventDetails['description']}\n\n" .
+                            "View in Calendar: " . $createdEvent->htmlLink,
+                'event' => $eventDetails,
+                'success' => true
+            ];
+
+        } catch (Exception $e) {
+            error_log("Calendar Request Error: " . $e->getMessage());
+            return [
+                'message' => "Sorry, I encountered an error while scheduling your event: " . $e->getMessage(),
+                'error' => true
+            ];
+        }
+    }
+
+    /**
+     * Extract event details from user message using GPT
+     */
+    private function extractEventDetails($message)
+    {
+        $messages = [
+            [
+                'role' => 'system',
+                'content' => "You are a calendar assistant. Extract event details from the user's message and respond ONLY with a JSON object in this exact format: {\"summary\": \"event title\", \"description\": \"event description\", \"date\": \"YYYY-MM-DD\"} - If date is not specified, omit the date field. Keep the description brief and relevant."
+            ],
+            [
+                'role' => 'user',
+                'content' => $message
+            ]
+        ];
+
+        $curl = curl_init();
+        curl_setopt_array($curl, [
+            CURLOPT_URL => 'https://api.openai.com/v1/chat/completions',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => json_encode([
+                'model' => 'gpt-4',
+                'messages' => $messages,
+                'temperature' => 0.7
+            ]),
+            CURLOPT_HTTPHEADER => [
+                'Authorization: Bearer ' . $this->api_key,
+                'Content-Type: application/json'
+            ]
+        ]);
+
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+        curl_close($curl);
+
+        if ($err) {
+            throw new Exception("cURL Error: " . $err);
+        }
+
+        $result = json_decode($response, true);
+        if (isset($result['error'])) {
+            throw new Exception("API Error: " . $result['error']['message']);
+        }
+
+        $eventDetails = json_decode($result['choices'][0]['message']['content'], true);
+        if (!$eventDetails) {
+            throw new Exception("Failed to parse event details from AI response");
+        }
+        
+        // Set defaults if missing
+        if (!isset($eventDetails['summary']) || empty($eventDetails['summary'])) {
+            $eventDetails['summary'] = 'New Event';
+        }
+        if (!isset($eventDetails['description']) || empty($eventDetails['description'])) {
+            $eventDetails['description'] = 'Event scheduled via AI Assistant';
+        }
+
+        return $eventDetails;
     }
 }

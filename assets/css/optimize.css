@@ -1214,6 +1214,12 @@ body .table tbody tr:nth-child(even) > * {
   padding: 0.8rem;
   text-align: center;
 }
+body .modal {
+  background-color: transparent !important;
+}
+body .modal .modal-dialog {
+  background-color: transparent !important;
+}
 @media (min-width: 576px) {
   body .modal .modal-dialog:not(.modal-lg):not(.modal-xl) {
     max-width: 650px;
