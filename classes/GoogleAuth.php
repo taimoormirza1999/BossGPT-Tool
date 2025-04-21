@@ -35,6 +35,7 @@ class GoogleAuth
                 // User exists, just log them in
                 $_SESSION['user_id'] = $existingUser['id'];
                 $_SESSION['username'] = $existingUser['username'];
+                $_SESSION['email'] = $existingUser['email'];
                 return [
                     'success' => true,
                     'user_id' => $existingUser['id'],
@@ -45,7 +46,6 @@ class GoogleAuth
             } else {
                 // Create new user with unique username
                 $username = $this->generateUniqueUsername($email, $name);
-                
                 // Insert the new user
                 $stmt = $this->db->prepare(
                     "INSERT INTO users (username, email, password_hash, fcm_token, pro_plan) 
@@ -62,6 +62,7 @@ class GoogleAuth
                 // Set session variables
                 $_SESSION['user_id'] = $userId;
                 $_SESSION['username'] = $username;
+                $_SESSION['email'] = $email;
                 
                 // Send welcome email (if you have this functionality)
                 // if (function_exists('sendWelcomeEmail')) {

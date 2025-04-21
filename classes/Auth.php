@@ -54,6 +54,7 @@ class Auth
             // Store user info in session
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
+            $_SESSION['email'] = $user['email'];
             $_SESSION['pro_member'] = $user['pro_member'];
 
             // Update FCM token if available in the session
@@ -65,8 +66,17 @@ class Auth
 
             if ($user['pro_member'] != 1) {
                 if ($user['invited_by'] === null) {
-                    header("Location: " . $_ENV['STRIPE_PAYMENT_LINK']);
-                    exit;
+                    if (isset($_COOKIE['rewardful_referral'])) {
+                        $_SESSION['referral_code'] = $_COOKIE['rewardful_referral'];
+                        header("Location: " . $_ENV['STRIPE_PAYMENT_LINK_REFREAL']);
+                        exit;
+                    }else{
+                        header("Location: " . $_ENV['STRIPE_PAYMENT_LINK']);
+                        exit;
+                    }
+                    // echo"no refreal code here";
+                    // var_dump($_COOKIE);
+                    // exit;
                 }
             }
 

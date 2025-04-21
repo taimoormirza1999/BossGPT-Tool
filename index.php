@@ -64,6 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $user->sendWelcomeEmail($_POST['email'], $_POST['username'], $_ENV['BASE_URL']);                    // After successful registration, log the user in
                     $auth->login($_POST['email'], $_POST['password']);
 
+
                     $paymentLink = $_ENV['STRIPE_PAYMENT_LINK'];
                     header("Location: $paymentLink");
                     exit;
@@ -94,18 +95,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // API Endpoint Handler
 require_once './api_endPoints.php';
-
-
-// if (!isset($_SESSION["pro_member"])) {
-//     header("Location: " . $_ENV['STRIPE_PAYMENT_LINK']);
-//     // exit;
-// }
-// echo $_SESSION;
-// echo "dfdsf";
-// echo "<pre>";
-// print_r($_SESSION);
-// echo "</pre><br/>";
-
 ?>
 
 <!DOCTYPE html>
@@ -113,12 +102,15 @@ require_once './api_endPoints.php';
 
 <head>
     <!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-5JFVBHSJ');</script>
-<!-- End Google Tag Manager -->
+    <script>(function (w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            }); var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-5JFVBHSJ');</script>
+    <!-- End Google Tag Manager -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-signin-client_id"
@@ -220,9 +212,9 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
     style="background-color:<?php echo isset($_GET['page']) && ($_GET['page'] == 'login' || $_GET['page'] == 'register') ? '#000' : ''; ?> "
     class="system-mode">
     <!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5JFVBHSJ"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5JFVBHSJ" height="0" width="0"
+            style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
     <?php
     $auth = new Auth();
 
@@ -1826,6 +1818,12 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                     <?php
                     if (isset($_SESSION['user_id'])) {
                         echo "userId = " . json_encode($_SESSION['user_id']) . ";";
+                        if (isset($_GET['referral']) && $_GET['referral'] === 'true') {
+                            // Inject conversion JS
+                            echo "<script>
+          rewardful('convert', { email: '" . $_SESSION['user_email'] . "' });
+        </script>";
+                        }
                     }
                     ?>
                 }
@@ -3263,7 +3261,7 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
             });
         </script>
 
-    <?php
+        <?php
     }
     ?>
 </body>

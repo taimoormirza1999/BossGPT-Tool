@@ -695,12 +695,23 @@ if (isset($_GET['api'])) {
                     ];
                 } else {
                     $is_pro = isset($user['pro_member']) && $user['pro_member'] == 1;
-                    $response = [
-                        'success' => true,
-                        'is_pro' => $is_pro,
-                        'payment_link' => $_ENV['STRIPE_PAYMENT_LINK'],
-                        'invited_by' => $user['invited_by']
-                    ];
+                    if (isset($_COOKIE['rewardful_referral'])) {
+                        $_SESSION['referral_code'] = $_COOKIE['rewardful_referral'];
+                        $response = [
+                            'success' => true,
+                            'is_pro' => $is_pro,
+                            'payment_link' => $_ENV['STRIPE_PAYMENT_LINK_REFREAL'],
+                            'invited_by' => $user['invited_by']
+                        ];
+                    }else{
+                        $response = [
+                            'success' => true,
+                            'is_pro' => $is_pro,
+                            'payment_link' => $_ENV['STRIPE_PAYMENT_LINK'],
+                            'invited_by' => $user['invited_by']
+                        ];
+                    }
+                    
                 }
                 break;
 
