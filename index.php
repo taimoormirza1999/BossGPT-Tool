@@ -207,11 +207,6 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 <body
     style="background-color:<?php echo isset($_GET['page']) && ($_GET['page'] == 'login' || $_GET['page'] == 'register') ? '#000' : ''; ?> "
     class="system-mode">
-    <script
-  src="https://r.wdfl.co/rw.js"
-  data-rewardful="7d57a0"
-  async
-></script>
     <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5JFVBHSJ"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -656,27 +651,57 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
     <script>
         const iconImage = `<?php echo getIconImage(0, 0, "1.8rem"); ?>`
         const welcomeLogoImage = `<?php echo getIconImage(0, 0, '3.7rem'); ?>`; 
+        document.cookie = "rewardful_referral=taimoor; path=/; max-age=86400";
+
+// Quick check in console:
+// console.log("All cookies:", document.cookie);
+// console.log(
+//   "rewardful_referral:",
+//   document.cookie
+//     .split("; ")
+//     .find(c => c.startsWith("rewardful_referral="))
+);
     </script>
 
 
     <script>
         var userId = null;
-        // Add Rewardful initialization check
-        window.rewardful = window.rewardful || function() { (window.rewardful.q = window.rewardful.q || []).push(arguments) };
-        document.addEventListener('DOMContentLoaded', function () {
-            // Ensure rewardful is loaded before calling convert
-            if (typeof window.rewardful === 'function') {
-                console.log('window.rewardful →', window.rewardful);
-                rewardful('convert', { 
-                    email: 'taimoorhamza1999@gmail.com'
-                });
-            } else {
-                console.error('Rewardful not loaded properly');
-            }
-            <?php if(isset($_GET['pro-member']) && $_GET['pro-member'] == 'true') { ?>
-            updateProStatus();
-            <?php } ?>
-        });
+        // Keep the initialization but don't add duplicate script
+        
+          
+        // 2) Grab referral from ?ref= or ?via=
+    const params      = new URLSearchParams(window.location.search);
+    const referral    = params.get('ref') || params.get('via') || null;
+    const email       = "<?php echo addslashes($_SESSION['email'] ?? '') ?>";
+    
+    console.log('Referral:', referral);
+    console.log('window.rewardful:', window.rewardful);
+
+    // 3) Only fire convert once the library is actually present
+    if (typeof rewardful === 'function') {
+      rewardful('convert', {
+        email: email,
+        // Use 'referral' exactly as Rewardful expects
+        referral: referral || undefined
+      });
+      console.log('🔥 rewardful.convert() called');
+    } else {
+      console.error('🚨 rewardful() not available yet');
+      // retry once after a short delay
+      setTimeout(() => {
+        if (typeof rewardful === 'function') {
+          rewardful('convert', { email, referral });
+          console.log('🔥 rewardful.convert() called on retry');
+        } else {
+          console.error('🚨 rewardful() still not loaded');
+        }
+      }, 500);
+    }
+
+    // 4) Trigger your pro‑status update if needed
+    <?php if (!empty($_GET['pro-member']) && $_GET['pro-member']==='true'): ?>
+      updateProStatus();
+    <?php endif; ?>
         function getLastSelectedProject() {
             if (userId) { // Check if userId is available
                 return localStorage.getItem(`lastSelectedProject_${userId}`);
@@ -693,7 +718,7 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
 
 document.addEventListener('DOMContentLoaded', function () {
     // console.log('window.rewardful →', window.rewardful);
- 
+    // rewardful('convert', { email: <?php echo $_SESSION['email']; ?> })
     <?php if(isset($_GET['pro-member']) && $_GET['pro-member'] == 'true') { ?>
         // alert('updateProStatus');
     updateProStatus();
