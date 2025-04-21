@@ -16,7 +16,7 @@ $dotenv = Dotenv::createImmutable(__DIR__);
 session_set_cookie_params(60 * 60 * 24 * 365);
 ini_set('session.gc_maxlifetime', 60 * 60 * 24 * 365);
 
-session_start();
+    session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', $_ENV['DISPLAY_ERRORS']);
 ini_set('log_errors', 0);
@@ -799,7 +799,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // Create the debounced update function
                 const debouncedUpdateTaskStatus = debounce((taskId, newStatus) => {
-                    showLoading();
+                    // showLoading();
                     fetch('?api=update_task_status', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -815,8 +815,8 @@ document.addEventListener('DOMContentLoaded', function () {
                             }
                         })
                         .catch(error => console.error('Error updating task status:', error))
-                        .finally(hideLoading);
-                }, 500); // 500ms debounce time
+                        .finally();
+                }, 300); // 500ms debounce time
 
                 let currentProject = null;
                 // Load saved project from localStorage if available
@@ -1016,7 +1016,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // Load tasks
                 function loadTasks(projectId) {
-                    showLoading();
+                    // showLoading();
                     fetch('?api=get_tasks', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -1029,7 +1029,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             }
                         })
                         .catch(error => console.error('Error loading tasks:', error))
-                        .finally(hideLoading);
+                        .finally();
                 }
 
                 // Update tasks board
@@ -1301,7 +1301,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // Update task status
                 function updateTaskStatus(taskId, newStatus) {
-                    showLoading();
+                    // showLoading();
                     fetch('?api=update_task_status', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -1317,7 +1317,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             }
                         })
                         .catch(error => console.error('Error updating task status:', error))
-                        .finally(hideLoading);
+                        .finally();
                 }
 
                 // Handle chat form submission
@@ -1880,7 +1880,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (isDashboard) {
                     <?php
                     if (isset($_SESSION['user_id'])) {
-                        // echo "userId = " . json_encode($_SESSION['user_id']) . ";";
+                        echo "userId = " . json_encode($_SESSION['user_id']) . ";";
                     }
                     ?>
                 }
@@ -3275,14 +3275,13 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                 let selectedTone = 'friendly'; // Default selection
 
                 // Get existing settings from localStorage if available
-                const savedTone = localStorage.getItem('userAITone') || localStorage.getItem('aiToneMode');
+                const savedTone = localStorage.getItem('aiToneMode');
                 if (savedTone) {
                     selectedTone = savedTone;
                 }
 
                 // Set initial selection in both storage keys for compatibility
                 localStorage.setItem('aiToneMode', selectedTone);
-                localStorage.setItem('userAITone', selectedTone);
 
                 // Set initial active indicators based on saved tone
                 toneOptions.forEach(option => {

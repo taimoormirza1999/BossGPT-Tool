@@ -20,7 +20,7 @@ class Database
             );
         } catch (PDOException $e) {
             error_log("Database connection failed: " . $e->getMessage());
-            throw new Exception("Unable to connect to database. Please try again later.");
+            // throw new Exception("Unable to connect to database. Please try again later.");
         }
     }
 

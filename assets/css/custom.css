@@ -41,10 +41,10 @@
   /* ===============================
        3) SELECTION
        =============================== */
-  ::selection {
+  /* ::selection {
     background-color: var(--bs-primary-dark) !important;
     color: var(--bs-primary-white) !important;
-  }
+  } */
 
   .column_todo {
     background: rgba(187, 7, 10, 1) !important;
@@ -252,6 +252,7 @@
     transition: all 0.4s ease-in-out;
     max-height: 350px!important;
     overflow-y: auto;
+    color: white!important;
   }
   button#aiSendMessageBtn{
     height: 3rem;
