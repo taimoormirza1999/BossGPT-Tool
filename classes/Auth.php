@@ -53,7 +53,7 @@ class Auth
             
             // Store user info in session
             $_SESSION['user_id'] = $user['id'];
-            $_SESSION['email'] = $user['email'];
+            $_SESSION['email'] = $email;
             $_SESSION['username'] = $user['username'];
             $_SESSION['pro_member'] = $user['pro_member'];
 

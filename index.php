@@ -673,11 +673,7 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
             } else {
                 console.error('Rewardful not loaded properly');
             }
-
-            // console.log('window.rewardful →', window.rewardful);
-            // rewardful('convert', { email: <?php echo $_SESSION['email']; ?> })
             <?php if(isset($_GET['pro-member']) && $_GET['pro-member'] == 'true') { ?>
-                // alert('updateProStatus');
             updateProStatus();
             <?php } ?>
         });
@@ -697,7 +693,7 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
 
 document.addEventListener('DOMContentLoaded', function () {
     // console.log('window.rewardful →', window.rewardful);
-    // rewardful('convert', { email: <?php echo $_SESSION['email']; ?> })
+ 
     <?php if(isset($_GET['pro-member']) && $_GET['pro-member'] == 'true') { ?>
         // alert('updateProStatus');
     updateProStatus();
