@@ -651,7 +651,7 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
     <script>
         const iconImage = `<?php echo getIconImage(0, 0, "1.8rem"); ?>`
         const welcomeLogoImage = `<?php echo getIconImage(0, 0, '3.7rem'); ?>`; 
-        document.cookie = "rewardful_referral=taimoor; path=/; max-age=86400";
+        // document.cookie = "rewardful_referral=taimoor; path=/; max-age=86400";
 
 // Quick check in console:
 // console.log("All cookies:", document.cookie);
@@ -660,7 +660,7 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
 //   document.cookie
 //     .split("; ")
 //     .find(c => c.startsWith("rewardful_referral="))
-);
+// );
     </script>
 
 
