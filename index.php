@@ -672,7 +672,8 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
         // 2) Grab referral from ?ref= or ?via=
     const params      = new URLSearchParams(window.location.search);
     const referral    = params.get('ref') || params.get('via') || null;
-    const email       = "<?php echo addslashes($_SESSION['email'] ?? '') ?>";
+    const email = "<?php echo addslashes(isset($_SESSION['email']) ? $_SESSION['email'] : ''); ?>";
+    // console.log('Got email:', email);
     
     console.log('Referral:', referral);
     console.log('window.rewardful:', window.rewardful);
