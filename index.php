@@ -64,8 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $user->sendWelcomeEmail($_POST['email'], $_POST['username'], $_ENV['BASE_URL']);                    // After successful registration, log the user in
                     $auth->login($_POST['email'], $_POST['password']);
 
-                    $paymentLink = $_ENV['STRIPE_PAYMENT_LINK'];
-                    header("Location: $paymentLink");
+                   
                     exit;
 
                 case 'login':
@@ -94,18 +93,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // API Endpoint Handler
 require_once './api_endPoints.php';
-
-
-// if (!isset($_SESSION["pro_member"])) {
-//     header("Location: " . $_ENV['STRIPE_PAYMENT_LINK']);
-//     // exit;
-// }
-// echo $_SESSION;
-// echo "dfdsf";
-// echo "<pre>";
-// print_r($_SESSION);
-// echo "</pre><br/>";
-
 ?>
 
 <!DOCTYPE html>
@@ -113,6 +100,7 @@ require_once './api_endPoints.php';
 
 <head>
     <!-- Google Tag Manager -->
+
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
@@ -219,6 +207,11 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 <body
     style="background-color:<?php echo isset($_GET['page']) && ($_GET['page'] == 'login' || $_GET['page'] == 'register') ? '#000' : ''; ?> "
     class="system-mode">
+    <script
+  src="https://r.wdfl.co/rw.js"
+  data-rewardful="7d57a0"
+  async
+></script>
     <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5JFVBHSJ"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -668,13 +661,48 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
 
     <script>
         var userId = null;
+        // Add Rewardful initialization check
+        window.rewardful = window.rewardful || function() { (window.rewardful.q = window.rewardful.q || []).push(arguments) };
+        document.addEventListener('DOMContentLoaded', function () {
+            // Ensure rewardful is loaded before calling convert
+            if (typeof window.rewardful === 'function') {
+                console.log('window.rewardful →', window.rewardful);
+                rewardful('convert', { 
+                    email: 'taimoorhamza1999@gmail.com'
+                });
+            } else {
+                console.error('Rewardful not loaded properly');
+            }
+
+            // console.log('window.rewardful →', window.rewardful);
+            // rewardful('convert', { email: <?php echo $_SESSION['email']; ?> })
+            <?php if(isset($_GET['pro-member']) && $_GET['pro-member'] == 'true') { ?>
+                // alert('updateProStatus');
+            updateProStatus();
+            <?php } ?>
+        });
         function getLastSelectedProject() {
             if (userId) { // Check if userId is available
                 return localStorage.getItem(`lastSelectedProject_${userId}`);
             }
             return null; // No user logged in or session expired
         }
+        function updateProStatus(){
+    fetch('?api=update_pro_status')
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+    })
+}
 
+document.addEventListener('DOMContentLoaded', function () {
+    // console.log('window.rewardful →', window.rewardful);
+    // rewardful('convert', { email: <?php echo $_SESSION['email']; ?> })
+    <?php if(isset($_GET['pro-member']) && $_GET['pro-member'] == 'true') { ?>
+        // alert('updateProStatus');
+    updateProStatus();
+    <?php } ?>
+});
         document.addEventListener('DOMContentLoaded', function () {
             // Check if we're on the garden stats page
             const isGardenStats = window.location.href.includes('page=garden_stats');
@@ -697,36 +725,42 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                     .then(response => response.json())
                     .then(data => {
                         if (data.success && (!data.is_pro)) {
+                            if (data.invited_by == null && (data.payment_link == '<?php echo $_ENV['STRIPE_PAYMENT_LINK_REFREAL']; ?>' || data.payment_link == '<?php echo $_ENV['STRIPE_PAYMENT_LINK']; ?>')) {
 
-                            if (data.invited_by == null) {
-                                window.location.href = data.payment_link;
+                                // window.location.href = data.payment_link;
                             }
                         }
                     })
                     .catch(error => console.error('Error checking pro status:', error));
 
-                // check if user is pro member
-                // if no then redirect to stripe page simply
+                // Check URL parameters for pro-member status
                 const urlParams = new URLSearchParams(window.location.search);
                 if (urlParams.has('pro-member') && urlParams.get('pro-member') === 'true') {
-                    // Call API to update pro status
-                    // alert('pro-member');
-                    // return;
+                    console.log('Updating pro status...');
                     fetch('?api=update_pro_status')
-                        .then(response => response.json())
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
                         .then(data => {
+                            console.log('Pro status update response:', data);
                             if (data.success) {
-                                console.log('Pro status updated successfully');
-                                Toast('success', 'Upgrade Complete', 'Your account has been upgraded to Pro!');
-                                // Remove the parameter from URL without page reload
-                                const newUrl = window.location.pathname + window.location.search.replace(/[?&]pro-member=true/, '');
-                                window.history.replaceState({}, document.title, newUrl);
+                                Toast('success', 'Success', 'Your account has been upgraded to Pro!');
+                                // setTimeout(() => {
+                                //     window.location.href = '?page=dashboard';
+                                // }, 1500);
                             } else {
-                                console.error('Failed to update pro status:', data.message);
+                                Toast('error', 'Error', data.message || 'Failed to update pro status');
                             }
                         })
-                        .catch(error => console.error('Error updating pro status:', error));
+                        .catch(error => {
+                            console.error('Error updating pro status:', error);
+                            Toast('error', 'Error', 'Failed to update pro status. Please try again.');
+                        });
                 }
+
                 // Add debounce function at the start
                 function debounce(func, wait) {
                     let timeout;
@@ -1825,7 +1859,7 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
                 if (isDashboard) {
                     <?php
                     if (isset($_SESSION['user_id'])) {
-                        echo "userId = " . json_encode($_SESSION['user_id']) . ";";
+                        // echo "userId = " . json_encode($_SESSION['user_id']) . ";";
                     }
                     ?>
                 }
@@ -3025,7 +3059,7 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
         // get Reminders
         function getReminders() {
             const fcmToken = "<?php echo isset($_SESSION['fcm_token']) ? $_SESSION['fcm_token'] : ''; ?>";
-            console.log("FCM Token for reminders:", fcmToken);
+            // console.log("FCM Token for reminders:", fcmToken);
             if (!fcmToken) {
                 console.error('No FCM token found');
                 return;
@@ -3074,7 +3108,7 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                             // updatePopupVisibility();
                         }
                     } else {
-                        console.log("No reminders found or empty response");
+                        // console.log("No reminders found or empty response");
                     }
                 })
                 .catch(error => {

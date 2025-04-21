@@ -39,7 +39,7 @@ class Auth
     public function login($email, $password)
     {
         try {
-            $stmt = $this->db->prepare("SELECT id, username, password_hash, pro_plan as pro_member, invited_by FROM users WHERE email = ?");
+            $stmt = $this->db->prepare("SELECT id, username, email, password_hash, pro_plan as pro_member, invited_by FROM users WHERE email = ?");
             $stmt->execute([$email]);
             $user = $stmt->fetch();
 
@@ -53,6 +53,7 @@ class Auth
             
             // Store user info in session
             $_SESSION['user_id'] = $user['id'];
+            $_SESSION['email'] = $user['email'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['pro_member'] = $user['pro_member'];
 
@@ -65,7 +66,11 @@ class Auth
 
             if ($user['pro_member'] != 1) {
                 if ($user['invited_by'] === null) {
-                    header("Location: " . $_ENV['STRIPE_PAYMENT_LINK']);
+                    if (isset($_COOKIE['rewardful_referral'])) {
+                        header("Location: " . $_ENV['STRIPE_PAYMENT_LINK_REFREAL']);
+                    } else {
+                        header("Location: " . $_ENV['STRIPE_PAYMENT_LINK']);
+                    }
                     exit;
                 }
             }
@@ -112,9 +117,25 @@ class Auth
     }
     public function updateProStatus($userId)
     {
-        $stmt = $this->db->prepare("UPDATE users SET pro_plan = 1 WHERE id = ?");
-        $stmt->execute([$userId]);
-        return $stmt->rowCount() > 0;
+        try {
+            // First check if user is already a pro member
+            $stmt = $this->db->prepare("SELECT pro_plan FROM users WHERE id = ?");
+            $stmt->execute([$userId]);
+            $user = $stmt->fetch();
+            
+            if ($user && $user['pro_plan'] == 1) {
+                // User is already a pro member
+                return true;
+            }
+            
+            // Update to pro if not already
+            $stmt = $this->db->prepare("UPDATE users SET pro_plan = 1 WHERE id = ?");
+            $stmt->execute([$userId]);
+            return true;
+        } catch (Exception $e) {
+            error_log("Update pro status error: " . $e->getMessage());
+            throw new Exception("Failed to update pro status: " . $e->getMessage());
+        }
     }
 
     public function updateFcmToken($userId, $fcmToken) {

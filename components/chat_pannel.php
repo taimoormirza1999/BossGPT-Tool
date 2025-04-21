@@ -80,7 +80,7 @@
                                         }
                                     },
                                     {
-                                        delay: 4000,
+                                        delay: 3500,
                                         title: '💡 How I Can Help',
                                         content: {
                                             text: 'Once you create a project, I can:',
@@ -93,7 +93,7 @@
                                         }
                                     },
                                     {
-                                        delay: 6000,
+                                        delay: 5000,
                                         title: '🎯 Next Steps',
                                         content: {
                                             text: 'To get the most out of BossGPT:',
@@ -107,7 +107,7 @@
                                         }
                                     },
                                     {
-                                        delay: 8000,
+                                        delay: 7000,
                                         title: '🌟 Ready to Begin?',
                                         content: {
                                             text: 'Create your first project and let\'s make something amazing together!',

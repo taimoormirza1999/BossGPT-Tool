@@ -17,21 +17,33 @@ if (isset($_GET['api'])) {
         switch ($_GET['api']) {
 
             case 'update_pro_status':
+                header('Content-Type: application/json');
+                session_start();
                 if (!isset($_SESSION['user_id'])) {
-                    return json_encode(['success' => false, 'message' => 'User not logged in']);
+                    echo json_encode(['success' => false, 'message' => 'User not logged in']);
                     exit;
                 }
 
                 try {
                     $auth = new Auth();
+                    error_log("Attempting to update pro status for user: " . $_SESSION['user_id']);
+                    
                     $result = $auth->updateProStatus($_SESSION['user_id']);
-                    return json_encode(['success' => true, 'message' => 'Pro status updated successfully']);
+                    if ($result) {
+                        $_SESSION['pro_member'] = 1;
+                        error_log("Successfully updated pro status for user: " . $_SESSION['user_id']);
+                        echo json_encode(['success' => true, 'message' => 'Pro status updated successfully']);
+                    } else {
+                        error_log("Failed to update pro status for user: " . $_SESSION['user_id']);
+                        echo json_encode(['success' => false, 'message' => 'Failed to update pro status']);
+                    }
                     exit;
                 } catch (Exception $e) {
-                    return json_encode(['success' => false, 'message' => $e->getMessage()]);
+                    error_log("Error updating pro status: " . $e->getMessage());
+                    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
                     exit;
                 }
-                exit;
+                break;
             case 'get_chat_history':
                 $data = json_decode(file_get_contents('php://input'), true);
                 if (!isset($data['project_id'])) {
@@ -695,12 +707,35 @@ if (isset($_GET['api'])) {
                     ];
                 } else {
                     $is_pro = isset($user['pro_member']) && $user['pro_member'] == 1;
-                    $response = [
-                        'success' => true,
-                        'is_pro' => $is_pro,
-                        'payment_link' => $_ENV['STRIPE_PAYMENT_LINK'],
-                        'invited_by' => $user['invited_by']
-                    ];
+                    if($is_pro){
+                        $response = [
+                            'success' => true,
+                            'is_pro' => $is_pro,
+                            'payment_link' =>null,
+                            'invited_by' => $user['invited_by']
+                        ];
+                        echo json_encode($response);
+                        exit;
+                       
+                    }
+                    if(isset($_GET['pro-member'])){
+                    if (isset($_COOKIE['rewardful_referral'])) {
+                        $_SESSION['referral_code'] = $_COOKIE['rewardful_referral'];
+                        $response = [
+                            'success' => true,
+                            'is_pro' => $is_pro,
+                            'payment_link' => $_ENV['STRIPE_PAYMENT_LINK_REFREAL'],
+                            'invited_by' => $user['invited_by']
+                        ];
+                    }else{
+                        $response = [
+                            'success' => true,
+                            'is_pro' => $is_pro,
+                            'payment_link' => $_ENV['STRIPE_PAYMENT_LINK'],
+                            'invited_by' => $user['invited_by']
+                        ];
+                    }
+                }
                 }
                 break;
 

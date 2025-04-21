@@ -350,8 +350,7 @@ function appendWelcomeLogo() {
   // Always insert at the beginning of the chat container
   chatMessages.insertBefore(logoContainer, chatMessages.firstChild);
   
-  // Log to verify it's being called
-  console.log("Welcome logo added to chat container");
+
 }
 
 // Add styles for the welcome logo
@@ -741,7 +740,7 @@ function initializeFCM() {
 
   // Request permission and get token
   messaging
-    .getToken({ vapidKey: "YOUR_VAPID_KEY" })
+    .getToken({ vapidKey: 'BNvQzVggQ4j6sTH5W6sxSa4K8Q-K0BhPn2tJT1en85dcp1P46M4EFJjoxe_uJI3PnEgQ06LO2mgv0SvcpBfyL00' })
     .then((currentToken) => {
       if (currentToken) {
         saveFCMToken(currentToken);
@@ -752,7 +751,7 @@ function initializeFCM() {
       }
     })
     .catch((err) => {
-      console.log("An error occurred while retrieving token. ", err);
+      // console.log("An error occurred while retrieving token. ", err);
     });
 
   // Handle token refresh
@@ -796,7 +795,7 @@ function saveFCMToken(token) {
     .then((data) => {
       if (data.success) {
         fcmTokenSaved = true;
-        console.log("FCM token saved to database");
+        // console.log("FCM token saved to database");
       } else {
         console.error("Failed to save FCM token to database");
       }
