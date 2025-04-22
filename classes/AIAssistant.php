@@ -691,7 +691,7 @@ class AIAssistant
     /**
      * Handle calendar-related requests
      */
-    private function handleCalendarRequest($message)
+    public function handleCalendarRequest($message)
     {
         try {
             if (!$this->calendar->isAuthenticated()) {
@@ -699,6 +699,21 @@ class AIAssistant
                     'message' => 'Please connect your Google Calendar first. I\'ll help you schedule events once you\'re connected. <button class="btn btn-primary" onclick="window.location.href=\'calendar/connect-calendar.php\'">Connect Calendar</button>',
                     'action' => 'connect_calendar'
                 ];
+            }
+
+            // Check if token has expired and refresh if necessary
+            $client = $this->calendar->getClient();
+            if ($client->isAccessTokenExpired()) {
+                if ($client->getRefreshToken()) {
+                    $client->fetchAccessTokenWithRefreshToken($client->getRefreshToken());
+                    $_SESSION['access_token'] = $client->getAccessToken();
+                } else {
+                    // No refresh token available, need to reconnect
+                    return [
+                        'message' => 'Your calendar connection has expired. Please reconnect your Google Calendar. <button class="btn btn-primary" onclick="window.location.href=\'calendar/connect-calendar.php\'">Reconnect Calendar</button>',
+                        'action' => 'connect_calendar'
+                    ];
+                }
             }
 
             // Use GPT to extract event details from the message
@@ -748,7 +763,7 @@ class AIAssistant
             ]);
 
             $calendarId = 'primary';
-            $service = new Google_Service_Calendar($this->calendar->getClient());
+            $service = new Google_Service_Calendar($client);
             $createdEvent = $service->events->insert($calendarId, $event);
 
             // Format time for display using the Dubai timezone
@@ -767,6 +782,17 @@ class AIAssistant
 
         } catch (Exception $e) {
             error_log("Calendar Request Error: " . $e->getMessage());
+            
+            // Provide more detailed error message based on error type
+            $errorMsg = $e->getMessage();
+            if (strpos($errorMsg, 'insufficient authentication scopes') !== false) {
+                return [
+                    'message' => "I need additional permissions to schedule this event. Please reconnect your calendar: <button class='btn btn-primary' onclick=\"window.location.href='calendar/connect-calendar.php'\">Reconnect Calendar</button>",
+                    'error' => true,
+                    'action' => 'reconnect_calendar'
+                ];
+            }
+            
             return [
                 'message' => "Sorry, I encountered an error while scheduling your event: " . $e->getMessage(),
                 'error' => true

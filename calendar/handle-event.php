@@ -11,9 +11,22 @@ if (!isset($_SESSION['access_token'])) {
 $client = new Google_Client();
 $client->setClientId($_ENV['GOOGLE_CLIENT_ID']);
 $client->setClientSecret($_ENV['GOOGLE_CLIENT_SECRET']);
-$client->setRedirectUri($_ENV['GOOGLE_REDIRECT_URI']);
+$client->setRedirectUri($_ENV['GOOGLE_CALENDAR_REDIRECT_URI']);
 $client->addScope(Google_Service_Calendar::CALENDAR);
+$client->addScope(Google_Service_Calendar::CALENDAR_EVENTS);
 $client->setAccessToken($_SESSION['access_token']);
+
+// Check if token has expired and refresh if necessary
+if ($client->isAccessTokenExpired()) {
+    if ($client->getRefreshToken()) {
+        $client->fetchAccessTokenWithRefreshToken($client->getRefreshToken());
+        $_SESSION['access_token'] = $client->getAccessToken();
+    } else {
+        // No refresh token, redirect to re-authenticate
+        header('Location: connect-calendar.php');
+        exit;
+    }
+}
 
 $service = new Google_Service_Calendar($client);
 
