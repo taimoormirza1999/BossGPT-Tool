@@ -844,7 +844,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // Load projects
                 function loadProjects() {
-                    showLoading();
+                    // showLoading();
                     fetch('?api=get_projects')
                         .then(response => response.json())
                         .then(data => {
