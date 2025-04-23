@@ -55,7 +55,7 @@ if (isset($_GET['api'])) {
                     SELECT message, sender, timestamp 
                     FROM chat_history 
                     WHERE project_id = ? 
-                    ORDER BY timestamp DESC 
+                    ORDER BY id DESC 
                     LIMIT ? OFFSET ?
                 ");
                 $stmt->bindParam(1, $data['project_id']);

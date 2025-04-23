@@ -99,7 +99,7 @@ $purple-mode-modal-header-bgcolor: #361734;
 $brown-mode-modal-header-bgcolor: #410404;
 $default-mode-modal-header-bgcolor: #1d1d1d;
 
-$black-mode-modal-input-bgcolor: rgba(12, 1, 17, 0.2);
+$black-mode-modal-input-bgcolor: rgba(0, 0, 0, 0.2);
 $purple-mode-modal-input-bgcolor: rgba(12, 1, 17, 0.5);
 $brown-mode-modal-input-bgcolor: rgba(12, 1, 17, 0.2);
 $default-mode-modal-input-bgcolor: rgba(10, 10, 10, 0.2);
@@ -311,6 +311,7 @@ $geist-fonts: (
   .modal {
     .modal-dialog {
       .modal-content {
+       
         @include theme-bgcolor($container-bgcolor);
         .close-icon-btn {
         }
@@ -327,7 +328,8 @@ $geist-fonts: (
           .tree-option {
             @include theme-bgcolor($input-bgcolor);
           }
-          .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        
+          .select2-container--default .select2-selection--multiple .select2-selection__choice,.select2-dropdown {
             background-color: $container-bgcolor!important;
           }
         }
@@ -592,7 +594,7 @@ body {
   background-position: top;
   background-repeat: no-repeat;
   background-attachment: fixed;
-  overflow-y: hidden;
+  // overflow-y: hidden;
   // login/register pa ges
   .register-page,
   .login-page,
