@@ -955,7 +955,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     console.log(projectId)
                     const THRESHOLD = 20;  // pixels from the very top
                     if (chatMessages.scrollTop <= THRESHOLD && !loading && !allLoaded) {
-                        loadChatHistory(projectId, offset);
+                        loadChatHistory(projectId, offset, false);
                     }
                 });
                 // Select project
@@ -1017,8 +1017,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 // Load chat history
-                function loadChatHistory(projectId, currentOffset = 0) {
+                function loadChatHistory(projectId, currentOffset = 0, reset = true) {
                     loading = true;
+                    if (reset) {
+                        offset = 0;
+                        allLoaded = false;
+                        chatMessages.innerHTML = '';
+                    }
                     showChatLoading();
                     
                     const oldScrollHeight = chatMessages.scrollHeight;
