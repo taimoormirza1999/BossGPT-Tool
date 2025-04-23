@@ -191,90 +191,44 @@
                         </script>
                     <?php endif; ?>
                 </div>
-                <div class="chat-input">
-                    <?php
-                    $prompts = [
-                        "📑 set a reminder for task #number",
-                        "📑 suggest tasks for my project",
-                        "🎯 Create task 'Your Task' and assign it to myself",
-                        "📋 Create tasks for Your Feature",
-                        "✏️ Move task #number to in_progress",
-                        "👥 Assign task 'Your Task' to @name",
-                        "📅 Set deadline for task #number to next Friday",
-                        "📝 Update description of task 'Your Task'",
-                        "🔄 Mark task #number as completed",
-                        "📊 Show project progress",
-                        "📑 List all tasks in current project",
-                        "🔍 Show tasks assigned to me"
-                    ];
-
-                    function renderPromptButtons($prompts)
-                    {
-                        foreach ($prompts as $prompt) {
-                            echo '<button style="border-radius: 20px!important;" class="btn btn-outline-light  prompt-btn" type="button" onclick="handlePromptClick(this)">' . $prompt . '</button>';
-                        }
-                    }
-                    ?>
-
-                    <!-- Prompt suggestions -->
-                    <div class="prompt-suggestions">
-                        <div class="nav nav-tabs border-0 flex-nowrap overflow-auto mb-0 px-0"
-                            style="scrollbar-width: none; -ms-overflow-style: none;">
-                            <?php renderPromptButtons($prompts); ?>
-                        </div>
-                    </div>
-
-
+                <div class="chat-input d-flex align-items-center" id="chat-input" data-project-id="<?php echo $project_id; ?>">
+                    <button type="button" id="improvePromptBtn" class="btn btn-outline-light me-2" title="Improve Prompt">✨</button>
                     <form id="chatForm" class="d-flex">
-                        <textarea class="form-control me-2" id="messageInput" placeholder="Type your message..."
-                            rows="1"></textarea>
-                        <button type="submit" id="aiSendMessageBtn"
-                            class="btn btn-send-primary"><?php echo file_get_contents("assets/icons/send.svg"); ?>
-                        </button>
+                        <textarea class="form-control me-2" id="messageInput" placeholder="Type your message..." rows="1"></textarea>
+                        <button type="submit" id="aiSendMessageBtn" class="btn btn-send-primary"><?php echo file_get_contents("assets/icons/send.svg"); ?></button>
                     </form>
                     <script>
-                        // Auto-resize textarea as user types
-                        const messageInput = document.getElementById('messageInput');
-                        if (messageInput) {
-                            messageInput.addEventListener('input', function () {
-                                this.style.height = 'auto';
-                                this.style.height = (this.scrollHeight) + 'px';
-                            });
-                            
-                            // Add event listener for Enter key press
-                            messageInput.addEventListener('keypress', function(event) {
-                                if (event.key === 'Enter' && !event.shiftKey) {
-                                    event.preventDefault();
-                                    document.getElementById('chatForm').dispatchEvent(new Event('submit'));
+                        document.getElementById('improvePromptBtn').addEventListener('click', async function() {
+                            const textarea = document.getElementById('messageInput');
+                            alert(getLastSelectedProject());
+                            const original = textarea.value;
+                            if (!original.trim()) return;
+                            const btn = this;
+                            btn.disabled = true;
+                            btn.innerText = '⏳';
+                            try {
+                                const response = await fetch('api_endPoints.php?api=improve_prompt', {
+                                    method: 'POST',
+                                    headers: {'Content-Type': 'application/json'},
+                                    body: JSON.stringify({
+                                        message: original,
+                                        project_id: getLastSelectedProject()
+                                    })
+                                });
+                                const result = await response.json();
+                                if (result.success && result.improvedMessage) {
+                                    textarea.value = result.improvedMessage;
+                                    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+                                } else {
+                                    console.error('Improve prompt failed', result);
                                 }
-                            });
-
-                            // Reset height when form is submitted
-                            document.getElementById('chatForm').addEventListener('submit', function () {
-                                setTimeout(() => {
-                                    // messageInput.style.height = 'auto';
-                                }, 100);
-                            });
-                        }
-
-                        function handlePromptClick(button) {
-                            let promptText = button.innerText;
-                            let inputField = document.getElementById("messageInput");
-                            let aiSendMessageBtn = document.getElementById("aiSendMessageBtn");
-
-                            // Set input field value
-                            inputField.value = promptText;
-
-                            // Trigger the input event to resize the textarea
-                            const inputEvent = new Event('input', { bubbles: true });
-                            inputField.dispatchEvent(inputEvent);
-
-                            // Auto-submit the form
-                            setTimeout(() => {
-                                // aiSendMessageBtn.click();
-                                // chatForm.submit();
-                            }, 200); // Small delay to make it smooth
-                        }
+                            } catch (err) {
+                                console.error('Error improving prompt', err);
+                            } finally {
+                                btn.disabled = false;
+                                btn.innerText = '✨';
+                            }
+                        });
                     </script>
                 </div>
             </div>

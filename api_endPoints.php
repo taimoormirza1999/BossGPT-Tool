@@ -107,6 +107,23 @@ if (isset($_GET['api'])) {
                 $response = ['success' => true] + $result;
                 break;
 
+            case 'improve_prompt':
+                error_reporting(E_ALL);
+ini_set('display_errors', 1);
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (!isset($data['message']) || !isset($data['project_id'])) {
+                    throw new Exception('Message and project ID are required');
+                }
+                // Call assistant to improve prompt
+                $improved = $ai_assistant->improvePrompt(
+                    $data['message'],
+                    $data['project_id']
+                );
+                $response = ['success' => true, 'improvedMessage' => $improved];
+                echo json_encode($response);
+                exit;
+                break;
+
             case 'create_project':
                 $data = json_decode(file_get_contents('php://input'), true);
                 if (!isset($data['title'])) {

@@ -863,4 +863,63 @@ class AIAssistant
 
         return $eventDetails;
     }
+
+    /**
+     * Improve a user's prompt message based on project context.
+     */
+    public function improvePrompt($message, $project_id)
+    {
+        try {
+            // Retrieve project context and format
+            $context = $this->getProjectContext($project_id);
+            $formatted_context = $this->formatContextForAI($context);
+
+            // Prepare system and user messages for prompt improvement
+            $systemMsg = "You are a prompt improvement assistant. Based on the following project context, rewrite the user's message to be clearer, more concise, and more effective.\n\nProject Context:\n" . $formatted_context;
+            $messages = [
+                ['role' => 'system', 'content' => $systemMsg],
+                ['role' => 'user', 'content' => $message]
+            ];
+
+            // Call OpenAI Chat Completions API
+            $curl = curl_init();
+            curl_setopt_array($curl, [
+                CURLOPT_URL => 'https://api.openai.com/v1/chat/completions',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 30,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => json_encode([
+                    'model' => $this->model,
+                    'messages' => $messages,
+                    'temperature' => 0.7
+                ]),
+                CURLOPT_HTTPHEADER => [
+                    'Authorization: Bearer ' . $this->api_key,
+                    'Content-Type: application/json'
+                ]
+            ]);
+            $response = curl_exec($curl);
+            $err = curl_error($curl);
+            curl_close($curl);
+
+            if ($err) {
+                throw new Exception("cURL Error: " . $err);
+            }
+            $result = json_decode($response, true);
+            if (isset($result['error'])) {
+                throw new Exception("API Error: " . $result['error']['message']);
+            }
+
+            // Extract improved prompt
+            $improved = $result['choices'][0]['message']['content'] ?? '';
+            return trim($improved);
+        } catch (Exception $e) {
+            error_log("Error improving prompt: " . $e->getMessage());
+            // Fallback to original message if improvement fails
+            return $message;
+        }
+    }
 }
