@@ -5,8 +5,10 @@ document.addEventListener("DOMContentLoaded", function () {
   loader.className = "initial-loader";
   loader.innerHTML = `
         <div class="loader-content">
-            <div class="loader-spinner"></div>
-            <div class="loader-text">Loading BossGPT...</div>
+       <canvas id="myLottie" width="53" height="53" style="height:50px;width:50px"></canvas>
+        <div class="loader-text text-sm mt-2">
+        Loading BossGPT...
+        </div>
         </div>
     `;
   document.body.appendChild(loader);
@@ -330,7 +332,14 @@ function scrollToBottom() {
   }
 }
 const aiMessageClasses = "ai-message d-flex align-items-start intro-message";
-
+function hideWelcomeLogo() {
+  const chatMessages = document.getElementById("chatMessages");
+  if (!chatMessages) return;
+  const existingLogo = chatMessages.querySelector('.welcome-logo-container');
+  if (existingLogo) {
+    existingLogo.remove();
+  }
+}
 // Add this new function to append a welcome logo
 function appendWelcomeLogo() {
   const chatMessages = document.getElementById("chatMessages");

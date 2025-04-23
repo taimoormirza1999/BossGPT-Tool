@@ -131,7 +131,28 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <!-- Custom js -->
     <script src="./assets/js/custom.js"></script>
 
+    <script type="module">
+  import { DotLottie } from "https://cdn.jsdelivr.net/npm/@lottiefiles/dotlottie-web/+esm";
 
+  document.addEventListener('DOMContentLoaded', function () {
+    function initializeLottie(canvasId, lottieUrl) {
+      const canvas = document.getElementById(canvasId);
+      if (canvas) {
+        new DotLottie({
+          canvas: canvas,
+          src: lottieUrl,
+          loop: true,
+          autoplay: true
+        });
+      } else {
+        console.warn(`Canvas with ID '${canvasId}' not found.`);
+      }
+    }
+    // Initialize both animations
+    initializeLottie("myLottie", "https://res.cloudinary.com/da6qujoed/raw/upload/v1745325374/loader_bossgpt_htiw2q.lottie");
+    initializeLottie("mychatLoader", "https://res.cloudinary.com/da6qujoed/raw/upload/v1745325374/loader_bossgpt_htiw2q.lottie");
+  });
+</script>
     <link rel="icon" type="image/png" sizes="32x32" href="faviconbossgpt.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -832,7 +853,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 const messageInput = document.getElementById('messageInput');
                 const createProjectBtn = document.getElementById('createProjectBtn');
                 const loadingIndicator = document.querySelector('.loading');
+                const chatLoader = document.getElementById('mychatLoader');
 
+                // Show/hide loading indicator
+                function showChatLoading() {
+                    chatLoader.classList.remove('d-none');
+                
+                }
+
+                function hideChatLoading() {
+                    chatLoader.classList.add('d-none');
+                }
                 // Show/hide loading indicator
                 function showLoading() {
                     loadingIndicator.style.display = 'flex';
@@ -841,7 +872,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 function hideLoading() {
                     loadingIndicator.style.display = 'none';
                 }
-
+                function scrollToBottom() {
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+                hideChatLoading();
                 // Load projects
                 function loadProjects() {
                     // showLoading();
@@ -911,7 +945,19 @@ document.addEventListener('DOMContentLoaded', function () {
                         })
                         .finally(hideLoading);
                 }
-
+                let offset = 0;
+                const limit = 20;
+                let loading = false;
+                let allLoaded = false;
+                 // Infinite scroll event
+                 chatMessages.addEventListener('scroll', () => {
+                    const projectId = $('#myselectedcurrentProject').val();
+                    console.log(projectId)
+                    const THRESHOLD = 20;  // pixels from the very top
+                    if (chatMessages.scrollTop <= THRESHOLD && !loading && !allLoaded) {
+                        loadChatHistory(projectId, offset);
+                    }
+                });
                 // Select project
                 function selectProject(projectId, selectedProjectTitle = "") {
                     const $button = $('#projectDropdownButton');
@@ -971,15 +1017,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 // Load chat history
-                function loadChatHistory(projectId) {
-                    showLoading();
+                function loadChatHistory(projectId, currentOffset = 0) {
+                    loading = true;
+                    showChatLoading();
+                    
+                    const oldScrollHeight = chatMessages.scrollHeight;
                     fetch('?api=get_chat_history', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                             'Accept': 'application/json'
                         },
-                        body: JSON.stringify({ project_id: projectId })
+                        body: JSON.stringify({ project_id: projectId, offset: currentOffset, limit })
                     })
                         .then(response => {
                             if (!response.ok) {
@@ -989,17 +1038,28 @@ document.addEventListener('DOMContentLoaded', function () {
                         })
                         .then(data => {
                             if (data.success) {
-                                chatMessages.innerHTML = '';
                                 if (Array.isArray(data.history) && data.history.length > 0) {
-                                    appendWelcomeLogo();
-                                    data.history.forEach(msg => {
-                                        appendMessage(msg.message, msg.sender);
-                                    });
+                                    if (offset === 0) {
+                                        chatMessages.innerHTML = '';
+                                        appendWelcomeLogo();
+                                        data.history.reverse().forEach(msg => appendMessage(msg.message, msg.sender));
+                                        // scrollToBottom();
+                                    } else {
+                                        hideWelcomeLogo();
+                                        data.history.forEach(msg => appendMessage(msg.message, msg.sender, 'top'));
+                                        // scrollToBottom();
+                                        // 2) AFTER prepending, restore the scroll position
+            const newScrollHeight = chatMessages.scrollHeight;
+            chatMessages.scrollTop = newScrollHeight - oldScrollHeight;
+                                        
+                                    }
+                                    offset += data.history.length;
                                 } else {
-                                    // If no chat history, show welcome messages
-                                    displayProjectCreationWelcomeMessages();
+                                    allLoaded = true;
+                                    // If no chat history, show welcome messages for first time users only
+                                    if (offset === 0) displayProjectCreationWelcomeMessages();
                                 }
-                            } else {
+                            }  else {
                                 throw new Error(data.message || 'Failed to load chat history');
                             }
                         })
@@ -1011,7 +1071,13 @@ document.addEventListener('DOMContentLoaded', function () {
                             </div>
                         `;
                         })
-                        .finally(hideLoading);
+                        .finally(() => {
+                            loading = false;
+                            setTimeout(() => {
+                                hideChatLoading();
+                            }, 500);
+                           
+                        });
                 }
 
                 // Load tasks

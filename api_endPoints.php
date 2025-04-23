@@ -49,15 +49,20 @@ if (isset($_GET['api'])) {
                 if (!isset($data['project_id'])) {
                     throw new Exception('Project ID is required');
                 }
-
+                $limit = isset($data['limit']) ? (int)$data['limit'] : 20;
+                $offset = isset($data['offset']) ? (int)$data['offset'] : 0;
                 $stmt = $db->prepare("
                     SELECT message, sender, timestamp 
                     FROM chat_history 
                     WHERE project_id = ? 
-                    ORDER BY timestamp
-                   
+                    ORDER BY timestamp DESC 
+                    LIMIT ? OFFSET ?
                 ");
-                $stmt->execute([$data['project_id']]);
+                $stmt->bindParam(1, $data['project_id']);
+                $stmt->bindParam(2, $limit, PDO::PARAM_INT);
+                $stmt->bindParam(3, $offset, PDO::PARAM_INT);
+                $stmt->execute();
+            
                 $history = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 $response = [

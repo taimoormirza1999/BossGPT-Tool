@@ -9,6 +9,7 @@ define('DB_NAME', 'project_manager');
 
 // OpenAI API configuration
 define('OPENAI_API_KEY', $_ENV['OPENAI_API_KEY']);
+define('OPENAI_MODEL', $_ENV['OPENAI_MODEL']);
 
 
 

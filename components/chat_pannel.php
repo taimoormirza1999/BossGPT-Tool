@@ -39,6 +39,7 @@
         </div>
         <div class="card-body p-0">
             <div class="chat-container">
+                <canvas id="mychatLoader" width="20" height="20" style="height: 30px;width: 30px;" class="mx-auto my-2 d-none justify-content-center align-items-center"></canvas>
                 <div class="chat-messages" id="chatMessages">
                     <?php if (empty($projects)): ?>
                         <div class="welcome-guide">
@@ -192,13 +193,8 @@
                 </div>
                 <div class="chat-input">
                     <?php
-
-
                     $prompts = [
-                        "what is my name?",
-                        "what is today's date?",
-                        "what is the time?",
-                        "📑 book a meeting with Taimoor by tomorrow at 10am",
+                        "📑 set a reminder for task #number",
                         "📑 suggest tasks for my project",
                         "🎯 Create task 'Your Task' and assign it to myself",
                         "📋 Create tasks for Your Feature",

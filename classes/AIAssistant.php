@@ -7,11 +7,13 @@ class AIAssistant
 {
     private $api_key;
     private $db;
+    private $model;
     private $calendar;
 
     public function __construct()
     {
         $this->api_key = OPENAI_API_KEY;
+        $this->model = OPENAI_MODEL;
         $this->db = Database::getInstance()->getConnection();
         $this->calendar = new GoogleCalendarManager();
     }
@@ -345,7 +347,7 @@ class AIAssistant
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'POST',
                 CURLOPT_POSTFIELDS => json_encode([
-                    'model' => 'gpt-4o',
+                    'model' => $this->model,
                     'messages' => $messages,
                     'functions' => $functions,
                     'function_call' => 'auto'
@@ -823,7 +825,7 @@ class AIAssistant
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => json_encode([
-                'model' => 'gpt-4',
+                'model' => $this->model,
                 'messages' => $messages,
                 'temperature' => 0.7
             ]),
