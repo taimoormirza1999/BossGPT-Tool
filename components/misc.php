@@ -175,4 +175,8 @@ function showAIToneModal() {
     aiToneModal.style.display = 'block';
   }
 }
+function openLink(link) {
+  window.open(link, '_blank');
+}
+
 </script>

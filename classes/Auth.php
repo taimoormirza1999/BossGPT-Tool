@@ -39,14 +39,13 @@ class Auth
     public function login($email, $password)
     {
         try {
-            $stmt = $this->db->prepare("SELECT id, username, email, password_hash, pro_plan as pro_member, invited_by FROM users WHERE email = ?");
+            $stmt = $this->db->prepare("SELECT id, username, email, password_hash, pro_plan as pro_member, invited_by, fcm_token, telegram_chat_id, discord_id FROM users WHERE email = ?");
             $stmt->execute([$email]);
             $user = $stmt->fetch();
 
             if (!$user || !password_verify($password, $user['password_hash'])) {
                 throw new Exception("Invalid credentials");
             }
-
             // Update the last_login timestamp
             $stmt = $this->db->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
             $stmt->execute([$user['id']]);
@@ -56,6 +55,8 @@ class Auth
             $_SESSION['email'] = $user['email'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['pro_member'] = $user['pro_member'];
+            $_SESSION['telegram_token'] = $user['telegram_chat_id'];
+            $_SESSION['discord_token'] = $user['discord_id'];
 
             // Update FCM token if available in the session
             if (isset($_SESSION['fcm_token']) && $_SESSION['fcm_token'] !== '0') {

@@ -3,6 +3,7 @@
 // webhook.php?source=discord
 // error_reporting(E_ALL);
 // ini_set('display_errors', 1);
+session_start();
 require_once __DIR__ . '/../classes/Database.php';
 require_once __DIR__ . '/../config/constants.php';
 
@@ -29,7 +30,7 @@ function handleTelegram($data) {
     $text = $data['message']['text'];
 
     if (preg_match('/\/start connect(_(\d+))?/', $text, $matches)) {
-    sendTelegramMessage($chat_id, "Please reply with your registered email to connect your Telegram. with BossGPT to connect with reminders");
+    sendTelegramMessage($chat_id, "To ensure you never miss a deadline, please provide your registered email. We'll link your Telegram to your BossGPT account for timely updates.");
 } elseif (filter_var($text, FILTER_VALIDATE_EMAIL)) {
     $db = Database::getInstance()->getConnection();
 
@@ -41,7 +42,8 @@ function handleTelegram($data) {
         $stmt = $db->prepare("UPDATE users SET telegram_chat_id = ? WHERE email = ?");
         $stmt->execute([$chat_id, $text]);
 
-        sendTelegramMessage($chat_id, "✅ Your Telegram is now connected for reminders!");
+        sendTelegramMessage($chat_id, "✅ Your Telegram is now connected for reminders! You can now receive timely updates and reminders directly to your Telegram.\n\n <a href='".$_ENV['BASE_URL']."'>Go to BossGPT</a>");
+        $_SESSION['telegram_token'] = $chat_id;
     } else {
         sendTelegramMessage($chat_id, "❌ Email not found. Please make sure you're using your BossGPT registered email.");
     }
