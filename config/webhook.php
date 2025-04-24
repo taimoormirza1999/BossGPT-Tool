@@ -1,8 +1,11 @@
 <?php
 // webhook.php?source=telegram
 // webhook.php?source=discord
-
+// error_reporting(E_ALL);
+// ini_set('display_errors', 1);
 require_once __DIR__ . '/../classes/Database.php';
+require_once __DIR__ . '/../config/constants.php';
+
 
 $body = file_get_contents('php://input');
 $data = json_decode($body, true);

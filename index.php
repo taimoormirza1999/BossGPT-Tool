@@ -7,11 +7,6 @@ require_once './classes/UserManager.php';
 require_once './classes/Notification.php';
 require_once './classes/NotificationManager.php';
 require_once './classes/GardenManager.php';
-use Dotenv\Dotenv;
-
-// // Load environment variables
-$dotenv = Dotenv::createImmutable(__DIR__);
-
 // Added to persist the login cookie for one year
 session_set_cookie_params(60 * 60 * 24 * 365);
 ini_set('session.gc_maxlifetime', 60 * 60 * 24 * 365);

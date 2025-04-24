@@ -1,6 +1,5 @@
 <?php
-require_once 'env.php';
-loadEnv();
+
 require_once 'config/constants.php';
 session_start();
 require_once 'classes/GardenManager.php';

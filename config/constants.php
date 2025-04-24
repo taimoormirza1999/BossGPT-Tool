@@ -1,5 +1,11 @@
 <?php
 
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use Dotenv\Dotenv;
+// // Load environment variables
+$dotenv = Dotenv::createImmutable(dirname(__DIR__));
+$dotenv->load();
 define('TESTING_FEATURE', $_ENV['TESTING_FEATURE']);
 // Database configuration
 define('DB_HOST', 'localhost');
