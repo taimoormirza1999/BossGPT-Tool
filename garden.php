@@ -186,7 +186,7 @@ function getPlantImage($plantType, $extraClasses = "")
 <body class="dark-mode">
     <div class="garden-container">
         <!-- Add loading overlay -->
-        <div id="loadingOverlay"
+        <!-- <div id="loadingOverlay"
             class="position-fixed top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center">
             <div class="d-flex flex-column justify-content-center align-items-center garden-overlay-content">
                 <div class="text-center mb-4">
@@ -197,10 +197,16 @@ function getPlantImage($plantType, $extraClasses = "")
                     <h2 class="text-white">Growing Your Garden</h2>
                 </div>
                 <div class="loader-spinner"></div>
-                <!-- <canvas id="myLottie" width="53" height="53"></canvas> -->
+                <canvas id="myLottie" width="53" height="53"></canvas>
                 <div id="loadingText" class="text-white">Loading assets (0%)</div>
             </div>
-        </div>
+        </div> -->
+        <?php 
+        
+$loadingText = "Preparing your AI workspace...";
+$contentHeading = "Growing Your Garden";
+$contentContainerClass = "custom-content-style";
+        require_once 'components/loadingOverlay.php'; ?>
 
         <canvas id="gardenCanvas"></canvas>
 

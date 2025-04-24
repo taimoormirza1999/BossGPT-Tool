@@ -57,6 +57,9 @@
   }
   
 
+  body{
+    overflow-y: hidden!important;
+  }
 
   /* ===============================
        4) BUTTONS
@@ -1027,7 +1030,7 @@
     position: fixed;
     bottom: 20px;
     left: 20px;
-    background: rgba(101, 101, 101, 0.5);
+    background: rgba(19, 19, 19, 0.5);
     border: 1px solid rgba(237, 237, 237, 0.3);
     backdrop-filter: blur(18px);
     border-radius: 20px;
@@ -1041,19 +1044,20 @@
     opacity: 1;
     z-index: 9990;
   }
-  
+  .popup-alert.special-popup-container {
+    padding: 16px 41px 12px 17px !important;
+    width: auto !important;
+   bottom:150px !important;
+  }
   .popup-alert.hidden {
     display: none;
   }
-  
-  /* Stack alerts dynamically */
   .popup-alert:nth-child(1) {
     bottom: 40px;
     z-index: 9992;
     scale: 0.92;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
-  
   .popup-alert:nth-child(2) {
     bottom: 28px;
     scale: 0.89;

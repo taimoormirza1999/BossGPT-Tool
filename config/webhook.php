@@ -20,6 +20,10 @@ switch ($source) {
         // handleDiscord($data);
         break;
 }
+function handleDiscord($data) {
+    // Just log the event for now or test message back
+    file_put_contents(__DIR__ . '/discord_log.txt', json_encode($data, JSON_PRETTY_PRINT));
+}
 function handleTelegram($data) {
     $chat_id = $data['message']['chat']['id'];
     $text = $data['message']['text'];
@@ -42,6 +46,22 @@ function handleTelegram($data) {
         sendTelegramMessage($chat_id, "❌ Email not found. Please make sure you're using your BossGPT registered email.");
     }
 }
+}
+
+function sendDiscordReminder($webhookUrl, $message) {
+    $payload = json_encode([
+        "content" => $message
+    ]);
+
+    $ch = curl_init($webhookUrl);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    return $response;
 }
 
 function sendTelegramMessage($chat_id, $text) {

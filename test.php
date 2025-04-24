@@ -1,12 +1,26 @@
 <?php
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 require './classes/NotificationManager.php';
 require './classes/UserManager.php';
+require './config/constants.php';
+require './classes/Database.php';
+
+
+$database = Database::getInstance();
+echo $database->initializeTables();
+if($database->initializeTables()){
+    echo "Tables initialized successfully";
+}else{
+    echo "Tables not initialized";
+}
 // Notification::send('project_48', 'user_added', ['message' => 'New User Added successfully']);
 // Notification::send('project_48', 'task_created', ['message' => 'New Task Created successfully']);
 // Notification::send('project_48', 'task_updated', ['message' => 'Task Updated successfully']);
 // echo "<script>alert('Notification Sent');</script>";
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+// error_reporting(E_ALL);
+// ini_set('display_errors', 1);
 session_start();
 echo "<pre>";
 print_r(value: $_SESSION);

@@ -488,11 +488,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
                     <!-- Chat Panel - now spans 3 columns -->
                     <?php require_once 'components/chat_pannel.php'; ?>
-                    <a href="https://t.me/BossGPTAssistantBot?start=connect_<?= $_SESSION['user_id'] ?>" 
+                    <!-- <a href="https://t.me/BossGPTAssistantBot?start=connect_<?= $_SESSION['user_id'] ?>" 
    class="btn btn-main-primary position-fixed" 
    style="bottom: 20px; left: 20px; z-index: 9999; width: 100px; height: 100px;">
    Connect Telegram
+</a> -->
+<!-- <a href="<?php //echo $_ENV['DISCORD_BOT_INVITE_URL']; ?>" 
+   class="btn btn-main-primary position-fixed" 
+   style="bottom: 20px; left: 20px; z-index: 9999;">
+   🤖 Connect Discord
 </a>
+<a href="https://discord.gg/zCjmGfF7" 
+   class="btn btn-main-primary position-fixed" 
+   style="bottom: 20px; left: 20px; z-index: 9999;">
+  Join Discord Server
+</a> -->
+
                 </div>
             </div>
 
@@ -656,12 +667,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <span>Turn on Reminders</span>
             </button> -->
             <?php
+            if (!isset($_SESSION['telegram_token'])) {
+                echo getPopupAlert('Link Telegram', 'Link your Telegram to stay updated!', 'reminderButton', '<h6 class="font-secondaryBold button-text" id="enableNowBtn" onclick="DynamicOpen(\'#notificationPermissionModal\')">Enable Now</h6>', 'special-popup-container', 'https://res.cloudinary.com/da6qujoed/image/upload/v1745509466/sendicon_zvrv33.png');
+            }
+            if (!isset($_SESSION['discord_token'])) {
+                echo getPopupAlert('Link Discord', 'Link your Discord to stay updated!', 'reminderButton', '<h6 class="font-secondaryBold button-text" id="enableNowBtn" onclick="DynamicOpen(\'#notificationPermissionModal\')">Enable Now</h6>', 'special-popup-container', 'https://res.cloudinary.com/da6qujoed/image/upload/v1745510472/discord_zowxul.png');
+            }
+            ?>
+        <?php } ?>
+        
+            <?php
             if (!isset($_SESSION['fcm_token'])) {
                 echo getPopupAlert('Enable Notifications', 'Stay updated! Enable browser notifications to get the 
 latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold button-text" id="enableNowBtn" onclick="DynamicOpen(\'#notificationPermissionModal\')">Enable Now</h6>');
             }
             ?>
-        <?php } ?>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>

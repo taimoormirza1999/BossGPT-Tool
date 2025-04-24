@@ -594,6 +594,7 @@ body {
   background-position: top;
   background-repeat: no-repeat;
   background-attachment: fixed;
+  overflow-y: hidden!important;
   // overflow-y: hidden;
   // login/register pa ges
   .register-page,

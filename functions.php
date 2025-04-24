@@ -172,12 +172,12 @@ function getLogoImage($bottomMargin = "0", $topMargin = "-1rem", $width = "15rem
     {
         return '<img src="assets/images/garden/plant-ball.png" alt="Plant Ball" class="plant-ball">';
     }
-    function getPopupAlert($title, $description, $reminder_id, $button = false)
+    function getPopupAlert($title, $description, $reminder_id, $button = false, $container_class = '', $icon = 'https://res.cloudinary.com/da6qujoed/image/upload/v1743687520/belliconImage_vnxkhi.png')
     {
-        return '<div class="popup-alert" data-reminder-id="'.$reminder_id.'" id="'.$reminder_id.'">
+        return '<div class="popup-alert '.$container_class.'" data-reminder-id="'.$reminder_id.'" id="'.$reminder_id.'">
         <div class="bell-icon">
           <img
-            src="https://res.cloudinary.com/da6qujoed/image/upload/v1743687520/belliconImage_vnxkhi.png"
+            src="'.$icon.'"
             alt="Bell icon"
           />
         </div>
