@@ -15,7 +15,21 @@ if (isset($_GET['api'])) {
         $ai_assistant = new AIAssistant();
 
         switch ($_GET['api']) {
-
+            case 'save_telegram_chat_id':
+                $data = json_decode(file_get_contents('php://input'), true);
+            
+                if (!isset($data['telegram_chat_id'])) {
+                    throw new Exception('Telegram Chat ID is required');
+                }
+            
+                $userId = $_SESSION['user_id'];
+                $telegramId = $data['telegram_chat_id'];
+            
+                $stmt = $db->prepare("UPDATE users SET telegram_chat_id = ? WHERE id = ?");
+                $stmt->execute([$telegramId, $userId]);
+            
+                $response = ['success' => true, 'message' => 'Telegram chat ID saved successfully'];
+                break;
             case 'update_pro_status':
                 header('Content-Type: application/json');
                 session_start();

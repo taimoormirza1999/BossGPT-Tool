@@ -50,6 +50,7 @@ class Database
                 pro_plan BOOLEAN DEFAULT FALSE,
                 fcm_token VARCHAR(255) NULL,
                 verification_token VARCHAR(255) NULL,
+                telegram_chat_id BIGINT NULL,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )",
 

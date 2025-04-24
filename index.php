@@ -493,6 +493,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
                     <!-- Chat Panel - now spans 3 columns -->
                     <?php require_once 'components/chat_pannel.php'; ?>
+                    <a href="https://t.me/BossGPTAssistantBot?start=connect_<?= $_SESSION['user_id'] ?>" 
+   class="btn btn-main-primary position-fixed" 
+   style="bottom: 20px; left: 20px; z-index: 9999; width: 100px; height: 100px;">
+   Connect Telegram
+</a>
                 </div>
             </div>
 
@@ -697,7 +702,7 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
     // console.log('Got email:', email);
     
     console.log('Referral:', referral);
-    console.log('window.rewardful:', window.rewardful);
+    console.log('window.rewardful:', window?.rewardful);
 
     // 3) Only fire convert once the library is actually present
     if (typeof rewardful === 'function') {
@@ -708,14 +713,14 @@ latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold butt
       });
       console.log('🔥 rewardful.convert() called');
     } else {
-      console.error('🚨 rewardful() not available yet');
+    //   console.error('🚨 rewardful() not available yet');
       // retry once after a short delay
       setTimeout(() => {
         if (typeof rewardful === 'function') {
           rewardful('convert', { email, referral });
           console.log('🔥 rewardful.convert() called on retry');
         } else {
-          console.error('🚨 rewardful() still not loaded');
+        //   console.error('🚨 rewardful() still not loaded');
         }
       }, 500);
     }
@@ -814,8 +819,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         clearTimeout(timeout);
                         timeout = setTimeout(later, wait);
                     };
-
-
                 }
 
                 // Create the debounced update function
@@ -882,7 +885,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     fetch('?api=get_projects')
                         .then(response => response.json())
                         .then(data => {
-                            console.log("Loaded projects: ", data.projects);
+                            // console.log("Loaded projects: ", data.projects);
                             if (data.success) {
                                 const projectDropdown = document.getElementById('projectDropdown');
                                 projectDropdown.innerHTML = '';
@@ -952,7 +955,7 @@ document.addEventListener('DOMContentLoaded', function () {
                  // Infinite scroll event
                  chatMessages.addEventListener('scroll', () => {
                     const projectId = $('#myselectedcurrentProject').val();
-                    console.log(projectId)
+                    // console.log(projectId)
                     const THRESHOLD = 20;  // pixels from the very top
                     if (chatMessages.scrollTop <= THRESHOLD && !loading && !allLoaded) {
                         loadChatHistory(projectId, offset, false);
@@ -3151,7 +3154,6 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
         // get Reminders
         function getReminders() {
             const fcmToken = "<?php echo isset($_SESSION['fcm_token']) ? $_SESSION['fcm_token'] : ''; ?>";
-            // console.log("FCM Token for reminders:", fcmToken);
             if (!fcmToken) {
                 console.error('No FCM token found');
                 return;
