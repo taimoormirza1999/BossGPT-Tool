@@ -21,9 +21,9 @@ function handleTelegram($data) {
     $chat_id = $data['message']['chat']['id'];
     $text = $data['message']['text'];
 
-    if (strpos($text, '/start connect') !== false) {
-        sendTelegramMessage($chat_id, "Please reply with your registered email to connect.");
-    } elseif (filter_var($text, FILTER_VALIDATE_EMAIL)) {
+    if (preg_match('/\/start connect(_(\d+))?/', $text, $matches)) {
+    sendTelegramMessage($chat_id, "Please reply with your registered email to connect your Telegram. with BossGPT to connect with reminders");
+} elseif (filter_var($text, FILTER_VALIDATE_EMAIL)) {
         $db = Database::getInstance()->getConnection();
         $stmt = $db->prepare("UPDATE users SET telegram_chat_id = ? WHERE email = ?");
         $stmt->execute([$chat_id, $text]);
