@@ -9,7 +9,7 @@ session_start();
 // 1. Get authorization code
 if (!isset($_GET['code'])) {
     error_log('Discord OAuth callback missing code');
-    // header("Location: " . $_ENV['BASE_URL'] . "/");
+    header("Location: " . $_ENV['BASE_URL'] . "/");
     exit();
 }
 
@@ -79,8 +79,8 @@ try {
     $stmt->execute([$discord_id, $_SESSION['user_id']]);
     $_SESSION['discord_token'] = $discord_id;
     echo "✅ Your Discord is now connected successfully!";
-    // header("Location: " . $_ENV['DISCORD_BOT_INVITE_URL']);
+    header("Location: " . 'https://discord.gg/zCjmGfF7');
 } catch (PDOException $e) {
+    header("Location: " . $_ENV['BASE_URL'] . "/");
     exit("❌ DB Error: " . $e->getMessage());
-    // header("Location: " . $_ENV['BASE_URL'] . "/");
 }
