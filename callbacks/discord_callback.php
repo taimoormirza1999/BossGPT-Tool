@@ -2,12 +2,15 @@
 require_once __DIR__ . '/../classes/Database.php';
 require_once __DIR__ . '/../config/constants.php'; // for DISCORD_CLIENT_ID & SECRET
 
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 session_start();
 
 // 1. Get authorization code
 if (!isset($_GET['code'])) {
-    exit('Error: Missing code from Discord.');
-    header("Location: " . $_ENV['BASE_URL'] . "/");
+    error_log('Discord OAuth callback missing code');
+    // header("Location: " . $_ENV['BASE_URL'] . "/");
+    exit();
 }
 
 $code = $_GET['code'];
@@ -75,9 +78,9 @@ try {
     $stmt = $db->prepare("UPDATE users SET discord_id = ? WHERE id = ?");
     $stmt->execute([$discord_id, $_SESSION['user_id']]);
     $_SESSION['discord_token'] = $discord_id;
-    // echo "✅ Your Discord is now connected successfully!";
-    header("Location: " . $_ENV['DISCORD_BOT_INVITE_URL']);
+    echo "✅ Your Discord is now connected successfully!";
+    // header("Location: " . $_ENV['DISCORD_BOT_INVITE_URL']);
 } catch (PDOException $e) {
     exit("❌ DB Error: " . $e->getMessage());
-    header("Location: " . $_ENV['BASE_URL'] . "/");
+    // header("Location: " . $_ENV['BASE_URL'] . "/");
 }
