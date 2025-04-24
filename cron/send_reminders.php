@@ -1,9 +1,9 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-require_once 'classes/Database.php';
-require_once 'config/constants.php';
-require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__ . '/../classes/Database.php';
+require_once __DIR__ . '/../config/constants.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
@@ -22,7 +22,7 @@ if ($action === 'telegram' || $action === 'all') {
 }
 function sendFcmReminders($pdo) {
     echo "\n--- Sending FCM Reminders ---<br>";
-    $factory = (new Factory)->withServiceAccount(__DIR__ . $_ENV['FIREBASE_CREDENTIALS']);
+    $factory = (new Factory)->withServiceAccount(__DIR__ .'/../'. $_ENV['FIREBASE_CREDENTIALS']);
     $messaging = $factory->createMessaging();
 
     $userStmt = $pdo->query("SELECT id, username, fcm_token FROM users WHERE fcm_token IS NOT NULL");
