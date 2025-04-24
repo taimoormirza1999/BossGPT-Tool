@@ -24,12 +24,21 @@ function handleTelegram($data) {
     if (preg_match('/\/start connect(_(\d+))?/', $text, $matches)) {
     sendTelegramMessage($chat_id, "Please reply with your registered email to connect your Telegram. with BossGPT to connect with reminders");
 } elseif (filter_var($text, FILTER_VALIDATE_EMAIL)) {
-        $db = Database::getInstance()->getConnection();
+    $db = Database::getInstance()->getConnection();
+
+    // Check if user with this email exists
+    $userCheck = $db->prepare("SELECT id FROM users WHERE email = ?");
+    $userCheck->execute([$text]);
+
+    if ($userCheck->rowCount() > 0) {
         $stmt = $db->prepare("UPDATE users SET telegram_chat_id = ? WHERE email = ?");
         $stmt->execute([$chat_id, $text]);
 
         sendTelegramMessage($chat_id, "✅ Your Telegram is now connected for reminders!");
+    } else {
+        sendTelegramMessage($chat_id, "❌ Email not found. Please make sure you're using your BossGPT registered email.");
     }
+}
 }
 
 function sendTelegramMessage($chat_id, $text) {
