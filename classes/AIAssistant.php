@@ -451,14 +451,9 @@ class AIAssistant
                     // Use ProjectManager to update status directly
                     try {
                         $projectManager = new ProjectManager();
-                        if ($arguments['status'] == 'in_progress') {
-                            error_log("Using updateTaskStatus for in_progress");
-                            $projectManager->updateTaskStatus($arguments['task_id'], 'in_progress');
-                            error_log("Status updated successfully");
-                        } else {
-                            error_log("Using normal status update for: " . $arguments['status']);
-                            $projectManager->updateTaskStatus($arguments['task_id'], $arguments['status']);
-                        }
+                        error_log("Updating task status to: " . $arguments['status']);
+                        $projectManager->updateTaskStatus($arguments['task_id'], $arguments['status']);
+                        error_log("Status updated successfully");
 
                         // Log the activity regardless of other updates
                         if ($task) {
@@ -469,7 +464,7 @@ class AIAssistant
                             );
                         }
 
-                        break; // Exit the case if we handled the status update
+                        // Don't break here - let the rest of the updates process if needed
                     } catch (Exception $e) {
                         error_log("Error updating task status: " . $e->getMessage());
                         // Continue with normal update as fallback
