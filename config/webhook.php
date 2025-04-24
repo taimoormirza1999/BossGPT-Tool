@@ -45,6 +45,6 @@ function handleTelegram($data) {
 }
 
 function sendTelegramMessage($chat_id, $text) {
-    $token = '7646465598:AAHLURvH87qnQEcpmhw5HwoAS8HaA8Tm4Sg';
+    $token = $_ENV['TELEGRAM_BOT_TOKEN'];
     file_get_contents("https://api.telegram.org/bot$token/sendMessage?chat_id=$chat_id&text=" . urlencode($text));
 }
