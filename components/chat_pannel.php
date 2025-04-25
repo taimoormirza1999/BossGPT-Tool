@@ -50,7 +50,7 @@
 
                         <script>
                             // Immediately invoke function to initialize welcome messages
-                            (function initializeWelcomeMessages() {
+                            (function initializeWelcomeProjectGuideMssages() {
                                 // console.log('Initializing welcome messages...'); // Debug log
 
                                 const welcomeThread = document.getElementById('welcomeThread');
@@ -61,7 +61,7 @@
                                     return;
                                 }
 
-                                const welcomeMessages = [
+                                const welcomeProjectGuideMssages = [
                                     {
                                         delay: 0,
                                         title: '👋 Welcome to BossGPT!',
@@ -180,7 +180,7 @@
 
 
                                 async function displayMessages() {
-                                    for (const message of welcomeMessages) {
+                                    for (const message of welcomeProjectGuideMssages) {
                                         await new Promise(resolve => setTimeout(resolve, message.delay));
                                         await showMessage(message);
                                     }

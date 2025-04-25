@@ -19,15 +19,10 @@
                 </li>
             </ul>
             <div class="d-flex align-items-center">
-
-                <!-- <div class="d-flex align-items-center me-4">
-                    <label for="fontSizeRange" class="text-light me-2 mb-0">Font Size:</label>
-                    <input type="range" class="form-range" id="fontSizeRange" min="12" max="24" step="1"
-                        style="width: 100px;">
-                    <span id="fontSizeValue" class="text-light ms-2" style="min-width: 45px;">16px</span>
-                </div> -->
-
-                <!-- Notification Icon with Red Badge -->
+            <button onclick="openLink('<?php echo $_ENV['BASE_URL']?>/garden.php')" class="btn btn-outline-light btn-logout mx-2" data-bs-toggle="tooltip" data-bs-placement="bottom" title="My Garden"><?php echo getTreeIcon(); ?></button>
+        <button type="submit" class="btn btn-outline-light btn-logout" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Invite User"><?php echo getAddUserIcon(); ?></button>
+        <button type="submit" class="btn btn-outline-light btn-logout mx-2" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Project Activity"><?php echo getClockIcon(); ?></button>
+        <button type="submit" class="btn btn-outline-light btn-logout mx-2" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Profile"  onclick="openLink('<?php echo $_ENV['BASE_URL']?>/profile')"> <?php echo getClockIcon(); ?></button>
                 <?php
                 $unreadNotifications = 0;
                 $notifications = [];
@@ -59,6 +54,8 @@
                         </div>
                     </div>
                 </div>
+
+                
                 <button class="btn btn-icon-only mx-2" id="btn-theme" onclick="toggleThemeClick()" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Switch Theme">
             <?php echo getThemeIcon(); ?>
             <div class="theme-icon-container d-none">
@@ -84,6 +81,7 @@
                 </div>
             </div>
         </button>
+       
                 <!-- Logout Form -->
                 <form method="POST" class="d-inline">
                     <input type="hidden" name="action" value="logout">

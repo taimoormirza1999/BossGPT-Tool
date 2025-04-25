@@ -242,7 +242,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     }
 
     if (!$auth->isLoggedIn() && !in_array($page, ['login', 'register'])) {
-        header('Location: ?page=login');
+        header('Location:'.$_ENV['BASE_URL'].'?page=login');
         exit;
     }
 

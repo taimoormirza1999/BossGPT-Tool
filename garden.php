@@ -5,7 +5,7 @@ session_start();
 require_once 'classes/GardenManager.php';
 // Redirect if not logged in
 if (!isset($_SESSION['user_id'])) {
-    header('Location: index.php?page=login');
+    header('Location:'.$_ENV['BASE_URL'].'?page=login');
     exit;
 }
 
@@ -254,7 +254,7 @@ $contentContainerClass = "custom-content-style";
             <?php endif; ?>
         </div>
 
-        <a href="index.php" class="btn back-button btn-main-primary">
+        <a href="<?php echo $_ENV['BASE_URL']?>/" class="btn back-button btn-main-primary">
             <i class="bi bi-arrow-left"></i> Back to Dashboard
         </a>
     </div>

@@ -372,6 +372,7 @@ $geist-fonts: (
     }
     .card-header {
       @include theme-bgcolor($card-header-bgcolor);
+      border-bottom: 1px solid rgba(211, 211, 211, 0.5) !important;
     }
     .card-body {
       .welcome-logo-container {
@@ -381,6 +382,11 @@ $geist-fonts: (
         @include theme-bgcolor($card-body-chat-loading-container-bgcolor);
       }
       .ai-message {
+        .user-avatar{
+          .chat-loading-avatar{
+            padding:0!important;
+          }
+        }
         .chat-loading-avatar {
           @include theme-bgcolor($card-body-ai-message-bgcolor);
         }
@@ -449,7 +455,7 @@ body.system-mode {
     }
 
     .card-header {
-      @include theme-bgcolor($default-mode-main-bgcolor);
+      @include theme-bgcolor(#131313);
       border-bottom: 1px solid rgba(211, 211, 211, 0.5) !important;
     }
     .card-body {
@@ -462,7 +468,7 @@ body.system-mode {
     }
   }
   @include theme-common-chat-pannel(
-    $default-mode-main-bgcolor,
+    #131313,
     $default-mode-welcome-logo-bgcolor,
     $default-mode-card-task-bgcolor,
     $default-mode-card-task-bgcolor,
@@ -739,8 +745,8 @@ body {
     }
   }
   .sides-padding {
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
+    // padding-left: 1rem !important;
+    // padding-right: 1rem !important;
     @media (max-width: 768px) {
       padding-left: 0.2rem !important;
       padding-right: 0.2rem !important;
@@ -756,9 +762,9 @@ body {
     background: rgba(20, 20, 35, 0.3) !important;
     backdrop-filter: blur(16px) !important;
     // box-shadow: 0 4px 30px $black-color-10 !important;
-    border-bottom: 1px solid $gray-color-3;
+    // border-bottom: 1px solid $gray-color-3;
     button {
-      border: 1.4px solid $white-color-80 !important;
+      border: 1.45px solid rgba(248, 249, 250, 0.5) !important;
     }
     button#notificationDropdown,
     button#toggleDarkModeBtn,
@@ -1121,11 +1127,16 @@ body {
         margin-bottom: 1.2rem !important;
         border: 1px solid rgba(211, 211, 211, 0.5)
       }
+      .ai-avatar{
+        .chat-loading-avatar{
+          padding:0.3rem!important;
+        }
+      }
       .chat-loading-avatar {
         @extend .hover-up;
         border: 1px solid rgba(211, 211, 211, 0.5);
         border-radius: 50%;
-        padding-bottom: 0.3rem;
+       
       }
       .chat-loading-container {
         border: 1px solid rgba(211, 211, 211, 0.5);
