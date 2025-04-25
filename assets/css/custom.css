@@ -4,13 +4,11 @@
    :root {
     --bs-primary-stroke50percent: rgba(211, 211, 211, 0.5);
     --bs-secondary-stroke50percent: rgba(248, 249, 250, 0.5);
-  
     --bs-primary-white: rgba(255, 255, 255, 1);
     --bs-primary-white10percent: rgba(255, 255, 255, 0.1);
     --bs-primary-white20percent: rgba(255, 255, 255, 0.2);
     --bs-primary-white50percent: rgba(211, 211, 211, 0.5);
     --bs-primary-white55percent: rgba(255, 255, 255, 0.55);
-  
     --bs-primary-dark: #18191c;
     --bs-primary-dark60percent: rgba(40, 3, 59, 0.6);
     --bs-primary-dark50percent: rgba(40, 3, 59, 0.5);
@@ -18,10 +16,9 @@
     --bs-secondary-dark: #2d2d2d;
     --bs-tertiary-dark: #242526;
     --bs-quaternary-dark: #353535;
-  
     --bs-primary-black: #2d2d2d;
     --bs-primary-rgb: 255, 255, 255;
-    --bs-primary: #fff; /* Default text or background? */
+    --bs-primary: #fff;
   
     /* Additional root variables */
     --primary-color: #007bff;
@@ -31,10 +28,7 @@
   
   /* Dark Purple */
   --bs-primary-darkpurple-linear-gradient: linear-gradient(135deg, #240121ba 0%, #4f014275 100%);
-  
-  
   }
-  
   .nav-background {
     backdrop-filter: blur(8px) !important;
   }
@@ -603,7 +597,16 @@
     border-radius: 12px;
  
   }
-
+  .hide-scrollbar {
+    overflow: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  }
+  
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+  
   body .modal .form-label{
     font-weight: 600!important;
     font-size: 0.937rem!important;
@@ -1025,7 +1028,6 @@
   }
   
   /* Popup Alert */
-  
   .popup-alert {
     position: fixed;
     bottom: 20px;
@@ -1034,7 +1036,7 @@
     border: 1px solid rgba(237, 237, 237, 0.3);
     backdrop-filter: blur(18px);
     border-radius: 20px;
-    padding: 16px;
+    padding: 0.85rem 2.37rem 0.56rem 0.9rem !important;
     display: flex;
     align-items: center;
     gap: 20px;
@@ -1045,7 +1047,7 @@
     z-index: 9990;
   }
   .popup-alert.special-popup-container {
-    padding: 16px 41px 12px 17px !important;
+  
     width: auto !important;
    bottom:150px !important;
   }

@@ -488,32 +488,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
                     <!-- Chat Panel - now spans 3 columns -->
                     <?php require_once 'components/chat_pannel.php'; ?>
-                    <!-- <a href="https://t.me/BossGPTAssistantBot?start=connect_<?= $_SESSION['user_id'] ?>" 
-   class="btn btn-main-primary position-fixed" 
-   style="bottom: 20px; left: 20px; z-index: 9999; width: 100px; height: 100px;">
-   Connect Telegram
-</a> -->
-<!-- <a href="<?php //echo $_ENV['DISCORD_BOT_INVITE_URL']; ?>" 
-   class="btn btn-main-primary position-fixed" 
-   style="bottom: 20px; left: 20px; z-index: 9999;">
-   🤖 Connect Discord
-</a>
-<a href="https://discord.gg/zCjmGfF7" 
-   class="btn btn-main-primary position-fixed" 
-   style="bottom: 20px; left: 20px; z-index: 9999;">
-  Join Discord Server
-</a> -->
-
                 </div>
             </div>
 
             <?php require_once 'components/modals.php'; ?>
             <script>
-
-
                 document.addEventListener('DOMContentLoaded', function () {
-
-
                     // 1) The tree images
                     const treeImages = [
                         { file: 'treelv2.png', alt: 'Tree Level 2' },

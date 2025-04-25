@@ -326,7 +326,7 @@
             <!-- Activity Log Modal -->
             <div class="modal fade" id="activityLogModal" tabindex="-1">
                 <div class="modal-dialog modal-lg modal-dialog-centered ">
-                    <div class="modal-content">
+                    <div class="modal-content d-flex justify-content-center mx-auto " style="max-width: 1250px;" >
                         <div class="modal-header text-white border-0 rounded-t-lg">
                             <h5 class="modal-title">Recent Project Actions</h5>
                             <button type="button" class="btn btn-link p-0 text-white close-icon-btn" data-bs-dismiss="modal"
