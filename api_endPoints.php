@@ -15,6 +15,62 @@ if (isset($_GET['api'])) {
         $ai_assistant = new AIAssistant();
 
         switch ($_GET['api']) {
+            case 'upload_profile_image':
+                ini_set('display_errors', 1);
+error_reporting(E_ALL);
+                header('Content-Type: application/json');
+            
+                if (!isset($_SESSION['user_id'])) {
+                    http_response_code(401);
+                    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+                    exit;
+                }
+            
+                $userId = $_SESSION['user_id'];
+            
+                if (!isset($_FILES['avatar']) || $_FILES['avatar']['error'] !== UPLOAD_ERR_OK) {
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'message' => 'Image upload failed']);
+                    exit;
+                }
+            
+                $uploadDir = __DIR__ . '/uploads/avatars/';
+                if (!file_exists($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
+                }
+            
+                $filename = uniqid('avatar_') . '_' . basename($_FILES['avatar']['name']);
+                $targetPath = $uploadDir . $filename;
+                $publicPath = 'uploads/avatars/' . $filename;
+                $auth = new Auth();
+                if (move_uploaded_file($_FILES['avatar']['tmp_name'], $targetPath)) {
+                    $auth->updateAvatarImage($userId, $publicPath);
+                    echo json_encode(['success' => true, 'image_url' => $publicPath]);
+                } else {
+                    http_response_code(500);
+                    echo json_encode(['success' => false, 'message' => 'Failed to move uploaded file']);
+                }
+                error_log("UPLOAD BLOCK TRIGGERED"); // should show up in error_log
+
+if (!isset($_FILES['avatar'])) {
+    error_log("No avatar uploaded");
+} else {
+    error_log("Avatar uploaded: " . print_r($_FILES['avatar'], true));
+}
+                exit;
+                case 'get_user_avatar':
+                    header('Content-Type: application/json');
+                    if (!isset($_SESSION['user_id'])) {
+                        echo json_encode(['success' => false, 'message' => 'Not logged in']);
+                        exit;
+                    }
+                
+                    $stmt = $database->getConnection()->prepare("SELECT avatar_image FROM users WHERE id = ?");
+                    $stmt->execute([$_SESSION['user_id']]);
+                    $row = $stmt->fetch();
+                
+                    echo json_encode(['success' => true, 'avatar' => $row['avatar_image']]);
+                    exit;
             case 'save_telegram_chat_id':
                 $data = json_decode(file_get_contents('php://input'), true);
             

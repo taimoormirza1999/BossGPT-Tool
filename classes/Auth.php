@@ -149,4 +149,15 @@ class Auth
             throw $e;
         }
     }
+    public function updateAvatarImage($userId, $imagePath)
+{
+    try {
+        $stmt = $this->db->prepare("UPDATE users SET avatar_image = ? WHERE id = ?");
+        $stmt->execute([$imagePath, $userId]);
+        return true;
+    } catch (Exception $e) {
+        error_log("Avatar upload error: " . $e->getMessage());
+        throw new Exception("Failed to update profile image.");
+    }
+}
 }

@@ -832,7 +832,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         })
                         .catch(error => console.error('Error updating task status:', error))
                         .finally();
-                }, 300); // 500ms debounce time
+                }, 0); // 500ms debounce time
 
                 let currentProject = null;
                 // Load saved project from localStorage if available

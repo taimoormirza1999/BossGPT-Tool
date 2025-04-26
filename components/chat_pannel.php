@@ -31,7 +31,7 @@
             </h5>
             <button class="change_aitone_btn" onclick="DynamicOpen('#AiToneModal')">
                 <img src="https://res.cloudinary.com/da6qujoed/image/upload/v1744704440/robot_pfahvf.svg"
-                    style="width:2rem;">
+                    style="width:1.55rem;">
             </button>
             <button class="btn btn-link p-0 text-white close-icon-btn position-absolute " data-bs-dismiss="modal"
                 aria-label="Close" onclick="closeChatPannel()"><?php echo getCloseSquareIcon(); ?></button>

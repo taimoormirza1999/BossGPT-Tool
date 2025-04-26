@@ -19,10 +19,13 @@
                 </li>
             </ul>
             <div class="d-flex align-items-center">
+            <button type="button" class="btn btn-main-primary" data-bs-toggle="modal" data-bs-target="#newProjectModal">
+                <?php echo getAddSquareIcon();?> CreateNew Project
+            </button>
             <button onclick="openLink('<?php echo $_ENV['BASE_URL']?>/garden.php')" class="btn btn-outline-light btn-logout mx-2" data-bs-toggle="tooltip" data-bs-placement="bottom" title="My Garden"><?php echo getTreeIcon(); ?></button>
         <button type="submit" class="btn btn-outline-light btn-logout" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Invite User"><?php echo getAddUserIcon(); ?></button>
         <button type="submit" class="btn btn-outline-light btn-logout mx-2" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Project Activity"><?php echo getClockIcon(); ?></button>
-        <button type="submit" class="btn btn-outline-light btn-logout mx-2" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Profile"  onclick="openLink('<?php echo $_ENV['BASE_URL']?>/profile')"> <?php echo getClockIcon(); ?></button>
+        <button type="submit" class="btn btn-outline-light btn-logout" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Profile"  onclick="openLink('<?php echo $_ENV['BASE_URL']?>/profile')"> <?php echo getClockIcon(); ?></button>
                 <?php
                 $unreadNotifications = 0;
                 $notifications = [];

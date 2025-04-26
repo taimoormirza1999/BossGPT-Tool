@@ -53,6 +53,8 @@ class Database
                 verification_token VARCHAR(255) NULL,
                 telegram_chat_id BIGINT NULL,
                 discord_id VARCHAR(50) DEFAULT NULL,
+                bio TEXT NULL,
+                avatar_image VARCHAR(255) NULL, 
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )",
 
