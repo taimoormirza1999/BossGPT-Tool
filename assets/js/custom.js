@@ -326,7 +326,7 @@ function openNewProjectModal() {
   const modal = new bootstrap.Modal(document.getElementById("newProjectModal"));
   modal.show();
 }
-function scrollToBottom() {
+function scrollToBottom(welcomeThread) {
   if (welcomeThread) {
     welcomeThread.scrollTop = welcomeThread.scrollHeight;
   }

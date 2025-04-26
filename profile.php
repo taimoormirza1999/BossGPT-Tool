@@ -64,6 +64,10 @@ require_once './api_endPoints.php';
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <!-- Flatpickr Core CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<!-- Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <!-- iziToast CSS & JS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/izitoast/dist/css/iziToast.min.css">
     <script src="https://cdn.jsdelivr.net/npm/izitoast/dist/js/iziToast.min.js"></script>
@@ -96,7 +100,7 @@ require_once './api_endPoints.php';
             }
             // Initialize both animations
             initializeLottie("myLottie", "https://res.cloudinary.com/da6qujoed/raw/upload/v1745325374/loader_bossgpt_htiw2q.lottie");
-            initializeLottie("mychatLoader", "https://res.cloudinary.com/da6qujoed/raw/upload/v1745325374/loader_bossgpt_htiw2q.lottie");
+
         });
     </script>
     <link rel="icon" type="image/png" sizes="32x32" href="faviconbossgpt.ico">
@@ -128,8 +132,22 @@ require_once './api_endPoints.php';
     ?>
 
     <div class="container-fluid mt-4">
-        <?php include_dashboard(); ?>
+        <?php include_dashboard($images); ?>
         <style>
+.calendar-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#dateRangeButton {
+    background-color: transparent;
+    font-weight: 500;
+    font-size: 1rem;
+    padding: 0.3rem 0.5rem;
+}
+</style>
+        <style>
+            
             .tabs-pannel .nav-tabs .nav-link.active {
 
                 color: #fff !important;
@@ -139,18 +157,86 @@ require_once './api_endPoints.php';
 
                 color: rgba(255, 255, 255, 0.5) !important;
             }
+
             #avatarImage {
-    display: none;
-  }
-  #avatarPreview {
-    cursor: pointer;
-  }
+                display: none;
+            }
+
+            #avatarPreview {
+                cursor: pointer;
+                border: 2px solid white;
+                width: 6.75rem;
+                height: 6.75rem;
+                object-fit: cover;
+                object-position: center;
+            }
+
+            div.tab-pane {
+                background: rgba(0, 0, 0, 0.8);
+                border: 1px solid rgba(234, 234, 234, 0.3);
+                backdrop-filter: blur(6.35px);
+                border-radius: 16px;
+                margin: auto;
+                padding: 2.5rem 1.4rem;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                overflow-y: hidden;
+            }
+
+            div#profile {
+                width: 50%;
+                max-width: 576px;
+            }
+
+            div#settings {
+                width: 50%;
+                max-width: 576px;
+            }
+
+            div#activity,
+            div#cards {
+                width: 95%;
+                height: 93%;
+                /* max-width: 576px; */
+            }
+
+            div#profile .form-control {
+                background-color: transparent;
+                border: 1px solid rgba(156, 156, 156, 1);
+            }
+
+            div#profile input.form-control {
+                height: 48px;
+                color: white !important;
+            }
+
+            div#profile input.form-control::placeholder,
+            div#profile textarea.form-control::placeholder {
+                color: rgba(255, 255, 255, 0.8) !important;
+            }
         </style>
         <?php
 
+        function renderProfileTab()
+        {
+            require_once 'components/profile_tab.php';
+        }
+        function renderActivityTab()
+        {
+            require_once 'components/activity_tab.php';
+        }
+        function renderCardsTab()
+        {
+            require_once 'components/cards_tab.php';
+        }
+        function renderSettingsTab()
+        {
+            require_once 'components/cards_tab.php';
+        }
 
-
-        function include_dashboard()
+        function include_dashboard($images)
         {
             require_once 'components/misc.php';
             ?>
@@ -166,28 +252,26 @@ require_once './api_endPoints.php';
                     <!-- Tasks Panel (Board) - now spans 9 columns -->
                     <div class="col-12 col-md-12 tasks-panel">
                         <div class="card h-100 projects_card tabs-pannel">
-
-
                             <div class="card-header d-flex justify-content-between align-items-center border-bottom">
                                 <ul class="py-0 px-0 my-0 nav nav-tabs card-header-tabs" id="profileTabs" role="tablist">
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link active bg-transparent border-0" id="profile-tab"
-                                            data-bs-toggle="tab" data-bs-target="#profile" type="button"
+                                        <button class="nav-link active bg-transparent border-0 font-secondaryLight"
+                                            id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button"
                                             role="tab">Profile</button>
                                     </li>
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link bg-transparent border-0 px-2" id="activity-tab"
-                                            data-bs-toggle="tab" data-bs-target="#activity" type="button"
+                                        <button class="nav-link bg-transparent border-0 px-2 font-secondaryLight"
+                                            id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button"
                                             role="tab">Activity</button>
                                     </li>
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link bg-transparent border-0 " id="cards-tab"
+                                        <button class="nav-link bg-transparent border-0 font-secondaryLight" id="cards-tab"
                                             data-bs-toggle="tab" data-bs-target="#cards" type="button"
                                             role="tab">Cards</button>
                                     </li>
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link bg-transparent border-0 px-2" id="settings-tab"
-                                            data-bs-toggle="tab" data-bs-target="#settings" type="button"
+                                        <button class="nav-link bg-transparent border-0 px-2 font-secondaryLight"
+                                            id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button"
                                             role="tab">Settings</button>
                                     </li>
                                 </ul>
@@ -198,88 +282,248 @@ require_once './api_endPoints.php';
                                 <div class="content-container" style="height: 80vh!important; background: rgba(24, 25, 28, 0.5);
 backdrop-filter: blur(14.7px);
 border-radius: 16px;">
-
                                     <div class="card-body p-0">
                                         <div class="tab-content p-3" id="profileTabsContent"
                                             style="height: 80vh!important; background: rgba(24, 25, 28, 0.5); backdrop-filter: blur(14.7px); border-radius: 16px;">
                                             <div class="tab-pane fade show active" id="profile" role="tabpanel"
                                                 aria-labelledby="profile-tab">
+                                                <h2 class="text-center text-white font-secondaryBold">Profile</h2>
+                                                <div class="mt-3">
+                                                    <div class="text-center">
+                                                        <img id="avatarPreview"
+                                                            src="<?= $_SESSION['avatar_image'] ?? $images['default-user-image'] ?>"
+                                                            alt="Avatar" class="rounded-circle mb-2" width="100"
+                                                            height="100">
+                                                        <input type="file" id="avatarImage" accept="image/*">
+                                                    </div>
+                                                </div>
                                                 <form id="profileForm" class="text-white" enctype="multipart/form-data"
                                                     method="POST">
-                                                    <div class="mt-2">
-                                                    <div class="text-center">
-  <img id="avatarPreview" src="uploads/avatars/default.jpg" alt="Avatar" class="rounded-circle mb-2" width="100" height="100">
-  <input type="file" id="avatarImage" accept="image/*">
-</div>
-                                                    </div>
-                                                    <div class="mb-3 text-center">
-          
-                                                    </div>
+
                                                     <div class="mb-3">
                                                         <label for="profileUserName"
                                                             class="form-label">Username<?php ?></label>
                                                         <input type="text" class="form-control" id="profileUserName"
-                                                            placeholder="Zeeshanali96">
+                                                            placeholder="Zeeshanali96"
+                                                            value="<?php echo $_SESSION['username'] ?? ''; ?>">
                                                     </div>
                                                     <div class="mb-3">
                                                         <label for="profileName" class="form-label">Name<?php ?></label>
                                                         <input type="text" class="form-control" id="profileName"
-                                                            placeholder="Enter full name">
+                                                            placeholder="Enter full name"
+                                                            value="<?php echo $_SESSION['name'] ?? ''; ?>">
                                                     </div>
                                                     <div class="mb-3">
                                                         <label for="profileEmail" class="form-label">Email<?php ?></label>
-                                                        <input type="email" class="form-control text-lowercase"
-                                                            id="profileEmail" placeholder="user@example.com">
+                                                        <input type="email" class="form-control text-lowercase text-white"
+                                                            id="profileEmail" placeholder="user@example.com"
+                                                            value="<?php echo $_SESSION['email'] ?? ''; ?>">
                                                     </div>
                                                     <div class="mb-3">
                                                         <label for="profileBio" class="form-label">Bio</label>
-                                                        <textarea class="form-control" id="profileBio" rows="3"
-                                                            placeholder="Tell us about yourself..."></textarea>
+                                                        <textarea class="form-control" id="profileBio" rows="5"
+                                                            placeholder="Tell us about yourself..."
+                                                            value="<?php echo $_SESSION['bio'] ?? ''; ?>"></textarea>
                                                     </div>
                                                 </form>
                                                 <script>
-                                                     // Clicking avatar triggers input
-  document.getElementById('avatarPreview').addEventListener('click', function () {
-    document.getElementById('avatarImage').click();
-  });
+                                                    // Clicking avatar triggers file input
+                                                    document.getElementById('avatarPreview').addEventListener('click', function () {
+                                                        document.getElementById('avatarImage').click();
+                                                    });
 
-  document.getElementById('avatarImage').addEventListener('change', async function () {
-    const file = this.files[0];
-    if (!file) return;
+                                                    document.getElementById('avatarImage').addEventListener('change', async function () {
+                                                        const file = this.files[0];
+                                                        if (!file) return;
 
-    const formData = new FormData();
-    formData.append('avatar', file);
+                                                        const formData = new FormData();
+                                                        formData.append('avatar', file);
 
-    const res = await fetch('api_endPoints.php?action=upload_profile_image', {
-      method: 'POST',
-      body: formData
-    });
+                                                        try {
+                                                            const res = await fetch('?api=upload_profile_image', {
+                                                                method: 'POST',
+                                                                body: formData
+                                                            });
 
-    try {
-      const data = await res.json();
-      if (data.success) {
-        document.getElementById('avatarPreview').src = data.image_url;
-        iziToast.success({ title: 'Success', message: 'Profile image updated!' });
-      } else {
-        iziToast.error({ title: 'Error', message: data.message || 'Upload failed' });
-      }
-    } catch (err) {
-      iziToast.error({ title: 'Error', message: 'Invalid response from server' });
-    }
-  });
+                                                            const data = await res.json();
+
+                                                            if (res.ok && data.success) {
+                                                                // Update avatar preview immediately
+                                                                document.getElementById('avatarPreview').src = data.image_url;
+
+                                                                iziToast.success({
+                                                                    title: 'Success',
+                                                                    message: 'Profile image updated!'
+                                                                });
+                                                            } else {
+                                                                iziToast.error({
+                                                                    title: 'Error',
+                                                                    message: data.message || 'Upload failed'
+                                                                });
+                                                            }
+                                                        } catch (err) {
+                                                            iziToast.error({
+                                                                title: 'Error',
+                                                                message: 'Network error or server is offline.'
+                                                            });
+                                                            console.log(err);
+                                                        }
+                                                    });
+
                                                 </script>
                                             </div>
                                             <div class="tab-pane fade" id="activity" role="tabpanel"
                                                 aria-labelledby="activity-tab">
-                                                <p>Activity content coming soon... Activity</p>
+                                                <!-- Top Bar with Project Dropdown + Date Filter -->
+                                                <div
+                                                    class="d-flex justify-content-between align-items-center mb-4 card-header p-0">
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-link dropdown-toggle" type="button"
+                                                            data-bs-toggle="dropdown" aria-expanded="false"
+                                                            id="projectDropdownButton">
+                                                            Select Project
+                                                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                                                xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M4 6L8 10L12 6" stroke="currentColor"
+                                                                    stroke-width="1.5" stroke-linecap="round"
+                                                                    stroke-linejoin="round" />
+                                                            </svg>
+                                                        </button>
+                                                        <ul class="dropdown-menu" id="projectDropdown">
+                                                            <!-- Dynamically loaded items will be appended here -->
+                                                        </ul>
+                                                    </div>
+
+                                                    <!-- Date Range Filter -->
+                                                    <div class="d-flex align-items-center gap-2">
+    <!-- Calendar Icon -->
+    <div class="calendar-icon">
+        <?php echo getCalendarIcon(24, 24); ?>
+    </div>
+
+    <!-- Date Range Display -->
+    <button id="dateRangeButton" class="btn btn-dark text-white d-flex align-items-center gap-2 border-0">
+        <span id="selectedDateRange">Select Date Range</span>
+    </button>
+</div>
+                                                </div>
+
+                                                <div id="activityLogList" class="list-group w-1/2 mx-auto"
+                                                    style="max-height: 95%; overflow-y: auto; width: 55%;">
+                                                    <!-- Repeat for more activities dynamically -->
+
+                                                </div>
                                             </div>
+
                                             <div class="tab-pane fade" id="cards" role="tabpanel"
                                                 aria-labelledby="cards-tab">
-                                                <p>Cards content coming soon... Cards</p>
+                                                <!-- Top Bar with Project Dropdown + Date Filter -->
+                                                <div
+                                                    class="d-flex justify-content-between align-items-center mb-4 card-header p-0">
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-link dropdown-toggle" type="button"
+                                                            data-bs-toggle="dropdown" aria-expanded="false"
+                                                            id="projectDropdownButton3">
+                                                            Select Project
+                                                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                                                xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M4 6L8 10L12 6" stroke="currentColor"
+                                                                    stroke-width="1.5" stroke-linecap="round"
+                                                                    stroke-linejoin="round" />
+                                                            </svg>
+                                                        </button>
+                                                        <ul class="dropdown-menu" id="projectDropdown3">
+                                                            <!-- Dynamically loaded items will be appended here -->
+                                                        </ul>
+                                                    </div>
+
+                                                    <!-- Date Range Filter -->
+                                                    <div class="d-flex align-items-center gap-2">
+    <!-- Calendar Icon -->
+    <div class="calendar-icon">
+        <?php echo getCalendarIcon(24, 24); ?>
+    </div>
+
+    <!-- Date Range Display -->
+    <button id="dateRangeButton" class="btn btn-dark text-white d-flex align-items-center gap-2 border-0">
+        <span id="selectedDateRange">Select Date Range</span>
+    </button>
+</div>
+
+                                                </div>
+                                                <table class="table text-white table-hover align-middle">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Title</th>
+                                                            <th>Assign to</th>
+                                                            <th>Due Date</th>
+                                                            <th>Description</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="tasksTableBody">
+                                                        <!-- Tasks will be inserted dynamically here -->
+                                                    </tbody>
+                                                </table>
                                             </div>
                                             <div class="tab-pane fade" id="settings" role="tabpanel"
                                                 aria-labelledby="settings-tab">
-                                                <p>Settings content coming soon... Settings </p>
+                                                <div class="text-center mb-4">
+                                                    <h2 class="text-white font-secondaryBold">Settings</h2>
+                                                </div>
+
+                                                <!-- Password Section -->
+                                                <div class="mb-4">
+                                                    <label for="password" class="form-label text-white">Password</label>
+                                                    <div class="input-group bg-dark rounded-2 p-2">
+                                                        <input type="password" class="form-control text-white" id="password"
+                                                            placeholder="Password">
+                                                        <button class="btn btn-outline-light" type="button"
+                                                            id="togglePassword">
+                                                            <i class="bi bi-eye"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Themes Section -->
+                                                <div class="mb-5">
+                                                    <label class="form-label text-white">Themes</label>
+                                                    <div class="d-flex justify-content-center gap-4 flex-wrap">
+                                                        <!-- Theme Items -->
+                                                        <div class="text-center">
+                                                            <div class="rounded-circle"
+                                                                style="width: 50px; height: 50px; background: purple;">
+                                                            </div>
+                                                            <small class="text-white d-block mt-2">Purple</small>
+                                                        </div>
+                                                        <div class="text-center">
+                                                            <div class="rounded-circle"
+                                                                style="width: 50px; height: 50px; background: #4B0082;">
+                                                            </div>
+                                                            <small class="text-white d-block mt-2">Dark Purple</small>
+                                                        </div>
+                                                        <div class="text-center">
+                                                            <div class="rounded-circle"
+                                                                style="width: 50px; height: 50px; background: brown;"></div>
+                                                            <small class="text-white d-block mt-2">Brown</small>
+                                                        </div>
+                                                        <div class="text-center">
+                                                            <div class="rounded-circle"
+                                                                style="width: 50px; height: 50px; background: gray;"></div>
+                                                            <small class="text-white d-block mt-2">Dark</small>
+                                                        </div>
+                                                        <div class="text-center">
+                                                            <div class="rounded-circle"
+                                                                style="width: 50px; height: 50px; background: white; border:1px solid #ccc;">
+                                                            </div>
+                                                            <small class="text-white d-block mt-2">Light</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Profile Info Section -->
+                                                <div class="text-center mb-4">
+                                                    <h5 class="text-white">Update Profile Info</h5>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -295,15 +539,60 @@ border-radius: 16px;">
 
         <?php } ?>
     </div>
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const dateRangeButton = document.getElementById('dateRangeButton');
+    const selectedDateRange = document.getElementById('selectedDateRange');
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    const today = new Date();
+    const fiveDaysAgo = new Date();
+    fiveDaysAgo.setDate(today.getDate() - 5);
+
+    const picker = flatpickr(document.createElement('input'), {
+        mode: 'range',
+        dateFormat: 'd M Y',
+        defaultDate: [fiveDaysAgo, today],
+        theme: 'dark',
+        onChange: function(selectedDates) {
+            if (selectedDates.length === 2) {
+                const startFormatted = formatDate(selectedDates[0]);
+                const endFormatted = formatDate(selectedDates[1]);
+
+                selectedDateRange.textContent = `${startFormatted} - ${endFormatted}`;
+
+                // Call loadActivityLog2 with selected dates in backend format (Y-m-d)
+                const startForBackend = formatDateForBackend(selectedDates[0]);
+                const endForBackend = formatDateForBackend(selectedDates[1]);
+                loadActivityLog2(startForBackend, endForBackend);
+            }
+        }
+    });
+
+    dateRangeButton.addEventListener('click', function() {
+        picker.open();
+    });
+
+    // Helper functions
+    function formatDate(date) {
+        const options = { day: '2-digit', month: 'short' };
+        return date.toLocaleDateString('en-GB', options);
+    }
+
+    function formatDateForBackend(date) {
+        return date.toISOString().split('T')[0]; // YYYY-MM-DD
+    }
+
+    // Auto-load logs for default 5 days range
+    loadActivityLog2(formatDateForBackend(fiveDaysAgo), formatDateForBackend(today));
+});
+
+</script>
+
+    <?php require_once 'components/externalScripts.php'; ?>
+    <script src="./assets/js/custom.js"></script>
+    <?php require_once 'components/specific_pages.php'; ?>
+    <?php require_once 'components/global.php'; ?>
     <!-- for logoIcon -->
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 
 </html>

@@ -59,7 +59,9 @@
        4) BUTTONS
        =============================== */
   /* Dark mode toggle button */
- 
+ .nav-btn-container{
+  gap: 0.8rem;
+ }
   
   .card{
     background-color: transparent!important;
@@ -76,13 +78,16 @@
   }
   
   /* Project dropdown button */
-  button#projectDropdownButton {
+  button#projectDropdownButton, button#projectDropdownButton3 {
     background: transparent !important;
     border: none !important;
     font-family: "CabinetGroteskBold";
   }
-  button#projectDropdownButton:focus,
-  button#projectDropdownButton:hover {
+  button#projectDropdownButton:focus, button#projectDropdownButton3:focus {
+    box-shadow: none !important;
+    color: var(--bs-primary-white) !important;
+  }
+  button#projectDropdownButton:hover, button#projectDropdownButton3:hover {
     box-shadow: none !important;
     color: var(--bs-primary-white) !important;
   }
@@ -154,7 +159,7 @@
   /* ===============================
        5) DROPDOWNS
        =============================== */
-  ul#projectDropdown {
+  ul#projectDropdown, ul#projectDropdown3 {
     background: var(--bs-primary-white10percent) !important;
     border: 1px solid var(--bs-primary-stroke50percent) !important;
     backdrop-filter: blur(4.3px) !important;
@@ -162,7 +167,7 @@
     padding-top: 0;
     padding-bottom: 0;
   }
-  ul#projectDropdown li.dropdown-item {
+  ul#projectDropdown li.dropdown-item, ul#projectDropdown3 li.dropdown-item {
     padding: 0.6rem 0.55rem !important;
     border-bottom: 1px solid var(--bs-primary-stroke50percent) !important;
     font-family: "CabinetGroteskLight";
@@ -170,25 +175,28 @@
   }
   
   /* Dark mode dropdown */
-  .dark-mode ul#projectDropdown li:has(button.dropdown-item.active) {
+  .dark-mode ul#projectDropdown li:has(button.dropdown-item.active), .dark-mode ul#projectDropdown3 li:has(button.dropdown-item.active) {
     background: var(--bs-primary-white20percent) !important;
   }
   .nav-link {
     color: white !important;
   }
-  .dark-mode ul#projectDropdown li.dropdown-item:focus,
+  .dark-mode ul#projectDropdown li.dropdown-item:focus, .dark-mode ul#projectDropdown3 li.dropdown-item:focus {
   .loadingOverlay,
   .dark-mode ul#projectDropdown li.dropdown-item:hover,.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
     background: var(--bs-primary-white20percent) !important;
   }
-  .dark-mode ul#projectDropdown button.dropdown-item {
+  .dark-mode ul#projectDropdown button.dropdown-item, .dark-mode ul#projectDropdown3 button.dropdown-item {
     background: transparent !important;
     color: var(--bs-primary-white) !important;
     font-size: 1.2rem !important;
     text-transform: capitalize;
   }
-  .dark-mode ul#projectDropdown button.dropdown-item:focus,
-  .dark-mode ul#projectDropdown button.dropdown-item:hover {
+  .dark-mode ul#projectDropdown button.dropdown-item:focus, .dark-mode ul#projectDropdown3 button.dropdown-item:focus { 
+    background: transparent !important;
+    color: var(--bs-primary-white) !important;
+  }
+  .dark-mode ul#projectDropdown button.dropdown-item:hover, .dark-mode ul#projectDropdown3 button.dropdown-item:hover {
     background: transparent !important;
     color: var(--bs-primary-white) !important;
   }
@@ -340,6 +348,15 @@
   /* ===============================
        9) MISC STYLES
        =============================== */
+       
+       .flatpickr-day.selected,
+       .flatpickr-day.startRange,
+       .flatpickr-day.endRange,
+       .flatpickr-day.inRange {
+           background: rgba(42, 95, 255, 1) !important;
+           border-color: rgba(42, 95, 255, 1) !important;
+           color: #fff !important;
+       }
       .subtasks-list .form-check.me-2{
         align-self: flex-start;
       }
@@ -737,7 +754,7 @@
   .chat-messages {
     padding: 1rem;
     overflow-y: auto;
-    height: calc(100vh - 250px);
+    height: 78%;
   }
   
   

@@ -76,6 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 case 'logout':
                     $auth->logout();
+                    header('Location: ?page=login');
                     exit;
             }
         }

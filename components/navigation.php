@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid sides-padding" style="overflow: visible;">
-        <a class="navbar-brand" href="?page=dashboard">
+        <a class="navbar-brand" href="<?php echo $_ENV['BASE_URL']?>?page=dashboard">
             <?php echo getLogoImage($bottomMargin = '0.4rem', $topMargin = "0.4rem", $width = "11rem", $height = "auto", $positionClass = " ", $positionStyle = " ", $src = "https://res.cloudinary.com/da6qujoed/image/upload/v1742651528/bossgpt-transparent_n4axv7.png"); ?>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -18,14 +18,13 @@
                     </a>
                 </li>
             </ul>
-            <div class="d-flex align-items-center">
+            <div class="d-flex align-items-center nav-btn-container" >
             <button type="button" class="btn btn-main-primary" data-bs-toggle="modal" data-bs-target="#newProjectModal">
                 <?php echo getAddSquareIcon();?> CreateNew Project
             </button>
-            <button onclick="openLink('<?php echo $_ENV['BASE_URL']?>/garden.php')" class="btn btn-outline-light btn-logout mx-2" data-bs-toggle="tooltip" data-bs-placement="bottom" title="My Garden"><?php echo getTreeIcon(); ?></button>
+            <button onclick="openLink('<?php echo $_ENV['BASE_URL']?>/garden.php')" class="btn btn-outline-light btn-logout" data-bs-toggle="tooltip" data-bs-placement="bottom" title="My Garden"><?php echo getTreeIcon(); ?></button>
         <button type="submit" class="btn btn-outline-light btn-logout" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Invite User"><?php echo getAddUserIcon(); ?></button>
-        <button type="submit" class="btn btn-outline-light btn-logout mx-2" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Project Activity"><?php echo getClockIcon(); ?></button>
-        <button type="submit" class="btn btn-outline-light btn-logout" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Profile"  onclick="openLink('<?php echo $_ENV['BASE_URL']?>/profile')"> <?php echo getClockIcon(); ?></button>
+        <button type="submit" class="btn btn-outline-light btn-logout " data-bs-toggle="tooltip" data-bs-placement="bottom" title="Project Activity"><?php echo getClockIcon(); ?></button>
                 <?php
                 $unreadNotifications = 0;
                 $notifications = [];
@@ -59,7 +58,7 @@
                 </div>
 
                 
-                <button class="btn btn-icon-only mx-2" id="btn-theme" onclick="toggleThemeClick()" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Switch Theme">
+                <button class="btn btn-icon-only" id="btn-theme" onclick="toggleThemeClick()" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Switch Theme">
             <?php echo getThemeIcon(); ?>
             <div class="theme-icon-container d-none">
                 <h6>Theme</h6>
@@ -84,7 +83,8 @@
                 </div>
             </div>
         </button>
-       
+        <image src="<?php echo $_SESSION['avatar_image'] ?? $images['default-user-image']?>" style="width: 44px; height: 44px; border-radius: 50%; border: 2px solid rgba(248, 249, 250, 0.5);" class=" btn-logout" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Profile"  onclick="openLink('<?php echo $_ENV['BASE_URL']?>/profile')"/> 
+
                 <!-- Logout Form -->
                 <form method="POST" class="d-inline">
                     <input type="hidden" name="action" value="logout">

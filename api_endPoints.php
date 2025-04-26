@@ -1,9 +1,12 @@
 <?php
 if (isset($_GET['api'])) {
+
     ini_set('display_errors', 0);
     header('Content-Type: application/json');
+    set_error_handler(function ($severity, $message, $file, $line) {
+        throw new ErrorException($message, 0, $severity, $file, $line);
+    });
     $response = ['success' => false, 'message' => 'Invalid request'];
-
     try {
         $auth = new Auth();
         if (!$auth->isLoggedIn()) {
@@ -16,29 +19,26 @@ if (isset($_GET['api'])) {
 
         switch ($_GET['api']) {
             case 'upload_profile_image':
-                ini_set('display_errors', 1);
-error_reporting(E_ALL);
                 header('Content-Type: application/json');
-            
                 if (!isset($_SESSION['user_id'])) {
                     http_response_code(401);
                     echo json_encode(['success' => false, 'message' => 'Unauthorized']);
                     exit;
                 }
-            
+
                 $userId = $_SESSION['user_id'];
-            
+
                 if (!isset($_FILES['avatar']) || $_FILES['avatar']['error'] !== UPLOAD_ERR_OK) {
                     http_response_code(400);
                     echo json_encode(['success' => false, 'message' => 'Image upload failed']);
                     exit;
                 }
-            
+
                 $uploadDir = __DIR__ . '/uploads/avatars/';
                 if (!file_exists($uploadDir)) {
                     mkdir($uploadDir, 0777, true);
                 }
-            
+
                 $filename = uniqid('avatar_') . '_' . basename($_FILES['avatar']['name']);
                 $targetPath = $uploadDir . $filename;
                 $publicPath = 'uploads/avatars/' . $filename;
@@ -52,38 +52,38 @@ error_reporting(E_ALL);
                 }
                 error_log("UPLOAD BLOCK TRIGGERED"); // should show up in error_log
 
-if (!isset($_FILES['avatar'])) {
-    error_log("No avatar uploaded");
-} else {
-    error_log("Avatar uploaded: " . print_r($_FILES['avatar'], true));
-}
+                if (!isset($_FILES['avatar'])) {
+                    error_log("No avatar uploaded");
+                } else {
+                    error_log("Avatar uploaded: " . print_r($_FILES['avatar'], true));
+                }
                 exit;
-                case 'get_user_avatar':
-                    header('Content-Type: application/json');
-                    if (!isset($_SESSION['user_id'])) {
-                        echo json_encode(['success' => false, 'message' => 'Not logged in']);
-                        exit;
-                    }
-                
-                    $stmt = $database->getConnection()->prepare("SELECT avatar_image FROM users WHERE id = ?");
-                    $stmt->execute([$_SESSION['user_id']]);
-                    $row = $stmt->fetch();
-                
-                    echo json_encode(['success' => true, 'avatar' => $row['avatar_image']]);
+            case 'get_user_avatar':
+                header('Content-Type: application/json');
+                if (!isset($_SESSION['user_id'])) {
+                    echo json_encode(['success' => false, 'message' => 'Not logged in']);
                     exit;
+                }
+
+                $stmt = $database->getConnection()->prepare("SELECT avatar_image FROM users WHERE id = ?");
+                $stmt->execute([$_SESSION['user_id']]);
+                $row = $stmt->fetch();
+
+                echo json_encode(['success' => true, 'avatar' => $row['avatar_image']]);
+                exit;
             case 'save_telegram_chat_id':
                 $data = json_decode(file_get_contents('php://input'), true);
-            
+
                 if (!isset($data['telegram_chat_id'])) {
                     throw new Exception('Telegram Chat ID is required');
                 }
-            
+
                 $userId = $_SESSION['user_id'];
                 $telegramId = $data['telegram_chat_id'];
-            
+
                 $stmt = $db->prepare("UPDATE users SET telegram_chat_id = ? WHERE id = ?");
                 $stmt->execute([$telegramId, $userId]);
-            
+
                 $response = ['success' => true, 'message' => 'Telegram chat ID saved successfully'];
                 break;
             case 'update_pro_status':
@@ -97,7 +97,7 @@ if (!isset($_FILES['avatar'])) {
                 try {
                     $auth = new Auth();
                     error_log("Attempting to update pro status for user: " . $_SESSION['user_id']);
-                    
+
                     $result = $auth->updateProStatus($_SESSION['user_id']);
                     if ($result) {
                         $_SESSION['pro_member'] = 1;
@@ -119,8 +119,8 @@ if (!isset($_FILES['avatar'])) {
                 if (!isset($data['project_id'])) {
                     throw new Exception('Project ID is required');
                 }
-                $limit = isset($data['limit']) ? (int)$data['limit'] : 20;
-                $offset = isset($data['offset']) ? (int)$data['offset'] : 0;
+                $limit = isset($data['limit']) ? (int) $data['limit'] : 20;
+                $offset = isset($data['offset']) ? (int) $data['offset'] : 0;
                 $stmt = $db->prepare("
                     SELECT message, sender, timestamp 
                     FROM chat_history 
@@ -132,7 +132,7 @@ if (!isset($_FILES['avatar'])) {
                 $stmt->bindParam(2, $limit, PDO::PARAM_INT);
                 $stmt->bindParam(3, $offset, PDO::PARAM_INT);
                 $stmt->execute();
-            
+
                 $history = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 $response = [
@@ -459,20 +459,35 @@ if (!isset($_FILES['avatar'])) {
                 if (!isset($data['project_id'])) {
                     throw new Exception('Project ID is required');
                 }
+                $projectId = $data['project_id'];
+                $startDate = isset($data['start_date']) ? $data['start_date'] : null;
+                $endDate = isset($data['end_date']) ? $data['end_date'] : null;
+                // Build base query
+                $query = "
+    SELECT 
+        al.action_type,
+        al.description,
+        al.created_at,
+        u.username
+    FROM activity_log al
+    LEFT JOIN users u ON al.user_id = u.id
+    WHERE al.project_id = ?
+";
 
-                $stmt = $db->prepare("
-                    SELECT 
-                        al.action_type,
-                        al.description,
-                        al.created_at,
-                        u.username
-                    FROM activity_log al
-                    LEFT JOIN users u ON al.user_id = u.id
-                    WHERE al.project_id = ?
-                    ORDER BY al.created_at DESC
-                    LIMIT 100
-                ");
-                $stmt->execute([$data['project_id']]);
+                $params = [$projectId];
+
+                // Add date filtering if provided
+                if ($startDate && $endDate) {
+                    $query .= " AND al.created_at BETWEEN ? AND ?";
+                    $params[] = $startDate . ' 00:00:00'; // start of day
+                    $params[] = $endDate . ' 23:59:59';   // end of day
+                }
+
+                // Finish query
+                $query .= " ORDER BY al.created_at DESC LIMIT 100";
+
+                $stmt = $db->prepare($query);
+                $stmt->execute($params);
                 $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 $response = ['success' => true, 'logs' => $logs];
@@ -782,35 +797,35 @@ if (!isset($_FILES['avatar'])) {
                     ];
                 } else {
                     $is_pro = isset($user['pro_member']) && $user['pro_member'] == 1;
-                    if($is_pro){
+                    if ($is_pro) {
                         $response = [
                             'success' => true,
                             'is_pro' => $is_pro,
-                            'payment_link' =>null,
+                            'payment_link' => null,
                             'invited_by' => $user['invited_by']
                         ];
                         echo json_encode($response);
                         exit;
-                       
+
                     }
-                    if(isset($_GET['pro-member'])){
-                    if (isset($_COOKIE['rewardful_referral'])) {
-                        $_SESSION['referral_code'] = $_COOKIE['rewardful_referral'];
-                        $response = [
-                            'success' => true,
-                            'is_pro' => $is_pro,
-                            'payment_link' => $_ENV['STRIPE_PAYMENT_LINK_REFREAL'],
-                            'invited_by' => $user['invited_by']
-                        ];
-                    }else{
-                        $response = [
-                            'success' => true,
-                            'is_pro' => $is_pro,
-                            'payment_link' => $_ENV['STRIPE_PAYMENT_LINK'],
-                            'invited_by' => $user['invited_by']
-                        ];
+                    if (isset($_GET['pro-member'])) {
+                        if (isset($_COOKIE['rewardful_referral'])) {
+                            $_SESSION['referral_code'] = $_COOKIE['rewardful_referral'];
+                            $response = [
+                                'success' => true,
+                                'is_pro' => $is_pro,
+                                'payment_link' => $_ENV['STRIPE_PAYMENT_LINK_REFREAL'],
+                                'invited_by' => $user['invited_by']
+                            ];
+                        } else {
+                            $response = [
+                                'success' => true,
+                                'is_pro' => $is_pro,
+                                'payment_link' => $_ENV['STRIPE_PAYMENT_LINK'],
+                                'invited_by' => $user['invited_by']
+                            ];
+                        }
                     }
-                }
                 }
                 break;
 

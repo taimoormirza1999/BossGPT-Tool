@@ -613,6 +613,10 @@ body {
   overflow-y: hidden!important;
   // overflow-y: hidden;
   // login/register pa ges
+  img{
+    object-fit: cover;
+    object-position: center;
+  }
   .register-page,
   .login-page,
   .aitone-page {
@@ -881,11 +885,11 @@ body {
         @include flex-center-hv;
         // @extend .hover-up;
       }
-      #projectDropdownButton {
+      #projectDropdownButton, #projectDropdownButton3 {
         text-decoration: none !important;
         color: $white-color !important;
       }
-      ul#projectDropdown {
+      ul#projectDropdown, ul#projectDropdown3 {
         background: rgba(255, 255, 255, 0.1);
         border: 1px solid rgba(211, 211, 211, 0.5);
         backdrop-filter: blur(4.3px);
@@ -951,7 +955,7 @@ body {
           border-radius: $border-radius-12;
           padding: 1rem;
           // overflow: scroll;
-          height: 69vh;
+          height: 73vh;
           overflow-y: scroll;
           @extend .hide-scrollbar;
           .task-card {

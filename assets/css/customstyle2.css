@@ -16,7 +16,7 @@
   flex-grow: 1;
   overflow-y: auto;
   padding: 1rem;
-  max-height: calc(100vh - 276px);
+  max-height: 78%;
 }
 
 .chat-input {
@@ -594,6 +594,8 @@ body.dark-mode .nav-tabs .nav-link.active {
   padding-right: 1rem;
   margin-left: 0;
   margin-right: 0;
+  height: 95%;
+  overflow-y: hidden;
 }
 
 .task-card h6 {
@@ -671,11 +673,11 @@ body.dark-mode .nav-tabs::-webkit-scrollbar-track {
   display: flex;
 }
 
-#projectDropdownButton.dropdown-toggle::after {
+#projectDropdownButton.dropdown-toggle::after, #projectDropdownButton3.dropdown-toggle::after {
   display: none !important;
 }
 
-#projectDropdownButton.dropdown-toggle {
+#projectDropdownButton.dropdown-toggle, #projectDropdownButton3.dropdown-toggle {
   display: inline-flex;
   align-items: center;
   font-size: calc(var(--font-size, 1rem) + 0.15rem) !important;
@@ -683,20 +685,20 @@ body.dark-mode .nav-tabs::-webkit-scrollbar-track {
   color: white !important;
 }
 
-#projectDropdownButton.dropdown-toggle svg {
+#projectDropdownButton.dropdown-toggle svg, #projectDropdownButton3.dropdown-toggle svg {
   margin-left: 5px;
   width: 1.5rem;
   height: 1.5rem;
   transition: transform 0.2s;
 }
 
-#projectDropdownButton.dropdown-toggle[aria-expanded="true"] svg {
+#projectDropdownButton.dropdown-toggle[aria-expanded="true"] svg, #projectDropdownButton3.dropdown-toggle[aria-expanded="true"] svg {
   transform: rotate(180deg);
   width: 1.5rem;
   height: 1.5rem;
 }
 
-#projectDropdownButton.dropdown-toggle:not(:has(svg))::after {
+#projectDropdownButton.dropdown-toggle:not(:has(svg))::after, #projectDropdownButton3.dropdown-toggle:not(:has(svg))::after {
   content: "";
   display: inline-block;
   width: 24px;
@@ -709,6 +711,8 @@ body.dark-mode .nav-tabs::-webkit-scrollbar-track {
 }
 
 #projectDropdownButton.dropdown-toggle[aria-expanded="true"]:not(
+    :has(svg)
+  )::after, #projectDropdownButton3.dropdown-toggle[aria-expanded="true"]:not(
     :has(svg)
   )::after {
   transform: rotate(180deg);

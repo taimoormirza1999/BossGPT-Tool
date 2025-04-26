@@ -19,3 +19,13 @@ define('OPENAI_MODEL', $_ENV['OPENAI_MODEL']);
 
 
 
+$images=[
+    'default-user-image'=>'https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg'
+];
+
+
+function isPage($pageName) {
+    return strpos($_SERVER['REQUEST_URI'], $pageName) !== false;
+}
+?>
+
