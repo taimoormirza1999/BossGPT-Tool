@@ -1,8 +1,5 @@
 <?php
-// if(!isset($_SESSION['user_id'])){
-//     echo '<script>window.location.href = "'.$_ENV['BASE_URL'].'?page=login";</script>';
-//     exit;
-// }
+require_once 'config/constants.php';
 switch ($page) {
     case 'login':
         include_login_page();
@@ -23,9 +20,13 @@ switch ($page) {
     case 'aitone':
         include_aitone_page();
         break;
-    case 'garden_stats':
-        header('Location: ?page=dashboard');
-        exit;
+    // case 'garden_stats':
+    //     header('Location: ?page=dashboard');
+    //     exit;
+    case 'profile':
+        require_once 'profile.php';
+        include_profile($images);
+        break;
     default:
         echo "<h1>404 - Page Not Found</h1>";
 }

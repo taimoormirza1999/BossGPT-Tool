@@ -1177,7 +1177,7 @@
     transition: all 0.34s ease-in-out;
   }
   
-  .reminder-btn {
+  /* .reminder-btn {
     border-radius: 12px !important;
     width: 100% !important;
     margin-bottom: 8px;
@@ -1233,7 +1233,7 @@
   .reminder-input::placeholder {
     color: rgba(255, 255, 255, 0.6);
   }
-  
+   */
   /* Tree selection grid */
   .tree-select-grid {
     display: grid;

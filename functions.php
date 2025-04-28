@@ -258,3 +258,4 @@ function getLogoImage($bottomMargin = "0", $topMargin = "-1rem", $width = "15rem
         </div>';
     }
     
+    
