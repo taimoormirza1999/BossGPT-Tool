@@ -73,11 +73,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
 
                     $auth->login($_POST['email'], $_POST['password']);
-                    header('Location: ?page=dashboard');
+                    header('Location:'.$_ENV['BASE_URL'].'?page=dashboard');
                     exit;
 
                 case 'logout':
                     $auth->logout();
+                    header('Location:'.$_ENV['BASE_URL'].'?page=login');
                     exit;
             }
         }
@@ -263,34 +264,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="container-fluid mt-4">
         <?php
 
-        switch ($page) {
-            case 'login':
-                include_login_page();
-                break;
-            case 'register':
-                include_register_page();
-                break;
-            case 'dashboard':
-                // Check if AI tone is set
-                echo "<script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        if (!localStorage.getItem('aiToneMode')) {
-                            window.location.href = '?page=aitone';
-                        }
-                    });
-                </script>";
-                include_dashboard();
-                break;
-            case 'aitone':
-                include_aitone_page();
-                break;
-            case 'garden_stats':
-                // Redirect to dashboard since we now use a modal for garden stats
-                header('Location: ?page=dashboard');
-                exit;
-            default:
-                echo "<h1>404 - Page Not Found</h1>";
-        }
+       require_once 'components/url.php';
         function include_login_page()
         {
             global $error_message;
@@ -303,7 +277,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <div class="card">
                             <div class="card-body">
                                 <h2 class="card-title text-center mb-4">Login</h2>
-                                <?php if (isset($error_message) && $_GET['page'] == 'login'): ?>
+                                <?php if (isset($error_message)): ?>
                                     <script>
                                         Toast("error", "Error", "<?php echo htmlspecialchars($error_message); ?>");
                                     </script>
@@ -347,7 +321,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <div class="card">
                             <div class="card-body">
                                 <h2 class="card-title text-center mb-4">Register</h2>
-                                <?php if (isset($error_message) && $_GET['page'] == 'register'): ?>
+                                <?php if (isset($error_message)): ?>
                                     <script>
                                         Toast("error", "Error", "<?php echo htmlspecialchars($error_message); ?>");
                                     </script>
@@ -417,7 +391,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
             <div class="container-fluid pb-3">
                 <!-- New Tab Navigation -->
-                <?php require_once 'components/user_highlighter_bar.php'; ?>
+                <?php //require_once 'components/user_highlighter_bar.php'; ?>
 
                 <!-- Main Content Area -->
                 <div class="row sides-padding " style="width: 100%!important;">
@@ -835,7 +809,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         })
                         .catch(error => console.error('Error updating task status:', error))
                         .finally();
-                }, 300); // 500ms debounce time
+                }, 0); // 500ms debounce time
 
                 let currentProject = null;
                 // Load saved project from localStorage if available
@@ -1060,7 +1034,14 @@ document.addEventListener('DOMContentLoaded', function () {
                                 } else {
                                     allLoaded = true;
                                     // If no chat history, show welcome messages for first time users only
-                                    if (offset === 0) displayProjectCreationWelcomeMessages();
+                                    // if (offset === 0) displayProjectCreationWelcomeMessages();
+                                    if (offset === 0){
+                                        loading = false; hideChatLoading();
+                                        // alert(savedProject+" Last Project");
+                                        if(data.history.length == 0 && !(savedProject == 0 || savedProject == null)){
+                                            displayProjectCreationWelcomeMessages();
+                                        }
+                                    }
                                 }
                             }  else {
                                 throw new Error(data.message || 'Failed to load chat history');
@@ -1259,7 +1240,7 @@ document.addEventListener('DOMContentLoaded', function () {
     data-bs-toggle="tooltip" data-bs-placement="bottom" title="Plant Stage"
     style="
     height: 42px;
-    box-shadow: 0 0 15px 5px rgba(255, 255, 150, 0.8);
+    box-shadow: 0 0 15px 5px rgba(255, 255, 150, 0.2);
     border-radius: 50%;
 "  >
     <img src="assets/images/garden/${getPlantImage(task)}" 
