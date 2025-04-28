@@ -1,4 +1,4 @@
-<div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+<div class="tab-pane fade show active w-100 w-md-75 w-lg-50 mx-auto" id="profile" role="tabpanel" aria-labelledby="profile-tab">
     <h2 class="text-center text-white font-secondaryBold">Profile</h2>
     <div class="mt-3">
         <div class="text-center">
@@ -29,12 +29,12 @@
             <textarea class="form-control" id="profileBio" rows="3" placeholder="Tell us about yourself..."
                 value="<?php echo $_SESSION['bio'] ?? ''; ?>"></textarea>
         </div>
-        <div class="mb-4 d-flex justify-content-between items-center">
+        <div class="mt-2 d-flex justify-content-between items-center">
             <!-- <login with google button -->
             <button class="btn btn-main-primary" type="button" id="loginWithGoogle">
-                <?= getGoogleIcon() ?> Link your Google Account
+                <?= getGoogleIcon() ?>Link your Google Account
             </button>
-            <button class="btn  btn-main-primary" type="submit">Update</button>
+            <button class="btn btn-main-primary px-4" id="updateprofileSubmitbtn" type="submit">Update</button>
         </div>
     </form>
     <script>
@@ -80,6 +80,49 @@
                 console.log(err);
             }
         });
+
+        document.getElementById('updateprofileSubmitbtn').addEventListener('click', function (e) {
+    e.preventDefault(); // prevent normal form submission
+
+    const username = document.getElementById('profileUserName').value.trim();
+    const name = document.getElementById('profileName').value.trim();
+    const email = document.getElementById('profileEmail').value.trim();
+    const bio = document.getElementById('profileBio').value.trim();
+
+    if (!username || !email) {
+        iziToast.error({
+            title: 'Error',
+            message: 'Username and Email are required.'
+        });
+        return;
+    }
+
+    fetch('?api=update_profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, name, email, bio })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            iziToast.success({
+                title: 'Success',
+                message: 'Profile updated successfully!'
+            });
+        } else {
+            iziToast.error({
+                title: 'Error',
+                message: 'Error: ' + data.message
+            });
+        }
+    })
+    .catch(error => {
+        iziToast.error({
+            title: 'Error',
+            message: 'Unexpected error occurred.'
+        });
+    });
+});
 
     </script>
 </div>

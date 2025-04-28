@@ -96,6 +96,7 @@ function fetchNotifications(project_id) {
       .then((data) => {
         if (data.success) {
           updateNotificationDropdown(data.logs || []);
+          updateActivityBoard(data.logs || []);
           resolve();
         } else {
           console.error("Error fetching notifications:", data.message);

@@ -78,13 +78,15 @@
   }
   
   /* Project dropdown button */
-  button#projectDropdownButton {
+  button#projectDropdownButton, button#projectDropdownButton1 {
     background: transparent !important;
     border: none !important;
     font-family: "CabinetGroteskBold";
   }
   button#projectDropdownButton:focus,
-  button#projectDropdownButton:hover {
+  button#projectDropdownButton:hover,
+  button#projectDropdownButton1:focus,
+  button#projectDropdownButton1:hover {
     box-shadow: none !important;
     color: var(--bs-primary-white) !important;
   }

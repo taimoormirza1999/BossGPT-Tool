@@ -21,7 +21,7 @@ border: 1.3px solid rgba(255, 255, 255, 0.35)!important;
 box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1)!important;">
                     <?php echo getAddSquareIcon(); ?> CreateNew Project
                 </button>
-                <button onclick="openLink('<?php echo $_ENV['BASE_URL'] ?>/garden')"
+                <button onclick="openLink('<?php echo $_ENV['BASE_URL'] ?>/garden'false)"
                     class="btn btn-outline-light btn-logout" data-bs-toggle="tooltip" data-bs-placement="bottom"
                     title="My Garden"><?php echo getTreeIcon(); ?></button>
                 <button type="button" class="btn btn-outline-light btn-logout" data-bs-toggle="tooltip"
@@ -60,36 +60,38 @@ box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1)!important;">
                         </div>
                     </div>
                 </div>
-                <button class="btn btn-icon-only" id="btn-theme" onclick="toggleThemeClick()" data-bs-toggle="tooltip"
-                    data-bs-placement="bottom" title="Switch Theme">
-                    <?php echo getThemeIcon(); ?>
-                    <div class="theme-icon-container d-none">
-                        <h6>Theme</h6>
-                        <div class="theme-icon-content-container">
-                            <div class="theme-icon-content-item">
-                                <div class="theme-icon-color" onclick="changeTheme('purple-mode')"></div>
-                                <span>Purple</span>
-                            </div>
+                <?php
+$themes = [
+    'purple-mode' => 'Purple',
+    'black-mode' => 'Black',
+    'brown-mode' => 'Brown',
+    'system-mode' => 'Default'
+];
+?>
 
-                            <div class="theme-icon-content-item">
-                                <div class="theme-icon-color" onclick="changeTheme('black-mode')"></div>
-                                <span>Black</span>
-                            </div>
-                            <div class="theme-icon-content-item">
-                                <div class="theme-icon-color" onclick="changeTheme('brown-mode')"></div>
-                                <span>Brown</span>
-                            </div>
-                            <div class="theme-icon-content-item">
-                                <div class="theme-icon-color" onclick="changeTheme('system-mode')"></div>
-                                <span>Default</span>
-                            </div>
-                        </div>
-                    </div>
-                </button>
+<button class="btn btn-icon-only" id="btn-theme" onclick="toggleThemeClick()" data-bs-toggle="tooltip"
+    data-bs-placement="bottom" title="Switch Theme">
+    
+    <?php echo getThemeIcon(); ?>
+
+    <div class="theme-icon-container d-none">
+        <h6>Theme</h6>
+        <div class="theme-icon-content-container">
+            <?php foreach ($themes as $themeClass => $themeName): ?>
+                <div class="theme-icon-content-item">
+                    <div class="theme-icon-color" onclick="changeTheme('<?php echo $themeClass; ?>')"></div>
+                    <span><?php echo htmlspecialchars($themeName); ?></span>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+
+</button>
+
                 <image src="<?php echo $_SESSION['avatar_image'] ?? $images['default-user-image'] ?>"
                     style="cursor: pointer;width: 44px; height: 44px; border-radius: 50%; border: 2px solid rgba(248, 249, 250, 0.5);"
                     class=" btn-logout" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Profile"
-                    onclick="openLink('<?php echo $_ENV['BASE_URL'] ?>?page=profile')" />
+                    onclick="openLink('<?php echo $_ENV['BASE_URL'] ?>?page=profile',false)" />
                 <!-- Logout Form -->
                 <form method="POST" class="d-inline">
                     <input type="hidden" name="action" value="logout">

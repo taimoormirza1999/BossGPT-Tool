@@ -289,74 +289,83 @@
                 hideChatLoading();
                 <?php } ?>
                 // Load projects
-                function loadProjects() {
-                    // showLoading();
-                    fetch('?api=get_projects')
-                        .then(response => response.json())
-                        .then(data => {
-                            // console.log("Loaded projects: ", data.projects);
-                            if (data.success) {
-                                const projectDropdown = document.getElementById('projectDropdown');
-                                projectDropdown.innerHTML = '';
+            function loadProjects() {
+                // showLoading();
+                fetch('?api=get_projects')
+                    .then(response => response.json())
+                    .then(data => {
+                        // console.log("Loaded projects: ", data.projects);
+                        if (data.success) {
+                            const projectDropdown = document.getElementById('projectDropdown');
+                            <?php if(isPage('profile') && $_SESSION['selected_tab'] == 'cards'){ ?>
+                            const projectDropdown1 = document.getElementById('projectDropdown1');
+                            projectDropdown1.innerHTML = '';
+                            <?php } ?>
+                            projectDropdown.innerHTML = '';
 
-                                if (!data.projects || data.projects.length === 0) {
-                                    // If no projects exist, display a placeholder item
-                                    const placeholder = document.createElement('li');
-                                    placeholder.className = 'dropdown-item disabled';
-                                    placeholder.textContent = 'No projects found';
-                                    projectDropdown.appendChild(placeholder);
-                                } else {
-                                    // Loop through the projects and create dropdown items
-                                    data.projects.forEach(project => {
-                                        const li = document.createElement('li');
-                                        li.className = 'dropdown-item';
-                                        li.innerHTML = `
-                            <button class="dropdown-item" type="button" data-id="${project.id}" title="${escapeHtml(project.title)}">
-                                ${escapeHtml(project.title)}
-                            </button>
-                        `;
-                                        projectDropdown.appendChild(li);
-                                    });
-                                }
-
-                                // Add click handlers for project selection
-                                document.querySelectorAll('.dropdown-item').forEach(item => {
-                                    item.addEventListener('click', (e) => {
-                                        e.preventDefault();
-                                        const button = item.querySelector('button');
-                                        if (button) {
-                                            const projectId = button.dataset.id;
-                                            const projectTitle = button.getAttribute('title');
-                                            selectProject(projectId, projectTitle);
-                                        }
-                                    });
+                            if (!data.projects || data.projects.length === 0) {
+                                // If no projects exist, display a placeholder item
+                                const placeholder = document.createElement('li');
+                                placeholder.className = 'dropdown-item disabled';
+                                placeholder.textContent = 'No projects found';
+                                projectDropdown.appendChild(placeholder);
+                            } else {
+                                // Loop through the projects and create dropdown items
+                                data.projects.forEach(project => {
+                                    const li = document.createElement('li');
+                                    li.className = 'dropdown-item';
+                                    li.innerHTML = `
+                        <button class="dropdown-item" type="button" data-id="${project.id}" title="${escapeHtml(project.title)}">
+                            ${escapeHtml(project.title)}
+                        </button>
+                    `;
+                                    projectDropdown.appendChild(li);
+                                    <?php if(isPage('profile') && $_SESSION['selected_tab'] == 'cards'){ ?>
+                                    // projectDropdown1.appendChild(li);
+                                    const liClone = li.cloneNode(true);
+projectDropdown1.appendChild(liClone);
+                                    <?php } ?>
                                 });
+                            }
 
-                                // After projects are loaded, check for saved project
-                                const savedProject = getLastSelectedProject();
-                                if (savedProject && savedProject !== 'null' && savedProject !== '0') {
-                                    const projectId = parseInt(savedProject);
-                                    const projectButton = document.querySelector(`#projectDropdown button[data-id="${projectId}"]`);
-                                    if (projectButton) {
-                                        const projectTitle = projectButton.getAttribute('title');
+                            // Add click handlers for project selection
+                            document.querySelectorAll('.dropdown-item').forEach(item => {
+                                item.addEventListener('click', (e) => {
+                                    e.preventDefault();
+                                    const button = item.querySelector('button');
+                                    if (button) {
+                                        const projectId = button.dataset.id;
+                                        const projectTitle = button.getAttribute('title');
                                         selectProject(projectId, projectTitle);
                                     }
+                                });
+                            });
+
+                            // After projects are loaded, check for saved project
+                            const savedProject = getLastSelectedProject();
+                            if (savedProject && savedProject !== 'null' && savedProject !== '0') {
+                                const projectId = parseInt(savedProject);
+                                const projectButton = document.querySelector(`#projectDropdown button[data-id="${projectId}"]`);
+                                if (projectButton) {
+                                    const projectTitle = projectButton.getAttribute('title');
+                                    selectProject(projectId, projectTitle);
                                 }
                             }
-                        })
-                        .catch(error => {
-                            console.error('Error loading projects:', error);
-                            const projectDropdown = document.getElementById('projectDropdown');
-                            projectDropdown.innerHTML = `
-                <li class="dropdown-item">
-                    <div class="alert alert-danger">
-                        Unable to load projects. Please try again later.
-                    </div>
-                </li>
-            `;
-                        })
-                        .finally(hideLoading);
-                }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading projects:', error);
+                        const projectDropdown = document.getElementById('projectDropdown');
+                                    projectDropdown.innerHTML = `
+                        <li class="dropdown-item">
+                            <div class="alert alert-danger">
+                                Unable to load projects. Please try again later.
+                            </div>
+                        </li>
+                    `;
+                    })
+                    .finally(hideLoading);
+            }
                 let offset = 0;
                 const limit = 20;
                 let loading = false;
@@ -376,13 +385,25 @@
                 // Select project
                 function selectProject(projectId, selectedProjectTitle = "") {
                     const $button = $('#projectDropdownButton');
-
+                    <?php if(isPage('profile') && $_SESSION['selected_tab'] == 'cards'){ ?>
+                    const $button1 = $('#projectDropdownButton1');
+                    <?php } ?>
                     // If no title is provided, get it from the dropdown item
                     if (!selectedProjectTitle) {
                         const selectedButton = $(`#projectDropdown button[data-id="${projectId}"]`);
+                        if(isPage('profile') && $_SESSION['selected_tab'] == 'cards'){ 
+       const selectedButton1 = $(`#projectDropdown1 button[data-id="${projectId}"]`);
+                        }
                         if (selectedButton.length) {
                             selectedProjectTitle = selectedButton.attr('title');
                         }
+    
+
+                        <?php if(isPage('profile') && $_SESSION['selected_tab'] == 'cards'){ ?>
+                            if (selectedButton1.length) {
+    selectedProjectTitle = selectedButton1.attr('title');
+}
+                        <?php } ?>
                     }
 
                     // Get the current SVG if it exists
@@ -390,10 +411,15 @@
 
                     // Clear and update the button text
                     $button.text(selectedProjectTitle);
-
+                    <?php if(isPage('profile') && $_SESSION['selected_tab'] == 'cards'){ ?>
+$button1.text(selectedProjectTitle);
+<?php } ?>
                     // Add the SVG back if it exists
                     if ($svg.length > 0) {
                         $button.append($svg);
+                        <?php if(isPage('profile') && $_SESSION['selected_tab'] == 'cards'){ ?>
+                        $button1.append($svg);
+                        <?php } ?>
                     } else {
                         // If SVG doesn't exist, add a new one
                         $button.append(`
@@ -401,6 +427,13 @@
                                 <path d="M4 6L8 10L12 6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                         `);
+                        <?php if(isPage('profile') && $_SESSION['selected_tab'] == 'cards'){ ?>
+                        $button1.append(`
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4 6L8 10L12 6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        `);
+                        <?php } ?>
                     }
 
                     // Update project ID and state
@@ -414,7 +447,10 @@
                     // Update dropdown selection state
                     $('#projectDropdown button').removeClass('active').attr('data-selected', false);
                     $(`#projectDropdown button[data-id="${projectId}"]`).addClass('active').attr('data-selected', true);
-
+                    <?php if(isPage('profile')){ ?>
+                    $('#projectDropdown1 button').removeClass('active').attr('data-selected', false);
+                    $(`#projectDropdown1 button[data-id="${projectId}"]`).addClass('active').attr('data-selected', true);
+                    <?php } ?>
                     // Update project items state
                     document.querySelectorAll('.project-item').forEach(item => {
                         const itemId = parseInt(item.dataset.id);
@@ -427,8 +463,10 @@
                     // Load project data
                     loadTasks(projectId);
 
+                    <?php if (!isPage('profile')) { ?>
                     loadChatHistory(projectId);
                     initPusher(projectId);
+                    <?php } ?>
                 }
 
                 // Load chat history
@@ -518,7 +556,11 @@
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                updateTasksBoard(data.tasks);
+                                <?php if (isPage('profile')) { ?>
+                updateCardsBoard(data.tasks);
+            <?php } else { ?>
+                updateTasksBoard(data.tasks);
+            <?php } ?>
                             }
                         })
                         .catch(error => console.error('Error loading tasks:', error))

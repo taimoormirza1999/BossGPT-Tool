@@ -175,9 +175,14 @@
       aiToneModal.style.display = 'block';
     }
   }
-  function openLink(link) {
+  function openLink(link, newPage = true) {
+  if (newPage) {
     window.open(link, '_blank');
+  } else {
+    window.location.href = link;
   }
+}
+
   function openModal(modalId) {
     const modalElement = document.getElementById(modalId);
     if (!modalElement) {
@@ -200,5 +205,161 @@
     const date = new Date(dateString);
     return date.toLocaleString();
   }
+  function timeAgo(dateString) {
+  const now = new Date();
+  const past = new Date(dateString);
+  const diffSeconds = Math.floor((now - past) / 1000);
+
+  if (diffSeconds < 60) return 'just now';
+  const minutes = Math.floor(diffSeconds / 60);
+  if (minutes < 60) return minutes + ' minutes ago';
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return hours + ' hours ago';
+  const days = Math.floor(hours / 24);
+  return days + ' days ago';
+}
+function escapeHtml(text) {
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function updateActivityBoard(logs) {
+  const activityContainer = document.getElementById('activityLogList'); 
+  if (!activityContainer) return; // Safety check
+
+  activityContainer.innerHTML = ''; // Clear existing
+
+  if (logs.length === 0) {
+    activityContainer.innerHTML = '<p class="text-muted text-center">No recent activity.</p>';
+    return;
+  }
+
+  logs.forEach(log => {
+    const username = escapeHtml(log.username || 'User'); // fallback
+    const parts = username.trim().split(' ');
+    let initials = '';
+
+    if (parts.length === 1) {
+      initials = parts[0].substring(0, 2).toUpperCase(); // 2 letters
+    } else {
+      const firstInitial = parts[0][0] ? parts[0][0].toUpperCase() : '';
+      const secondInitial = parts[1][0] ? parts[1][0].toUpperCase() : '';
+      initials = firstInitial + '.' + secondInitial;
+    }
+
+    const createdAt = formatDateTime(log.created_at);
+    const actionType = escapeHtml(log.action_type);
+    const description = escapeHtml(log.description);
+
+    const activityItem = `
+      <div class="list-group-item border-0 list-group-item-action bg-transparent text-white d-flex align-items-start border-light border rounded mb-2">
+        <div class="me-3">
+          <div class="rounded-circle text-white d-flex align-items-center justify-content-center"
+               style="width: 3.1rem; height: 3.1rem; background: rgba(42, 95, 255, 1);">
+            ${initials}
+          </div>
+        </div>
+        <div class="flex-grow-1">
+          <div>
+            <strong>${username}</strong> moved <span class="text-decoration-underline">${description}</span> as <strong>${actionType}</strong>.
+          </div>
+          <small class="text-muted d-flex align-items-center mt-1">
+            <i class="bi bi-clock me-1"></i> ${createdAt}
+          </small>
+        </div>
+      </div>
+    `;
+
+    activityContainer.innerHTML += activityItem;
+  });
+}
+
+function formatDate(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+}
+function renderAssignedUsers(assignedUsers) {
+    if (!assignedUsers || Object.keys(assignedUsers).length === 0) {
+        return '<span class="text-muted">No Assignee</span>';
+    }
+
+    const usersHtml = [];
+
+    for (const userId in assignedUsers) {
+        const user = assignedUsers[userId];
+        if (user.avatar_image) {
+    usersHtml.push(`
+      <div class="d-flex align-items-center gap-2">
+        <img src="${escapeHtml(user.avatar_image)}" class="rounded-circle" style="width: 3.1rem; height: 3.1rem; object-fit: cover;" alt="Avatar">
+        <span>${escapeHtml(user.username)}</span>
+      </div>
+    `);
+} else {
+    const username = escapeHtml(user.username || 'User');
+    const parts = username.trim().split(' ');
+
+    let initials = '';
+    if (parts.length === 1) {
+        initials = parts[0].substring(0, 2).toUpperCase();
+    } else {
+        const firstInitial = parts[0][0] ? parts[0][0].toUpperCase() : '';
+        const secondInitial = parts[1][0] ? parts[1][0].toUpperCase() : '';
+        initials = firstInitial + '.' + secondInitial;
+    }
+
+    usersHtml.push(`
+      <div class="d-flex align-items-center gap-2">
+        <div class="rounded-circle text-white d-flex align-items-center justify-content-center"
+          style="width: 3.1rem; height: 3.1rem; background: rgba(42, 95, 255, 1); font-size: 0.95rem;">
+          ${initials}
+        </div>
+        <span>${username}</span>
+      </div>
+    `);
+}
+
+    }
+
+    return usersHtml.join('');
+}
+
+function updateCardsBoard(tasks) {
+    const tableBody = document.getElementById('tasksTableBody');
+
+    if (!tableBody) return; // Safety check
+
+    tableBody.innerHTML = ''; // Clear existing table content
+
+    if (!tasks || tasks.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="4" class="text-center text-muted">No tasks available.</td>
+            </tr>
+        `;
+        return;
+    }
+
+    tasks.forEach(task => {
+        const row = document.createElement('tr');
+
+        row.innerHTML = `
+            <td style="width: 20%;">${task.title ? escapeHtml(task.title) : '-'}</td>
+            <td style="width: 25%;" class="d-flex align-items-center gap-2">
+                ${renderAssignedUsers(task.assigned_users)}
+            </td>
+            <td style="width: 15%;">${formatDate(task.due_date)}</td>
+            <td style="width: 40%;">${task.description ? escapeHtml(task.description) : '-'}</td>
+        `;
+
+
+        tableBody.appendChild(row);
+    });
+}
+
 
 </script>

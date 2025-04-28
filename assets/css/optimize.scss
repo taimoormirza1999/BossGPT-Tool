@@ -180,6 +180,22 @@ $geist-fonts: (
   display: none; /* Chrome, Safari, Opera */
 }
 
+.primary-input{
+  background-color: $default-mode-modal-input-bgcolor!important;
+  border: $boder-width_1_3 solid rgba(156, 156, 156, 1)!important;
+  border-radius: $border-radius-12;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: $white-color;
+  &:focus{
+    background-color: $default-mode-modal-input-bgcolor!important;
+    border: $boder-width_1_3 solid rgba(156, 156, 156, 1)!important;
+  }
+  & + .btn-outline-action {
+    border: $boder-width_1_3 solid rgba(156, 156, 156, 1)!important;
+}
+}
 .hover-up {
   transition: all $transition-duration-34 ease-in-out;
   &:hover {
@@ -403,6 +419,11 @@ $geist-fonts: (
     @include theme-bgcolor($bgcolor);
   }
 }
+@mixin theme-tab-panel($bgcolor) {
+  .tab-pane {
+    @include theme-bgcolor($bgcolor);
+  }
+}
 #user-add-icon {
   @include button-icon-only;
 }
@@ -462,6 +483,7 @@ body.system-mode {
       }
     }
   }
+  @include theme-tab-panel($default-mode-modal-container-bgcolor);
   @include theme-common-chat-pannel(
     $default-mode-main-bgcolor,
     $default-mode-welcome-logo-bgcolor,
@@ -501,6 +523,7 @@ body.purple-mode {
       }
     }
   }
+  @include theme-tab-panel($purple-mode-modal-container-bgcolor);
   @include theme-common-chat-pannel(
     $purple-mode-bar-bgcolor,
     $purple-mode-card-task-bgcolor,
@@ -539,6 +562,7 @@ body.black-mode {
       }
     }
   }
+  @include theme-tab-panel($black-mode-modal-container-bgcolor);
   @include theme-common-chat-pannel(
     $black-mode-bar-bgcolor,
     $black-mode-card-task-bgcolor,
@@ -577,6 +601,7 @@ body.brown-mode {
       }
     }
   }
+  @include theme-tab-panel($brown-mode-modal-container-bgcolor);
   @include theme-common-chat-pannel(
     $brown-mode-bar-bgcolor,
     $brown-mode-bar-bgcolor,
@@ -851,7 +876,14 @@ body {
     border: $boder-width_1_3 solid $white-color-20;
     border-radius: $border-radius-12;
   }
-
+  div.tab-pane {
+    border: 1px solid rgba(234, 234, 234, 0.3);
+    backdrop-filter: blur(6.35px);
+    border-radius: $border-radius-16;
+    margin: auto;
+    padding: 2.5rem 1.4rem;
+    overflow-y: hidden;
+}
   .btn-main-primary,
   .btn-send-primary {
     background: rgba(255, 255, 255, 0.1) !important;
@@ -876,11 +908,11 @@ body {
         @include flex-center-hv;
         // @extend .hover-up;
       }
-      #projectDropdownButton {
+      #projectDropdownButton, #projectDropdownButton1 {
         text-decoration: none !important;
         color: $white-color !important;
       }
-      ul#projectDropdown {
+      ul#projectDropdown, ul#projectDropdown1 {
         background: rgba(255, 255, 255, 0.1);
         border: $boder-width_1_3 solid rgba(211, 211, 211, 0.5);
         backdrop-filter: blur(4.3px);
@@ -1231,8 +1263,7 @@ body {
         border: $dark-mode-modal-border;
         max-height: 60vh;
         border-radius: 16px !important;
-        background: rgba(255, 255, 255, 0.1);
-        border: $boder-width_1_3 solid rgba(211, 211, 211, 0.5);
+        border: $boder-width_1_3 solid rgba(211, 211, 211, 0.5)!important;
         backdrop-filter: blur(6.35px);
         .close-icon-btn {
           transform: translateY(-50%);

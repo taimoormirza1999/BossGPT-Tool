@@ -42,15 +42,7 @@ function include_profile($images)
             object-position: center;
         }
 
-        div.tab-pane {
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid rgba(234, 234, 234, 0.3);
-            backdrop-filter: blur(6.35px);
-            border-radius: 16px;
-            margin: auto;
-            padding: 2.5rem 1.4rem;
-            overflow-y: hidden;
-        }
+
 
         div#profile {
             width: 50%;
@@ -93,25 +85,31 @@ function include_profile($images)
             <div class="col-12 col-md-12 tasks-panel">
                 <div class="card h-100 projects_card tabs-pannel">
                     <div class="card-header d-flex justify-content-between align-items-center border-bottom">
-                        <ul class="py-0 px-0 my-0 nav nav-tabs card-header-tabs" id="profileTabs" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active bg-transparent border-0 font-secondaryLight" id="profile-tab"
-                                    data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab">Profile</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link bg-transparent border-0 px-2 font-secondaryLight" id="activity-tab"
-                                    data-bs-toggle="tab" data-bs-target="#activity" type="button"
-                                    role="tab">Activity</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link bg-transparent border-0 font-secondaryLight" id="cards-tab"
-                                    data-bs-toggle="tab" data-bs-target="#cards" type="button" role="tab">Cards</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link bg-transparent border-0 px-2 font-secondaryLight" id="settings-tab"
-                                    data-bs-toggle="tab" data-bs-target="#settings" type="button"
-                                    role="tab">Settings</button>
-                            </li>
+                        <style>
+                            #profileTabs .nav-link {
+                                padding: 0.5rem;
+                            }
+                        </style>
+                        <?php
+                        $tabs = [
+                            ['id' => 'profile', 'label' => 'Profile'],
+                            ['id' => 'activity', 'label' => 'Activity'],
+                            ['id' => 'cards', 'label' => 'Cards'],
+                            ['id' => 'settings', 'label' => 'Settings']
+                        ];
+                        ?>
+                        <ul class="py-0 px-2 my-0 nav nav-tabs card-header-tabs" id="profileTabs" role="tablist">
+                            <?php foreach ($tabs as $index => $tab): ?>
+                                <li class="nav-item" role="presentation">
+                                    <button
+                                        class="nav-link bg-transparent border-0 font-secondaryLight  <?php echo $index === 0 ? 'active' : ''; ?>"
+                                        id="<?php echo $tab['id']; ?>-tab" data-bs-toggle="tab"
+                                        data-bs-target="#<?php echo $tab['id']; ?>" type="button" role="tab"
+                                        style="font-size: 1.2rem; font-weight: 700;">
+                                        <?php echo htmlspecialchars($tab['label']); ?>
+                                    </button>
+                                </li>
+                            <?php endforeach; ?>
                         </ul>
                     </div>
 
@@ -119,8 +117,9 @@ function include_profile($images)
                         <div class="content-container h-100"
                             style=" background: rgba(24, 25, 28, 0.5);backdrop-filter: blur(14.7px);border-radius: 0 0 16px 16px; overflow-y: scroll;">
                             <div class="card-body p-0">
-                                <div class="tab-content p-3" id="profileTabsContent"
-                                    style="height: 80vh!important; background: rgba(24, 25, 28, 0.5); backdrop-filter: blur(14.7px); border-radius: 16px;overflow: scroll;">
+                                <div class="tab-content p-3 d-flex justify-content-center align-items-center"
+                                    id="profileTabsContent"
+                                    style="height: 80vh!important; background: rgba(24, 25, 28, 0.0); backdrop-filter: blur(14.7px); border-radius: 16px;overflow: scroll;">
 
                                     <?php require_once 'components/profile/tabProfile.php'; ?>
                                     <?php require_once 'components/profile/tabActivity.php'; ?>
@@ -139,6 +138,27 @@ function include_profile($images)
         </div>
     </div>
     <script>
+        document.querySelectorAll('#profileTabs button[data-bs-toggle="tab"]').forEach(function (tabButton) {
+    tabButton.addEventListener('shown.bs.tab', function (event) {
+        const targetId = event.target.getAttribute('data-bs-target').substring(1); // get tab id without '#'
+
+        if (targetId === 'cards') {
+            // alert('cards');
+            // return;
+            // Send to server to save in session
+            fetch('?api=set_selected_tab', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ selected_tab: targetId })
+            }).then(response => {
+                // Optionally check response if you want
+                console.log('Selected tab saved to session');
+            }).catch(error => {
+                console.error('Error saving tab selection:', error);
+            });
+        }
+    });
+});
         document.addEventListener('DOMContentLoaded', function () {
             const dateRangeButton = document.getElementById('dateRangeButton');
             const selectedDateRange = document.getElementById('selectedDateRange');
@@ -181,7 +201,7 @@ function include_profile($images)
                 return date.toISOString().split('T')[0]; // YYYY-MM-DD
             }
             // Auto-load logs for default 5 days range
-            loadActivityLog2(formatDateForBackend(fiveDaysAgo), formatDateForBackend(today));
+            // loadActivityLog2(formatDateForBackend(fiveDaysAgo), formatDateForBackend(today));
         });
 
     </script>

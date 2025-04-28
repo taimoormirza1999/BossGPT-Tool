@@ -141,7 +141,41 @@ if (isset($_GET['api'])) {
                     'history' => $history ?? []
                 ];
                 break;
-
+                case 'update_password':
+                    $data = json_decode(file_get_contents('php://input'), true);
+        
+                    if (empty($data['password'])) {
+                        throw new Exception('Password is required');
+                    }
+        
+                    if (!isset($_SESSION['user_id'])) {
+                        throw new Exception('User not authenticated');
+                    }
+                    $auth = new Auth();
+                    $auth->updatePassword($_SESSION['user_id'], $data['password']);
+                    $response = ['success' => true];
+                    break;
+                    case 'update_profile':
+                        $data = json_decode(file_get_contents('php://input'), true);
+                        header('Content-Type: application/json');
+                    
+                        if (!isset($data['username']) || !isset($data['email'])) {
+                            throw new Exception('Username and Email are required.');
+                        }
+                    
+                        if (!isset($_SESSION['user_id'])) {
+                            throw new Exception('User not authenticated.');
+                        }
+                    
+                        $username = trim($data['username']);
+                        $name = trim($data['name'] ?? '');
+                        $email = trim($data['email']);
+                        $bio = trim($data['bio'] ?? '');
+                    
+                        $auth->updateProfile($_SESSION['user_id'], $username, $name, $email, $bio);
+                    
+                        $response = ['success' => true];
+                        break;
             case 'get_project_users':
                 $data = json_decode(file_get_contents('php://input'), true);
                 header('Content-Type: application/json');
@@ -411,7 +445,19 @@ if (isset($_GET['api'])) {
                     $response = ['success' => false, 'message' => 'Failed to remove user'];
                 }
                 break;
-
+                case 'set_selected_tab':
+                    $data = json_decode(file_get_contents('php://input'), true);
+                    header('Content-Type: application/json');
+                
+                    if (!isset($data['selected_tab'])) {
+                        throw new Exception('Selected tab is required');
+                    }
+                
+                    $_SESSION['selected_tab'] = $data['selected_tab'];
+                
+                    $response = ['success' => true];
+                    break;
+                
             case 'get_task_assignees':
                 $data = json_decode(file_get_contents('php://input'), true);
                 if (!isset($data['task_id'])) {
