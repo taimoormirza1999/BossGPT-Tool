@@ -89,7 +89,7 @@ $themes = [
 </button>
 
                 <image src="<?php echo $_SESSION['avatar_image'] ?? $images['default-user-image'] ?>"
-                    style="cursor: pointer;width: 47px; height: 47px; border-radius: 50%; border: 1.6px solid rgba(248, 249, 250, 0.5);"
+                    style="  object-fit: cover;object-position: center;cursor: pointer;width: 47px; height: 47px; border-radius: 50%; border: 1.6px solid rgba(248, 249, 250, 0.5);"
                     class=" btn-logout" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Profile"
                     onclick="openLink('<?php echo $_ENV['BASE_URL'] ?>?page=profile',false)" />
                 <!-- Logout Form -->
