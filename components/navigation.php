@@ -9,7 +9,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="<?php echo $_ENV['BASE_URL'] ?>/garden">
+                    <a class="nav-link" href="<?php echo $_ENV['BASE_URL'] ?>/garden.php">
                         <i class="bi bi-tree"></i> My Garden
                     </a>
                 </li>
@@ -21,7 +21,7 @@ border: 1.3px solid rgba(255, 255, 255, 0.35)!important;
 box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1)!important;">
                     <?php echo getAddSquareIcon(); ?> CreateNew Project
                 </button>
-                <button onclick="openLink('<?php echo $_ENV['BASE_URL'] ?>/garden'false)"
+                <button onclick="openLink('<?php echo $_ENV['BASE_URL'] ?>/garden.php',false)"
                     class="btn btn-outline-light btn-logout" data-bs-toggle="tooltip" data-bs-placement="bottom"
                     title="My Garden"><?php echo getTreeIcon(); ?></button>
                 <button type="button" class="btn btn-outline-light btn-logout" data-bs-toggle="tooltip"

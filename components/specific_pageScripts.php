@@ -297,7 +297,7 @@
                         // console.log("Loaded projects: ", data.projects);
                         if (data.success) {
                             const projectDropdown = document.getElementById('projectDropdown');
-                            <?php if(isPage('profile') && $_SESSION['selected_tab'] == 'cards'){ ?>
+                            <?php if(isPage('profile')){ ?>
                             const projectDropdown1 = document.getElementById('projectDropdown1');
                             projectDropdown1.innerHTML = '';
                             <?php } ?>
@@ -320,7 +320,7 @@
                         </button>
                     `;
                                     projectDropdown.appendChild(li);
-                                    <?php if(isPage('profile') && $_SESSION['selected_tab'] == 'cards'){ ?>
+                                    <?php if(isPage('profile')){ ?>
                                     // projectDropdown1.appendChild(li);
                                     const liClone = li.cloneNode(true);
 projectDropdown1.appendChild(liClone);
@@ -385,13 +385,13 @@ projectDropdown1.appendChild(liClone);
                 // Select project
                 function selectProject(projectId, selectedProjectTitle = "") {
                     const $button = $('#projectDropdownButton');
-                    <?php if(isPage('profile') && $_SESSION['selected_tab'] == 'cards'){ ?>
+                    <?php if (isPage('profile')){ ?>
                     const $button1 = $('#projectDropdownButton1');
                     <?php } ?>
                     // If no title is provided, get it from the dropdown item
                     if (!selectedProjectTitle) {
                         const selectedButton = $(`#projectDropdown button[data-id="${projectId}"]`);
-                        if(isPage('profile') && $_SESSION['selected_tab'] == 'cards'){ 
+                        if(isPage('profile')){ 
        const selectedButton1 = $(`#projectDropdown1 button[data-id="${projectId}"]`);
                         }
                         if (selectedButton.length) {
@@ -399,7 +399,7 @@ projectDropdown1.appendChild(liClone);
                         }
     
 
-                        <?php if(isPage('profile') && $_SESSION['selected_tab'] == 'cards'){ ?>
+                        <?php if(isPage('profile') ){ ?>
                             if (selectedButton1.length) {
     selectedProjectTitle = selectedButton1.attr('title');
 }
@@ -411,13 +411,19 @@ projectDropdown1.appendChild(liClone);
 
                     // Clear and update the button text
                     $button.text(selectedProjectTitle);
-                    <?php if(isPage('profile') && $_SESSION['selected_tab'] == 'cards'){ ?>
+                    <?php if(isPage('profile')){ ?>
 $button1.text(selectedProjectTitle);
 <?php } ?>
                     // Add the SVG back if it exists
                     if ($svg.length > 0) {
+                        
                         $button.append($svg);
-                        <?php if(isPage('profile') && $_SESSION['selected_tab'] == 'cards'){ ?>
+                        <?php if(isPage('profile') ){ ?>
+                            $button.append(`
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4 6L8 10L12 6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        `);
                         $button1.append($svg);
                         <?php } ?>
                     } else {
@@ -427,7 +433,7 @@ $button1.text(selectedProjectTitle);
                                 <path d="M4 6L8 10L12 6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                         `);
-                        <?php if(isPage('profile') && $_SESSION['selected_tab'] == 'cards'){ ?>
+                        <?php if(isPage('profile') ){ ?>
                         $button1.append(`
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M4 6L8 10L12 6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
