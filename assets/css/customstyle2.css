@@ -7,7 +7,7 @@
 }
 
 .chat-container {
-  height: calc(100vh - 230px);
+  height: calc(100vh - 152.5px);
   display: flex;
   flex-direction: column;
 }
@@ -209,15 +209,25 @@
   flex-wrap: wrap;
   margin-bottom: 0;
 }
-
+.delete-task-btn svg path {
+  stroke: #FF5733 !important;
+}
 .delete-task-btn {
-  background-color: rgb(187, 7, 10) !important;
-  padding: 0.4rem;
+  /* background-color: rgb(187, 7, 10) !important; */
   opacity: 0;
   transition: opacity 0.34s;
   position: absolute;
   top: -2.15rem;
   right: 0.5rem;
+  height: 40px;
+  width: 40px;
+  padding: 0!important;
+  background: #ff58333a !important;
+    border-radius: 50%!important;
+    border: 1.3px solid #FF5733;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .delete-task-btn:hover {
@@ -594,6 +604,7 @@ body.dark-mode .nav-tabs .nav-link.active {
   padding-right: 1rem;
   margin-left: 0;
   margin-right: 0;
+  overflow-y: hidden;
 }
 
 .task-card h6 {
@@ -671,11 +682,11 @@ body.dark-mode .nav-tabs::-webkit-scrollbar-track {
   display: flex;
 }
 
-#projectDropdownButton.dropdown-toggle::after {
+#projectDropdownButton.dropdown-toggle::after, #projectDropdownButton1.dropdown-toggle::after {
   display: none !important;
 }
 
-#projectDropdownButton.dropdown-toggle {
+#projectDropdownButton.dropdown-toggle, #projectDropdownButton1.dropdown-toggle {
   display: inline-flex;
   align-items: center;
   font-size: calc(var(--font-size, 1rem) + 0.15rem) !important;
@@ -683,20 +694,20 @@ body.dark-mode .nav-tabs::-webkit-scrollbar-track {
   color: white !important;
 }
 
-#projectDropdownButton.dropdown-toggle svg {
+#projectDropdownButton.dropdown-toggle svg, #projectDropdownButton1.dropdown-toggle svg {
   margin-left: 5px;
   width: 1.5rem;
   height: 1.5rem;
   transition: transform 0.2s;
 }
 
-#projectDropdownButton.dropdown-toggle[aria-expanded="true"] svg {
+#projectDropdownButton.dropdown-toggle[aria-expanded="true"] svg, #projectDropdownButton1.dropdown-toggle[aria-expanded="true"] svg {
   transform: rotate(180deg);
   width: 1.5rem;
   height: 1.5rem;
 }
 
-#projectDropdownButton.dropdown-toggle:not(:has(svg))::after {
+#projectDropdownButton.dropdown-toggle:not(:has(svg))::after, #projectDropdownButton1.dropdown-toggle:not(:has(svg))::after {
   content: "";
   display: inline-block;
   width: 24px;
@@ -709,6 +720,8 @@ body.dark-mode .nav-tabs::-webkit-scrollbar-track {
 }
 
 #projectDropdownButton.dropdown-toggle[aria-expanded="true"]:not(
+    :has(svg)
+  )::after, #projectDropdownButton1.dropdown-toggle[aria-expanded="true"]:not(
     :has(svg)
   )::after {
   transform: rotate(180deg);
@@ -802,7 +815,7 @@ button#toggleDarkModeBtn:active {
 .btn-icon-only:active,
 .btn:hover,
 .btn:focus,
-:not(.btn-primary):focus:not(.delete-subtask-btn) {
+.btn:not(.btn-primary):not(.btn-danger.delete-task-btn):not(.ai-add-subtask-btn),.btn:not(.btn-danger.delete-task-btn) {
   background: var(--bs-primary-white10percent) !important;
   color: var(--bs-primary-white) !important;
   box-shadow: none !important;

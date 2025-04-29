@@ -163,6 +163,7 @@ class ProjectManager
                     t.due_date, 
                     t.created_at, 
                     t.updated_at, 
+                    COALESCE(GROUP_CONCAT(DISTINCT u.avatar_image SEPARATOR ', '), '') AS assigned_user_avatars,
                     COALESCE(GROUP_CONCAT(DISTINCT u.username SEPARATOR ', '), '') AS assigned_usernames,
                     COALESCE(GROUP_CONCAT(DISTINCT u.id SEPARATOR ', '), '') AS assigned_user_ids,
                     COALESCE(

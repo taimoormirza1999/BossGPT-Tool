@@ -39,7 +39,7 @@ class Auth
     public function login($email, $password)
     {
         try {
-            $stmt = $this->db->prepare("SELECT id, username, email, password_hash, pro_plan as pro_member, invited_by, fcm_token, telegram_chat_id, discord_id FROM users WHERE email = ?");
+            $stmt = $this->db->prepare("SELECT id, username, name, email, bio, password_hash, avatar_image, pro_plan as pro_member, invited_by, fcm_token, telegram_chat_id, discord_id FROM users WHERE email = ?");
             $stmt->execute([$email]);
             $user = $stmt->fetch();
 
@@ -54,10 +54,12 @@ class Auth
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['email'] = $user['email'];
             $_SESSION['username'] = $user['username'];
+            $_SESSION['name'] = $user['name'];
+            $_SESSION['bio'] = $user['bio'];
             $_SESSION['pro_member'] = $user['pro_member'];
             $_SESSION['telegram_token'] = $user['telegram_chat_id'];
             $_SESSION['discord_token'] = $user['discord_id'];
-
+            $_SESSION['avatar_image'] = $user['avatar_image'];
             // Update FCM token if available in the session
             if (isset($_SESSION['fcm_token']) && $_SESSION['fcm_token'] !== '0') {
                 $this->updateFcmToken($user['id'], $_SESSION['fcm_token']);
@@ -92,7 +94,7 @@ class Auth
         session_start();
         session_unset();
         session_destroy();
-        header("Location: " . $_ENV['BASE_URL']);
+        header("Location: " . $_ENV['BASE_URL'].'?page=login');
         exit;
     }
 
@@ -149,4 +151,42 @@ class Auth
             throw $e;
         }
     }
+    public function updateAvatarImage($userId, $imagePath)
+{
+    try {
+        $stmt = $this->db->prepare("UPDATE users SET avatar_image = ? WHERE id = ?");
+        $stmt->execute([$imagePath, $userId]);
+        return true;
+    } catch (Exception $e) {
+        error_log("Avatar upload error: " . $e->getMessage());
+        throw new Exception("Failed to update profile image.");
+    }
+}
+public function updatePassword($userId, $newPassword)
+{
+    try {
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+        $stmt = $this->db->prepare("UPDATE users SET password_hash = ? WHERE id = ?");
+        $stmt->execute([$hashedPassword, $userId]);
+        return true;
+    } catch (Exception $e) {
+        error_log("Password update error: " . $e->getMessage());
+        throw new Exception("Failed to update password.".$e->getMessage());
+    }
+}
+public function updateProfile($userId, $username, $name, $email, $bio)
+{
+    try {
+        $stmt = $this->db->prepare("UPDATE users SET username = ?, name = ?, email = ?, bio = ? WHERE id = ?");
+        $stmt->execute([$username, $name, $email, $bio, $userId]);
+        $_SESSION['username'] = $username;
+        $_SESSION['name'] = $name;
+        $_SESSION['email'] = $email;
+        $_SESSION['bio'] = $bio;
+        return true;
+    } catch (Exception $e) {
+        error_log("Profile update error: " . $e->getMessage());
+        throw new Exception("Failed to update profile".$e->getMessage());
+    }
+}
 }

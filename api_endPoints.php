@@ -1,7 +1,11 @@
 <?php
 if (isset($_GET['api'])) {
-    ini_set('display_errors', 0);
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
     header('Content-Type: application/json');
+    set_error_handler(function ($severity, $message, $file, $line) {
+        throw new ErrorException($message, 0, $severity, $file, $line);
+    });
     $response = ['success' => false, 'message' => 'Invalid request'];
 
     try {
@@ -15,6 +19,59 @@ if (isset($_GET['api'])) {
         $ai_assistant = new AIAssistant();
 
         switch ($_GET['api']) {
+            case 'upload_profile_image':
+                header('Content-Type: application/json');
+                if (!isset($_SESSION['user_id'])) {
+                    http_response_code(401);
+                    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+                    exit;
+                }
+
+                $userId = $_SESSION['user_id'];
+
+                if (!isset($_FILES['avatar']) || $_FILES['avatar']['error'] !== UPLOAD_ERR_OK) {
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'message' => 'Image upload failed']);
+                    exit;
+                }
+
+                $uploadDir = __DIR__ . '/uploads/avatars/';
+                if (!file_exists($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
+                }
+
+                $filename = uniqid('avatar_') . '_' . basename($_FILES['avatar']['name']);
+                $targetPath = $uploadDir . $filename;
+                $publicPath = 'uploads/avatars/' . $filename;
+                $auth = new Auth();
+                if (move_uploaded_file($_FILES['avatar']['tmp_name'], $targetPath)) {
+                    $auth->updateAvatarImage($userId, $publicPath);
+                    echo json_encode(['success' => true, 'image_url' => $publicPath]);
+                } else {
+                    http_response_code(500);
+                    echo json_encode(['success' => false, 'message' => 'Failed to move uploaded file']);
+                }
+                error_log("UPLOAD BLOCK TRIGGERED"); // should show up in error_log
+
+                if (!isset($_FILES['avatar'])) {
+                    error_log("No avatar uploaded");
+                } else {
+                    error_log("Avatar uploaded: " . print_r($_FILES['avatar'], true));
+                }
+                exit;
+            case 'get_user_avatar':
+                header('Content-Type: application/json');
+                if (!isset($_SESSION['user_id'])) {
+                    echo json_encode(['success' => false, 'message' => 'Not logged in']);
+                    exit;
+                }
+
+                $stmt = $database->getConnection()->prepare("SELECT avatar_image FROM users WHERE id = ?");
+                $stmt->execute([$_SESSION['user_id']]);
+                $row = $stmt->fetch();
+
+                echo json_encode(['success' => true, 'avatar' => $row['avatar_image']]);
+                exit;
             case 'save_telegram_chat_id':
                 $data = json_decode(file_get_contents('php://input'), true);
             
@@ -84,7 +141,41 @@ if (isset($_GET['api'])) {
                     'history' => $history ?? []
                 ];
                 break;
-
+                case 'update_password':
+                    $data = json_decode(file_get_contents('php://input'), true);
+        
+                    if (empty($data['password'])) {
+                        throw new Exception('Password is required');
+                    }
+        
+                    if (!isset($_SESSION['user_id'])) {
+                        throw new Exception('User not authenticated');
+                    }
+                    $auth = new Auth();
+                    $auth->updatePassword($_SESSION['user_id'], $data['password']);
+                    $response = ['success' => true];
+                    break;
+                    case 'update_profile':
+                        $data = json_decode(file_get_contents('php://input'), true);
+                        header('Content-Type: application/json');
+                    
+                        if (!isset($data['username']) || !isset($data['email'])) {
+                            throw new Exception('Username and Email are required.');
+                        }
+                    
+                        if (!isset($_SESSION['user_id'])) {
+                            throw new Exception('User not authenticated.');
+                        }
+                    
+                        $username = trim($data['username']);
+                        $name = trim($data['name'] ?? '');
+                        $email = trim($data['email']);
+                        $bio = trim($data['bio'] ?? '');
+                    
+                        $auth->updateProfile($_SESSION['user_id'], $username, $name, $email, $bio);
+                    
+                        $response = ['success' => true];
+                        break;
             case 'get_project_users':
                 $data = json_decode(file_get_contents('php://input'), true);
                 header('Content-Type: application/json');
@@ -354,7 +445,19 @@ if (isset($_GET['api'])) {
                     $response = ['success' => false, 'message' => 'Failed to remove user'];
                 }
                 break;
-
+                case 'set_selected_tab':
+                    $data = json_decode(file_get_contents('php://input'), true);
+                    header('Content-Type: application/json');
+                
+                    if (!isset($data['selected_tab'])) {
+                        throw new Exception('Selected tab is required');
+                    }
+                
+                    $_SESSION['selected_tab'] = $data['selected_tab'];
+                
+                    $response = ['success' => true];
+                    break;
+                
             case 'get_task_assignees':
                 $data = json_decode(file_get_contents('php://input'), true);
                 if (!isset($data['task_id'])) {
@@ -403,20 +506,35 @@ if (isset($_GET['api'])) {
                 if (!isset($data['project_id'])) {
                     throw new Exception('Project ID is required');
                 }
+                $projectId = $data['project_id'];
+                $startDate = isset($data['start_date']) ? $data['start_date'] : null;
+                $endDate = isset($data['end_date']) ? $data['end_date'] : null;
+                // Build base query
+                $query = "
+    SELECT 
+        al.action_type,
+        al.description,
+        al.created_at,
+        u.username
+    FROM activity_log al
+    LEFT JOIN users u ON al.user_id = u.id
+    WHERE al.project_id = ?
+";
 
-                $stmt = $db->prepare("
-                    SELECT 
-                        al.action_type,
-                        al.description,
-                        al.created_at,
-                        u.username
-                    FROM activity_log al
-                    LEFT JOIN users u ON al.user_id = u.id
-                    WHERE al.project_id = ?
-                    ORDER BY al.created_at DESC
-                    LIMIT 100
-                ");
-                $stmt->execute([$data['project_id']]);
+                $params = [$projectId];
+
+                // Add date filtering if provided
+                if ($startDate && $endDate) {
+                    $query .= " AND al.created_at BETWEEN ? AND ?";
+                    $params[] = $startDate . ' 00:00:00'; // start of day
+                    $params[] = $endDate . ' 23:59:59';   // end of day
+                }
+
+                // Finish query
+                $query .= " ORDER BY al.created_at DESC LIMIT 100";
+
+                $stmt = $db->prepare($query);
+                $stmt->execute($params);
                 $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 $response = ['success' => true, 'logs' => $logs];

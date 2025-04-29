@@ -59,7 +59,9 @@
        4) BUTTONS
        =============================== */
   /* Dark mode toggle button */
- 
+ .nav-btn-container{
+  gap: 0.8rem;
+ }
   
   .card{
     background-color: transparent!important;
@@ -76,13 +78,15 @@
   }
   
   /* Project dropdown button */
-  button#projectDropdownButton {
+  button#projectDropdownButton, button#projectDropdownButton1 {
     background: transparent !important;
     border: none !important;
     font-family: "CabinetGroteskBold";
   }
   button#projectDropdownButton:focus,
-  button#projectDropdownButton:hover {
+  button#projectDropdownButton:hover,
+  button#projectDropdownButton1:focus,
+  button#projectDropdownButton1:hover {
     box-shadow: none !important;
     color: var(--bs-primary-white) !important;
   }
@@ -441,7 +445,7 @@
   }
   
   .sides-padding {
-    width: 95% !important;
+    width: 96.5% !important;
     padding-left: 1rem !important;
     padding-right: 1rem !important;
   }
@@ -1167,25 +1171,14 @@
   .prompt-btn {
     border: 1px solid;
     border-radius: 50%!important;
-      backdrop-filter: blur(10px);
-      padding: 4px 3px;
-      font-size: 0.80rem;
-      white-space: nowrap;
-      color: rgba(255, 255, 255, 0.9) !important;
-      transition: all 0.34s ease-in-out;
+    backdrop-filter: blur(10px);
+    padding: 4px 3px;
+    font-size: 0.80rem;
+    white-space: nowrap;
+    color: rgba(255, 255, 255, 0.9) !important;
+    transition: all 0.34s ease-in-out;
   }
   
-  .prompt-btn:hover {
-      background: rgba(255, 255, 255, 0.2);
-      border-color: rgba(255, 255, 255, 0.3);
-      transform: translateY(-2px);
-  }
-  
-  .prompt-btn:active {
-      transform: translateY(-1px);
-  }
-  
-
   /* Tree selection grid */
   .tree-select-grid {
     display: grid;

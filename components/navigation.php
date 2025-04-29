@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid sides-padding" style="overflow: visible;">
-        <a class="navbar-brand" href="?page=dashboard">
+    <div class="container-fluid sides-padding" style="overflow: visible; padding:0!important;">
+        <a class="navbar-brand" href="<?php echo $_ENV['BASE_URL'] ?>?page=dashboard">
             <?php echo getLogoImage($bottomMargin = '0.4rem', $topMargin = "0.4rem", $width = "11rem", $height = "auto", $positionClass = " ", $positionStyle = " ", $src = "https://res.cloudinary.com/da6qujoed/image/upload/v1742651528/bossgpt-transparent_n4axv7.png"); ?>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -8,25 +8,26 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
-                <!-- <li class="nav-item">
-                            <a class="nav-link <?= $page === 'dashboard' ? 'active' : '' ?>"
-                                href="?page=dashboard">Dashboard</a>
-                        </li> -->
                 <li class="nav-item">
-                    <a class="nav-link" href="garden.php">
+                    <a class="nav-link" href="<?php echo $_ENV['BASE_URL'] ?>/garden">
                         <i class="bi bi-tree"></i> My Garden
                     </a>
                 </li>
             </ul>
-            <div class="d-flex align-items-center">
-
-                <!-- <div class="d-flex align-items-center me-4">
-                    <label for="fontSizeRange" class="text-light me-2 mb-0">Font Size:</label>
-                    <input type="range" class="form-range" id="fontSizeRange" min="12" max="24" step="1"
-                        style="width: 100px;">
-                    <span id="fontSizeValue" class="text-light ms-2" style="min-width: 45px;">16px</span>
-                </div> -->
-
+            <div class="d-flex align-items-center nav-btn-container">
+                <button type="button" class="btn btn-main-primary" data-bs-toggle="modal"
+                    data-bs-target="#newProjectModal" style="background: rgba(255, 255, 255, 0.1)!important;
+border: 1.3px solid rgba(255, 255, 255, 0.35)!important;
+box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1)!important;">
+                    <?php echo getAddSquareIcon(); ?> CreateNew Project
+                </button>
+                <button onclick="openLink('<?php echo $_ENV['BASE_URL'] ?>/garden'false)"
+                    class="btn btn-outline-light btn-logout" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                    title="My Garden"><?php echo getTreeIcon(); ?></button>
+                <button type="button" class="btn btn-outline-light btn-logout" data-bs-toggle="tooltip"
+                    data-bs-placement="bottom" onclick="openModal('assignUserModal')" title="Invite User"><?php echo getAddUserIcon(); ?></button>
+                <button type="button" class="btn btn-outline-light btn-logout " data-bs-toggle="tooltip"
+                    data-bs-placement="bottom" onclick="openModal('activityLogModal')" title="Project Activity"><?php echo getClockIcon(); ?></button>
                 <!-- Notification Icon with Red Badge -->
                 <?php
                 $unreadNotifications = 0;
@@ -59,37 +60,44 @@
                         </div>
                     </div>
                 </div>
-                <button class="btn btn-icon-only mx-2" id="btn-theme" onclick="toggleThemeClick()" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Switch Theme">
-            <?php echo getThemeIcon(); ?>
-            <div class="theme-icon-container d-none">
-                <h6>Theme</h6>
-                <div class="theme-icon-content-container">
-                    <div class="theme-icon-content-item">
-                    <div class="theme-icon-color" onclick="changeTheme('purple-mode')"></div>
-                    <span>Purple</span>
-                    </div>
-                
-                   <div class="theme-icon-content-item">
-                   <div class="theme-icon-color" onclick="changeTheme('black-mode')"></div>
-                   <span>Black</span>
-                   </div>
-                   <div class="theme-icon-content-item">
-                   <div class="theme-icon-color" onclick="changeTheme('brown-mode')"></div>
-                   <span>Brown</span>
-                   </div>
-                   <div class="theme-icon-content-item">
-                   <div class="theme-icon-color" onclick="changeTheme('system-mode')"></div>
-                   <span>Default</span>
-                   </div>
+                <?php
+$themes = [
+    'purple-mode' => 'Purple',
+    'black-mode' => 'Black',
+    'brown-mode' => 'Brown',
+    'system-mode' => 'Default'
+];
+?>
+
+<button class="btn btn-icon-only" id="btn-theme" onclick="toggleThemeClick()" data-bs-toggle="tooltip"
+    data-bs-placement="bottom" title="Switch Theme">
+    
+    <?php echo getThemeIcon(); ?>
+
+    <div class="theme-icon-container d-none">
+        <h6>Theme</h6>
+        <div class="theme-icon-content-container">
+            <?php foreach ($themes as $themeClass => $themeName): ?>
+                <div class="theme-icon-content-item">
+                    <div class="theme-icon-color" onclick="changeTheme('<?php echo $themeClass; ?>')"></div>
+                    <span><?php echo htmlspecialchars($themeName); ?></span>
                 </div>
-            </div>
-        </button>
+            <?php endforeach; ?>
+        </div>
+    </div>
+
+</button>
+
+                <image src="<?php echo $_SESSION['avatar_image'] ?? $images['default-user-image'] ?>"
+                    style="cursor: pointer;width: 47px; height: 47px; border-radius: 50%; border: 1.6px solid rgba(248, 249, 250, 0.5);"
+                    class=" btn-logout" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Profile"
+                    onclick="openLink('<?php echo $_ENV['BASE_URL'] ?>?page=profile',false)" />
                 <!-- Logout Form -->
                 <form method="POST" class="d-inline">
                     <input type="hidden" name="action" value="logout">
-                    <button type="submit" class="btn btn-outline-light btn-logout" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Logout"><?php echo getLogoutIcon(); ?></button>
+                    <button type="submit" class="btn btn-outline-light btn-logout" data-bs-toggle="tooltip"
+                        data-bs-placement="bottom" title="Logout"><?php echo getLogoutIcon(); ?></button>
                 </form>
             </div>
         </div>
-    </div>
 </nav>
