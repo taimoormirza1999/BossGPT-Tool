@@ -476,7 +476,7 @@ body.system-mode {
     }
     .card-body {
       .task-column_header {
-        border: $boder-width_1_3 solid rgba(211, 211, 211, 0.5) !important;
+        border: $boder-width_1_5 solid rgba(211, 211, 211, 0.5) !important;
       }
       .task-card {
         @include theme-bgcolor($default-mode-card-task-bgcolor);
@@ -1129,6 +1129,7 @@ body {
     }
     .card-header {
       position: relative;
+      border-bottom: 1.5px solid rgba(211, 211, 211, .5)!important;
       h5 {
         color: $white-color;
       }

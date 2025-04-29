@@ -209,15 +209,25 @@
   flex-wrap: wrap;
   margin-bottom: 0;
 }
-
+.delete-task-btn svg path {
+  stroke: #FF5733 !important;
+}
 .delete-task-btn {
-  background-color: rgb(187, 7, 10) !important;
-  padding: 0.4rem;
+  /* background-color: rgb(187, 7, 10) !important; */
   opacity: 0;
   transition: opacity 0.34s;
   position: absolute;
   top: -2.15rem;
   right: 0.5rem;
+  height: 40px;
+  width: 40px;
+  padding: 0!important;
+  background: #ff58333a !important;
+    border-radius: 50%!important;
+    border: 1.3px solid #FF5733;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .delete-task-btn:hover {
@@ -594,6 +604,7 @@ body.dark-mode .nav-tabs .nav-link.active {
   padding-right: 1rem;
   margin-left: 0;
   margin-right: 0;
+  overflow-y: hidden;
 }
 
 .task-card h6 {
@@ -804,7 +815,7 @@ button#toggleDarkModeBtn:active {
 .btn-icon-only:active,
 .btn:hover,
 .btn:focus,
-.btn:not(.btn-primary),.btn:focus:not(.delete-subtask-btn) {
+.btn:not(.btn-primary):not(.btn-danger.delete-task-btn):not(.ai-add-subtask-btn),.btn:not(.btn-danger.delete-task-btn) {
   background: var(--bs-primary-white10percent) !important;
   color: var(--bs-primary-white) !important;
   box-shadow: none !important;

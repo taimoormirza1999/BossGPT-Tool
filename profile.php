@@ -35,7 +35,7 @@ function include_profile($images)
 
         #avatarPreview {
             cursor: pointer;
-            border: 2px solid white;
+            border: 2px dashed rgba(255, 255, 255, 0.5);
             width: 6.75rem;
             height: 6.75rem;
             object-fit: cover;
