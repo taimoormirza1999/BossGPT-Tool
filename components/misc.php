@@ -176,12 +176,12 @@
     }
   }
   function openLink(link, newPage = true) {
-  if (newPage) {
-    window.open(link, '_blank');
-  } else {
-    window.location.href = link;
+    if (newPage) {
+      window.open(link, '_blank');
+    } else {
+      window.location.href = link;
+    }
   }
-}
 
   function openModal(modalId) {
     const modalElement = document.getElementById(modalId);
@@ -206,56 +206,56 @@
     return date.toLocaleString();
   }
   function timeAgo(dateString) {
-  const now = new Date();
-  const past = new Date(dateString);
-  const diffSeconds = Math.floor((now - past) / 1000);
+    const now = new Date();
+    const past = new Date(dateString);
+    const diffSeconds = Math.floor((now - past) / 1000);
 
-  if (diffSeconds < 60) return 'just now';
-  const minutes = Math.floor(diffSeconds / 60);
-  if (minutes < 60) return minutes + ' minutes ago';
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return hours + ' hours ago';
-  const days = Math.floor(hours / 24);
-  return days + ' days ago';
-}
-function escapeHtml(text) {
+    if (diffSeconds < 60) return 'just now';
+    const minutes = Math.floor(diffSeconds / 60);
+    if (minutes < 60) return minutes + ' minutes ago';
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return hours + ' hours ago';
+    const days = Math.floor(hours / 24);
+    return days + ' days ago';
+  }
+  function escapeHtml(text) {
     return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-
-function updateActivityBoard(logs) {
-  const activityContainer = document.getElementById('activityLogList'); 
-  if (!activityContainer) return; // Safety check
-
-  activityContainer.innerHTML = ''; // Clear existing
-
-  if (logs.length === 0) {
-    activityContainer.innerHTML = '<p class="text-muted text-center">No recent activity.</p>';
-    return;
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
   }
 
-  logs.forEach(log => {
-    const username = escapeHtml(log.username || 'User'); // fallback
-    const parts = username.trim().split(' ');
-    let initials = '';
+  function updateActivityBoard(logs) {
+    const activityContainer = document.getElementById('activityLogList');
+    if (!activityContainer) return; // Safety check
 
-    if (parts.length === 1) {
-      initials = parts[0].substring(0, 2).toUpperCase(); // 2 letters
-    } else {
-      const firstInitial = parts[0][0] ? parts[0][0].toUpperCase() : '';
-      const secondInitial = parts[1][0] ? parts[1][0].toUpperCase() : '';
-      initials = firstInitial + '.' + secondInitial;
+    activityContainer.innerHTML = ''; // Clear existing
+
+    if (logs.length === 0) {
+      activityContainer.innerHTML = '<p class="text-muted text-center">No recent activity.</p>';
+      return;
     }
 
-    const createdAt = formatDateTime(log.created_at);
-    const actionType = escapeHtml(log.action_type);
-    const description = escapeHtml(log.description);
+    logs.forEach(log => {
+      const username = escapeHtml(log.username || 'User'); // fallback
+      const parts = username.trim().split(' ');
+      let initials = '';
 
-    const activityItem = `
+      if (parts.length === 1) {
+        initials = parts[0].substring(0, 2).toUpperCase(); // 2 letters
+      } else {
+        const firstInitial = parts[0][0] ? parts[0][0].toUpperCase() : '';
+        const secondInitial = parts[1][0] ? parts[1][0].toUpperCase() : '';
+        initials = firstInitial + '.' + secondInitial;
+      }
+
+      const createdAt = formatDateTime(log.created_at);
+      const actionType = escapeHtml(log.action_type);
+      const description = escapeHtml(log.description);
+
+      const activityItem = `
       <div class="list-group-item border-0 list-group-item-action bg-transparent text-white d-flex align-items-start border-light border rounded mb-2">
         <div class="me-3">
           <div class="rounded-circle text-white d-flex align-items-center justify-content-center"
@@ -274,61 +274,70 @@ function updateActivityBoard(logs) {
       </div>
     `;
 
-    activityContainer.innerHTML += activityItem;
-  });
-}
+      activityContainer.innerHTML += activityItem;
+    });
+  }
 
-function formatDate(dateString) {
+  function formatDate(dateString) {
     if (!dateString) return '-';
     const date = new Date(dateString);
     return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
-}
-function renderAssignedUsers(assignedUsers) {
-    if (!assignedUsers || Object.keys(assignedUsers).length === 0) {
-        return '<span class="text-muted">No Assignee</span>';
+  }
+
+
+
+  function renderAssignedUsers(assignedUsers) {
+    // pull in your session values right here:
+    const sessionId = <?php echo json_encode($_SESSION['user_id']); ?>;
+    const sessionUsername = <?php echo json_encode($_SESSION['username']); ?>;
+    const sessionAvatar = <?php echo json_encode($_SESSION['avatar_image']); ?>;
+
+    if (!assignedUsers || !Object.keys(assignedUsers).length) {
+      return '<span class="text-muted">No Assignee</span>';
     }
 
-    const usersHtml = [];
+    return Object.entries(assignedUsers).map(([id, user]) => {
+      // detect yourself
+      const isMe = parseInt(id, 10) == <?php echo json_encode($_SESSION['user_id']); ?>;
+      const avatar = isMe
+        ? sessionAvatar
+        : user.avatar_image;
+      const name = isMe
+        ? sessionUsername
+        : user.username;
 
-    for (const userId in assignedUsers) {
-        const user = assignedUsers[userId];
-        if (user.avatar_image) {
-    usersHtml.push(`
-      <div class="d-flex align-items-center gap-2">
-        <img src="${escapeHtml(user.avatar_image)}" class="rounded-circle" style="width: 3.1rem; height: 3.1rem; object-fit: cover;" alt="Avatar">
-        <span>${escapeHtml(user.username)}</span>
-      </div>
-    `);
-} else {
-    const username = escapeHtml(user.username || 'User');
-    const parts = username.trim().split(' ');
+      if (avatar) {
+        return `
+              <div class="d-flex align-items-center gap-2 justify-content-center">
+                <img src="${escapeHtml(avatar)}"
+                     class="rounded-circle border border-secondary"
+                     style="width:2.7rem;height:2.7rem;object-fit:cover;"
+                     alt="Avatar">
+                <span>@${escapeHtml(name)}</span>
+              </div>`;
+      } else {
+        const parts = name.trim().split(' ');
+        const initials = parts.length === 1
+          ? parts[0].slice(0, 2).toUpperCase()
+          : (parts[0][0] + '.' + parts[1][0]).toUpperCase();
+        return `
+              <div class="d-flex align-items-center gap-2 justify-content-center">
+                <div class="rounded-circle text-white d-flex align-items-center justify-content-center"
+                     style="width:3.1rem;height:3.1rem;
+                            background:rgba(42,95,255,1);
+                            font-size:0.95rem;">
+                  ${initials}
+                </div>
+                <span>${escapeHtml(name)}</span>
+              </div>`;
+      }
+    }).join('');
+  }
 
-    let initials = '';
-    if (parts.length === 1) {
-        initials = parts[0].substring(0, 2).toUpperCase();
-    } else {
-        const firstInitial = parts[0][0] ? parts[0][0].toUpperCase() : '';
-        const secondInitial = parts[1][0] ? parts[1][0].toUpperCase() : '';
-        initials = firstInitial + '.' + secondInitial;
-    }
 
-    usersHtml.push(`
-      <div class="d-flex align-items-center gap-2">
-        <div class="rounded-circle text-white d-flex align-items-center justify-content-center"
-          style="width: 3.1rem; height: 3.1rem; background: rgba(42, 95, 255, 1); font-size: 0.95rem;">
-          ${initials}
-        </div>
-        <span>${username}</span>
-      </div>
-    `);
-}
 
-    }
 
-    return usersHtml.join('');
-}
-
-function updateCardsBoard(tasks) {
+  function updateCardsBoard(tasks) {
     const tableBody = document.getElementById('tasksTableBody');
 
     if (!tableBody) return; // Safety check
@@ -336,33 +345,88 @@ function updateCardsBoard(tasks) {
     tableBody.innerHTML = ''; // Clear existing table content
 
     if (!tasks || tasks.length === 0) {
-        tableBody.innerHTML = `
+      tableBody.innerHTML = `
             <tr>
                 <td colspan="4" class="text-center text-muted">No tasks available.</td>
             </tr>
         `;
-        return;
+      return;
     }
 
     tasks.forEach(task => {
-        const row = document.createElement('tr');
+      const row = document.createElement('tr');
 
-        row.innerHTML = `
-            <td style="width: 20%;">${task.title ? escapeHtml(task.title) : '-'}</td>
-            <td style="width: 25%;" class="d-flex align-items-center gap-2">
+      row.innerHTML = `
+            <td style="width: 20%; text-align: center;">${task.title ? escapeHtml(task.title) : '-'}</td>
+            <td style="width: 25%; text-align: center;" class="d-flex align-items-center gap-2">
                 ${renderAssignedUsers(task.assigned_users)}
             </td>
-            <td style="width: 15%;">${formatDate(task.due_date)}</td>
-            <td style="width: 40%;">${task.description ? escapeHtml(task.description) : '-'}</td>
+            <td style="width: 15%; text-align: center;">${formatDate(task.due_date)}</td>
+            <td style="width: 40%; text-align: center;">${task.description ? escapeHtml(task.description) : '-'}</td>
         `;
 
-
-        tableBody.appendChild(row);
+      tableBody.appendChild(row);
     });
-}
+  }
 
+
+  function clearRewardfulCookies() {
+    const cookies = document.cookie.split(";");
+
+    cookies.forEach(cookie => {
+      const cookieName = cookie.split("=")[0].trim();
+      // List of cookies Rewardful typically sets, but you need to verify them
+      const rewardfulCookies = ["rewardful_referral", "rewardful_source", "rewardful_session"];
+
+      if (rewardfulCookies.includes(cookieName)) {
+        document.cookie = cookieName + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+      }
+    });
+  }
+  // Helper functions
+  function formatDate(date) {
+    // Check if the date is valid
+    const validDate = new Date(date);
+    if (isNaN(validDate)) {
+      // If the date is invalid, return a fallback value
+      return '-'; // or whatever fallback you prefer
+    }
+    const options = { day: '2-digit', month: 'short' };
+    return validDate.toLocaleDateString('en-GB', options);
+  }
+
+  function formatDateForBackend(date) {
+    if (!(date instanceof Date) || isNaN(date)) {
+      console.log('Invalid date provided:', date);
+      return null; // Or handle differently, like returning an empty string or a default value
+    }
+    return date.toISOString().split('T')[0]; // YYYY-MM-DD
+  }
+  function loadTasks2(projectId, startDate = null, endDate = null) {
+                // Add startDate and endDate to the data if provided
+                let requestData = { project_id: projectId };
+                if (startDate && endDate) {
+                    // Format the dates into 'YYYY-MM-DD' format (or adjust based on your format needs)
+                    requestData.start_date = startDate;
+                    requestData.end_date = endDate;
+                    // alert(startDate+" "+endDate);
+                }
+
+                fetch('?api=get_tasks', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestData)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            <?php if (isPage('profile')) { ?>
+                                updateCardsBoard(data.tasks);
+                            <?php } ?>
+                        }
+                    })
+                    .catch(error => console.error('Error loading tasks:', error))
+                    .finally();
+            }
 
 </script>
-
-
-

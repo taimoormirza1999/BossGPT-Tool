@@ -326,7 +326,6 @@ $geist-fonts: (
     }
   }
 }
-
 @mixin theme-common-notification-list($bgcolor) {
   .dropdown-item {
     &:hover {
@@ -422,6 +421,13 @@ $geist-fonts: (
 @mixin theme-tab-panel($bgcolor) {
   .tab-pane {
     @include theme-bgcolor($bgcolor);
+    &#activity, &#cards{
+    height: calc(100vh - 250px)!important;
+    }
+    .card-header{
+      @include theme-bgcolor($bgcolor);
+    }
+    
   }
 }
 #user-add-icon {
@@ -455,7 +461,6 @@ svg.calendar-icons {
   height: 1.2rem !important;
   width: 1.2rem !important;
 } 
-
 body.system-mode {
   @include theme-bgcolor($default-mode-card-task-bgcolor);
   background-image: $bg-img1-black;
@@ -469,10 +474,10 @@ body.system-mode {
     .column_done {
       background: $default-mode-main-bgcolor !important;
     }
-
     .card-header {
-      @include theme-bgcolor($default-mode-main-bgcolor);
+      @include theme-bgcolor(rgba(0,0,0,0.8));
       border-bottom: $boder-width_1_3 solid rgba(211, 211, 211, 0.5) !important;
+      
     }
     .card-body {
       .task-column_header {
@@ -483,7 +488,7 @@ body.system-mode {
       }
     }
   }
-  @include theme-tab-panel($default-mode-modal-container-bgcolor);
+  @include theme-tab-panel(rgba(0,0,0,0.8 ));
   @include theme-common-chat-pannel(
     $default-mode-main-bgcolor,
     $default-mode-welcome-logo-bgcolor,
@@ -513,7 +518,6 @@ body.purple-mode {
   }
   .projects_card {
     @include commomtaskheader;
-
     .card-header {
       @include theme-bgcolor($purple-mode-bar-bgcolor);
     }
@@ -883,7 +887,7 @@ body {
     margin: auto;
     padding: 2.5rem 1.4rem;
     overflow-y: hidden;
-}
+  }
   .btn-main-primary,
   .btn-send-primary {
     background: rgba(255, 255, 255, 0.1) !important;
@@ -893,8 +897,6 @@ body {
     transition: all $transition-duration-40 ease-in-out !important;
   }
   .projects_card {
-    // box-shadow: 0 2px 5px $black-color-20;
-    background: rgba(255, 255, 255, 0.1);
     border: $boder-width_1_5 solid rgba(211, 211, 211, 0.5);
     backdrop-filter: blur(7.199999809265137px);
     .card-header {
@@ -1070,7 +1072,6 @@ body {
       right: 15px;
     }
   }
-
   .chat-pannel {
     @media (max-width: 768px) {
       position: fixed !important;
@@ -1155,6 +1156,9 @@ body {
         @extend .hover-up;
         margin-bottom: 1.2rem !important;
         border: $boder-width_1_3 solid rgba(211, 211, 211, 0.5)
+      }
+      .chat-messages{
+        @extend .hide-scrollbar;
       }
       .chat-loading-avatar {
         @extend .hover-up;

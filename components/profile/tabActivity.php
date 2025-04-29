@@ -21,7 +21,7 @@
                                                     </div>
 
                                                     <!-- Date Range Filter -->
-                                                    <div class="d-flex align-items-center gap-2">
+                                                    <div class="d-flex align-items-center gap-2 main_date_range_filter">
                                                         <!-- Calendar Icon -->
                                                         <div class="calendar-icon">
                                                             <?php echo getCalendarIcon(24, 24); ?>
@@ -38,6 +38,5 @@
                                                 <div id="activityLogList" class="list-group w-1/2 mx-auto"
                                                     style="max-height: 95%; overflow-y: auto; width: 55%;">
                                                     <!-- Repeat for more activities dynamically -->
-
                                                 </div>
                                             </div>

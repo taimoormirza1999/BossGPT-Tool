@@ -236,8 +236,11 @@ if (isset($_GET['api'])) {
                 if (!isset($data['project_id'])) {
                     throw new Exception('Project ID is required');
                 }
+                // Initialize start_date and end_date variables as null (if not provided)
+                $startDate = isset($data['start_date']) ? $data['start_date'] : null;
+                $endDate = isset($data['end_date']) ? $data['end_date'] : null;
 
-                $tasks = $project_manager->getTasks($data['project_id']);
+                $tasks = $project_manager->getTasks($data['project_id'], $startDate, $endDate);
                 $response = ['success' => true, 'tasks' => $tasks];
                 break;
 
@@ -544,21 +547,37 @@ if (isset($_GET['api'])) {
                 if (!isset($_GET['project_id'])) {
                     throw new Exception('Project ID is required');
                 }
-
-                $stmt = $db->prepare("
-                    SELECT 
-                        al.action_type,
-                        al.description,
-                        al.created_at,
-                        u.username,
-                        al.status as notification_status
-                    FROM activity_log al
-                    LEFT JOIN users u ON al.user_id = u.id
-                    WHERE al.project_id = ? AND al.status = 'unread'
-                    ORDER BY al.created_at DESC
-                    LIMIT 100
-                ");
-                $stmt->execute([$_GET['project_id']]);
+                
+                $query = "
+                SELECT 
+                    al.action_type,
+                    al.description,
+                    al.created_at,
+                    u.username,
+                    al.status as notification_status
+                FROM activity_log al
+                LEFT JOIN users u ON al.user_id = u.id
+                WHERE al.project_id = :project_id
+            ";       
+                // Check if 'start_date' and 'end_date' are provided in the GET request
+                if (isset($_GET['start_date']) && isset($_GET['end_date'])) {
+                    $query .= " AND al.created_at BETWEEN :start_date AND :end_date";
+                }else{
+                    $query .= " AND al.status = 'unread'";
+                } 
+                // Add order and limit to the query
+                $query .= " ORDER BY al.created_at DESC";
+                // Prepare the statement
+                $stmt = $db->prepare($query);
+                // Bind the parameters
+                $stmt->bindParam(':project_id', $_GET['project_id']);
+                // Bind the date parameters if provided
+                if (isset($_GET['start_date']) && isset($_GET['end_date'])) {
+                    $stmt->bindParam(':start_date', $_GET['start_date']);
+                    $stmt->bindParam(':end_date', $_GET['end_date']);
+                }
+                $stmt->execute();
+                // Fetch the results
                 $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 $response = ['success' => true, 'logs' => $logs];

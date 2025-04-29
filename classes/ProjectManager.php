@@ -149,56 +149,75 @@ class ProjectManager
             throw $e;
         }
     }
-    public function getTasks($project_id)
+    public function getTasks($project_id, $startDate = null, $endDate = null)
     {
         try {
-            $stmt = $this->db->prepare(
-                "SELECT 
-                    t.id, 
-                    t.project_id, 
-                    t.title, 
-                    t.description, 
-                    t.picture, 
-                    t.status, 
-                    t.due_date, 
-                    t.created_at, 
-                    t.updated_at, 
-                    COALESCE(GROUP_CONCAT(DISTINCT u.avatar_image SEPARATOR ', '), '') AS assigned_user_avatars,
-                    COALESCE(GROUP_CONCAT(DISTINCT u.username SEPARATOR ', '), '') AS assigned_usernames,
-                    COALESCE(GROUP_CONCAT(DISTINCT u.id SEPARATOR ', '), '') AS assigned_user_ids,
-                    COALESCE(
-                        (
-                            SELECT CONCAT('[', 
-                                GROUP_CONCAT(
-                                    CONCAT(
-                                        '{\"id\":', s.id, 
-                                        ',\"title\":\"', s.title, 
-                                        '\",\"description\":\"', COALESCE(s.description, ''), 
-                                        '\",\"status\":\"', s.status, 
-                                        '\",\"due_date\":\"', COALESCE(s.due_date, ''), '\"}'
-                                    ) 
-                                    SEPARATOR ','
-                                ), 
-                            ']') 
-                            FROM subtasks s 
-                            WHERE s.task_id = t.id
-                        ), '[]'
-                    ) AS subtasks,
-                    g.stage as plant_stage,
-                    g.plant_type,
-                    g.size as plant_size
-                FROM tasks t
-                LEFT JOIN task_assignees ta ON t.id = ta.task_id
-                LEFT JOIN users u ON ta.user_id = u.id
-                LEFT JOIN user_garden g ON t.id = g.task_id AND g.user_id = ?
-                WHERE t.project_id = ? 
-                AND t.status != 'deleted'
-                GROUP BY t.id, t.project_id, t.title, t.description, t.picture, t.status, t.due_date, t.created_at, t.updated_at, g.stage, g.plant_type, g.size
-                ORDER BY t.created_at DESC"
-            );
+           
+            $query = "
+          SELECT 
+                   t.id, 
+                   t.project_id, 
+                   t.title, 
+                   t.description, 
+                   t.picture, 
+                   t.status, 
+                   t.due_date, 
+                   t.created_at, 
+                   t.updated_at, 
+                   COALESCE(GROUP_CONCAT(DISTINCT u.avatar_image SEPARATOR ', '), '') AS assigned_user_avatars,
+                   COALESCE(GROUP_CONCAT(DISTINCT u.username SEPARATOR ', '), '') AS assigned_usernames,
+                   COALESCE(GROUP_CONCAT(DISTINCT u.id SEPARATOR ', '), '') AS assigned_user_ids,
+                   COALESCE(
+                       (
+                           SELECT CONCAT('[', 
+                               GROUP_CONCAT(
+                                   CONCAT(
+                                       '{\"id\":', s.id, 
+                                       ',\"title\":\"', s.title, 
+                                       '\",\"description\":\"', COALESCE(s.description, ''), 
+                                       '\",\"status\":\"', s.status, 
+                                       '\",\"due_date\":\"', COALESCE(s.due_date, ''), '\"}'
+                                   ) 
+                                   SEPARATOR ','
+                               ), 
+                           ']') 
+                           FROM subtasks s 
+                           WHERE s.task_id = t.id
+                       ), '[]'
+                   ) AS subtasks,
+                   g.stage as plant_stage,
+                   g.plant_type,
+                   g.size as plant_size
+               FROM tasks t
+               LEFT JOIN task_assignees ta ON t.id = ta.task_id
+               LEFT JOIN users u ON ta.user_id = u.id
+               LEFT JOIN user_garden g ON t.id = g.task_id AND g.user_id = :user_id
+               WHERE t.project_id = :project_id 
+               AND t.status != 'deleted'
+              
+        ";
+        // Conditionally add the date filter if both start_date and end_date are provided
+        if (isset($startDate) && isset($endDate)) {
+            $query .= " AND t.created_at BETWEEN :start_date AND :end_date";
+        }
+        $query .= " GROUP BY t.id, t.project_id, t.title, t.description, t.picture, t.status, t.due_date, t.created_at, t.updated_at, g.stage, g.plant_type, g.size";
+        $query .= " ORDER BY t.created_at DESC";
+        // Prepare the statement
+        $stmt = $this->db->prepare($query);
+          // Bind the parameters using named placeholders
+          $stmt->bindParam(':user_id', $_SESSION['user_id']);  // User ID from session
+          $stmt->bindParam(':project_id', $project_id);
+         // Bind date parameters if provided
+         if (isset($startDate) && isset($endDate)) {
+            $stmt->bindParam(':start_date', $startDate);
+            $stmt->bindParam(':end_date', $endDate);
+        }
+            // Execute the query
+            // Fetch and return the results
+            // $stmt->execute([$_SESSION['user_id'], $project_id]);
+            $stmt->execute();
 
-            $stmt->execute([$_SESSION['user_id'], $project_id]);
-            $tasks = $stmt->fetchAll();
+            $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             // Process the concatenated strings into arrays
             foreach ($tasks as &$task) {
@@ -207,9 +226,23 @@ class ProjectManager
                         explode(',', $task['assigned_user_ids']),
                         explode(',', $task['assigned_usernames'])
                     ) : [];
-                unset($task['assigned_usernames']);
-                unset($task['assigned_user_ids']);
-
+                // unset($task['assigned_usernames']);
+                // unset($task['assigned_user_ids']);
+                // $task['assigned_users'] = [];
+                if (isset($startDate)){
+                foreach ($task['assigned_users'] as $userId => $username) {
+                    // Get the avatar image from your database or any source
+                    // $avatarImage = getAvatarForUser($userId); // Replace with your actual logic
+            
+                    // Structure the data as id, username, and avatar
+                    $task['assigned_users'][$userId] = [
+                        'id' => $userId,
+                        'username' => $username,
+                        'avatar_image' => "fdcvx"
+                    ];
+                }
+            }
+            
                 // Parse subtasks JSON
                 $task['subtasks'] = json_decode($task['subtasks'] ?? '[]', true) ?? [];
                 

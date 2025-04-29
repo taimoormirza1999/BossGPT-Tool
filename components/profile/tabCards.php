@@ -16,15 +16,15 @@
         </div>
 
         <!-- Date Range Filter -->
-        <div class="d-flex align-items-center gap-2">
+        <div class="d-flex align-items-center gap-2 card_tab_main_date_range_filter">
             <!-- Calendar Icon -->
             <div class="calendar-icon">
                 <?php echo getCalendarIcon(24, 24); ?>
             </div>
 
             <!-- Date Range Display -->
-            <button id="dateRangeButton" class="btn btn-dark text-white d-flex align-items-center gap-2 border-0">
-                <span id="selectedDateRange">Select Date Range</span>
+            <button id="dateRangeButtonCardTab" class="btn btn-dark text-white d-flex align-items-center gap-2 border-0">
+                <span id="selectedDateRangeCardTab">Select Date Range</span>
             </button>
         </div>
 

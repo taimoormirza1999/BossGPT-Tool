@@ -122,12 +122,13 @@ require_once './api_endPoints.php';
     <!-- iziToast CSS & JS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/izitoast/dist/css/iziToast.min.css">
     <script src="https://cdn.jsdelivr.net/npm/izitoast/dist/js/iziToast.min.js"></script>
+    <!-- Flatpickr Core CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <!-- Tailwind CSS -->
     <!-- <script src="https://unpkg.com/@tailwindcss/browser@4"></script> -->
     <!-- Initialize user ID for project management -->
     <script>
         window.userId = <?php echo isset($_SESSION['user_id']) ? json_encode($_SESSION['user_id']) : 'null'; ?>;
-
     </script>
     <!-- Custom js -->
     <script src="./assets/js/custom.js"></script>
@@ -172,12 +173,12 @@ require_once './api_endPoints.php';
     <script>
         // Initialize Firebase with your config
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyAPByoVru7fAR1Mk8_y8AW73vWVRwEDma4",
+            authDomain: "bossgpt-367ab.firebaseapp.com",
+            projectId: "bossgpt-367ab",
+            storageBucket: "bossgpt-367ab.firebasestorage.app",
+            messagingSenderId: "1078128619253",
+            appId: "1:1078128619253:web:edf3e5f2306ab349191fbc"
         };
 
         // Initialize Firebase only if it's not already initialized
@@ -455,18 +456,32 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
            
 
         <?php } ?>
-        <?php require_once 'components/specific_pageScripts.php'; ?>
+
+        <?php 
+        if(isLoginUserPage()){
+            require_once 'components/specific_pageScripts.php';
+        }
+        ?>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- for logoIcon -->
-    <script>
-        const iconImage = `<?php echo getIconImage(0, 0, "1.8rem"); ?>`
-        const welcomeLogoImage = `<?php echo getIconImage(0, 0, '3.7rem'); ?>`;
-    </script>
+    <!-- Firebase -->
+    <script type="module" src="assets/js/firbase.js"></script>
+    <?php 
+        if(isLoginUserPage()){?>
+            <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <!-- Pusher -->
+            <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+                    <!-- for logoIcon -->
+            <script>
+                const iconImage = `<?php echo getIconImage(0, 0, "1.8rem"); ?>`
+                const welcomeLogoImage = `<?php echo getIconImage(0, 0, '3.7rem'); ?>`;
+            </script>
+        <?php } ?>
+   
+  
 
 
 

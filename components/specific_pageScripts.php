@@ -1,10 +1,8 @@
-  <!-- Reminder button -->
-  <?php if(isLoginUserPage()){ ?>
-      <!-- Flatpickr Core CSS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<!-- Reminder button -->
+<?php if(isLoginUserPage()){ ?>
 <!-- Flatpickr JS -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <script>
+<script>
                 document.addEventListener('DOMContentLoaded', function () {
                     // 1) The tree images
                     const treeImages = [
@@ -121,6 +119,7 @@
                 referral: referral || undefined
             });
             console.log('🔥 rewardful.convert() called');
+            clearRewardfulCookies();
         } else {
             //   console.error('🚨 rewardful() not available yet');
             // retry once after a short delay
@@ -467,11 +466,21 @@ $button1.text(selectedProjectTitle);
                     fetchNotificationsAndOpen(false);
 
                     // Load project data
-                    loadTasks(projectId);
-
+                  
+                    
                     <?php if (!isPage('profile')) { ?>
+                    loadTasks(projectId);
                     loadChatHistory(projectId);
                     initPusher(projectId);
+                    <?php }else{ ?>
+                        const today = new Date();
+                        const startDate = formatDateForBackend(
+  new Date(today.getFullYear(), today.getMonth() - 1, 5)
+);
+const endDate = formatDateForBackend(
+  new Date(today.getFullYear(), today.getMonth() + 1, 5)
+);
+                    loadTasks2(projectId,startDate,endDate);
                     <?php } ?>
                 }
 
@@ -552,26 +561,34 @@ $button1.text(selectedProjectTitle);
                 }
 
                 // Load tasks
-                function loadTasks(projectId) {
-                    // showLoading();
-                    fetch('?api=get_tasks', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ project_id: projectId })
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                <?php if (isPage('profile')) { ?>
-                updateCardsBoard(data.tasks);
-            <?php } else { ?>
-                updateTasksBoard(data.tasks);
-            <?php } ?>
-                            }
+                    function loadTasks(projectId, startDate=null, endDate=null) {
+                        // showLoading();
+                         // Add startDate and endDate to the data if provided
+                    if (startDate && endDate) {
+                        // Format the dates into 'YYYY-MM-DD' format (or adjust based on your format needs)
+                        requestData.start_date = startDate;
+                        requestData.end_date = endDate;
+                        alert(startDate+" "+endDate);
+                    }
+
+                        fetch('?api=get_tasks', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ project_id: projectId })
                         })
-                        .catch(error => console.error('Error loading tasks:', error))
-                        .finally();
-                }
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    <?php if (isPage('profile')) { ?>
+                    updateCardsBoard(data.tasks);
+                <?php } else { ?>
+                    updateTasksBoard(data.tasks);
+                <?php } ?>
+                                }
+                            })
+                            .catch(error => console.error('Error loading tasks:', error))
+                            .finally();
+                    }
 
                 // Update tasks board
                 function updateTasksBoard(tasks) {
@@ -2653,12 +2670,7 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
         initializeChatLoading();
     </script>
 
-    <!-- Firebase -->
-    <?php if (isset($page) && ($page === 'register' || $page === 'login' || $page === 'dashboard')): ?>
-        <script type="module" src="assets/js/firbase.js"></script>
-    <?php endif; ?>
-    <!-- Pusher -->
-    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+
     <div class="popup-container">
     </div>
 

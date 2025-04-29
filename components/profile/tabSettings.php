@@ -72,12 +72,12 @@ document.getElementById('togglePassword').addEventListener('click', function () 
 $colorThemes = [
     ['color' => 'linear-gradient(152.14deg, #240121 8.15%, #8A047F 91.85%);
 ', 'name' => 'Purple', 'theme' => 'purple-mode'],
-    ['color' => 'linear-gradient(156.22deg, #0B020F 8.55%, #561075 91.45%);
-', 'name' => 'Dark Purple', 'theme' => 'dark-purple-mode'],
+    ['color' => 'linear-gradient(156.22deg, #0B020F 8.55%,rgb(17, 13, 18) 91.45%);
+', 'name' => 'Black', 'theme' => 'black-mode'],
     ['color' => 'linear-gradient(153.27deg, #410404 8.31%, #A70A0A 91.69%);
 ', 'name' => 'Brown', 'theme' => 'brown-mode'],
     ['color' => 'linear-gradient(156.22deg, #000000 8.55%, #FFFFFF 91.45%);
-', 'name' => 'Dark', 'theme' => 'dark-mode'],
+', 'name' => 'Default', 'theme' => 'system-mode'],
 ];
 ?>
 

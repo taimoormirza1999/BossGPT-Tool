@@ -89,9 +89,16 @@ function fetchNotificationsAndOpen(showDropdown = true) {
     });
 }
 
-function fetchNotifications(project_id) {
+function fetchNotifications(project_id, startDate = null, endDate = null) {
   return new Promise((resolve, reject) => {
-    fetch("?api=get_unreadnotifications&project_id=" + project_id)
+    let url = "?api=get_unreadnotifications&project_id=" + project_id;
+    if (startDate && endDate) {
+      const formattedStartDate = startDate;
+      const formattedEndDate = endDate;
+      // alert(formattedStartDate + " " + formattedEndDate);
+      url += `&start_date=${formattedStartDate}&end_date=${formattedEndDate}`;
+    }
+    fetch(url)
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
@@ -972,13 +979,14 @@ function loadFirebaseScript() {
       firebaseMessagingScript.onload = () => {
         // Initialize Firebase
         const firebaseConfig = {
-          apiKey: "YOUR_API_KEY",
-          authDomain: "YOUR_AUTH_DOMAIN",
-          projectId: "YOUR_PROJECT_ID",
-          storageBucket: "YOUR_STORAGE_BUCKET",
-          messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-          appId: "YOUR_APP_ID",
+          apiKey: "AIzaSyAPByoVru7fAR1Mk8_y8AW73vWVRwEDma4",
+          authDomain: "bossgpt-367ab.firebaseapp.com",
+          projectId: "bossgpt-367ab",
+          storageBucket: "bossgpt-367ab.firebasestorage.app",
+          messagingSenderId: "1078128619253",
+          appId: "1:1078128619253:web:edf3e5f2306ab349191fbc"
         };
+        
 
         firebase.initializeApp(firebaseConfig);
         resolve();

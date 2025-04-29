@@ -17,16 +17,36 @@ function include_profile($images)
             font-size: 1rem;
             padding: 0.3rem 0.5rem;
         }
+
+        .flatpickr-calendar {
+            position: absolute;
+            z-index: 9999;
+            top: 100%;
+            left: 0;
+        }
+
+        .flatpickr-calendar.open {
+            top: 260px !important;
+        }
     </style>
     <style>
         .tabs-pannel .nav-tabs .nav-link.active {
-
             color: #fff !important;
         }
 
         .tabs-pannel .nav-tabs .nav-link {
-
             color: rgba(255, 255, 255, 0.5) !important;
+        }
+
+        span.flatpickr-day.today.selected.endRange,
+        .flatpickr-day.selected.startRange,
+        .flatpickr-day.startRange.startRange,
+        .flatpickr-day.endRange.startRange,
+        .flatpickr-day.selected.endRange,
+        .flatpickr-day.startRange.endRange,
+        .flatpickr-day.endRange.endRange {
+            background: #000000 !important;
+            border: solid 1px #000000 !important;
         }
 
         #avatarImage {
@@ -58,7 +78,7 @@ function include_profile($images)
         div#activity,
         div#cards {
             width: 95%;
-            height: calc(100vh - 200px);
+            padding: 1.5rem 1.4rem !important;
         }
 
         div#profile .form-control {
@@ -139,39 +159,49 @@ function include_profile($images)
     </div>
     <script>
         document.querySelectorAll('#profileTabs button[data-bs-toggle="tab"]').forEach(function (tabButton) {
-    tabButton.addEventListener('shown.bs.tab', function (event) {
-        const targetId = event.target.getAttribute('data-bs-target').substring(1); // get tab id without '#'
+            tabButton.addEventListener('shown.bs.tab', function (event) {
+                const targetId = event.target.getAttribute('data-bs-target').substring(1); // get tab id without '#'
 
-        if (targetId === 'cards') {
-            // alert('cards');
-            // return;
-            // Send to server to save in session
-            fetch('?api=set_selected_tab', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ selected_tab: targetId })
-            }).then(response => {
-                // Optionally check response if you want
-                console.log('Selected tab saved to session');
-            }).catch(error => {
-                console.error('Error saving tab selection:', error);
+                if (targetId === 'cards') {
+                    // alert('cards');
+                    // return;
+                    // Send to server to save in session
+                    fetch('?api=set_selected_tab', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ selected_tab: targetId })
+                    }).then(response => {
+                        // Optionally check response if you want
+                        console.log('Selected tab saved to session');
+                    }).catch(error => {
+                        console.error('Error saving tab selection:', error);
+                    });
+                }
             });
-        }
-    });
-});
+        });
         document.addEventListener('DOMContentLoaded', function () {
             const dateRangeButton = document.getElementById('dateRangeButton');
+            const dateRangeButtonCardTab = document.getElementById('dateRangeButtonCardTab');
+            const selectedDateRangeCardTab = document.getElementById('selectedDateRangeCardTab');
             const selectedDateRange = document.getElementById('selectedDateRange');
 
             const today = new Date();
             const fiveDaysAgo = new Date();
             fiveDaysAgo.setDate(today.getDate() - 5);
-
-            const picker = flatpickr(document.createElement('input'), {
+            const calendarWrapper = document.createElement('div');
+            const calendarWrapperCardTab = document.createElement('div');
+            calendarWrapper.classList.add('flatpickr-calendar-wrapper');
+            document.querySelector('.main_date_range_filter').appendChild(calendarWrapper);
+            calendarWrapperCardTab.classList.add('flatpickr-calendar-wrapper');
+            document.querySelector('.card_tab_main_date_range_filter').appendChild(calendarWrapperCardTab);
+            const picker = flatpickr(calendarWrapper, {
                 mode: 'range',
                 dateFormat: 'd M Y',
                 defaultDate: [fiveDaysAgo, today],
+                position: "below",
                 theme: 'dark',
+                // inline: 'true',
+                // wrap: 'true',
                 onChange: function (selectedDates) {
                     if (selectedDates.length === 2) {
                         const startFormatted = formatDate(selectedDates[0]);
@@ -183,6 +213,26 @@ function include_profile($images)
                         const startForBackend = formatDateForBackend(selectedDates[0]);
                         const endForBackend = formatDateForBackend(selectedDates[1]);
                         // loadActivityLog2(startForBackend, endForBackend);
+                        // alert(`You have selected a date range: ${startForBackend} - ${endForBackend}`);
+                        fetchNotifications(getLastSelectedProject(), startForBackend, endForBackend);
+                    }
+                }
+            });
+            const pickerCardTab = flatpickr(calendarWrapperCardTab, {
+                mode: 'range',
+                dateFormat: 'd M Y',
+                defaultDate: [fiveDaysAgo, today],
+                theme: 'dark',
+                onChange: function (selectedDates) {
+                    if (selectedDates.length === 2) {
+                        const startFormatted = formatDate(selectedDates[0]);
+                        const endFormatted = formatDate(selectedDates[1]);
+                        selectedDateRangeCardTab.textContent = `${startFormatted} - ${endFormatted}`;
+                        const startForBackend = formatDateForBackend(selectedDates[0]);
+                        const endForBackend = formatDateForBackend(selectedDates[1]);
+                        // loadActivityLog2(startForBackend, endForBackend);
+                        // alert(`You have selected a date range: ${startFormatted} - ${endFormatted}`);
+                        loadTasks2(getLastSelectedProject(), startForBackend, endForBackend);
                     }
                 }
             });
@@ -191,17 +241,12 @@ function include_profile($images)
                 picker.open();
             });
 
-            // Helper functions
-            function formatDate(date) {
-                const options = { day: '2-digit', month: 'short' };
-                return date.toLocaleDateString('en-GB', options);
-            }
+            dateRangeButtonCardTab.addEventListener('click', function () {
+                pickerCardTab.open();
+            });
 
-            function formatDateForBackend(date) {
-                return date.toISOString().split('T')[0]; // YYYY-MM-DD
-            }
-            // Auto-load logs for default 5 days range
-            // loadActivityLog2(formatDateForBackend(fiveDaysAgo), formatDateForBackend(today));
+      
+
         });
 
     </script>
