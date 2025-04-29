@@ -1179,63 +1179,6 @@
     transition: all 0.34s ease-in-out;
   }
   
-  /* .reminder-btn {
-    border-radius: 12px !important;
-    width: 100% !important;
-    margin-bottom: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 8px 12px !important;
-    font-size: 0.9rem !important;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.34s ease-in-out;
-  }
-  
-  .reminder-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
-  }
-  
-  .reminder-btn.active {
-    background: linear-gradient(145.32deg, #048a40 -14.49%, #04068a 82.49%);
-    border-color: transparent;
-  }
-  
-  .reminder-btn i {
-    font-size: 1.1rem;
-    animation: bellShake 3s infinite;
-  }
-  
-  .reminder-input-container {
-    display: flex;
-    gap: 8px;
-    padding: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    margin-bottom: 8px;
-  }
-  
-  .reminder-input {
-    flex: 1;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    padding: 6px 12px;
-    color: white;
-    font-size: 0.9rem;
-  }
-  
-  .reminder-input:focus {
-    outline: none;
-    border-color: rgba(255, 255, 255, 0.4);
-  }
-  
-  .reminder-input::placeholder {
-    color: rgba(255, 255, 255, 0.6);
-  }
-   */
   /* Tree selection grid */
   .tree-select-grid {
     display: grid;
