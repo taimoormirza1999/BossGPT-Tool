@@ -418,7 +418,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                 <div class="d-flex align-items-end">
                                     <button type="button" class="btn btn-sm btn-main-primary me-2" data-bs-toggle="modal"
                                         data-bs-target="#newTaskModal">
-                                        <?php echo getAddSquareIcon(); ?>Create&nbsp;New&nbsp;Task
+                                        <?php echo getAddSquareIcon(); ?>New&nbsp;Task
                                     </button>
                                    
                                 </div>
