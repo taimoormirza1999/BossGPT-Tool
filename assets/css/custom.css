@@ -552,11 +552,6 @@
   body .task-label.label-purple {
     background: linear-gradient(90deg, #9b59b6, #8e44ad);
   }
-
-
-  
-
-  
   /* Modern task title styling with enhanced typography */
   body .task-card h5,
   body .task-card .h5,
@@ -671,9 +666,8 @@
   
   .task-card:hover::before {
     background-position: 200% 0;
-    opacity: 0.6; /* Reduce opacity to ensure content visibility */
+    opacity: 0.6; 
   }
-  
   /* Ensure card content stays above the shine effect */
   .task-card * {
     position: relative;
@@ -809,15 +803,6 @@
     left: 0;
     width: 100%;
     height: 100%;
-    /* background: linear-gradient(
-      135deg,
-      #44125c 0%,
-      #713e7f 25%,
-      #a04e84 50%,
-      #cf6373 75%,
-      #e9896a 100%
-    ); */
-    /* background: rgba(0, 0, 0, 0.8); */
     background: linear-gradient(
       to bottom right,
       rgba(0, 0, 0, 0.65),
@@ -884,9 +869,6 @@
       z-index: 10;
       position: relative;
   }
-  
-
-  
   /* Ensure buttons container is above the shine effect */
   .task-card .subtask-buttons {
       position: relative;
@@ -895,9 +877,6 @@
       gap: 8px;
       margin-top: 8px;
   }
-  
-  
-
   /* Task card action buttons */
   .task-card .btn-link:not(.delete-subtask-btn) {
       opacity: 0;
@@ -947,8 +926,6 @@
       font-size: 1.25rem !important;
     color: white;
   }
-  
-
   
   /* Task card action buttons container */
   .task-card .d-flex.gap-2.mt-2, .subtasks.mt-2 .d-flex.gap-2 {

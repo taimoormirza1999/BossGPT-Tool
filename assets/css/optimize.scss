@@ -430,6 +430,67 @@ $geist-fonts: (
     
   }
 }
+// Projects Cards 
+@mixin projects-card(
+  $main-bg,
+  $header-bg,
+  $header-border-width,
+  $header-border-color,
+  $column-header-border-width,
+  $column-header-border-color,
+  $task-card-bg
+) {
+  .projects_card {
+    // 1) the three columns all get the same main background
+    .column_todo,
+    .column_in_progress,
+    .column_done {
+      background: $main-bg !important;
+      .task-card {
+        .btn-sm.btn-link,
+        .add-subtask-btn,
+        .ai-add-subtask-btn,
+        .ai-update-dates-btn {
+          color: $white-color !important;
+          text-decoration: none !important;
+          padding: 6px 12px;
+          border-radius: $border-radius-8;
+          background: $white-color-10;
+          border: $boder-width_1_3 solid $white-color-10;
+          margin: 2px;
+          display: none;
+          align-items: center;
+          gap: 6px;
+          font-size: 0.875rem;
+          transition: all $transition-duration-34 ease;
+          white-space: nowrap;
+          &:hover {
+            background: $white-color-20;
+            transform: translateY(-1px);
+          }
+        }
+      }
+    }
+
+    // 2) header gets themed background + border-bottom
+    .card-header {
+      @include theme-bgcolor($header-bg);
+      border-bottom: $header-border-width solid $header-border-color !important;
+    }
+
+    // 3) body
+    .card-body {
+      // 3a) sub-column headers
+      .task-column_header {
+        border: $column-header-border-width solid $column-header-border-color !important;
+      }
+      // 3b) task cards
+      .task-card {
+        @include theme-bgcolor($task-card-bg);
+      }
+    }
+  }
+}
 #user-add-icon {
   @include button-icon-only;
 }
@@ -449,7 +510,6 @@ $geist-fonts: (
   @include flex-center-hv;
   @extend .hover-up;
 }
-
 .due-date_size{
   font-size: 0.7rem!important;
 }
@@ -460,7 +520,7 @@ $geist-fonts: (
 svg.calendar-icons {
   height: 1.2rem !important;
   width: 1.2rem !important;
-} 
+}
 body.system-mode {
   @include theme-bgcolor($default-mode-card-task-bgcolor);
   background-image: $bg-img1-black;
@@ -468,29 +528,19 @@ body.system-mode {
   .nav-background {
     @include theme-bgcolor($default-mode-topbar-bgcolor);
   }
-  .projects_card {
-    .column_todo,
-    .column_in_progress,
-    .column_done {
-      background: $default-mode-main-bgcolor !important;
-    }
-    .card-header {
-      @include theme-bgcolor(rgba(0,0,0,0.8));
-      border-bottom: $boder-width_1_3 solid rgba(211, 211, 211, 0.5) !important;
-      
-    }
-    .card-body {
-      .task-column_header {
-        border: $boder-width_1_5 solid rgba(211, 211, 211, 0.5) !important;
-      }
-      .task-card {
-        @include theme-bgcolor($default-mode-card-task-bgcolor);
-      }
-    }
-  }
+  @include projects-card(
+    $default-mode-main-bgcolor,
+    rgba(0, 0, 0, 0.8),
+    $boder-width_1_3,
+    rgba(211, 211, 211, 0.5),
+    $boder-width_1_5,
+    rgba(211, 211, 211, 0.5),
+    $default-mode-card-task-bgcolor
+  );
+  
   @include theme-tab-panel(rgba(0,0,0,0.8 ));
   @include theme-common-chat-pannel(
-    $default-mode-main-bgcolor,
+    #131313,
     $default-mode-welcome-logo-bgcolor,
     $default-mode-card-task-bgcolor,
     $default-mode-card-task-bgcolor,
@@ -516,17 +566,16 @@ body.purple-mode {
   .nav-background {
     @include theme-bgcolor($purple-mode-bar-bgcolor);
   }
-  .projects_card {
-    @include commomtaskheader;
-    .card-header {
-      @include theme-bgcolor($purple-mode-bar-bgcolor);
-    }
-    .card-body {
-      .task-card {
-        @include theme-bgcolor($purple-mode-card-task-bgcolor);
-      }
-    }
-  }
+// Purple mode
+@include projects-card(
+  null,
+  $purple-mode-bar-bgcolor,
+  $boder-width_1_3,
+  rgba(211, 211, 211, 0.5),
+  $boder-width_1_5,
+  rgba(211, 211, 211, 0.5),
+  $purple-mode-card-task-bgcolor
+);
   @include theme-tab-panel($purple-mode-modal-container-bgcolor);
   @include theme-common-chat-pannel(
     $purple-mode-bar-bgcolor,
@@ -555,17 +604,15 @@ body.black-mode {
   .nav-background {
     @include theme-bgcolor($black-mode-bar-bgcolor);
   }
-  .projects_card {
-    @include commomtaskheader;
-    .card-header {
-      @include theme-bgcolor($black-mode-bar-bgcolor);
-    }
-    .card-body {
-      .task-card {
-        @include theme-bgcolor($black-mode-card-task-bgcolor);
-      }
-    }
-  }
+  @include projects-card(
+    null,
+    $black-mode-bar-bgcolor,
+    $boder-width_1_3,
+    rgba(211, 211, 211, 0.5),
+    $boder-width_1_5,
+    rgba(211, 211, 211, 0.5),
+    $black-mode-card-task-bgcolor
+);
   @include theme-tab-panel($black-mode-modal-container-bgcolor);
   @include theme-common-chat-pannel(
     $black-mode-bar-bgcolor,
@@ -594,17 +641,15 @@ body.brown-mode {
   .nav-background {
     @include theme-bgcolor($brown-mode-bar-bgcolor);
   }
-  .projects_card {
-    @include commomtaskheader;
-    .card-header {
-      @include theme-bgcolor($brown-mode-bar-bgcolor);
-    }
-    .card-body {
-      .task-card {
-        @include theme-bgcolor($brown-mode-card-task-bgcolor);
-      }
-    }
-  }
+  @include projects-card(
+    null,
+    $brown-mode-bar-bgcolor,
+    $boder-width_1_3,
+    rgba(211, 211, 211, 0.5),
+    $boder-width_1_5,
+    rgba(211, 211, 211, 0.5),
+    $brown-mode-card-task-bgcolor
+  );
   @include theme-tab-panel($brown-mode-modal-container-bgcolor);
   @include theme-common-chat-pannel(
     $brown-mode-bar-bgcolor,
@@ -1423,37 +1468,6 @@ body {
     .dropdown-item .title-notification {
       transition: all $transition-duration-34 ease-in-out;
       @include theme-text-color($gray-color-92);
-    }
-  }
-}
-
-// Ensure buttons are properly styled in all columns
-.column_todo,
-.column_in_progress,
-.column_done {
-  .task-card {
-    .btn-sm.btn-link,
-    .add-subtask-btn,
-    .ai-add-subtask-btn,
-    .ai-update-dates-btn {
-      color: $white-color !important;
-      text-decoration: none !important;
-      padding: 6px 12px;
-      border-radius: $border-radius-8;
-      background: $white-color-10;
-      border: $boder-width_1_3 solid $white-color-10;
-      margin: 2px;
-      display: none;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.875rem;
-      transition: all $transition-duration-34 ease;
-      white-space: nowrap;
-
-      &:hover {
-        background: $white-color-20;
-        transform: translateY(-1px);
-      }
     }
   }
 }
