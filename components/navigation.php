@@ -19,7 +19,7 @@
                     data-bs-target="#newProjectModal" style="background: rgba(255, 255, 255, 0.1)!important;
 border: 1.3px solid rgba(255, 255, 255, 0.35)!important;
 box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1)!important;">
-                    <?php echo getAddSquareIcon(); ?> CreateNew Project
+                    <?php echo getAddSquareIcon(); ?> New Project
                 </button>
                 <button onclick="openLink('<?php echo $_ENV['BASE_URL'] ?>/garden.php',false)"
                     class="btn btn-outline-light btn-logout" data-bs-toggle="tooltip" data-bs-placement="bottom"

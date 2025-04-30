@@ -33,6 +33,8 @@ try {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <!-- <link rel="preload" href="https://res.cloudinary.com/da6qujoed/raw/upload/v1745325374/loader_bossgpt_htiw2q.lottie"
         as="fetch" crossorigin> -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
+
     <style>
         body {
             margin: 0;
@@ -66,11 +68,16 @@ try {
             top: 20px;
             left: 20px;
             z-index: 10;
-            background: rgba(0, 0, 0, 0.5);
+            /* background: rgba(0, 0, 0, 0.5); */
             padding: 15px;
             border-radius: 10px;
             color: white;
+            background: rgba(0, 0, 0, 0.3) !important;
+    border: 1.5px solid rgba(211, 211, 211, 0.5) !important;
+    backdrop-filter: blur(40px) !important;
+    border-radius: 16px !important;
         }
+      
 
         .achievement-badge {
             display: inline-block;
@@ -91,10 +98,17 @@ try {
             top: 20px;
             right: 20px;
             z-index: 10;
+            background: rgba(0, 0, 0, 0.3) !important;
+    border: 1.5px solid rgba(211, 211, 211, 0.5) !important;
+    backdrop-filter: blur(40px) !important;
+    border-radius: 16px !important;
+    padding: 5px 10px;
+    text-decoration: none;
+    font-size: 0.9rem;
         }
 
         /* Loader spinner styles */
-        .loader-spinner {
+        /* .loader-spinner {
             width: 40px;
             height: 40px;
             border: 5px solid rgb(255 255 255 / 57%);
@@ -102,7 +116,7 @@ try {
             border-top-color: #339c29;
             animation: spin 1.2s ease-in-out infinite;
             margin: 0 auto 15px auto;
-        }
+        } */
 
         body.loaded #gardenCanvas {
             opacity: 1;
@@ -123,11 +137,11 @@ try {
             opacity: 1;
         }
 
-        @keyframes spin {
+        /* @keyframes spin {
             to {
                 transform: rotate(360deg);
             }
-        }
+        } */
 
         .garden-overlay-content {
             text-align: center;
@@ -146,6 +160,10 @@ try {
         .tree_image {
             width: 100px;
             height: 100px;
+        }
+        .tree_image_small {
+            width: 40px;
+            height: 40px;
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@lottiefiles/dotlottie-web/dist/index.umd.js"></script>
@@ -213,22 +231,22 @@ $contentContainerClass = "custom-content-style";
         <div class="garden-overlay">
             <h2>Your Virtual Garden</h2>
             <div class="garden-stats">
-                <p>Total Plants: <span id="totalPlants"><?= count($plants) ?></span></p>
-                <p>Completed Tasks (Lush Trees): <span id="completedTasks"><?= count(array_filter($plants, function ($p) {
+                <p>Total Plants: <span id="totalPlants"><?= '0'.count($plants) ?></span></p>
+                <p style="display: flex; align-items: center;"> <?php getPlantImage('treelv8', 'tree_image_small'); ?> Trees: <span id="completedTasks"><?= count(array_filter($plants, function ($p) {
                     return $p['stage'] == 'tree';
                 })) ?></span>
                 </p>
-                <p>Growing Plants: <span id="growingPlants"><?= count(array_filter($plants, function ($p) {
+                <p style="display: flex; align-items: flex-end;"> <?php getPlantImage('flower3', 'tree_image_small'); ?> Flowers: <span id="growingPlants"><?= count(array_filter($plants, function ($p) {
                     return $p['stage'] == 'growing';
                 })) ?></span>
                 </p>
-                <p>Seeds Planted: <span id="seedsPlanted"><?= count(array_filter($plants, function ($p) {
+                <p style="display: flex; align-items: flex-end;"> <?php getPlantImage('seed', 'tree_image_small'); ?> Seeds: <span id="seedsPlanted"><?= count(array_filter($plants, function ($p) {
                     return $p['stage'] == 'sprout';
                 })) ?></span>
                 </p>
             </div>
 
-            <?php if (count($plants) > 0): ?>
+            <?php if (count($plants) > 10): ?>
                 <div class="achievements mt-4">
                     <h4>Your Achievements</h4>
                     <?php if (count($plants) >= 5): ?>
@@ -254,8 +272,8 @@ $contentContainerClass = "custom-content-style";
             <?php endif; ?>
         </div>
 
-        <a href="<?php echo $_ENV['BASE_URL']?>/" class="btn back-button btn-main-primary">
-            <i class="bi bi-arrow-left"></i> Back to Dashboard
+        <a href="<?php echo $_ENV['BASE_URL']?>/?page=dashboard" class="btn back-button btn-main-primary">
+        <i class="bi bi-arrow-left-circle"></i> Back to Dashboard
         </a>
     </div>
 

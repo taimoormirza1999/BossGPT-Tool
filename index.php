@@ -379,7 +379,17 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 
             <div class="container-fluid pb-3">
                 <!-- New Tab Navigation -->
-                <?php //require_once 'components/user_highlighter_bar.php'; ?>
+                <?php
+ // Display welcome message if set
+ if (isset($_SESSION['welcome_message'])) {
+    echo "<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Toast('success', 'Welcome', '" . htmlspecialchars($_SESSION['welcome_message']) . "');
+        });
+    </script>";
+    unset($_SESSION['welcome_message']);
+}
+?>
 
                 <!-- Main Content Area -->
                 <div class="row sides-padding " style="width: 100%!important;">

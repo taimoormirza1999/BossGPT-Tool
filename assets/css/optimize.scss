@@ -637,6 +637,9 @@ body {
   overflow-y: hidden!important;
   // overflow-y: hidden;
   // login/register pa ges
+  h1, h2, h3, h4, h5, h6, .fontSecondaryBold {
+    @extend .font-secondaryBold;
+  }
   .register-page,
   .login-page,
   .aitone-page {
