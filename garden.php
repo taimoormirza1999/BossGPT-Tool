@@ -1,7 +1,9 @@
 <?php
 
 require_once 'config/constants.php';
-session_start();
+if (session_id() === '') {
+    session_start();
+  }
 require_once 'classes/GardenManager.php';
 // Redirect if not logged in
 if (!isset($_SESSION['user_id'])) {

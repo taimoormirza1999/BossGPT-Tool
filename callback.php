@@ -1,6 +1,8 @@
 <?php
 // Start the session
-session_start();
+if (session_id() === '') {
+    session_start();
+  }
 // Include required files
 require_once 'config.php';
 require_once 'env.php';
@@ -14,7 +16,9 @@ require_once 'classes/GoogleAuth.php';
 // Enable error reporting for debugging
 // ini_set('display_errors', 1);
 // error_reporting(E_ALL);
-session_start();
+if (session_id() === '') {
+    session_start();
+  }
 try {
     if (isset($_GET['code'])) {
         $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);

@@ -4,7 +4,9 @@ require_once __DIR__ . '/../config/constants.php'; // for DISCORD_CLIENT_ID & SE
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-session_start();
+if (session_id() === '') {
+    session_start();
+  }
 
 // 1. Get authorization code
 if (!isset($_GET['code'])) {

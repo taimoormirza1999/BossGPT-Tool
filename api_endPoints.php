@@ -89,7 +89,9 @@ if (isset($_GET['api'])) {
                 break;
             case 'update_pro_status':
                 header('Content-Type: application/json');
-                session_start();
+                if (session_id() === '') {
+                    session_start();
+                  }
                 if (!isset($_SESSION['user_id'])) {
                     echo json_encode(['success' => false, 'message' => 'User not logged in']);
                     exit;

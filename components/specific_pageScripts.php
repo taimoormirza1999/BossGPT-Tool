@@ -36,7 +36,6 @@
                             const treeValue = optionDiv.dataset.tree;
                             hiddenInput.value = treeValue;
                             console.log('Selected tree:', treeValue);
-
                             // Highlight selected
                             container.querySelectorAll('.tree-option').forEach(o => o.classList.remove('selected'));
                             optionDiv.classList.add('selected');
@@ -105,9 +104,9 @@
         var userId = <?php echo isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null; ?>;
         // Keep the initialization but don't add duplicate script
         // 2) Grab referral from ?ref= or ?via=
+        const email = "<?php echo addslashes(isset($_SESSION['email']) ? $_SESSION['email'] : ''); ?>";
         const params = new URLSearchParams(window.location.search);
         const referral = params.get('ref') || params.get('via') || null;
-        const email = "<?php echo addslashes(isset($_SESSION['email']) ? $_SESSION['email'] : ''); ?>";
         console.log('Referral:', referral);
         console.log('window.rewardful:', window?.rewardful);
 
@@ -119,13 +118,15 @@
                 referral: referral || undefined
             });
             console.log('🔥 rewardful.convert() called');
-            clearRewardfulCookies();
+
+            // clearRewardfulCookies(); 
         } else {
             //   console.error('🚨 rewardful() not available yet');
             // retry once after a short delay
             setTimeout(() => {
                 if (typeof rewardful === 'function') {
-                    rewardful('convert', { email, referral });
+                    // rewardful('convert', { email });
+                    rewardful('convert', { email: email, referral: referral });
                     console.log('🔥 rewardful.convert() called on retry');
                 } else {
                     //   console.error('🚨 rewardful() still not loaded');
@@ -189,7 +190,7 @@
                 // Check URL parameters for pro-member status
                 const urlParams = new URLSearchParams(window.location.search);
                 if (urlParams.has('pro-member') && urlParams.get('pro-member') === 'true') {
-                    console.log('Updating pro status...');
+                   
                     fetch('?api=update_pro_status')
                         .then(response => {
                             if (!response.ok) {
@@ -198,7 +199,7 @@
                             return response.json();
                         })
                         .then(data => {
-                            console.log('Pro status update response:', data);
+                            // console.log('Pro status update response:', data);
                             if (data.success) {
                                 Toast('success', 'Success', 'Your account has been upgraded to Pro!');
                                 // setTimeout(() => {
@@ -469,18 +470,18 @@ $button1.text(selectedProjectTitle);
                   
                     
                     <?php if (!isPage('profile')) { ?>
-                    loadTasks(projectId);
-                    loadChatHistory(projectId);
-                    initPusher(projectId);
-                    <?php }else{ ?>
+                        loadTasks(projectId);
+                        loadChatHistory(projectId);
+                        initPusher(projectId);
+                    <?php } else { ?>
                         const today = new Date();
                         const startDate = formatDateForBackend(
-  new Date(today.getFullYear(), today.getMonth() - 1, 5)
-);
-const endDate = formatDateForBackend(
-  new Date(today.getFullYear(), today.getMonth() + 1, 5)
-);
-                    loadTasks2(projectId,startDate,endDate);
+                            new Date(today.getFullYear(), today.getMonth() - 1, 5)
+                        );
+                        const endDate = formatDateForBackend(
+                            new Date(today.getFullYear(), today.getMonth() + 1, 5)
+                        );
+                        loadTasks2(projectId, startDate, endDate);
                     <?php } ?>
                 }
 

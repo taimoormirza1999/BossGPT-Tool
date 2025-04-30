@@ -4,19 +4,16 @@ require_once __DIR__ . '/../functions.php';
 class UserManager
 {
     private $db;
-
     public function __construct()
     {
         $this->db = Database::getInstance()->getConnection();
     }
-
     public function getUserDetails($id)
     {
         $stmt = $this->db->prepare('SELECT id, username, email FROM users WHERE id = ? ORDER BY username ASC');
         $stmt->execute([$id]); // Execute the query with the provided ID
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-
     public function createOrAssignUser($email, $projectId = null, $role = null, $BASE_URL, $invited_by = null)
     {
         try {
@@ -133,13 +130,11 @@ class UserManager
             throw $e;
         }
     }
-
     private function usernameExists($username) {
         $stmt = $this->db->prepare("SELECT 1 FROM users WHERE username = ?");
         $stmt->execute([$username]);
         return (bool) $stmt->fetch();
     }
-
     public function getProjectUsers($project_id)
     {
         try {
@@ -165,7 +160,6 @@ class UserManager
         }
         return $password;
     }
-
     public function sendWelcomeEmail($email, $username, $BASE_URL)
     {
         $subject = "BossGPT Welcomes You! Your AI-Powered Journey Starts Now!";
@@ -218,7 +212,6 @@ class UserManager
         //    return  sendTemplateEmail($emailData['email'], $emailData['subject'], $emailData['template'], $emailData['data']);
 
     }
-
     public function projectUsersNewUserAddedEmail($newUserUsername, $projectTilte, $newRole, $projectAllUsers)
     {
 
@@ -298,8 +291,6 @@ class UserManager
         }
         return true;
     }
-
-
     public function verifyUser($token)
     {
         try {

@@ -80,6 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 case 'logout':
                     $auth->logout();
+                    echo "<script>clearRewardfulCookies();</script>";
                     header('Location:' . $_ENV['BASE_URL'] . '?page=login');
                     exit;
             }

@@ -1,5 +1,4 @@
 <?php
-// session_start();
 $userManager = dirname(__DIR__) . './classes/UserManager.php';
 $token = $_GET['token'] ?? '';
 $message = '';

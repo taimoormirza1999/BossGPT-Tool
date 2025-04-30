@@ -278,15 +278,38 @@
     });
   }
 
-  function formatDate(dateString) {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+ 
+
+
+
+
+
+
+
+
+
+  function clearRewardfulCookies() {
+    const cookies = document.cookie.split(";");
+    console.log('Clearing Rewardful Cookies called');
+    cookies.forEach(cookie => {
+      const cookieName = cookie.split("=")[0].trim();
+      // List of cookies Rewardful typically sets, but you need to verify them
+      const rewardfulCookies = ["rewardful_referral", "rewardful_source", "rewardful_session"];
+
+      if (rewardfulCookies.includes(cookieName)) {
+        document.cookie = cookieName + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+      }
+    });
   }
+ 
 
 
 
-  function renderAssignedUsers(assignedUsers) {
+
+
+
+  <?php if (isPage('profile')) { ?>
+    function renderAssignedUsers(assignedUsers) {
     // pull in your session values right here:
     const sessionId = <?php echo json_encode($_SESSION['user_id']); ?>;
     const sessionUsername = <?php echo json_encode($_SESSION['username']); ?>;
@@ -334,10 +357,25 @@
     }).join('');
   }
 
+    
+    function formatDate(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+  }
+   // Helper functions
+   function formatDate(date) {
+    // Check if the date is valid
+    const validDate = new Date(date);
+    if (isNaN(validDate)) {
+      // If the date is invalid, return a fallback value
+      return '-'; // or whatever fallback you prefer
+    }
+    const options = { day: '2-digit', month: 'short' };
+    return validDate.toLocaleDateString('en-GB', options);
+  }
 
-
-
-  function updateCardsBoard(tasks) {
+    function updateCardsBoard(tasks) {
     const tableBody = document.getElementById('tasksTableBody');
 
     if (!tableBody) return; // Safety check
@@ -368,40 +406,13 @@
       tableBody.appendChild(row);
     });
   }
-
-
-  function clearRewardfulCookies() {
-    const cookies = document.cookie.split(";");
-
-    cookies.forEach(cookie => {
-      const cookieName = cookie.split("=")[0].trim();
-      // List of cookies Rewardful typically sets, but you need to verify them
-      const rewardfulCookies = ["rewardful_referral", "rewardful_source", "rewardful_session"];
-
-      if (rewardfulCookies.includes(cookieName)) {
-        document.cookie = cookieName + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+    function formatDateForBackend(date) {
+      if (!(date instanceof Date) || isNaN(date)) {
+        console.log('Invalid date provided:', date);
+        return null; // Or handle differently, like returning an empty string or a default value
       }
-    });
-  }
-  // Helper functions
-  function formatDate(date) {
-    // Check if the date is valid
-    const validDate = new Date(date);
-    if (isNaN(validDate)) {
-      // If the date is invalid, return a fallback value
-      return '-'; // or whatever fallback you prefer
+      return date.toISOString().split('T')[0]; // YYYY-MM-DD
     }
-    const options = { day: '2-digit', month: 'short' };
-    return validDate.toLocaleDateString('en-GB', options);
-  }
-
-  function formatDateForBackend(date) {
-    if (!(date instanceof Date) || isNaN(date)) {
-      console.log('Invalid date provided:', date);
-      return null; // Or handle differently, like returning an empty string or a default value
-    }
-    return date.toISOString().split('T')[0]; // YYYY-MM-DD
-  }
   function loadTasks2(projectId, startDate = null, endDate = null) {
                 // Add startDate and endDate to the data if provided
                 let requestData = { project_id: projectId };
@@ -428,5 +439,5 @@
                     .catch(error => console.error('Error loading tasks:', error))
                     .finally();
             }
-
+  <?php } ?>
 </script>
