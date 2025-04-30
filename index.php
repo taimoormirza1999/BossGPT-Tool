@@ -68,12 +68,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if (empty($_POST['email']) || empty($_POST['password'])) {
                         throw new Exception('Email and password are required');
                     }
-
                     // Store FCM token in session before login
                     if (isset($_POST['fcm_token']) && $_POST['fcm_token'] !== '0') {
                         $_SESSION['fcm_token'] = $_POST['fcm_token'];
                     }
-
                     $auth->login($_POST['email'], $_POST['password']);
                     header('Location:' . $_ENV['BASE_URL'] . '?page=dashboard');
                     exit;

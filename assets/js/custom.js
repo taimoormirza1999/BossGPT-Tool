@@ -1,26 +1,4 @@
-// Initial Loader
-document.addEventListener("DOMContentLoaded", function () {
-  // Create and append loader
-  const loader = document.createElement("div");
-  loader.className = "initial-loader";
-  loader.innerHTML = `
-        <div class="loader-content">
-       <canvas id="myLottie" width="53" height="53" style="height:50px;width:50px"></canvas>
-        <div class="loader-text text-sm mt-2">
-        Loading BossGPT...
-        </div>
-        </div>
-    `;
-  document.body.appendChild(loader);
 
-  // Remove loader after 3 seconds
-  setTimeout(() => {
-    loader.classList.add("fade-out");
-    setTimeout(() => {
-      loader.remove();
-    }, 500);
-  }, 3000);
-});
 
 // Notification System
 let isFetchingNotifications = false;

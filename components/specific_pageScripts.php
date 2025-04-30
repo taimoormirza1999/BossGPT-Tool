@@ -104,6 +104,8 @@
         var userId = <?php echo isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null; ?>;
         // Keep the initialization but don't add duplicate script
         // 2) Grab referral from ?ref= or ?via=
+       <?php if(isset($_GET['pro-member']) && (isset($_GET['referral']) && $_GET['referral']=='true')){ ?>
+        console.log('rewardfull called');
         const email = "<?php echo addslashes(isset($_SESSION['email']) ? $_SESSION['email'] : ''); ?>";
         const params = new URLSearchParams(window.location.search);
         const referral = params.get('ref') || params.get('via') || null;
@@ -133,7 +135,7 @@
                 }
             }, 500);
         }
-
+        <?php } ?>
         // 4) Trigger your pro‑status update if needed
         <?php if (!empty($_GET['pro-member']) && $_GET['pro-member'] === 'true'): ?>
             updateProStatus();
