@@ -797,11 +797,12 @@ class AIAssistant
                     'action' => 'reconnect_calendar'
                 ];
             }
-            
+            if($_ENV['APP_ENVIRONMENT']=='development'){
             return [
                 'message' => "Sorry, I encountered an error while scheduling your event: " . $e->getMessage(),
                 'error' => true
             ];
+            }
         }
     }
 
