@@ -61,13 +61,13 @@ box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1)!important;">
                     </div>
                 </div>
                 <?php
-$themes = [
-    'purple-mode' => 'Purple',
-    'black-mode' => 'Black',
-    'brown-mode' => 'Brown',
-    'system-mode' => 'Default'
-];
-?>
+                $themes = [
+                    'purple-mode' => 'Purple',
+                    'black-mode' => 'Black',
+                    'brown-mode' => 'Brown',
+                    'system-mode' => 'Default'
+                ];
+                ?>
 
 <button class="btn btn-icon-only" id="btn-theme" onclick="toggleThemeClick()" data-bs-toggle="tooltip"
     data-bs-placement="bottom" title="Switch Theme">

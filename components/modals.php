@@ -372,7 +372,7 @@
 
            
           
-            <?php if(!isset($_SESSION['fcm_token']) || $_SESSION['fcm_token'] == '0'): ?>
+         
             <!-- Notification Permission Modal -->
             <div class="modal fade" id="notificationPermissionModal" tabindex="-1" aria-labelledby="notificationPermissionModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
@@ -383,11 +383,11 @@
                         </div>
                         <div class="modal-body">
                 
-                            <div class="ratio ratio-16x9 mb-4" style="border-radius: 12px; overflow: hidden; ">
-                                <iframe width="560" height="315" src="https://www.youtube.com/embed/-fTV9_SqnKE?si=wizXX7DUlSgTXPfZ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                            <div class="ratio ratio-16x9 mb-2" style="border-radius: 12px; overflow: hidden; ">
+                                <iframe width="560" height="250" src="https://www.youtube.com/embed/-fTV9_SqnKE?si=wizXX7DUlSgTXPfZ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
                             </div>
                             
-                            <div class="alert alert-info d-flex align-items-center" role="alert">
+                            <div class="alert alert-main-primary d-flex align-items-center" role="alert">
                                 <i class="bi bi-info-circle-fill me-2"></i>
                                 <div>
                                     You'll need to enable browser notifications to receive reminders for your tasks and deadlines.
@@ -395,12 +395,11 @@
                             </div>
                         </div>
                         <div class="modal-footer justify-content-center">
-                            <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">Remind me later</button>
-                            <button type="button" class="btn btn-main-primary" id="enableNotificationsBtn">
+                            <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal" onclick="markAsEnabledNotification()">Mark as Enabled</button>
+                            <button type="button" class="btn btn-main-primary" >
                                 <i class="bi bi-bell-fill me-2"></i>Enable Notifications
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-            <?php endif; ?>

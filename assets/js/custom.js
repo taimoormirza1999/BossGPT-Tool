@@ -709,19 +709,31 @@ let fcmTokenSaved = false;
 // Check if FCM is already enabled
 function checkFCMStatus() {
   const fcmToken = localStorage.getItem("fcm_token");
-  const reminderButton = document.getElementById("reminderButton");
-
-  if (reminderButton) {
-    if (fcmToken) {
-      reminderButton.classList.add("active");
-      reminderButton.querySelector("span").textContent = "Reminders Active";
-      fcmTokenSaved = true;
-    } else {
-      reminderButton.classList.remove("active");
-      reminderButton.querySelector("span").textContent = "Turn on Reminders";
-      fcmTokenSaved = false;
-    }
+  const showFcmPopup = document.getElementsByClassName('showFcmPopup');
+  if (fcmToken && Notification.permission === 'granted') {
+    showFcmPopup[0].style.display = 'none';
+    // alert('fcmToken: ' + fcmToken);
+   saveFCMToken(fcmToken);
+  }else{
+    showFcmPopup[0].style.display = 'flex';
   }
+  // if (reminderButton) {
+  //   if (fcmToken) {
+  //     reminderButton.classList?.add("active");
+  //     const span = reminderButton.querySelector("span");
+  //     if (span) {
+  //       span.textContent = "Reminders Active";
+  //     }
+  //     fcmTokenSaved = true;
+  //   } else {
+  //     reminderButton.classList?.remove("active");
+  //     const span = reminderButton.querySelector("span");
+  //     if (span) {
+  //       span.textContent = "Turn on Reminders";
+  //     }
+  //     fcmTokenSaved = false;
+  //   }
+  // }
 }
 
 // Initialize FCM
@@ -771,17 +783,12 @@ function initializeFCM() {
 
 // Save token to database
 function saveFCMToken(token) {
-  localStorage.setItem("fcm_token", token);
-
-  // Update UI
-  const reminderButton = document.getElementById("reminderButton");
-  if (reminderButton) {
-    reminderButton.classList.add("active");
-    reminderButton.querySelector("span").textContent = "Reminders Active";
+  if(!token){
+    return;
+    Toast("error", "Error", "No FCM token found", "topRight");
   }
-
-  // Save to database
-  fetch("?api=update_fcm_token", {
+   // Save to database
+   fetch("?api=update_fcm_token", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ fcm_token: token }),
@@ -798,6 +805,17 @@ function saveFCMToken(token) {
     .catch((error) => {
       console.error("Error saving FCM token:", error);
     });
+  return;
+  localStorage.setItem("fcm_token", token);
+
+  // Update UI
+  const reminderButton = document.getElementById("reminderButton");
+  if (reminderButton) {
+    reminderButton.classList.add("active");
+    reminderButton.querySelector("span").textContent = "Reminders Active";
+  }
+
+ 
 }
 
 // Show browser notification
@@ -980,27 +998,27 @@ function loadFirebaseScript() {
 // Check notification permission on page load
 document.addEventListener("DOMContentLoaded", function () {
   // Wait 3 seconds after page load to check notification permission
-  setTimeout(() => {
-    // Only show modal if permission hasn't been granted or denied yet
-    if (Notification.permission === "default") {
-      // Show the notification permission modal
-      const notificationModal = new bootstrap.Modal(
-        document.getElementById("notificationPermissionModal")
-      );
-      notificationModal.show();
-    } else if (Notification.permission === "granted" && !fcmTokenSaved) {
-      // If permission is already granted but token not saved
-      if (typeof firebase !== "undefined" && firebase.messaging) {
-        initializeFCM();
-      } else {
-        loadFirebaseScript()
-          .then(() => {
-            initializeFCM();
-          })
-          .catch((error) => {
-            console.error("Error loading Firebase:", error);
-          });
-      }
-    }
-  }, 3000); // 3 second delay
+  // setTimeout(() => {
+  //   // Only show modal if permission hasn't been granted or denied yet
+  //   if (Notification.permission === "default") {
+  //     // Show the notification permission modal
+  //     const notificationModal = new bootstrap.Modal(
+  //       document.getElementById("notificationPermissionModal")
+  //     );
+  //     notificationModal.show();
+  //   } else if (Notification.permission === "granted" && !fcmTokenSaved) {
+  //     // If permission is already granted but token not saved
+  //     if (typeof firebase !== "undefined" && firebase.messaging) {
+  //       initializeFCM();
+  //     } else {
+  //       loadFirebaseScript()
+  //         .then(() => {
+  //           initializeFCM();
+  //         })
+  //         .catch((error) => {
+  //           console.error("Error loading Firebase:", error);
+  //         });
+  //     }
+  //   }
+  // }, 3000); // 3 second delay
 });
