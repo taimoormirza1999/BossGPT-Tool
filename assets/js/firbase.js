@@ -36,6 +36,7 @@
                     // Set the token in the hidden input
                     $('#fcm_token_value').attr('content', currentToken);
                     $('#fcm_token').val(currentToken);
+                    localStorage.setItem('fcm_token', currentToken);
                     fetch('requests.php', {
                         method: 'POST',
                         headers: {

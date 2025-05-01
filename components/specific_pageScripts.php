@@ -104,6 +104,8 @@
         var userId = <?php echo isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null; ?>;
         // Keep the initialization but don't add duplicate script
         // 2) Grab referral from ?ref= or ?via=
+       <?php if(isset($_GET['pro-member']) && (isset($_GET['referral']) && $_GET['referral']=='true')){ ?>
+        console.log('rewardfull called');
         const email = "<?php echo addslashes(isset($_SESSION['email']) ? $_SESSION['email'] : ''); ?>";
         const params = new URLSearchParams(window.location.search);
         const referral = params.get('ref') || params.get('via') || null;
@@ -133,7 +135,7 @@
                 }
             }, 500);
         }
-
+        <?php } ?>
         // 4) Trigger your pro‑status update if needed
         <?php if (!empty($_GET['pro-member']) && $_GET['pro-member'] === 'true'): ?>
             updateProStatus();
@@ -167,13 +169,9 @@
             }
 
             const currentProject = getLastSelectedProject();
-            // alert(currentProject);
-            console.log('currentProject →', currentProject);
-            // initPusher(currentProject);
             // First check if we're on the dashboard page
             const isDashboard = document.querySelector('.chat-container') !== null;
             const isProfile = <?php echo isPage('profile') ? 'true' : 'false'; ?>;
-
             if (isDashboard || isProfile) {
                 // Check if user is a pro member and redirect if necessary
                 fetch('?api=check_pro_status')
@@ -186,11 +184,9 @@
                         }
                     })
                     .catch(error => console.error('Error checking pro status:', error));
-
                 // Check URL parameters for pro-member status
                 const urlParams = new URLSearchParams(window.location.search);
                 if (urlParams.has('pro-member') && urlParams.get('pro-member') === 'true') {
-                   
                     fetch('?api=update_pro_status')
                         .then(response => {
                             if (!response.ok) {
@@ -199,12 +195,8 @@
                             return response.json();
                         })
                         .then(data => {
-                            // console.log('Pro status update response:', data);
                             if (data.success) {
                                 Toast('success', 'Success', 'Your account has been upgraded to Pro!');
-                                // setTimeout(() => {
-                                //     window.location.href = '?page=dashboard';
-                                // }, 1500);
                             } else {
                                 Toast('error', 'Error', data.message || 'Failed to update pro status');
                             }
@@ -229,7 +221,7 @@
                 }
 
                 // Create the debounced update function
-                const debouncedUpdateTaskStatus = debounce((taskId, newStatus) => {
+                const debouncedUpdateTaskStatus = debounce((taskId, newStatus,loadingAllTasks=true) => {
                     // showLoading();
                     fetch('?api=update_task_status', {
                         method: 'POST',
@@ -242,43 +234,40 @@
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                loadTasks(currentProject);
+                                if(loadingAllTasks){
+                                    loadTasks(currentProject);
+                                }
                             }
                         })
                         .catch(error => console.error('Error updating task status:', error))
                         .finally();
-                }, 0); // 500ms debounce time
-
+                }, 0);
                 let currentProject = null;
-                // Load saved project from localStorage if available
                 const savedProject = getLastSelectedProject();
                 if (savedProject && savedProject !== 'null') {
                     currentProject = parseInt(savedProject);
                     $('#myselectedcurrentProject').val(currentProject);
                 }
-
                 const projectsList = document.getElementById('projectsList');
                 const chatMessages = document.getElementById('chatMessages');
                 const chatForm = document.getElementById('chatForm');
                 const messageInput = document.getElementById('messageInput');
                 const createProjectBtn = document.getElementById('createProjectBtn');
                 const loadingIndicator = document.querySelector('.loading');
+            <?php if(!isPage('profile')){ ?>
                 const chatLoader = document.getElementById('mychatLoader');
-
                 // Show/hide loading indicator
                 function showChatLoading() {
                     chatLoader.classList.remove('d-none');
-
                 }
-
                 function hideChatLoading() {
                     chatLoader.classList.add('d-none');
                 }
+                <?php } ?>
                 // Show/hide loading indicator
                 function showLoading() {
                     loadingIndicator.style.display = 'flex';
                 }
-
                 function hideLoading() {
                     loadingIndicator.style.display = 'none';
                 }
@@ -304,13 +293,11 @@
                             projectDropdown.innerHTML = '';
 
                             if (!data.projects || data.projects.length === 0) {
-                                // If no projects exist, display a placeholder item
                                 const placeholder = document.createElement('li');
                                 placeholder.className = 'dropdown-item disabled';
                                 placeholder.textContent = 'No projects found';
                                 projectDropdown.appendChild(placeholder);
                             } else {
-                                // Loop through the projects and create dropdown items
                                 data.projects.forEach(project => {
                                     const li = document.createElement('li');
                                     li.className = 'dropdown-item';
@@ -827,17 +814,16 @@ $button1.text(selectedProjectTitle);
                     const taskCards = document.querySelectorAll('.task-card');
                     const taskColumns = document.querySelectorAll('.task-column');
 
+                    // Handle card drag events
                     taskCards.forEach(card => {
-                        card.addEventListener('dragstart', () => {
-                            card.classList.add('dragging');
-                        });
-
+                        card.addEventListener('dragstart', () => card.classList.add('dragging'));
                         card.addEventListener('dragend', () => {
                             card.classList.remove('dragging');
                             taskColumns.forEach(col => col.classList.remove('drag-over'));
                         });
                     });
 
+                    // Handle column drag events
                     taskColumns.forEach(column => {
                         column.addEventListener('dragenter', e => {
                             e.preventDefault();
@@ -849,42 +835,29 @@ $button1.text(selectedProjectTitle);
                             column.classList.remove('drag-over');
                         });
 
-                        column.addEventListener('dragover', e => {
-                            e.preventDefault();
-                        });
+                        column.addEventListener('dragover', e => e.preventDefault());
 
                         column.addEventListener('drop', e => {
                             e.preventDefault();
                             column.classList.remove('drag-over');
+                            
                             const draggingCard = document.querySelector('.dragging');
-                            if (draggingCard) {
-                                const newStatus = column.dataset.status;
-                                debouncedUpdateTaskStatus(draggingCard.dataset.id, newStatus);
-                            }
+                            if (!draggingCard) return;
+
+                            const newStatus = column.dataset.status;
+                            const taskId = draggingCard.dataset.id;
+
+                            // Optimistic UI update - move card immediately
+                            column.appendChild(draggingCard);
+                            draggingCard.dataset.status = newStatus;
+
+                            // Update server in background
+                            debouncedUpdateTaskStatus(taskId, newStatus, false);
                         });
                     });
                 }
 
-                // Update task status
-                function updateTaskStatus(taskId, newStatus) {
-                    // showLoading();
-                    fetch('?api=update_task_status', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            task_id: taskId,
-                            status: newStatus
-                        })
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                loadTasks(currentProject);
-                            }
-                        })
-                        .catch(error => console.error('Error updating task status:', error))
-                        .finally();
-                }
+               
                 <?php if(!isPage('profile')){ ?>
                 // Handle chat form submission
                 chatForm.addEventListener('submit', function (e) {
@@ -1138,7 +1111,7 @@ $button1.text(selectedProjectTitle);
                             task_id: taskId,
                             title: title,
                             description: description,
-                            due_date: dueDate, // This will now be null instead of empty string
+                            due_date: dueDate,
                             assignees: assignees
                         };
                         if (pictureData !== null) {
@@ -1188,7 +1161,6 @@ $button1.text(selectedProjectTitle);
                         );
                         return;
                     }
-                    // showLoading();
                     fetch(`?api=get_all_project_users&project_id=${getLastSelectedProject()}`)
                         .then(async response => {
                             const text = await response.text();
@@ -1200,7 +1172,6 @@ $button1.text(selectedProjectTitle);
                                 throw new Error('Invalid server response');
                             }
                         })
-                        // mujtabatesting1
                         .then(data => {
                             if (data.success) {
                                 const userListContainer = document.getElementById('userListContainer');
@@ -1401,7 +1372,7 @@ $button1.text(selectedProjectTitle);
 
                     const div = document.createElement('div');
                     div.className = sender === 'user' ? 'user-message d-flex align-items-start justify-content-end' : 'ai-message d-flex align-items-start';
-                    const iconImage = `<?php echo getIconImage(0, 0, '1.93rem'); ?>`;
+                    const iconImage = `<?php echo getIconImage(0, 0, '1.5rem'); ?>`;
 
                     if (sender === 'user') {
                         // Get username from session
@@ -1445,24 +1416,6 @@ $button1.text(selectedProjectTitle);
                     ?>
                 }
 
-                // Font size management
-                // const fontSizeRange = document.getElementById('fontSizeRange');
-                // const fontSizeValue = document.getElementById('fontSizeValue');
-                // const mainContent = document.body;
-
-                // Load saved font size or use default
-                // const savedFontSize = localStorage.getItem('preferredFontSize') || '16';
-                // fontSizeRange.value = savedFontSize;
-                // fontSizeValue.textContent = `${savedFontSize}px`;
-                // mainContent.style.fontSize = `${savedFontSize}px`;
-
-                // Update font size when slider changes
-                // fontSizeRange.addEventListener('input', function () {
-                //     const newSize = this.value;
-                //     fontSizeValue.textContent = `${newSize}px`;
-                //     mainContent.style.fontSize = `${newSize}px`;
-                //     localStorage.setItem('preferredFontSize', newSize);
-                // });
 
                 // Initialize Select2 for the edit task assignees
                 $('#editTaskAssignees').select2({
@@ -1628,7 +1581,6 @@ $button1.text(selectedProjectTitle);
 
                 // Add the deleteTask function
                 function deleteTask(taskId) {
-                    showLoading();
                     fetch('?api=update_task_status', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -1649,7 +1601,7 @@ $button1.text(selectedProjectTitle);
                             console.error('Error deleting task:', error);
                             alert('Failed to delete task. Please try again.');
                         })
-                        .finally(hideLoading);
+                        .finally();
                 }
 
                 // Add these functions inside the DOMContentLoaded event listener
@@ -1821,7 +1773,7 @@ $button1.text(selectedProjectTitle);
     <div class="chat-loading-avatar">
       <img src="https://res.cloudinary.com/da6qujoed/image/upload/v1742656707/logoIcon_pspxgh.png" 
            alt="Logo" class="logo-icon" 
-           style="filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3)); margin-top: 0; margin-bottom: 0; width: 1.8rem; height: auto">
+           style="filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3)); margin-top: 0; margin-bottom: 0; width: 1.5rem; height: auto">
     </div>
   `;
 
@@ -1903,32 +1855,7 @@ $button1.text(selectedProjectTitle);
                     }
                 });
 
-                // Add the deleteTask function here as well
-                function deleteTask(taskId) {
-                    showLoading();
-                    fetch('?api=update_task_status', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            task_id: taskId,
-                            status: 'deleted'
-                        })
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                loadTasks(currentProject);
-                            } else {
-                                throw new Error(data.message || 'Failed to delete task');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error deleting task:', error);
-                            alert('Failed to delete task. Please try again.');
-                        })
-                        .finally(hideLoading);
-                }
-
+              
                 // New event listener for removing task picture
                 document.getElementById('removeTaskPictureBtn').addEventListener('click', function () {
                     if (!confirm('Are you sure you want to remove the picture from this task?')) {
@@ -2541,60 +2468,10 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                     })
                     .finally(hideLoading);
             });
-            const fcmToken = "<?php echo isset($_SESSION['fcm_token']) ? $_SESSION['fcm_token'] : ''; ?>";
-            // console.log("FCM Token for reminders:", fcmToken);
-            if (fcmToken && <?php echo isset($_SESSION['user_id']) ? 'true' : 'false'; ?>) {
-                interval = setInterval(getReminders, 10000); //every 10 seconds it will check for reminders
-            }
+  
         }); // End of DOMContentLoaded
 
-        function sendWelcomeEmailTest() {
-
-            fetch('?api=send_welcome_email', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    email: "taimoorhamza1999@gmail.com",
-                    username: "User123",
-                    tempPassword: "TempPass123",
-                    projectId: 48
-                })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-                })
-                .catch(error => {
-                    console.error("Error:", error.message);
-                    alert("Failed to send email.");
-                });
-        }
-        function sendNotificationTest(projectId = 42, title = "DFs Title", body = "DFs Body") {
-            alert("Sending Notification Test");
-            fetch('?api=send_notification_project', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    action: 'send_notification_project',
-                    project_id: projectId,
-                    title: title,
-                    body: body
-                })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        console.log("✅ Notification sent successfully:", data.message);
-                    } else {
-                        console.error("❌ Error sending notification:", data.error);
-                    }
-                })
-                .catch(error => console.error("❌ Request failed:", error));
-        }
+       
         let displayedReminders = new Set();
         // get Reminders
         function getReminders() {
@@ -2699,61 +2576,57 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
             const reminderId = popup.dataset.reminderId;
 
             // Check if this is the notification reminder or enable now button
-            const isNotificationReminder = popup.id === 'reminderButton';
-            const isEnableNowBtn = button.id === 'enableNowBtn';
+            const isNotificationReminder = popup.id == 'reminderButton';
+            const isEnableNowBtn = button.id == 'enableNowBtn';
 
             if (isEnableNowBtn) {
+                alert("Enable Now Button Clicked");
                 // Handle the Enable Now button click
-                handleEnableNowBtn();
                 return;
             }
 
             // For other reminders
             popup.remove();
-
             // Delete from database/backend for regular reminders
             if (reminderId && !isNotificationReminder) {
                 delete_fcm_reminders(reminderId);
             }
-
             // Update popup visibility to show the next one if available
             updatePopupVisibility();
         }
 
         // Add this new function after the closePopup function
-        function handleEnableNowBtn() {
-            // Hide the notification popup
-            const notificationPopup = document.getElementById('reminderButton');
-            if (notificationPopup) {
-                notificationPopup.style.display = 'none';
-            }
+        // function handleEnableNowBtn() {
+        //     alert("Enable Now Button Clicked");
+        //     // Hide the notification popup
+        //     const notificationPopup = document.getElementById('reminderButton');
+        //     if (notificationPopup) {
+        //         notificationPopup.style.display = 'none';
+        //     }
 
-            // Show the notification permission modal
-            const notificationModal = new bootstrap.Modal(
-                document.getElementById("notificationPermissionModal")
-            );
-            notificationModal.show();
+        //     // Show the notification permission modal
+        //     const notificationModal = new bootstrap.Modal(
+        //         document.getElementById("notificationPermissionModal")
+        //     );
+        //     notificationModal.show();
 
-            // Add event listener to show the popup again if the modal is dismissed
-            const notificationModalEl = document.getElementById("notificationPermissionModal");
-            notificationModalEl.addEventListener('hidden.bs.modal', function onHidden() {
-                // Only show the popup again if we don't have FCM token yet
-                const fcmToken = localStorage.getItem('fcm_token');
-                if (!fcmToken && notificationPopup) {
-                    notificationPopup.style.display = '';
-                } else if (notificationPopup) {
-                    // If we now have FCM token, permanently remove the popup
-                    notificationPopup.remove();
-                }
-                // Remove this listener to prevent multiple bindings
-                notificationModalEl.removeEventListener('hidden.bs.modal', onHidden);
-            });
-        }
+        //     // Add event listener to show the popup again if the modal is dismissed
+        //     const notificationModalEl = document.getElementById("notificationPermissionModal");
+        //     notificationModalEl.addEventListener('hidden.bs.modal', function onHidden() {
+        //         // Only show the popup again if we don't have FCM token yet
+        //         const fcmToken = localStorage.getItem('fcm_token');
+        //         if (!fcmToken && notificationPopup) {
+        //             notificationPopup.style.display = '';
+        //         } else if (notificationPopup) {
+        //             // If we now have FCM token, permanently remove the popup
+        //             notificationPopup.remove();
+        //         }
+        //         // Remove this listener to prevent multiple bindings
+        //         notificationModalEl.removeEventListener('hidden.bs.modal', onHidden);
+        //     });
+        // }
     </script>
  <?php
-
-
-
 
 // Reminder button
 if(isLoginUserPage()){
@@ -2770,9 +2643,11 @@ if(isLoginUserPage()){
             if (!isset($_SESSION['discord_token'])) {
                 echo getPopupAlert('Link Discord', 'Link your Discord to stay updated!', 'reminderButton', '<h6 class="font-secondaryBold button-text" id="enableNowBtn" onclick="openLink(\'' . $_ENV['DISCORD_BOT_INVITE_URL'] . '\')">Enable Now</h6>', 'special-popup-container', 'https://res.cloudinary.com/da6qujoed/image/upload/v1745510472/discord_zowxul.png');
             }
-            if (!isset($_SESSION['fcm_token'])) {
+            // if (!isset($_SESSION['fcm_token'])) {
+                if(isset($_SESSION['user_id'])){
                 echo getPopupAlert('Enable Notifications', 'Stay updated! Enable browser notifications to get the 
-                latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold button-text" id="enableNowBtn" onclick="DynamicOpen(\'#notificationPermissionModal\')">Enable Now</h6>');
+                latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold button-text" id="enableNowBtn" onclick="openModal(\'notificationPermissionModal\')">Enable Now</h6>','showFcmPopup');
+            // }   
             }
 
         }

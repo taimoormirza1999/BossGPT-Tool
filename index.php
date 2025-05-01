@@ -68,12 +68,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if (empty($_POST['email']) || empty($_POST['password'])) {
                         throw new Exception('Email and password are required');
                     }
-
                     // Store FCM token in session before login
                     if (isset($_POST['fcm_token']) && $_POST['fcm_token'] !== '0') {
                         $_SESSION['fcm_token'] = $_POST['fcm_token'];
                     }
-
                     $auth->login($_POST['email'], $_POST['password']);
                     header('Location:' . $_ENV['BASE_URL'] . '?page=dashboard');
                     exit;
@@ -148,7 +146,7 @@ require_once './api_endPoints.php';
                         autoplay: true
                     });
                 } else {
-                    console.warn(`Canvas with ID '${canvasId}' not found.`);
+                    // console.warn(`Canvas with ID '${canvasId}' not found.`);
                 }
             }
             // Initialize both animations
@@ -171,22 +169,7 @@ require_once './api_endPoints.php';
     <!-- Firebase Scripts for FCM -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js"></script>
-    <script>
-        // Initialize Firebase with your config
-        const firebaseConfig = {
-            apiKey: "AIzaSyAPByoVru7fAR1Mk8_y8AW73vWVRwEDma4",
-            authDomain: "bossgpt-367ab.firebaseapp.com",
-            projectId: "bossgpt-367ab",
-            storageBucket: "bossgpt-367ab.firebasestorage.app",
-            messagingSenderId: "1078128619253",
-            appId: "1:1078128619253:web:edf3e5f2306ab349191fbc"
-        };
 
-        // Initialize Firebase only if it's not already initialized
-        if (typeof firebase === 'undefined' || !firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-    </script>
 
 </head>
 <!-- Reuseable Stuff -->
@@ -487,7 +470,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
             <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
                     <!-- for logoIcon -->
             <script>
-                const iconImage = `<?php echo getIconImage(0, 0, "1.8rem"); ?>`
+                const iconImage = `<?php echo getIconImage(0, 0, "1.5rem"); ?>`
                 const welcomeLogoImage = `<?php echo getIconImage(0, 0, '3.7rem'); ?>`;
             </script>
         <?php } ?>

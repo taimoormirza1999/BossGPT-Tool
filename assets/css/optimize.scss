@@ -716,6 +716,8 @@ body {
       height: 48px;
       color: #fff;
     }
+    input:focus{
+      background: rgba(0, 0, 0, 0.5);}
 
     .form-label,
     .card-title {
@@ -927,6 +929,13 @@ body {
     box-sizing: border-box;
     border: $boder-width_1_3 solid $white-color-20;
     border-radius: $border-radius-12;
+    transition: all $transition-duration-40 ease-in-out;
+  }
+  .form-control:focus{
+    background: transparent !important;
+    border: 1.3px solid $white-color-50 !important;
+    box-shadow:  none !important;
+    color: $white-color !important;
   }
   div.tab-pane {
     border: 1px solid rgba(234, 234, 234, 0.3);
@@ -1469,5 +1478,13 @@ body {
       transition: all $transition-duration-34 ease-in-out;
       @include theme-text-color($gray-color-92);
     }
+  }
+  .alert-main-primary{
+    background-color: rgba(19, 19, 19, 0.5);
+    background: rgba(19, 19, 19, 0.5);
+    border: 0.717771px solid rgba(237, 237, 237, 0.3);
+    backdrop-filter: blur(12.9199px);
+    border-radius: 14.3554px;
+    color: white;
   }
 }
