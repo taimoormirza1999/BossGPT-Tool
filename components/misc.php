@@ -3,12 +3,39 @@
   // Initial Loader
 document.addEventListener("DOMContentLoaded", function () {
   
-  // function checkFCMStatus(){
-  //   const token = localStorage.getItem('fcm_token');
-  //   if(token){
-  //     document.getElementById('fcmContent').style.display = 'block';
-  //   }
-  // }
+  function hideAiErrorMessages() {
+    console.log("Hiding AI Error Messages");
+    document.querySelectorAll('.ai-message').forEach(el => {
+      const message = el.querySelector('.message.ai');
+      // console.log(message.textContent);
+      const errorMessage = <?php echo json_encode(renderAIErrorMessage()); ?>;
+      const calendarSuccessMessage = <?php echo json_encode(renderAICalendarSuccessMessage()); ?>;
+      if (
+        message &&
+        (
+          message.textContent.includes('Please connect your Google') 
+          // message.innerHTML.includes('calendar/connect-calendar.php')
+        )
+      ) {
+        // console.log("Got it "+message.textContent);
+        // message.parentElement.style.backgroundColor = 'red';
+        // el.classList.remove("d-flex");
+        // el.classList.add("d-none");
+        message.innerHTML = errorMessage;
+        // message.innerHTML = calendarSuccessMessage;
+      }
+    });
+  }
+
+  // Run once on load
+  hideAiErrorMessages();
+
+  // Watch for dynamic AI messages
+  const chatContainer = document.getElementById('chatMessages');
+  if (chatContainer) {
+    const observer = new MutationObserver(() => hideAiErrorMessages());
+    observer.observe(chatContainer, { childList: true, subtree: true });
+  }
   // Create and append loader
   const loader = document.createElement("div");
   loader.className = "initial-loader";

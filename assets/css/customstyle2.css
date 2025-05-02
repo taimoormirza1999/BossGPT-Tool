@@ -794,13 +794,21 @@ button#toggleDarkModeBtn:active {
 .btn .btn-icon-only:hover {
   background: var(--bs-primary-white10percent) !important;
 }
-
-.btn-icon-only:hover,
+/* .btn-icon-only:hover,
 .btn-icon-only:focus,
 .btn-icon-only:active,
 .btn:hover,
 .btn:focus,
-.btn:not(.btn-primary):not(.btn-danger.delete-task-btn):not(.ai-add-subtask-btn),.btn:not(.btn-danger.delete-task-btn) {
+.btn:not(.btn-primary):not(.btn-danger.delete-task-btn):not(.ai-add-subtask-btn),.btn:not(.btn-danger.delete-task-btn),.btn:not(.btn-error) {
+  background: var(--bs-primary-white10percent) !important;
+  color: var(--bs-primary-white) !important;
+  box-shadow: none !important;
+} */
+.btn-icon-only:hover,
+.btn-icon-only:focus,
+.btn-icon-only:active,
+.btn:not(.btn-primary):not(.btn-danger.delete-task-btn):not(.ai-add-subtask-btn):not(.btn-error):hover,
+.btn:not(.btn-primary):not(.btn-danger.delete-task-btn):not(.ai-add-subtask-btn):not(.btn-error):focus {
   background: var(--bs-primary-white10percent) !important;
   color: var(--bs-primary-white) !important;
   box-shadow: none !important;
