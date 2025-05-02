@@ -10,6 +10,13 @@ document.addEventListener("DOMContentLoaded", function () {
   //   }
   // }
   // Create and append loader
+
+  document.querySelectorAll('.ai-message .message.ai').forEach(msg => {
+  const text = msg.textContent || '';
+  if (text.includes('Sorry, I encountered an error')) {
+    msg.closest('.ai-message')?.remove();
+  }
+});
   const loader = document.createElement("div");
   loader.className = "initial-loader";
   loader.innerHTML = `
