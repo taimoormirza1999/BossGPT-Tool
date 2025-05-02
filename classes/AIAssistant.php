@@ -704,18 +704,28 @@ class AIAssistant
             $client = $this->calendar->getClient();
             if ($client->isAccessTokenExpired()) {
                 if ($client->getRefreshToken()) {
-                    $client->fetchAccessTokenWithRefreshToken($client->getRefreshToken());
-                    $_SESSION['access_token'] = $client->getAccessToken();
+                    try {
+                        $client->fetchAccessTokenWithRefreshToken($client->getRefreshToken());
+                        $_SESSION['access_token'] = $client->getAccessToken();
+                    } catch (Exception $e) {
+                        error_log("Token refresh error: " . $e->getMessage());
+                        return [
+                            'message' => "Your calendar connection needs to be refreshed. Please reconnect: <button class='btn btn-main-primary' onclick=\"window.location.href='calendar/connect-calendar.php'\">Reconnect Calendar</button>",
+                            'error' => true,
+                            'action' => 'reconnect_calendar'
+                        ];
+                    }
                 } else {
-                    // No refresh token available, need to reconnect
                     return [
                         'message' => 'Your calendar connection has expired. Please reconnect your Google Calendar. <button class="btn btn-primary" onclick="window.location.href=\'calendar/connect-calendar.php\'">Reconnect Calendar</button>',
-                        'action' => 'connect_calendar'
+                        'action' => 'reconnect_calendar'
                     ];
                 }
             }
+            
             // Use GPT to extract event details from the message
             $eventDetails = $this->extractEventDetails($message);
+            
             // If no date is specified, default to tomorrow
             if (!isset($eventDetails['date']) || empty($eventDetails['date'])) {
                 $eventDetails['date'] = date('Y-m-d', strtotime('+1 day'));
@@ -730,16 +740,20 @@ class AIAssistant
                     $eventDetails['date'] = $parsedDate->format('Y-m-d');
                 }
             }
+
             // Set timezone to Dubai
             $dubaiTz = new DateTimeZone('Asia/Dubai');
+            
             // Create DateTime object for start time
             $startDateTime = new DateTime(
                 $eventDetails['date'] . ' ' . ($eventDetails['time'] ?? '10:00:00'),
                 $dubaiTz
             );
+            
             // Create end time (1 hour later)
             $endDateTime = clone $startDateTime;
             $endDateTime->modify('+1 hour');
+
             // Create the event with specified time
             $event = new Google_Service_Calendar_Event([
                 'summary' => $eventDetails['summary'],
@@ -754,39 +768,39 @@ class AIAssistant
                 ],
             ]);
 
-            $calendarId = 'primary';
-            $service = new Google_Service_Calendar($client);
-            $createdEvent = $service->events->insert($calendarId, $event);
-            // Format time for display using the Dubai timezone
-            $displayTime = $startDateTime->format('g:i A') . ' - ' . $endDateTime->format('g:i A');
+            try {
+                $calendarId = 'primary';
+                $service = new Google_Service_Calendar($client);
+                $createdEvent = $service->events->insert($calendarId, $event);
+                
+                // Format time for display using the Dubai timezone
+                $displayTime = $startDateTime->format('g:i A') . ' - ' . $endDateTime->format('g:i A');
 
-            return [
-                'message' => "✅ Event scheduled successfully!\n\n" .
-                    "📅 Event: {$eventDetails['summary']}\n" .
-                    "📆 Date: " . $startDateTime->format('l, F j, Y') . "\n" .
-                    "⏰ Time: {$displayTime} (Dubai Time)\n" .
-                    "📝 Description: {$eventDetails['description']}\n\n" .
-                    "View in Calendar: <a href='{$createdEvent->htmlLink}' target='_blank'>Open in Google Calendar</a>",
-                'event' => $eventDetails,
-                'success' => true
-            ];
-
-        } catch (Exception $e) {
-            error_log("Calendar Request Error: " . $e->getMessage());
-            
-            // Provide more detailed error message based on error type
-            $errorMsg = $e->getMessage();
-            if (strpos($errorMsg, 'insufficient authentication scopes') !== false) {
                 return [
-                    'message' => "I need additional permissions to schedule this event. Please reconnect your calendar: <button class='btn btn-main-primary' onclick=\"window.location.href='calendar/connect-calendar.php'\">Reconnect Calendar</button>",
+                    'message' => "✅ Event scheduled successfully!\n\n" .
+                        "📅 Event: {$eventDetails['summary']}\n" .
+                        "📆 Date: " . $startDateTime->format('l, F j, Y') . "\n" .
+                        "⏰ Time: {$displayTime} (Dubai Time)\n" .
+                        "📝 Description: {$eventDetails['description']}\n\n" .
+                        "View in Calendar: <a href='{$createdEvent->htmlLink}' target='_blank'>Open in Google Calendar</a>",
+                    'event' => $eventDetails,
+                    'success' => true
+                ];
+            } catch (Exception $e) {
+                error_log("Calendar API Error: " . $e->getMessage());
+                return [
+                    'message' => "I wasn't able to schedule the event. Please make sure your calendar is properly connected and try again: <button class='btn btn-main-primary' onclick=\"window.location.href='calendar/connect-calendar.php'\">Reconnect Calendar</button>",
                     'error' => true,
                     'action' => 'reconnect_calendar'
                 ];
             }
+
+        } catch (Exception $e) {
+            error_log("Calendar Request Error: " . $e->getMessage());
             
-            // Return a generic error message instead of the raw error
+            // Generic user-friendly error message
             return [
-                'message' => "I wasn't able to schedule your event. Please try reconnecting your calendar: <button class='btn btn-main-primary' onclick=\"window.location.href='calendar/connect-calendar.php'\">Reconnect Calendar</button>",
+                'message' => "I wasn't able to process your calendar request. Please try reconnecting your calendar: <button class='btn btn-main-primary' onclick=\"window.location.href='calendar/connect-calendar.php'\">Reconnect Calendar</button>",
                 'error' => true,
                 'action' => 'reconnect_calendar'
             ];
