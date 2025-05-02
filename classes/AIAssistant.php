@@ -2,14 +2,12 @@
 // Required for direct task updates
 require_once __DIR__ . '/ProjectManager.php';
 require_once __DIR__ . '/GoogleCalendarManager.php';
-
 class AIAssistant
 {
     private $api_key;
     private $db;
     private $model;
     private $calendar;
-
     public function __construct()
     {
         $this->api_key = OPENAI_API_KEY;
@@ -27,7 +25,6 @@ class AIAssistant
             ");
             $stmt->execute([$project_id]);
             $project = $stmt->fetch();
-
             // Get all tasks
             $stmt = $this->db->prepare("
                 SELECT * FROM tasks 
@@ -36,7 +33,6 @@ class AIAssistant
             ");
             $stmt->execute([$project_id]);
             $tasks = $stmt->fetchAll();
-
             // Get conversation history
             $stmt = $this->db->prepare("
                 SELECT message, sender, timestamp 
@@ -146,7 +142,6 @@ class AIAssistant
                 
                 return $calendarResponse;
             }
-
             // Check if this is a task status update request
             $enhanced_message = $message;
             if (preg_match('/move\s+task\s+[\'"]?([^\'"]*)[\'"]\s+from\s+todo\s+to\s+in\s+progress/i', $message, $matches)) {
@@ -705,7 +700,6 @@ class AIAssistant
                     'action' => 'connect_calendar'
                 ];
             }
-
             // Check if token has expired and refresh if necessary
             $client = $this->calendar->getClient();
             if ($client->isAccessTokenExpired()) {
@@ -720,10 +714,8 @@ class AIAssistant
                     ];
                 }
             }
-
             // Use GPT to extract event details from the message
             $eventDetails = $this->extractEventDetails($message);
-
             // If no date is specified, default to tomorrow
             if (!isset($eventDetails['date']) || empty($eventDetails['date'])) {
                 $eventDetails['date'] = date('Y-m-d', strtotime('+1 day'));
@@ -732,27 +724,22 @@ class AIAssistant
                 $parsedDate = new DateTime($eventDetails['date']);
                 $currentYear = (int)date('Y');
                 $dateYear = (int)$parsedDate->format('Y');
-                
                 // If the year is different from current year, update it
                 if ($dateYear !== $currentYear) {
                     $parsedDate->setDate($currentYear, $parsedDate->format('n'), $parsedDate->format('j'));
                     $eventDetails['date'] = $parsedDate->format('Y-m-d');
                 }
             }
-
             // Set timezone to Dubai
             $dubaiTz = new DateTimeZone('Asia/Dubai');
-            
             // Create DateTime object for start time
             $startDateTime = new DateTime(
                 $eventDetails['date'] . ' ' . ($eventDetails['time'] ?? '10:00:00'),
                 $dubaiTz
             );
-            
             // Create end time (1 hour later)
             $endDateTime = clone $startDateTime;
             $endDateTime->modify('+1 hour');
-
             // Create the event with specified time
             $event = new Google_Service_Calendar_Event([
                 'summary' => $eventDetails['summary'],
@@ -770,7 +757,6 @@ class AIAssistant
             $calendarId = 'primary';
             $service = new Google_Service_Calendar($client);
             $createdEvent = $service->events->insert($calendarId, $event);
-
             // Format time for display using the Dubai timezone
             $displayTime = $startDateTime->format('g:i A') . ' - ' . $endDateTime->format('g:i A');
 
@@ -792,17 +778,18 @@ class AIAssistant
             $errorMsg = $e->getMessage();
             if (strpos($errorMsg, 'insufficient authentication scopes') !== false) {
                 return [
-                    'message' => "I need additional permissions to schedule this event. Please reconnect your calendar: <button class='btn btn-primary' onclick=\"window.location.href='calendar/connect-calendar.php'\">Reconnect Calendar</button>",
+                    'message' => "I need additional permissions to schedule this event. Please reconnect your calendar: <button class='btn btn-main-primary' onclick=\"window.location.href='calendar/connect-calendar.php'\">Reconnect Calendar</button>",
                     'error' => true,
                     'action' => 'reconnect_calendar'
                 ];
             }
-            // if($_ENV['APP_ENVIRONMENT']=='development'){
-            // return [
-            //     'message' => "Sorry, I encountered an error while scheduling your event: " . $e->getMessage(),
-            //     'error' => true
-            // ];
-            // }
+            
+            // Return a generic error message instead of the raw error
+            return [
+                'message' => "I wasn't able to schedule your event. Please try reconnecting your calendar: <button class='btn btn-main-primary' onclick=\"window.location.href='calendar/connect-calendar.php'\">Reconnect Calendar</button>",
+                'error' => true,
+                'action' => 'reconnect_calendar'
+            ];
         }
     }
 
@@ -818,7 +805,6 @@ class AIAssistant
                 'content' => $message . "\nToday's date is " . date('Y-m-d') . "."
             ]
         ];
-
         $curl = curl_init();
         curl_setopt_array($curl, [
             CURLOPT_URL => 'https://api.openai.com/v1/chat/completions',
