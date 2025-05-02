@@ -1,6 +1,6 @@
 <div class="col-md-3 chat-pannel position-relative">
    
-    <div class="card" style="background-color: transparent!important;">
+    <div class="card" style="background-color: transparent!important;height: 89vh !important;">
  <!-- AI TONE Modal -->
  <div class=" my-custom-ai-tone-modal-chat-pannel d-none" id="AiToneModal">
         <div class="card-ai-tone-modal-content">
@@ -25,13 +25,13 @@
                                             gap: 10px;
                                             border-bottom: 0.5px solid;
                                                         ">
-            <h5 class="mb-0">
+            <h5 class="mb-0 flex items-center">
                 <?php echo getIconImage(0, 0, "2.5rem", "auto", "https://res.cloudinary.com/da6qujoed/image/upload/v1742656707/logoIcon_pspxgh.png", 0); ?>
                 &nbsp; Boss<span style="font-weight: 700;">GPT</span> Assistant
             </h5>
             <button class="change_aitone_btn" onclick="DynamicOpen('#AiToneModal')">
                 <img src="https://res.cloudinary.com/da6qujoed/image/upload/v1744704440/robot_pfahvf.svg"
-                    style="width:2rem;">
+                    style="width:1.55rem;">
             </button>
             <button class="btn btn-link p-0 text-white close-icon-btn position-absolute " data-bs-dismiss="modal"
                 aria-label="Close" onclick="closeChatPannel()"><?php echo getCloseSquareIcon(); ?></button>
@@ -39,6 +39,7 @@
         </div>
         <div class="card-body p-0">
             <div class="chat-container">
+                <canvas id="mychatLoader" width="20" height="20" style="height: 30px;width: 30px;" class="mx-auto my-2 d-none justify-content-center align-items-center"></canvas>
                 <div class="chat-messages" id="chatMessages">
                     <?php if (empty($projects)): ?>
                         <div class="welcome-guide">
@@ -49,7 +50,7 @@
 
                         <script>
                             // Immediately invoke function to initialize welcome messages
-                            (function initializeWelcomeMessages() {
+                            (function initializeWelcomeProjectGuideMssages() {
                                 // console.log('Initializing welcome messages...'); // Debug log
 
                                 const welcomeThread = document.getElementById('welcomeThread');
@@ -60,7 +61,7 @@
                                     return;
                                 }
 
-                                const welcomeMessages = [
+                                const welcomeProjectGuideMssages = [
                                     {
                                         delay: 0,
                                         title: '👋 Welcome to BossGPT!',
@@ -80,7 +81,7 @@
                                         }
                                     },
                                     {
-                                        delay: 4000,
+                                        delay: 3500,
                                         title: '💡 How I Can Help',
                                         content: {
                                             text: 'Once you create a project, I can:',
@@ -93,7 +94,7 @@
                                         }
                                     },
                                     {
-                                        delay: 6000,
+                                        delay: 5000,
                                         title: '🎯 Next Steps',
                                         content: {
                                             text: 'To get the most out of BossGPT:',
@@ -107,7 +108,7 @@
                                         }
                                     },
                                     {
-                                        delay: 8000,
+                                        delay: 7000,
                                         title: '🌟 Ready to Begin?',
                                         content: {
                                             text: 'Create your first project and let\'s make something amazing together!',
@@ -179,7 +180,7 @@
 
 
                                 async function displayMessages() {
-                                    for (const message of welcomeMessages) {
+                                    for (const message of welcomeProjectGuideMssages) {
                                         await new Promise(resolve => setTimeout(resolve, message.delay));
                                         await showMessage(message);
                                     }
@@ -192,9 +193,8 @@
                 </div>
                 <div class="chat-input">
                     <?php
-
-
                     $prompts = [
+                        "📑 set a reminder for task #number",
                         "📑 suggest tasks for my project",
                         "🎯 Create task 'Your Task' and assign it to myself",
                         "📋 Create tasks for Your Feature",

@@ -7,7 +7,7 @@
 }
 
 .chat-container {
-  height: calc(100vh - 230px);
+  height: calc(100vh - 152.5px);
   display: flex;
   flex-direction: column;
 }
@@ -24,12 +24,10 @@
   border-top: 1px solid #dee2e6;
   background: white;
 }
-
-.task-card:hover {
-  transform: translateY(-4px) scale(1.02);
-  border-color: rgba(13, 110, 253, 0.3);
-  z-index: 1;
+.task-card *, .task-card *::after, .task-card::after{
+  transition: all 0.8s!important;
 }
+
 
 .task-card:hover::after {
   content: "";
@@ -42,7 +40,7 @@
   background: radial-gradient(
     800px circle at var(--mouse-x) var(--mouse-y),
     rgba(13, 110, 253, 0.06),
-    transparent 40%
+    transparent 20%
   );
   z-index: 1;
   pointer-events: none;
@@ -68,7 +66,6 @@
   margin: 0;
   border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 12px!important;
-  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
   word-wrap: break-word;
   transition: all 0.3s ease 0.3s;
   background: rgba(255, 255, 255, 0.1) !important;
@@ -82,12 +79,6 @@
   max-height: 500px;
   padding: 0.75rem;
   margin: 0.5rem 0;
-}
-
-.task-card:hover {
-  transform: translateY(-2px);
-  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
-  background-color: #f8f9fa;
 }
 
 .task-card.dragging {
@@ -205,15 +196,25 @@
   flex-wrap: wrap;
   margin-bottom: 0;
 }
-
+.delete-task-btn svg path {
+  stroke: #FF5733 !important;
+}
 .delete-task-btn {
-  background-color: rgb(187, 7, 10) !important;
-  padding: 0.4rem;
+  /* background-color: rgb(187, 7, 10) !important; */
   opacity: 0;
   transition: opacity 0.34s;
   position: absolute;
   top: -2.15rem;
   right: 0.5rem;
+  height: 40px;
+  width: 40px;
+  padding: 0!important;
+  background: #ff58333a !important;
+    border-radius: 50%!important;
+    border: 1.3px solid #FF5733;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .delete-task-btn:hover {
@@ -274,7 +275,6 @@
   opacity: 0;
   transition: opacity 0.3s;
 }
-
 .task-card:hover .add-subtask-btn,
 .task-card:hover .ai-add-subtask-btn,
 .task-card:hover .ai-update-dates-btn {
@@ -282,7 +282,6 @@
     align-items: center;
     gap: 6px;
 }
-
 /* Button container */
 .task-card .d-flex.gap-2.mt-2,
 .subtasks.mt-2 .d-flex.gap-2 {
@@ -590,6 +589,7 @@ body.dark-mode .nav-tabs .nav-link.active {
   padding-right: 1rem;
   margin-left: 0;
   margin-right: 0;
+  overflow-y: hidden;
 }
 
 .task-card h6 {
@@ -667,11 +667,11 @@ body.dark-mode .nav-tabs::-webkit-scrollbar-track {
   display: flex;
 }
 
-#projectDropdownButton.dropdown-toggle::after {
+#projectDropdownButton.dropdown-toggle::after, #projectDropdownButton1.dropdown-toggle::after {
   display: none !important;
 }
 
-#projectDropdownButton.dropdown-toggle {
+#projectDropdownButton.dropdown-toggle, #projectDropdownButton1.dropdown-toggle {
   display: inline-flex;
   align-items: center;
   font-size: calc(var(--font-size, 1rem) + 0.15rem) !important;
@@ -679,20 +679,20 @@ body.dark-mode .nav-tabs::-webkit-scrollbar-track {
   color: white !important;
 }
 
-#projectDropdownButton.dropdown-toggle svg {
+#projectDropdownButton.dropdown-toggle svg, #projectDropdownButton1.dropdown-toggle svg {
   margin-left: 5px;
   width: 1.5rem;
   height: 1.5rem;
   transition: transform 0.2s;
 }
 
-#projectDropdownButton.dropdown-toggle[aria-expanded="true"] svg {
+#projectDropdownButton.dropdown-toggle[aria-expanded="true"] svg, #projectDropdownButton1.dropdown-toggle[aria-expanded="true"] svg {
   transform: rotate(180deg);
   width: 1.5rem;
   height: 1.5rem;
 }
 
-#projectDropdownButton.dropdown-toggle:not(:has(svg))::after {
+#projectDropdownButton.dropdown-toggle:not(:has(svg))::after, #projectDropdownButton1.dropdown-toggle:not(:has(svg))::after {
   content: "";
   display: inline-block;
   width: 24px;
@@ -705,6 +705,8 @@ body.dark-mode .nav-tabs::-webkit-scrollbar-track {
 }
 
 #projectDropdownButton.dropdown-toggle[aria-expanded="true"]:not(
+    :has(svg)
+  )::after, #projectDropdownButton1.dropdown-toggle[aria-expanded="true"]:not(
     :has(svg)
   )::after {
   transform: rotate(180deg);
@@ -798,7 +800,7 @@ button#toggleDarkModeBtn:active {
 .btn-icon-only:active,
 .btn:hover,
 .btn:focus,
-:not(.btn-primary):focus:not(.delete-subtask-btn) {
+.btn:not(.btn-primary):not(.btn-danger.delete-task-btn):not(.ai-add-subtask-btn),.btn:not(.btn-danger.delete-task-btn) {
   background: var(--bs-primary-white10percent) !important;
   color: var(--bs-primary-white) !important;
   box-shadow: none !important;

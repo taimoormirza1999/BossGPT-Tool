@@ -22,7 +22,7 @@
         // Register service worker first
         navigator.serviceWorker.register("./assets/js/sw.js")
             .then((registration) => {
-                console.log('Service worker registered:', registration);
+                // console.log('Service worker registered:', registration);
 
                 // Then get the messaging token
                 return getToken(messaging, {
@@ -32,10 +32,11 @@
             })
             .then((currentToken) => {
                 if (currentToken) {
-                    console.log("FCM Token:", currentToken);
+                    // console.log("FCM Token:", currentToken);
                     // Set the token in the hidden input
                     $('#fcm_token_value').attr('content', currentToken);
                     $('#fcm_token').val(currentToken);
+                    localStorage.setItem('fcm_token', currentToken);
                     fetch('requests.php', {
                         method: 'POST',
                         headers: {
@@ -48,7 +49,7 @@
                     })
                         .then(response => response.json())
                         .then(data => {
-                            console.log("Token stored in session:", data);
+                            // console.log("Token stored in session:", data);
                         })
                         .catch(error => {
                             console.error("Error storing token:", error);

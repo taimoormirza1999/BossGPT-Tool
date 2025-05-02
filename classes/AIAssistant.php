@@ -2,16 +2,16 @@
 // Required for direct task updates
 require_once __DIR__ . '/ProjectManager.php';
 require_once __DIR__ . '/GoogleCalendarManager.php';
-
 class AIAssistant
 {
     private $api_key;
     private $db;
+    private $model;
     private $calendar;
-
     public function __construct()
     {
         $this->api_key = OPENAI_API_KEY;
+        $this->model = OPENAI_MODEL;
         $this->db = Database::getInstance()->getConnection();
         $this->calendar = new GoogleCalendarManager();
     }
@@ -25,7 +25,6 @@ class AIAssistant
             ");
             $stmt->execute([$project_id]);
             $project = $stmt->fetch();
-
             // Get all tasks
             $stmt = $this->db->prepare("
                 SELECT * FROM tasks 
@@ -34,14 +33,12 @@ class AIAssistant
             ");
             $stmt->execute([$project_id]);
             $tasks = $stmt->fetchAll();
-
             // Get conversation history
             $stmt = $this->db->prepare("
                 SELECT message, sender, timestamp 
                 FROM chat_history 
                 WHERE project_id = ? 
                 ORDER BY timestamp
-                LIMIT 20
             ");
             $stmt->execute([$project_id]);
             $chat_history = $stmt->fetchAll();
@@ -118,18 +115,39 @@ class AIAssistant
 
             // Get the AI tone from the parameter instead of $_REQUEST
             $aiTone = isset($_REQUEST['aiTone']) ? $_REQUEST['aiTone'] : 'demanding';
-            
+
+            // Save user message first
+            $stmt = $this->db->prepare(
+                "INSERT INTO chat_history (project_id, message, sender, function_call) 
+                 VALUES (?, ?, ?, ?)"
+            );
+            $stmt->execute([
+                $project_id,
+                $message,
+                'user',
+                null
+            ]);
+
             // Check if this is a calendar-related request
             if ($this->isCalendarRequest($message)) {
-                return $this->handleCalendarRequest($message);
+                $calendarResponse = $this->handleCalendarRequest($message);
+                
+                // Save AI response for calendar request
+                $stmt->execute([
+                    $project_id,
+                    $calendarResponse['message'],
+                    'ai',
+                    null
+                ]);
+                
+                return $calendarResponse;
             }
-
             // Check if this is a task status update request
             $enhanced_message = $message;
             if (preg_match('/move\s+task\s+[\'"]?([^\'"]*)[\'"]\s+from\s+todo\s+to\s+in\s+progress/i', $message, $matches)) {
                 $task_title = $matches[1];
                 error_log("Detected task status update request for: $task_title");
-                
+
                 // Find the task ID
                 $task_id = $this->findTaskIdByTitle($project_id, $task_title);
                 if ($task_id) {
@@ -137,18 +155,18 @@ class AIAssistant
                     error_log("Enhanced message with task ID: $enhanced_message");
                 }
             }
-            
+
             // Map tone values to different system messages
             $toneMessages = [
                 'friendly' => "You are a friendly and supportive project manager. Your communication style is warm, encouraging, and focused on team morale. Use phrases like 'Let's try', 'We can', 'I think', and offer positive reinforcement. Be supportive and understanding while still maintaining progress.\n\nWhen responding:\n1. Be warm and approachable\n2. Offer encouragement\n3. Be understanding of challenges\n4. Focus on teamwork\n5. Celebrate progress\n6. Use collaborative language\n7. Balance goals with wellbeing\n8. Give constructive feedback\n\nProject Context:\n",
-                
+
                 'professional' => "You are a professional and methodical project manager. Your communication style is clear, balanced, and focused on process and quality. Use phrases like 'We should', 'The data shows', 'Our timeline requires', and emphasize best practices. Be logical and systematic while maintaining high standards.\n\nWhen responding:\n1. Be clear and objective\n2. Present information logically\n3. Remain neutral in tone\n4. Focus on process and quality\n5. Refer to data and evidence\n6. Use professional terminology\n7. Emphasize consistency\n8. Give balanced feedback\n\nProject Context:\n",
-                
+
                 'demanding' => "You are a demanding and results-driven executive manager. Your communication style is direct, authoritative, and focused on performance and deadlines. Use phrases like 'I expect', 'You need to', 'This must be done', and emphasize urgency and accountability. Be stern but fair, always pushing for excellence.\n\nWhen responding:\n1. Be direct and concise\n2. Set clear expectations and deadlines\n3. Show zero tolerance for excuses\n4. Emphasize accountability\n5. Push for high performance\n6. Use authoritative language\n7. Focus on results and metrics\n8. Give direct feedback\n\nProject Context:\n",
-                
+
                 'casual' => "You are a casual and relatable project coordinator. Your communication style is conversational, laid-back, and focused on maintaining a positive atmosphere. Use phrases like 'Hey team', 'Let's chat about', 'How's it going with', and keep things light but productive. Be approachable while still getting things done.\n\nWhen responding:\n1. Use casual, everyday language\n2. Be conversational in tone\n3. Show empathy and understanding\n4. Focus on human connection\n5. Balance work with team dynamics\n6. Use relaxed expressions\n7. Keep communication open\n8. Give friendly feedback\n\nProject Context:\n"
             ];
-            
+
             // Set the content based on the tone or default to demanding if tone is not recognized
             $systemContent = ($toneMessages[$aiTone] ?? $toneMessages['demanding']) . $formatted_context;
 
@@ -324,7 +342,7 @@ class AIAssistant
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'POST',
                 CURLOPT_POSTFIELDS => json_encode([
-                    'model' => 'gpt-4o',
+                    'model' => $this->model,
                     'messages' => $messages,
                     'functions' => $functions,
                     'function_call' => 'auto'
@@ -369,14 +387,14 @@ class AIAssistant
 
             // Save AI response
             $ai_message = $result['choices'][0]['message']['content'] ?? 'Tasks have been created successfully.';
-            
+
             // Check if the message is a JSON response for subtask dates and clean it
             if ($ai_message && preg_match('/\{\s*"task_id":\s*\d+,\s*"subtasks":\s*\[\s*\{\s*"id":\s*\d+,\s*"due_date":/i', $ai_message)) {
                 // This appears to be a raw JSON response for subtask dates
                 // We'll store it but let the front-end handle formatting
                 $ai_message = "Your subtask dates have been updated successfully. The schedule has been optimized for maximum efficiency.";
             }
-            
+
             $stmt->execute([
                 $project_id,
                 $ai_message,
@@ -415,28 +433,31 @@ class AIAssistant
             case 'update_task':
                 error_log("==== AI ASSISTANT: UPDATING TASK ====");
                 error_log("Task ID: " . $arguments['task_id']);
-                
+
                 if (isset($arguments['status'])) {
                     error_log("Requested status change to: " . $arguments['status']);
-                    
+
                     // Get task info
                     $taskStmt = $this->db->prepare("SELECT title, project_id, status FROM tasks WHERE id = ?");
                     $taskStmt->execute([$arguments['task_id']]);
                     $task = $taskStmt->fetch();
                     error_log("Current task status: " . ($task ? $task['status'] : 'unknown'));
-                    
+
                     // Use ProjectManager to update status directly
                     try {
                         $projectManager = new ProjectManager();
-                        if ($arguments['status'] == 'in_progress') {
-                            error_log("Using updateTaskStatus for in_progress");
-                            $projectManager->updateTaskStatus($arguments['task_id'], 'in_progress');
-                            error_log("Status updated successfully");
-                        } else {
-                            error_log("Using normal status update for: " . $arguments['status']);
-                            $projectManager->updateTaskStatus($arguments['task_id'], $arguments['status']);
-                        }
-                        
+                        error_log("Updating task status to: " . $arguments['status']);
+                        $projectManager->updateTaskStatus($arguments['task_id'], $arguments['status']);
+                        error_log("Status updated successfully");
+                        // if ($arguments['status'] == 'in_progress') {
+                        //     error_log("Using updateTaskStatus for in_progress");
+                        //     $projectManager->updateTaskStatus($arguments['task_id'], 'in_progress');
+                        //     error_log("Status updated successfully");
+                        // } else {
+                        //     error_log("Using normal status update for: " . $arguments['status']);
+                        //     $projectManager->updateTaskStatus($arguments['task_id'], $arguments['status']);
+                        // }
+
                         // Log the activity regardless of other updates
                         if ($task) {
                             $this->logActivity(
@@ -445,14 +466,14 @@ class AIAssistant
                                 "AI Assistant updated status of task '{$task['title']}' from '{$task['status']}' to '{$arguments['status']}'"
                             );
                         }
-                        
-                        break; // Exit the case if we handled the status update
+
+                        // break; // Exit the case if we handled the status update
                     } catch (Exception $e) {
                         error_log("Error updating task status: " . $e->getMessage());
                         // Continue with normal update as fallback
                     }
                 }
-                
+
                 // Normal update path continues
                 $updates = [];
                 $params = [];
@@ -482,14 +503,14 @@ class AIAssistant
                     error_log("SQL query: " . $sql . " with parameters: " . implode(", ", $params));
                     $stmt = $this->db->prepare($sql);
                     $stmt->execute($params);
-                    
+
                     // Log activity for status changes
                     if (isset($arguments['status'])) {
                         // Get task info for activity log
                         $taskStmt = $this->db->prepare("SELECT title, project_id FROM tasks WHERE id = ?");
                         $taskStmt->execute([$arguments['task_id']]);
                         $task = $taskStmt->fetch();
-                        
+
                         if ($task) {
                             $this->logActivity(
                                 $task['project_id'],
@@ -592,7 +613,7 @@ class AIAssistant
     {
         try {
             $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
-            
+
             $stmt = $this->db->prepare(
                 "INSERT INTO activity_log (project_id, user_id, action_type, description) 
                  VALUES (?, ?, ?, ?)"
@@ -603,7 +624,7 @@ class AIAssistant
                 $action_type,
                 $description
             ]);
-            
+
             error_log("Activity logged: $action_type - $description");
             return true;
         } catch (Exception $e) {
@@ -625,12 +646,12 @@ class AIAssistant
             ");
             $stmt->execute([$project_id, "%$task_title%"]);
             $tasks = $stmt->fetchAll();
-            
+
             if (count($tasks) > 0) {
                 error_log("Found task with title '$task_title': " . $tasks[0]['id']);
                 return $tasks[0]['id'];
             }
-            
+
             error_log("No task found with title like '$task_title'");
             return null;
         } catch (Exception $e) {
@@ -645,8 +666,17 @@ class AIAssistant
     private function isCalendarRequest($message)
     {
         $calendarKeywords = [
-            'schedule', 'book', 'appointment', 'meeting', 'calendar', 'event',
-            'remind', 'reminder', 'set up', 'arrange', 'plan'
+            'schedule',
+            'book',
+            'appointment',
+            'meeting',
+            'calendar',
+            'event',
+            'remind',
+            'reminder',
+            'set up',
+            'arrange',
+            'plan'
         ];
 
         $message = strtolower($message);
@@ -661,82 +691,120 @@ class AIAssistant
     /**
      * Handle calendar-related requests
      */
-    private function handleCalendarRequest($message)
+    public function handleCalendarRequest($message)
     {
         try {
             if (!$this->calendar->isAuthenticated()) {
                 return [
-                    'message' => "Please connect your Google Calendar first. I'll help you schedule events once you're connected.",
+                    'message' => 'Please connect your Google Calendar first. I\'ll help you schedule events once you\'re connected. <button class="btn btn-primary" onclick="window.location.href=\'calendar/connect-calendar.php\'">Connect Calendar</button>',
                     'action' => 'connect_calendar'
                 ];
             }
-
+            // Check if token has expired and refresh if necessary
+            $client = $this->calendar->getClient();
+            if ($client->isAccessTokenExpired()) {
+                if ($client->getRefreshToken()) {
+                    $client->fetchAccessTokenWithRefreshToken($client->getRefreshToken());
+                    $_SESSION['access_token'] = $client->getAccessToken();
+                } else {
+                    // No refresh token available, need to reconnect
+                    return [
+                        'message' => 'Your calendar connection has expired. Please reconnect your Google Calendar. <button class="btn btn-primary" onclick="window.location.href=\'calendar/connect-calendar.php\'">Reconnect Calendar</button>',
+                        'action' => 'connect_calendar'
+                    ];
+                }
+            }
             // Use GPT to extract event details from the message
             $eventDetails = $this->extractEventDetails($message);
-
             // If no date is specified, default to tomorrow
             if (!isset($eventDetails['date']) || empty($eventDetails['date'])) {
                 $eventDetails['date'] = date('Y-m-d', strtotime('+1 day'));
+            } else {
+                // Parse the date and ensure it uses the current year if not specified
+                $parsedDate = new DateTime($eventDetails['date']);
+                $currentYear = (int)date('Y');
+                $dateYear = (int)$parsedDate->format('Y');
+                // If the year is different from current year, update it
+                if ($dateYear !== $currentYear) {
+                    $parsedDate->setDate($currentYear, $parsedDate->format('n'), $parsedDate->format('j'));
+                    $eventDetails['date'] = $parsedDate->format('Y-m-d');
+                }
             }
-
-            // Default time to 3:00 PM if not specified
-            $startTime = $eventDetails['date'] . ' 15:00:00';
-            $endTime = $eventDetails['date'] . ' 16:00:00';
-
-            // Create the event with fixed time
+            // Set timezone to Dubai
+            $dubaiTz = new DateTimeZone('Asia/Dubai');
+            // Create DateTime object for start time
+            $startDateTime = new DateTime(
+                $eventDetails['date'] . ' ' . ($eventDetails['time'] ?? '10:00:00'),
+                $dubaiTz
+            );
+            // Create end time (1 hour later)
+            $endDateTime = clone $startDateTime;
+            $endDateTime->modify('+1 hour');
+            // Create the event with specified time
             $event = new Google_Service_Calendar_Event([
                 'summary' => $eventDetails['summary'],
                 'description' => $eventDetails['description'],
                 'start' => [
-                    'dateTime' => date('c', strtotime($startTime)),
+                    'dateTime' => $startDateTime->format('c'),
                     'timeZone' => 'Asia/Dubai',
                 ],
                 'end' => [
-                    'dateTime' => date('c', strtotime($endTime)),
+                    'dateTime' => $endDateTime->format('c'),
                     'timeZone' => 'Asia/Dubai',
                 ],
             ]);
 
             $calendarId = 'primary';
-            $service = new Google_Service_Calendar($this->calendar->getClient());
+            $service = new Google_Service_Calendar($client);
             $createdEvent = $service->events->insert($calendarId, $event);
+            // Format time for display using the Dubai timezone
+            $displayTime = $startDateTime->format('g:i A') . ' - ' . $endDateTime->format('g:i A');
 
             return [
                 'message' => "✅ Event scheduled successfully!\n\n" .
-                            "📅 Event: {$eventDetails['summary']}\n" .
-                            "📆 Date: " . date('l, F j, Y', strtotime($eventDetails['date'])) . "\n" .
-                            "⏰ Time: 3:00 PM - 4:00 PM\n" .
-                            "📝 Description: {$eventDetails['description']}\n\n" .
-                            "View in Calendar: " . $createdEvent->htmlLink,
+                    "📅 Event: {$eventDetails['summary']}\n" .
+                    "📆 Date: " . $startDateTime->format('l, F j, Y') . "\n" .
+                    "⏰ Time: {$displayTime} (Dubai Time)\n" .
+                    "📝 Description: {$eventDetails['description']}\n\n" .
+                    "View in Calendar: <a href='{$createdEvent->htmlLink}' target='_blank'>Open in Google Calendar</a>",
                 'event' => $eventDetails,
                 'success' => true
             ];
 
         } catch (Exception $e) {
             error_log("Calendar Request Error: " . $e->getMessage());
+            
+            // Provide more detailed error message based on error type
+            $errorMsg = $e->getMessage();
+            if (strpos($errorMsg, 'insufficient authentication scopes') !== false) {
+                return [
+                    'message' => "I need additional permissions to schedule this event. Please reconnect your calendar: <button class='btn btn-main-primary' onclick=\"window.location.href='calendar/connect-calendar.php'\">Reconnect Calendar</button>",
+                    'error' => true,
+                    'action' => 'reconnect_calendar'
+                ];
+            }
+            
+            // Return a generic error message instead of the raw error
             return [
-                'message' => "Sorry, I encountered an error while scheduling your event: " . $e->getMessage(),
-                'error' => true
+                'message' => "I wasn't able to schedule your event. Please try reconnecting your calendar: <button class='btn btn-main-primary' onclick=\"window.location.href='calendar/connect-calendar.php'\">Reconnect Calendar</button>",
+                'error' => true,
+                'action' => 'reconnect_calendar'
             ];
         }
     }
 
-    /**
-     * Extract event details from user message using GPT
-     */
     private function extractEventDetails($message)
     {
         $messages = [
             [
                 'role' => 'system',
-                'content' => "You are a calendar assistant. Extract event details from the user's message and respond ONLY with a JSON object in this exact format: {\"summary\": \"event title\", \"description\": \"event description\", \"date\": \"YYYY-MM-DD\"} - If date is not specified, omit the date field. Keep the description brief and relevant."
+                'content' => "You are a calendar assistant. Extract event details from the user's message and respond ONLY with a JSON object in this exact format: {\"summary\": \"event title\", \"description\": \"event description\", \"date\": \"YYYY-MM-DD\", \"time\": \"HH:MM:SS\"} - If date or time is not specified, omit those fields. Keep the description brief and relevant. For time, use 24-hour format. For relative dates like 'tomorrow', 'next week', etc., convert them to actual dates using today's date (" . date('Y-m-d') . ") as reference. Always use the current year (" . date('Y') . ") unless a different year is explicitly specified."
             ],
             [
                 'role' => 'user',
-                'content' => $message
+                'content' => $message . "\nToday's date is " . date('Y-m-d') . "."
             ]
         ];
-
         $curl = curl_init();
         curl_setopt_array($curl, [
             CURLOPT_URL => 'https://api.openai.com/v1/chat/completions',
@@ -747,7 +815,7 @@ class AIAssistant
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => json_encode([
-                'model' => 'gpt-4',
+                'model' => $this->model,
                 'messages' => $messages,
                 'temperature' => 0.7
             ]),
@@ -774,7 +842,7 @@ class AIAssistant
         if (!$eventDetails) {
             throw new Exception("Failed to parse event details from AI response");
         }
-        
+
         // Set defaults if missing
         if (!isset($eventDetails['summary']) || empty($eventDetails['summary'])) {
             $eventDetails['summary'] = 'New Event';

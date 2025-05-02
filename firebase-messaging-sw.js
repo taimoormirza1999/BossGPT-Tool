@@ -6,12 +6,12 @@ importScripts('https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js')
 
 // Your Firebase configuration - replace with your actual Firebase config
 firebase.initializeApp({
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyAPByoVru7fAR1Mk8_y8AW73vWVRwEDma4",
+  authDomain: "bossgpt-367ab.firebaseapp.com",
+  projectId: "bossgpt-367ab",
+  storageBucket: "bossgpt-367ab.firebasestorage.app",
+  messagingSenderId: "1078128619253",
+  appId: "1:1078128619253:web:edf3e5f2306ab349191fbc"
 });
 
 const messaging = firebase.messaging();

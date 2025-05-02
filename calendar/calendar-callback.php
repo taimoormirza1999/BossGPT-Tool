@@ -1,20 +1,23 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-session_start();
+if (session_id() === '') {
+    session_start();
+  }
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/../env.php';
-loadEnv();
-$GOOGLE_CLIENT_ID='949298386531-pbk4td6p6ga18e6diee9rifskto0ou0v.apps.googleusercontent.com';
-$GOOGLE_CLIENT_SECRET='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';
-$GOOGLE_REDIRECT_URI='http://localhost/bossgpt-tool/calendar/calendar-callback.php';
+require_once __DIR__ . '/constant.php';
 
+// Load environment variables
+loadEnv(__DIR__ . '/../.env');
 
 $client = new Google_Client();
-$client->setClientId($GOOGLE_CLIENT_ID);
-$client->setClientSecret($GOOGLE_CLIENT_SECRET);
-$client->setRedirectUri($GOOGLE_REDIRECT_URI);
+$client->setClientId($_ENV['GOOGLE_CLIENT_ID']);
+$client->setClientSecret($_ENV['GOOGLE_CLIENT_SECRET']);
+$client->setRedirectUri($_ENV['GOOGLE_CALENDAR_REDIRECT_URI']);
 $client->addScope(Google_Service_Calendar::CALENDAR);
+$client->addScope(Google_Service_Calendar::CALENDAR_EVENTS);
+$client->setAccessType('offline');
+$client->setPrompt('consent');
 
 if (isset($_GET['code'])) {
     $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
@@ -22,9 +25,7 @@ if (isset($_GET['code'])) {
 
     // Store token in session
     $_SESSION['access_token'] = $token;
-
-    // Redirect back to dashboard instead of create-event form
-    header('Location: ../dashboard.php');
+    header('Location: ../');
     exit;
 } else {
     echo "Failed to authenticate with Google Calendar.";

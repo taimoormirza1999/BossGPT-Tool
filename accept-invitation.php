@@ -1,6 +1,8 @@
 <?php
 require_once 'classes/UserManager.php';
-session_start();
+if (session_id() === '') {
+    session_start();
+  }
 
 $token = $_GET['token'] ?? '';
 $message = '';

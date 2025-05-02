@@ -74,9 +74,9 @@ $black-mode-bar-bgcolor: rgba(36, 37, 38, 0.5);
 $brown-mode-bar-bgcolor: rgba(65, 4, 4, 1);
 $light-mode-bar-bgcolor: rgba(255, 255, 255, 0.6);
 $dark-mode-modal-bgcolor: $black-color;
-$dark-mode-modal-border: 1px solid $white-color-20;
+$dark-mode-modal-border: 1.3px solid $white-color-20;
 $dark-mode-bar-bgcolor: var(--bs-primary-darkpurple-linear-gradient);
-$dark-mode-message-ai-border: 1px solid rgba(211, 211, 211, 0.5);
+$dark-mode-message-ai-border: 1.3px solid rgba(211, 211, 211, 0.5);
 $dark-mode-message-ai-color: #e4e6eb;
 $default-mode-message-user-bgcolor: $white-color-20;
 $dark-mode-message-user-bgcolor: $white-color-20;
@@ -99,7 +99,7 @@ $purple-mode-modal-header-bgcolor: #361734;
 $brown-mode-modal-header-bgcolor: #410404;
 $default-mode-modal-header-bgcolor: #1d1d1d;
 
-$black-mode-modal-input-bgcolor: rgba(12, 1, 17, 0.2);
+$black-mode-modal-input-bgcolor: rgba(0, 0, 0, 0.2);
 $purple-mode-modal-input-bgcolor: rgba(12, 1, 17, 0.5);
 $brown-mode-modal-input-bgcolor: rgba(12, 1, 17, 0.2);
 $default-mode-modal-input-bgcolor: rgba(10, 10, 10, 0.2);
@@ -108,7 +108,8 @@ $transition-duration-34: 0.34s;
 $transition-duration-40: 0.4s;
 $transition-duration-50: 0.5s;
 $notification-icon-padding: 0.5rem;
-
+$boder-width_1_3: 1.3px;
+$boder-width_1_5: 1.5px;
 // ===============================
 // 2) FONTS
 // ===============================
@@ -169,6 +170,32 @@ $geist-fonts: (
   }
 }
 
+.hide-scrollbar {
+  overflow: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.primary-input{
+  background-color: $default-mode-modal-input-bgcolor!important;
+  border: $boder-width_1_3 solid rgba(156, 156, 156, 1)!important;
+  border-radius: $border-radius-12;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: $white-color;
+  &:focus{
+    background-color: $default-mode-modal-input-bgcolor!important;
+    border: $boder-width_1_3 solid rgba(156, 156, 156, 1)!important;
+  }
+  & + .btn-outline-action {
+    border: $boder-width_1_3 solid rgba(156, 156, 156, 1)!important;
+}
+}
 .hover-up {
   transition: all $transition-duration-34 ease-in-out;
   &:hover {
@@ -299,7 +326,6 @@ $geist-fonts: (
     }
   }
 }
-
 @mixin theme-common-notification-list($bgcolor) {
   .dropdown-item {
     &:hover {
@@ -311,6 +337,7 @@ $geist-fonts: (
   .modal {
     .modal-dialog {
       .modal-content {
+       
         @include theme-bgcolor($container-bgcolor);
         .close-icon-btn {
         }
@@ -327,7 +354,8 @@ $geist-fonts: (
           .tree-option {
             @include theme-bgcolor($input-bgcolor);
           }
-          .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        
+          .select2-container--default .select2-selection--multiple .select2-selection__choice,.select2-dropdown {
             background-color: $container-bgcolor!important;
           }
         }
@@ -390,6 +418,79 @@ $geist-fonts: (
     @include theme-bgcolor($bgcolor);
   }
 }
+@mixin theme-tab-panel($bgcolor) {
+  .tab-pane {
+    @include theme-bgcolor($bgcolor);
+    &#activity, &#cards{
+    height: calc(100vh - 250px)!important;
+    }
+    .card-header{
+      @include theme-bgcolor($bgcolor);
+    }
+    
+  }
+}
+// Projects Cards 
+@mixin projects-card(
+  $main-bg,
+  $header-bg,
+  $header-border-width,
+  $header-border-color,
+  $column-header-border-width,
+  $column-header-border-color,
+  $task-card-bg
+) {
+  .projects_card {
+    // 1) the three columns all get the same main background
+    .column_todo,
+    .column_in_progress,
+    .column_done {
+      background: $main-bg !important;
+      .task-card {
+        .btn-sm.btn-link,
+        .add-subtask-btn,
+        .ai-add-subtask-btn,
+        .ai-update-dates-btn {
+          color: $white-color !important;
+          text-decoration: none !important;
+          padding: 6px 12px;
+          border-radius: $border-radius-8;
+          background: $white-color-10;
+          border: $boder-width_1_3 solid $white-color-10;
+          margin: 2px;
+          display: none;
+          align-items: center;
+          gap: 6px;
+          font-size: 0.875rem;
+          transition: all $transition-duration-34 ease;
+          white-space: nowrap;
+          &:hover {
+            background: $white-color-20;
+            transform: translateY(-1px);
+          }
+        }
+      }
+    }
+
+    // 2) header gets themed background + border-bottom
+    .card-header {
+      @include theme-bgcolor($header-bg);
+      border-bottom: $header-border-width solid $header-border-color !important;
+    }
+
+    // 3) body
+    .card-body {
+      // 3a) sub-column headers
+      .task-column_header {
+        border: $column-header-border-width solid $column-header-border-color !important;
+      }
+      // 3b) task cards
+      .task-card {
+        @include theme-bgcolor($task-card-bg);
+      }
+    }
+  }
+}
 #user-add-icon {
   @include button-icon-only;
 }
@@ -409,19 +510,17 @@ $geist-fonts: (
   @include flex-center-hv;
   @extend .hover-up;
 }
-
 .due-date_size{
   font-size: 0.7rem!important;
 }
 .due-date {
-  border: 1px solid #2f3031;
+  border: $boder-width_1_3 solid #2f3031!important;
   background: rgba(255, 255, 255, 0.1);
 }
 svg.calendar-icons {
   height: 1.2rem !important;
   width: 1.2rem !important;
-} 
-
+}
 body.system-mode {
   @include theme-bgcolor($default-mode-card-task-bgcolor);
   background-image: $bg-img1-black;
@@ -429,28 +528,19 @@ body.system-mode {
   .nav-background {
     @include theme-bgcolor($default-mode-topbar-bgcolor);
   }
-  .projects_card {
-    .column_todo,
-    .column_in_progress,
-    .column_done {
-      background: $default-mode-main-bgcolor !important;
-    }
-
-    .card-header {
-      @include theme-bgcolor($default-mode-main-bgcolor);
-      border-bottom: 1px solid rgba(211, 211, 211, 0.5) !important;
-    }
-    .card-body {
-      .task-column_header {
-        border: 1px solid rgba(211, 211, 211, 0.5) !important;
-      }
-      .task-card {
-        @include theme-bgcolor($default-mode-card-task-bgcolor);
-      }
-    }
-  }
-  @include theme-common-chat-pannel(
+  @include projects-card(
     $default-mode-main-bgcolor,
+    rgba(0, 0, 0, 0.8),
+    $boder-width_1_3,
+    rgba(211, 211, 211, 0.5),
+    $boder-width_1_5,
+    rgba(211, 211, 211, 0.5),
+    $default-mode-card-task-bgcolor
+  );
+  
+  @include theme-tab-panel(rgba(0,0,0,0.8 ));
+  @include theme-common-chat-pannel(
+    #131313,
     $default-mode-welcome-logo-bgcolor,
     $default-mode-card-task-bgcolor,
     $default-mode-card-task-bgcolor,
@@ -476,18 +566,17 @@ body.purple-mode {
   .nav-background {
     @include theme-bgcolor($purple-mode-bar-bgcolor);
   }
-  .projects_card {
-    @include commomtaskheader;
-
-    .card-header {
-      @include theme-bgcolor($purple-mode-bar-bgcolor);
-    }
-    .card-body {
-      .task-card {
-        @include theme-bgcolor($purple-mode-card-task-bgcolor);
-      }
-    }
-  }
+// Purple mode
+@include projects-card(
+  null,
+  $purple-mode-bar-bgcolor,
+  $boder-width_1_3,
+  rgba(211, 211, 211, 0.5),
+  $boder-width_1_5,
+  rgba(211, 211, 211, 0.5),
+  $purple-mode-card-task-bgcolor
+);
+  @include theme-tab-panel($purple-mode-modal-container-bgcolor);
   @include theme-common-chat-pannel(
     $purple-mode-bar-bgcolor,
     $purple-mode-card-task-bgcolor,
@@ -515,17 +604,16 @@ body.black-mode {
   .nav-background {
     @include theme-bgcolor($black-mode-bar-bgcolor);
   }
-  .projects_card {
-    @include commomtaskheader;
-    .card-header {
-      @include theme-bgcolor($black-mode-bar-bgcolor);
-    }
-    .card-body {
-      .task-card {
-        @include theme-bgcolor($black-mode-card-task-bgcolor);
-      }
-    }
-  }
+  @include projects-card(
+    null,
+    $black-mode-bar-bgcolor,
+    $boder-width_1_3,
+    rgba(211, 211, 211, 0.5),
+    $boder-width_1_5,
+    rgba(211, 211, 211, 0.5),
+    $black-mode-card-task-bgcolor
+);
+  @include theme-tab-panel($black-mode-modal-container-bgcolor);
   @include theme-common-chat-pannel(
     $black-mode-bar-bgcolor,
     $black-mode-card-task-bgcolor,
@@ -553,17 +641,16 @@ body.brown-mode {
   .nav-background {
     @include theme-bgcolor($brown-mode-bar-bgcolor);
   }
-  .projects_card {
-    @include commomtaskheader;
-    .card-header {
-      @include theme-bgcolor($brown-mode-bar-bgcolor);
-    }
-    .card-body {
-      .task-card {
-        @include theme-bgcolor($brown-mode-card-task-bgcolor);
-      }
-    }
-  }
+  @include projects-card(
+    null,
+    $brown-mode-bar-bgcolor,
+    $boder-width_1_3,
+    rgba(211, 211, 211, 0.5),
+    $boder-width_1_5,
+    rgba(211, 211, 211, 0.5),
+    $brown-mode-card-task-bgcolor
+  );
+  @include theme-tab-panel($brown-mode-modal-container-bgcolor);
   @include theme-common-chat-pannel(
     $brown-mode-bar-bgcolor,
     $brown-mode-bar-bgcolor,
@@ -592,8 +679,12 @@ body {
   background-position: top;
   background-repeat: no-repeat;
   background-attachment: fixed;
-
+  overflow-y: hidden!important;
+  // overflow-y: hidden;
   // login/register pa ges
+  h1, h2, h3, h4, h5, h6, .fontSecondaryBold {
+    @extend .font-secondaryBold;
+  }
   .register-page,
   .login-page,
   .aitone-page {
@@ -607,7 +698,7 @@ body {
       text-decoration: none !important;
 
       &.btn.btn-outline-link {
-        border: 1px solid #9c9c9c;
+        border:$boder-width_1_3 solid #9c9c9c;
         border-radius: 12px;
         width: 251px !important;
         height: 48px !important;
@@ -620,11 +711,13 @@ body {
 
     input {
       background: rgba(0, 0, 0, 0.5);
-      border: 1px solid #9c9c9c;
+      border: $boder-width_1_3 solid #9c9c9c;
       border-radius: 12px;
       height: 48px;
       color: #fff;
     }
+    input:focus{
+      background: rgba(0, 0, 0, 0.5);}
 
     .form-label,
     .card-title {
@@ -634,7 +727,7 @@ body {
     .card {
       .card-body {
         background: rgba(0, 0, 0, 0.8);
-        border: 1px solid rgba(234, 234, 234, 0.2);
+        border: $boder-width_1_3 solid rgba(234, 234, 234, 0.2);
         backdrop-filter: blur(6.35px);
         border-radius: 16px;
         display: flex !important;
@@ -689,7 +782,7 @@ body {
     .btn-primary {
       color: rgba(255, 255, 255, 1);
       background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(248, 249, 250, 0.5);
+      border: $boder-width_1_3 solid rgba(248, 249, 250, 0.5);
       border-radius: 10px;
       transition: all 0.34s ease-in-out;
       height: 49px;
@@ -743,7 +836,7 @@ body {
     background: rgba(20, 20, 35, 0.3) !important;
     backdrop-filter: blur(16px) !important;
     // box-shadow: 0 4px 30px $black-color-10 !important;
-    border-bottom: 1px solid $gray-color-3;
+    border-bottom: 0;
     button {
       border: 1.4px solid $white-color-80 !important;
     }
@@ -756,6 +849,7 @@ body {
       width: 42px;
       @include flex-center-hv;
       @extend .hover-up;
+      border: $boder-width_1_5 solid rgba(248, 249, 250, 0.5) !important;
     }
     .theme-icon-container {
       @include flex-center-hv-column;
@@ -833,22 +927,34 @@ body {
   .form-control {
     padding: 0.7rem 1rem;
     box-sizing: border-box;
-    border: 1px solid $white-color-20;
+    border: $boder-width_1_3 solid $white-color-20;
     border-radius: $border-radius-12;
+    transition: all $transition-duration-40 ease-in-out;
   }
-
+  .form-control:focus{
+    background: transparent !important;
+    border: 1.3px solid $white-color-50 !important;
+    box-shadow:  none !important;
+    color: $white-color !important;
+  }
+  div.tab-pane {
+    border: 1px solid rgba(234, 234, 234, 0.3);
+    backdrop-filter: blur(6.35px);
+    border-radius: $border-radius-16;
+    margin: auto;
+    padding: 2.5rem 1.4rem;
+    overflow-y: hidden;
+  }
   .btn-main-primary,
   .btn-send-primary {
     background: rgba(255, 255, 255, 0.1) !important;
-    border: 1px solid rgba(248, 249, 250, 0.5) !important;
+    border: $boder-width_1_3 solid rgba(248, 249, 250, 0.5) !important;
     border-radius: $border-radius-8 !important;
     color: white !important;
     transition: all $transition-duration-40 ease-in-out !important;
   }
   .projects_card {
-    // box-shadow: 0 2px 5px $black-color-20;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(211, 211, 211, 0.5);
+    border: $boder-width_1_5 solid rgba(211, 211, 211, 0.5);
     backdrop-filter: blur(7.199999809265137px);
     .card-header {
       // box-shadow: 0px 4px 30px $black-color-10 !important;
@@ -861,13 +967,13 @@ body {
         @include flex-center-hv;
         // @extend .hover-up;
       }
-      #projectDropdownButton {
+      #projectDropdownButton, #projectDropdownButton1 {
         text-decoration: none !important;
         color: $white-color !important;
       }
-      ul#projectDropdown {
+      ul#projectDropdown, ul#projectDropdown1 {
         background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(211, 211, 211, 0.5);
+        border: $boder-width_1_3 solid rgba(211, 211, 211, 0.5);
         backdrop-filter: blur(4.3px);
         li.dropdown-item {
           color: $white-color !important;
@@ -909,7 +1015,7 @@ body {
       .task-column_section {
         .task-column_header {
           backdrop-filter: blur(4px);
-          border: 1px solid $white-color-05;
+          border: $boder-width_1_3 solid $white-color-05;
           color: $white-color;
           font-weight: 800;
           border-radius: $border-radius-12;
@@ -925,12 +1031,15 @@ body {
         .task-column {
           background: rgba(76, 76, 76, 0.25);
           backdrop-filter: blur(20px);
-          border: 1px solid $white-color-50;
+          border: $boder-width_1_5 solid $white-color-50;
           transition: all $transition-duration-50 ease;
-          min-height: calc(100vh - 335px);
+          min-height: calc(100vh - 270px);
           border-radius: $border-radius-12;
           padding: 1rem;
-          overflow-y: auto;
+          // overflow: scroll;
+          height: 40vh;
+          overflow-y: scroll;
+          @extend .hide-scrollbar;
           .task-card {
             transition: all $transition-duration-34;
             transform-origin: center;
@@ -956,7 +1065,7 @@ body {
               transition: all 0.4s ease;
               color: rgba(160, 160, 160, 1) !important;
               &.overdue{
-                color:  #dc3545!important;
+                color:  rgba(160, 160, 160, 1)!important;
                 svg path{
                   stroke:  #dc3545!important;
                 }
@@ -1020,7 +1129,6 @@ body {
       right: 15px;
     }
   }
-
   .chat-pannel {
     @media (max-width: 768px) {
       position: fixed !important;
@@ -1041,7 +1149,7 @@ body {
       .card-ai-tone-modal-content {
         width: 90%;
         background: #242526;
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        border: $boder-width_1_3 solid rgba(255, 255, 255, 0.2);
         backdrop-filter: blur(6.35px);
         border-radius: 16px;
         @media (min-width: 1024px) {
@@ -1073,12 +1181,13 @@ body {
     }
     .card {
       background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(211, 211, 211, 0.5);
+      border: $boder-width_1_5 solid rgba(211, 211, 211, 0.5);
       backdrop-filter: blur(10px);
       border-radius: $border-radius-16;
     }
     .card-header {
       position: relative;
+      border-bottom: 1.5px solid rgba(211, 211, 211, .5)!important;
       h5 {
         color: $white-color;
       }
@@ -1103,16 +1212,19 @@ body {
       .welcome-logo-container {
         @extend .hover-up;
         margin-bottom: 1.2rem !important;
-        border: 1px solid rgba(211, 211, 211, 0.5)
+        border: $boder-width_1_3 solid rgba(211, 211, 211, 0.5)
+      }
+      .chat-messages{
+        @extend .hide-scrollbar;
       }
       .chat-loading-avatar {
         @extend .hover-up;
-        border: 1px solid rgba(211, 211, 211, 0.5);
+        border: $boder-width_1_3 solid rgba(211, 211, 211, 0.5);
         border-radius: 50%;
         padding-bottom: 0.3rem;
       }
       .chat-loading-container {
-        border: 1px solid rgba(211, 211, 211, 0.5);
+        border: $boder-width_1_3 solid rgba(211, 211, 211, 0.5);
         // box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         border-radius: 16px;
         backdrop-filter: blur(8px);
@@ -1213,8 +1325,7 @@ body {
         border: $dark-mode-modal-border;
         max-height: 60vh;
         border-radius: 16px !important;
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(211, 211, 211, 0.5);
+        border: $boder-width_1_3 solid rgba(211, 211, 211, 0.5)!important;
         backdrop-filter: blur(6.35px);
         .close-icon-btn {
           transform: translateY(-50%);
@@ -1257,14 +1368,14 @@ body {
           textarea,
           .select2-container--default .select2-selection--multiple,
           .tree-option {
-            border: 1px solid $white-color-20 !important;
+            border: $boder-width_1_3 solid $white-color-20 !important;
             color: $white-color !important;
             @extend .hover-up;
           }
           .tree-option {
             &:hover,
             &.selected {
-              border: 1px solid #28a745 !important;
+              border: $boder-width_1_3 solid #28a745 !important;
               background-color: rgba(40, 167, 69, 0.1) !important;
               @extend .hover-up;
             }
@@ -1303,7 +1414,7 @@ body {
     font-family: "CabinetGroteskBold", sans-serif;
     font-size: 1rem;
     backdrop-filter: blur(4px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: $boder-width_1_3 solid rgba(255, 255, 255, 0.2);
   }
 
   .reminder-button:hover {
@@ -1368,35 +1479,12 @@ body {
       @include theme-text-color($gray-color-92);
     }
   }
-}
-
-// Ensure buttons are properly styled in all columns
-.column_todo,
-.column_in_progress,
-.column_done {
-  .task-card {
-    .btn-sm.btn-link,
-    .add-subtask-btn,
-    .ai-add-subtask-btn,
-    .ai-update-dates-btn {
-      color: $white-color !important;
-      text-decoration: none !important;
-      padding: 6px 12px;
-      border-radius: $border-radius-8;
-      background: $white-color-10;
-      border: 1px solid $white-color-10;
-      margin: 2px;
-      display: none;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.875rem;
-      transition: all $transition-duration-34 ease;
-      white-space: nowrap;
-
-      &:hover {
-        background: $white-color-20;
-        transform: translateY(-1px);
-      }
-    }
+  .alert-main-primary{
+    background-color: rgba(19, 19, 19, 0.5);
+    background: rgba(19, 19, 19, 0.5);
+    border: 0.717771px solid rgba(237, 237, 237, 0.3);
+    backdrop-filter: blur(12.9199px);
+    border-radius: 14.3554px;
+    color: white;
   }
 }

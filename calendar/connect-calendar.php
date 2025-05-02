@@ -13,6 +13,7 @@ $client->setClientId($_ENV['GOOGLE_CLIENT_ID']);
 $client->setClientSecret($_ENV['GOOGLE_CLIENT_SECRET']);
 $client->setRedirectUri($_ENV['GOOGLE_CALENDAR_REDIRECT_URI']);
 $client->addScope(Google_Service_Calendar::CALENDAR);
+$client->addScope(Google_Service_Calendar::CALENDAR_EVENTS); // Add events scope explicitly
 $client->setAccessType('offline'); // Get refresh token
 $client->setPrompt('consent'); // Always ask permission
 

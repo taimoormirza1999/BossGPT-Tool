@@ -1,12 +1,13 @@
 <?php
-require_once 'env.php';
-loadEnv();
+
 require_once 'config/constants.php';
-session_start();
+if (session_id() === '') {
+    session_start();
+  }
 require_once 'classes/GardenManager.php';
 // Redirect if not logged in
 if (!isset($_SESSION['user_id'])) {
-    header('Location: index.php?page=login');
+    header('Location:'.$_ENV['BASE_URL'].'?page=login');
     exit;
 }
 
@@ -24,7 +25,6 @@ try {
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,6 +33,10 @@ try {
     <!-- <link rel="stylesheet" href="assets/css/custom.css"> -->
     <link rel="stylesheet" href="assets/css/optimize.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- <link rel="preload" href="https://res.cloudinary.com/da6qujoed/raw/upload/v1745325374/loader_bossgpt_htiw2q.lottie"
+        as="fetch" crossorigin> -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
+
     <style>
         body {
             margin: 0;
@@ -42,6 +46,12 @@ try {
 
         canvas {
             display: block;
+        }
+
+        #myLottie {
+            width: 53px;
+            height: 53px;
+            display: block !important;
         }
 
         #gardenCanvas {
@@ -60,11 +70,16 @@ try {
             top: 20px;
             left: 20px;
             z-index: 10;
-            background: rgba(0, 0, 0, 0.5);
+            /* background: rgba(0, 0, 0, 0.5); */
             padding: 15px;
             border-radius: 10px;
             color: white;
+            background: rgba(0, 0, 0, 0.3) !important;
+    border: 1.5px solid rgba(211, 211, 211, 0.5) !important;
+    backdrop-filter: blur(40px) !important;
+    border-radius: 16px !important;
         }
+      
 
         .achievement-badge {
             display: inline-block;
@@ -85,18 +100,25 @@ try {
             top: 20px;
             right: 20px;
             z-index: 10;
+            background: rgba(0, 0, 0, 0.3) !important;
+    border: 1.5px solid rgba(211, 211, 211, 0.5) !important;
+    backdrop-filter: blur(40px) !important;
+    border-radius: 16px !important;
+    padding: 5px 10px;
+    text-decoration: none;
+    font-size: 0.9rem;
         }
 
         /* Loader spinner styles */
-        .loader-spinner {
+        /* .loader-spinner {
             width: 40px;
-    height: 40px;
-    border: 5px solid rgb(255 255 255 / 57%);
-    border-radius: 50%;
-    border-top-color: #339c29;
-    animation: spin 1.2s ease-in-out infinite;
+            height: 40px;
+            border: 5px solid rgb(255 255 255 / 57%);
+            border-radius: 50%;
+            border-top-color: #339c29;
+            animation: spin 1.2s ease-in-out infinite;
             margin: 0 auto 15px auto;
-        }
+        } */
 
         body.loaded #gardenCanvas {
             opacity: 1;
@@ -114,93 +136,146 @@ try {
             justify-content: center;
             align-items: center;
             backdrop-filter: blur(20px);
+            opacity: 1;
         }
 
-        @keyframes spin {
+        /* @keyframes spin {
             to {
                 transform: rotate(360deg);
             }
-        }
-    .garden-overlay-content{
-        text-align: center;
-    padding: 4rem 4rem;
-    background: rgba(0, 0, 0, 0.35);
-    border-radius: 12px;
-    color: white;
-    }
-    @media (min-width:576px) {
+        } */
+
         .garden-overlay-content {
-            width: 650px;
+            text-align: center;
+            padding: 4rem 4rem;
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: 12px;
+            color: white;
         }
-    }
-    .tree_image{
-        width:100px; height:100px;
-    }
-    
+
+        @media (min-width:576px) {
+            .garden-overlay-content {
+                width: 650px;
+            }
+        }
+
+        .tree_image {
+            width: 100px;
+            height: 100px;
+        }
+        .tree_image_small {
+            width: 40px;
+            height: 40px;
+        }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@lottiefiles/dotlottie-web/dist/index.umd.js"></script>
+
+
 </head>
+
+      <script type="module">
+  import { DotLottie } from "https://cdn.jsdelivr.net/npm/@lottiefiles/dotlottie-web/+esm";
+
+  document.addEventListener('DOMContentLoaded', function () {
+    function initializeLottie(canvasId, lottieUrl) {
+      const canvas = document.getElementById(canvasId);
+      if (canvas) {
+        new DotLottie({
+          canvas: canvas,
+          src: lottieUrl,
+          loop: true,
+          autoplay: true
+        });
+      } else {
+        console.warn(`Canvas with ID '${canvasId}' not found.`);
+      }
+    }
+
+    // Initialize both animations
+    initializeLottie("myLottie", "https://res.cloudinary.com/da6qujoed/raw/upload/v1745325374/loader_bossgpt_htiw2q.lottie");
+  });
+</script>
+<?php
+
+function getPlantImage($plantType, $extraClasses = "")
+{
+    echo '<img src="assets/images/garden/' . $plantType . '.png" alt="Garden Seed" class="tree_image ' . $extraClasses . ' mb-3 animate__animated animate__pulse animate__infinite">';
+}
+?>
 
 <body class="dark-mode">
     <div class="garden-container">
         <!-- Add loading overlay -->
-        <div id="loadingOverlay"
-            class="position-fixed top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center"
-            >
-<div class="d-flex flex-column justify-content-center align-items-center garden-overlay-content">
-<div class="text-center mb-4">
-                <img src="assets/images/garden/seed.png" alt="Garden Seed" class="tree_image" class="mb-3 animate__animated animate__pulse animate__infinite">
-<img src="assets/images/garden/treelv2.png" alt="Garden Seed" class="tree_image" class="mb-3 animate__animated animate__pulse animate__infinite">
-<img src="assets/images/garden/treelv6.png" alt="Garden Seed" class="tree_image" class="mb-3 animate__animated animate__pulse animate__infinite">
+        <!-- <div id="loadingOverlay"
+            class="position-fixed top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center">
+            <div class="d-flex flex-column justify-content-center align-items-center garden-overlay-content">
+                <div class="text-center mb-4">
+                    <?php getPlantImage('seed'); ?>
+                    <?php getPlantImage('treelv2'); ?>
+                    <?php getPlantImage('treelv6'); ?>
 
-                <h2 class="text-white">Growing Your Garden</h2>
+                    <h2 class="text-white">Growing Your Garden</h2>
+                </div>
+                <div class="loader-spinner"></div>
+                <canvas id="myLottie" width="53" height="53"></canvas>
+                <div id="loadingText" class="text-white">Loading assets (0%)</div>
             </div>
-            <div class="loader-spinner"></div>
-            <div id="loadingText" class="text-white">Loading assets (0%)</div>
-</div>
-        </div>
+        </div> -->
+        <?php 
+        
+$loadingText = "Preparing your AI workspace...";
+$contentHeading = "Growing Your Garden";
+$contentContainerClass = "custom-content-style";
+        require_once 'components/loadingOverlay.php'; ?>
 
         <canvas id="gardenCanvas"></canvas>
 
         <div class="garden-overlay">
             <h2>Your Virtual Garden</h2>
             <div class="garden-stats">
-                <p>Total Plants: <span id="totalPlants"><?= count($plants) ?></span></p>
-                <p>Completed Tasks (Lush Trees): <span
-                        id="completedTasks"><?= count(array_filter($plants, function ($p) {
-                            return $p['stage'] == 'lush_tree'; })) ?></span>
+                <p>Total Plants: <span id="totalPlants"><?= '0'.count($plants) ?></span></p>
+                <p style="display: flex; align-items: center;"> <?php getPlantImage('treelv8', 'tree_image_small'); ?> Trees: <span id="completedTasks"><?= count(array_filter($plants, function ($p) {
+                    return $p['stage'] == 'tree';
+                })) ?></span>
                 </p>
-                <p>Growing Plants: <span
-                        id="growingPlants"><?= count(array_filter($plants, function ($p) {
-                            return $p['stage'] == 'growing'; })) ?></span>
+                <p style="display: flex; align-items: flex-end;"> <?php getPlantImage('flower3', 'tree_image_small'); ?> Flowers: <span id="growingPlants"><?= count(array_filter($plants, function ($p) {
+                    return $p['stage'] == 'growing';
+                })) ?></span>
                 </p>
-                <p>Seeds Planted: <span
-                        id="seedsPlanted"><?= count(array_filter($plants, function ($p) {
-                            return $p['stage'] == 'seed'; })) ?></span>
+                <p style="display: flex; align-items: flex-end;"> <?php getPlantImage('seed', 'tree_image_small'); ?> Seeds: <span id="seedsPlanted"><?= count(array_filter($plants, function ($p) {
+                    return $p['stage'] == 'sprout';
+                })) ?></span>
                 </p>
             </div>
 
-            <?php if (count($plants) > 0): ?>
+            <?php if (count($plants) > 10): ?>
                 <div class="achievements mt-4">
                     <h4>Your Achievements</h4>
                     <?php if (count($plants) >= 5): ?>
                         <div class="achievement-badge">🌱 Garden Starter</div>
                     <?php endif; ?>
 
-                    <?php if (count(array_filter($plants, function ($p) {
-                        return $p['stage'] == 'lush_tree'; })) >= 3): ?>
+                    <?php if (
+                        count(array_filter($plants, function ($p) {
+                                return $p['stage'] == 'lush_tree';
+                            })) >= 3
+                    ): ?>
                         <div class="achievement-badge">🌳 Forest Creator</div>
                     <?php endif; ?>
 
-                    <?php if (count(array_filter($plants, function ($p) {
-                        return $p['stage'] == 'lush_tree' && $p['size'] == 'large'; })) >= 1): ?>
+                    <?php if (
+                        count(array_filter($plants, function ($p) {
+                            return $p['stage'] == 'lush_tree' && $p['size'] == 'large';
+                        })) >= 1
+                    ): ?>
                         <div class="achievement-badge">🌲 Project Completer</div>
                     <?php endif; ?>
                 </div>
             <?php endif; ?>
         </div>
 
-        <a href="index.php" class="btn back-button btn-main-primary">
-            <i class="bi bi-arrow-left"></i> Back to Dashboard
+        <a href="<?php echo $_ENV['BASE_URL']?>/?page=dashboard" class="btn back-button btn-main-primary">
+        <i class="bi bi-arrow-left-circle"></i> Back to Dashboard
         </a>
     </div>
 
@@ -258,7 +333,7 @@ try {
                     document.body.style.overflow = 'auto'; // Restore scrolling
                 }, 1000);
                 gardenCanvas.style.opacity = '1';
-            }, 800);
+            }, 1200);
         };
 
         // --- RENDERER ---
@@ -275,7 +350,6 @@ try {
         // --- SCENE ---
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x51a387);
-
         // --- CAMERA (Orthographic for isometric) ---
         const width = window.innerWidth;
         const height = window.innerHeight;
@@ -343,7 +417,7 @@ try {
         const plantTypes = [
             'seed', 'flower', 'treelv2', 'treelv3', 'treelv4',
             'treelv5', 'treelv6', 'treelv7', 'treelv8', 'treebig',
-            'dead', 'lush', 'treedead','flower1','flower3'
+            'dead', 'lush', 'treedead', 'flower1', 'flower3'
         ];
 
         plantTypes.forEach(type => {
@@ -436,17 +510,17 @@ try {
             // Determine which texture to use based on stage and plantType
             if (stage === 'sprout') {
                 texture = plantTextures['seed']
-            } 
+            }
             else if (stage === 'growing') {
-              
-                    texture = plantTextures['flower3'];
-            
-            }else {
+
+                texture = plantTextures['flower3'];
+
+            } else {
                 texture = plantTextures[textureKey];
             }
 
             // Use the actual texture or default to seed if not found
-          
+
 
             const plantMaterial = new THREE.MeshLambertMaterial({
                 map: texture,
@@ -507,7 +581,7 @@ try {
                     scene.add(plantMesh);
                 }
             });
-        } 
+        }
 
         // --- RESIZE HANDLER ---
         window.addEventListener('resize', () => {
@@ -527,9 +601,10 @@ try {
             requestAnimationFrame(animate);
             renderer.render(scene, camera);
         }
-
         animate();
     </script>
+
+   
 </body>
 
 </html>

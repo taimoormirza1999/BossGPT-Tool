@@ -1,7 +1,11 @@
 <?php
 if (isset($_GET['api'])) {
-    ini_set('display_errors', 0);
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
     header('Content-Type: application/json');
+    set_error_handler(function ($severity, $message, $file, $line) {
+        throw new ErrorException($message, 0, $severity, $file, $line);
+    });
     $response = ['success' => false, 'message' => 'Invalid request'];
 
     try {
@@ -15,37 +19,123 @@ if (isset($_GET['api'])) {
         $ai_assistant = new AIAssistant();
 
         switch ($_GET['api']) {
-
-            case 'update_pro_status':
+            case 'upload_profile_image':
+                header('Content-Type: application/json');
                 if (!isset($_SESSION['user_id'])) {
-                    return json_encode(['success' => false, 'message' => 'User not logged in']);
+                    http_response_code(401);
+                    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+                    exit;
+                }
+
+                $userId = $_SESSION['user_id'];
+
+                if (!isset($_FILES['avatar']) || $_FILES['avatar']['error'] !== UPLOAD_ERR_OK) {
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'message' => 'Image upload failed']);
+                    exit;
+                }
+
+                $uploadDir = __DIR__ . '/uploads/avatars/';
+                if (!file_exists($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
+                }
+
+                $filename = uniqid('avatar_') . '_' . basename($_FILES['avatar']['name']);
+                $targetPath = $uploadDir . $filename;
+                $publicPath = 'uploads/avatars/' . $filename;
+                $auth = new Auth();
+                if (move_uploaded_file($_FILES['avatar']['tmp_name'], $targetPath)) {
+                    $auth->updateAvatarImage($userId, $publicPath);
+                    echo json_encode(['success' => true, 'image_url' => $publicPath]);
+                } else {
+                    http_response_code(500);
+                    echo json_encode(['success' => false, 'message' => 'Failed to move uploaded file']);
+                }
+                error_log("UPLOAD BLOCK TRIGGERED"); // should show up in error_log
+
+                if (!isset($_FILES['avatar'])) {
+                    error_log("No avatar uploaded");
+                } else {
+                    error_log("Avatar uploaded: " . print_r($_FILES['avatar'], true));
+                }
+                exit;
+            case 'get_user_avatar':
+                header('Content-Type: application/json');
+                if (!isset($_SESSION['user_id'])) {
+                    echo json_encode(['success' => false, 'message' => 'Not logged in']);
+                    exit;
+                }
+
+                $stmt = $database->getConnection()->prepare("SELECT avatar_image FROM users WHERE id = ?");
+                $stmt->execute([$_SESSION['user_id']]);
+                $row = $stmt->fetch();
+
+                echo json_encode(['success' => true, 'avatar' => $row['avatar_image']]);
+                exit;
+            case 'save_telegram_chat_id':
+                $data = json_decode(file_get_contents('php://input'), true);
+            
+                if (!isset($data['telegram_chat_id'])) {
+                    throw new Exception('Telegram Chat ID is required');
+                }
+            
+                $userId = $_SESSION['user_id'];
+                $telegramId = $data['telegram_chat_id'];
+            
+                $stmt = $db->prepare("UPDATE users SET telegram_chat_id = ? WHERE id = ?");
+                $stmt->execute([$telegramId, $userId]);
+            
+                $response = ['success' => true, 'message' => 'Telegram chat ID saved successfully'];
+                break;
+            case 'update_pro_status':
+                header('Content-Type: application/json');
+                if (session_id() === '') {
+                    session_start();
+                  }
+                if (!isset($_SESSION['user_id'])) {
+                    echo json_encode(['success' => false, 'message' => 'User not logged in']);
                     exit;
                 }
 
                 try {
                     $auth = new Auth();
+                    error_log("Attempting to update pro status for user: " . $_SESSION['user_id']);
+                    
                     $result = $auth->updateProStatus($_SESSION['user_id']);
-                    return json_encode(['success' => true, 'message' => 'Pro status updated successfully']);
+                    if ($result) {
+                        $_SESSION['pro_member'] = 1;
+                        error_log("Successfully updated pro status for user: " . $_SESSION['user_id']);
+                        echo json_encode(['success' => true, 'message' => 'Pro status updated successfully']);
+                    } else {
+                        error_log("Failed to update pro status for user: " . $_SESSION['user_id']);
+                        echo json_encode(['success' => false, 'message' => 'Failed to update pro status']);
+                    }
                     exit;
                 } catch (Exception $e) {
-                    return json_encode(['success' => false, 'message' => $e->getMessage()]);
+                    error_log("Error updating pro status: " . $e->getMessage());
+                    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
                     exit;
                 }
-                exit;
+                break;
             case 'get_chat_history':
                 $data = json_decode(file_get_contents('php://input'), true);
                 if (!isset($data['project_id'])) {
                     throw new Exception('Project ID is required');
                 }
-
+                $limit = isset($data['limit']) ? (int)$data['limit'] : 20;
+                $offset = isset($data['offset']) ? (int)$data['offset'] : 0;
                 $stmt = $db->prepare("
                     SELECT message, sender, timestamp 
                     FROM chat_history 
                     WHERE project_id = ? 
-                    ORDER BY timestamp
-                    LIMIT 20
+                    ORDER BY id DESC 
+                    LIMIT ? OFFSET ?
                 ");
-                $stmt->execute([$data['project_id']]);
+                $stmt->bindParam(1, $data['project_id']);
+                $stmt->bindParam(2, $limit, PDO::PARAM_INT);
+                $stmt->bindParam(3, $offset, PDO::PARAM_INT);
+                $stmt->execute();
+            
                 $history = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 $response = [
@@ -53,7 +143,41 @@ if (isset($_GET['api'])) {
                     'history' => $history ?? []
                 ];
                 break;
-
+                case 'update_password':
+                    $data = json_decode(file_get_contents('php://input'), true);
+        
+                    if (empty($data['password'])) {
+                        throw new Exception('Password is required');
+                    }
+        
+                    if (!isset($_SESSION['user_id'])) {
+                        throw new Exception('User not authenticated');
+                    }
+                    $auth = new Auth();
+                    $auth->updatePassword($_SESSION['user_id'], $data['password']);
+                    $response = ['success' => true];
+                    break;
+                    case 'update_profile':
+                        $data = json_decode(file_get_contents('php://input'), true);
+                        header('Content-Type: application/json');
+                    
+                        if (!isset($data['username']) || !isset($data['email']) || !isset($data['bio'])) {
+                            throw new Exception('Username and Email, Bio are required.');
+                        }
+                    
+                        if (!isset($_SESSION['user_id'])) {
+                            throw new Exception('User not authenticated.');
+                        }
+                    
+                        $username = trim($data['username']);
+                        $name = trim($data['name'] ?? '');
+                        $email = trim($data['email']);
+                        $bio = trim($data['bio'] ?? '');
+                    
+                        $auth->updateProfile($_SESSION['user_id'], $username, $name, $email, $bio);
+                    
+                        $response = ['success' => true];
+                        break;
             case 'get_project_users':
                 $data = json_decode(file_get_contents('php://input'), true);
                 header('Content-Type: application/json');
@@ -73,22 +197,22 @@ if (isset($_GET['api'])) {
                 ]);
                 exit;
 
-case 'send_message':
-    $data = json_decode(file_get_contents('php://input'), true);
-    if (!isset($data['message']) || !isset($data['project_id'])) {
-        throw new Exception('Message and project ID are required');
-    }
+            case 'send_message':
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (!isset($data['message']) || !isset($data['project_id'])) {
+                    throw new Exception('Message and project ID are required');
+                }
 
-    // Pass the aiTone value to the processMessage method if provided
-    $aiTone = isset($data['aiTone']) ? $data['aiTone'] : 'demanding';
-    $_REQUEST['aiTone'] = $aiTone; // Set in $_REQUEST so it's accessible to AIAssistant
-    
-    $result = $ai_assistant->processMessage(
-        $data['message'],
-        $data['project_id']
-    );
-    $response = ['success' => true] + $result;
-    break;
+                // Pass the aiTone value to the processMessage method if provided
+                $aiTone = isset($data['aiTone']) ? $data['aiTone'] : 'demanding';
+                $_REQUEST['aiTone'] = $aiTone; // Set in $_REQUEST so it's accessible to AIAssistant
+
+                $result = $ai_assistant->processMessage(
+                    $data['message'],
+                    $data['project_id']
+                );
+                $response = ['success' => true] + $result;
+                break;
 
             case 'create_project':
                 $data = json_decode(file_get_contents('php://input'), true);
@@ -114,8 +238,11 @@ case 'send_message':
                 if (!isset($data['project_id'])) {
                     throw new Exception('Project ID is required');
                 }
+                // Initialize start_date and end_date variables as null (if not provided)
+                $startDate = isset($data['start_date']) ? $data['start_date'] : null;
+                $endDate = isset($data['end_date']) ? $data['end_date'] : null;
 
-                $tasks = $project_manager->getTasks($data['project_id']);
+                $tasks = $project_manager->getTasks($data['project_id'], $startDate, $endDate);
                 $response = ['success' => true, 'tasks' => $tasks];
                 break;
 
@@ -129,11 +256,11 @@ case 'send_message':
                     $data['task_id'],
                     $data['status']
                 );
-                
+
                 // Update plant growth in the garden
                 $gardenManager = new GardenManager();
                 $gardenManager->updatePlantStage($data['task_id'], $data['status']);
-                
+
                 $response = ['success' => true];
                 break;
 
@@ -323,7 +450,19 @@ case 'send_message':
                     $response = ['success' => false, 'message' => 'Failed to remove user'];
                 }
                 break;
-
+                case 'set_selected_tab':
+                    $data = json_decode(file_get_contents('php://input'), true);
+                    header('Content-Type: application/json');
+                
+                    if (!isset($data['selected_tab'])) {
+                        throw new Exception('Selected tab is required');
+                    }
+                
+                    $_SESSION['selected_tab'] = $data['selected_tab'];
+                
+                    $response = ['success' => true];
+                    break;
+                
             case 'get_task_assignees':
                 $data = json_decode(file_get_contents('php://input'), true);
                 if (!isset($data['task_id'])) {
@@ -372,20 +511,35 @@ case 'send_message':
                 if (!isset($data['project_id'])) {
                     throw new Exception('Project ID is required');
                 }
+                $projectId = $data['project_id'];
+                $startDate = isset($data['start_date']) ? $data['start_date'] : null;
+                $endDate = isset($data['end_date']) ? $data['end_date'] : null;
+                // Build base query
+                $query = "
+    SELECT 
+        al.action_type,
+        al.description,
+        al.created_at,
+        u.username
+    FROM activity_log al
+    LEFT JOIN users u ON al.user_id = u.id
+    WHERE al.project_id = ?
+";
 
-                $stmt = $db->prepare("
-                    SELECT 
-                        al.action_type,
-                        al.description,
-                        al.created_at,
-                        u.username
-                    FROM activity_log al
-                    LEFT JOIN users u ON al.user_id = u.id
-                    WHERE al.project_id = ?
-                    ORDER BY al.created_at DESC
-                    LIMIT 100
-                ");
-                $stmt->execute([$data['project_id']]);
+                $params = [$projectId];
+
+                // Add date filtering if provided
+                if ($startDate && $endDate) {
+                    $query .= " AND al.created_at BETWEEN ? AND ?";
+                    $params[] = $startDate . ' 00:00:00'; // start of day
+                    $params[] = $endDate . ' 23:59:59';   // end of day
+                }
+
+                // Finish query
+                $query .= " ORDER BY al.created_at DESC LIMIT 100";
+
+                $stmt = $db->prepare($query);
+                $stmt->execute($params);
                 $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 $response = ['success' => true, 'logs' => $logs];
@@ -395,21 +549,37 @@ case 'send_message':
                 if (!isset($_GET['project_id'])) {
                     throw new Exception('Project ID is required');
                 }
-
-                $stmt = $db->prepare("
-                    SELECT 
-                        al.action_type,
-                        al.description,
-                        al.created_at,
-                        u.username,
-                        al.status as notification_status
-                    FROM activity_log al
-                    LEFT JOIN users u ON al.user_id = u.id
-                    WHERE al.project_id = ? AND al.status = 'unread'
-                    ORDER BY al.created_at DESC
-                    LIMIT 100
-                ");
-                $stmt->execute([$_GET['project_id']]);
+                
+                $query = "
+                SELECT 
+                    al.action_type,
+                    al.description,
+                    al.created_at,
+                    u.username,
+                    al.status as notification_status
+                FROM activity_log al
+                LEFT JOIN users u ON al.user_id = u.id
+                WHERE al.project_id = :project_id
+            ";       
+                // Check if 'start_date' and 'end_date' are provided in the GET request
+                if (isset($_GET['start_date']) && isset($_GET['end_date'])) {
+                    $query .= " AND al.created_at BETWEEN :start_date AND :end_date";
+                }else{
+                    $query .= " AND al.status = 'unread'";
+                } 
+                // Add order and limit to the query
+                $query .= " ORDER BY al.created_at DESC";
+                // Prepare the statement
+                $stmt = $db->prepare($query);
+                // Bind the parameters
+                $stmt->bindParam(':project_id', $_GET['project_id']);
+                // Bind the date parameters if provided
+                if (isset($_GET['start_date']) && isset($_GET['end_date'])) {
+                    $stmt->bindParam(':start_date', $_GET['start_date']);
+                    $stmt->bindParam(':end_date', $_GET['end_date']);
+                }
+                $stmt->execute();
+                // Fetch the results
                 $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 $response = ['success' => true, 'logs' => $logs];
@@ -523,7 +693,7 @@ case 'send_message':
                 $logedinUser = $Auth->getCurrentUser();
                 $projectTilte = $project_manager->getProjectName($data['project_id']);
                 try {
-                    $emailSent = $userManager->projectUsersTaskAssignedEmail($logedinUser['username'], $projectTilte, $data['title'], $allAssignees );
+                    $emailSent = $userManager->projectUsersTaskAssignedEmail($logedinUser['username'], $projectTilte, $data['title'], $allAssignees);
                     // Initialize garden integration
                     $gardenManager = new GardenManager();
                     $taskSize = isset($data['size']) ? $data['size'] : 'medium'; // Default to medium if size not specified
@@ -551,7 +721,7 @@ case 'send_message':
                     ];
                 }
 
-               
+
 
                 $response = ['success' => true, 'task_id' => $task_id];
                 break;
@@ -695,12 +865,35 @@ case 'send_message':
                     ];
                 } else {
                     $is_pro = isset($user['pro_member']) && $user['pro_member'] == 1;
-                    $response = [
-                        'success' => true,
-                        'is_pro' => $is_pro,
-                        'payment_link' => $_ENV['STRIPE_PAYMENT_LINK'],
-                        'invited_by' => $user['invited_by']
-                    ];
+                    if($is_pro){
+                        $response = [
+                            'success' => true,
+                            'is_pro' => $is_pro,
+                            'payment_link' =>null,
+                            'invited_by' => $user['invited_by']
+                        ];
+                        echo json_encode($response);
+                        exit;
+                       
+                    }
+                    if(isset($_GET['pro-member'])){
+                    if (isset($_COOKIE['rewardful_referral'])) {
+                        $_SESSION['referral_code'] = $_COOKIE['rewardful_referral'];
+                        $response = [
+                            'success' => true,
+                            'is_pro' => $is_pro,
+                            'payment_link' => $_ENV['STRIPE_PAYMENT_LINK_REFREAL'],
+                            'invited_by' => $user['invited_by']
+                        ];
+                    }else{
+                        $response = [
+                            'success' => true,
+                            'is_pro' => $is_pro,
+                            'payment_link' => $_ENV['STRIPE_PAYMENT_LINK'],
+                            'invited_by' => $user['invited_by']
+                        ];
+                    }
+                }
                 }
                 break;
 
@@ -709,18 +902,18 @@ case 'send_message':
                 if (!isset($data['fcm_token'])) {
                     throw new Exception('FCM token is required');
                 }
-                
+
                 $userId = $_SESSION['user_id'];
                 $fcmToken = $data['fcm_token'];
-                
+
                 // Update the user's FCM token in the database
                 $stmt = $db->prepare("UPDATE users SET fcm_token = ? WHERE id = ?");
                 $result = $stmt->execute([$fcmToken, $userId]);
-                
+
                 if (!$result) {
                     throw new Exception('Failed to update FCM token');
                 }
-                
+
                 $response = ['success' => true, 'message' => 'FCM token updated successfully'];
                 break;
 

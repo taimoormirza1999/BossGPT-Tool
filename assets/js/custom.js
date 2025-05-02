@@ -1,24 +1,4 @@
-// Initial Loader
-document.addEventListener("DOMContentLoaded", function () {
-  // Create and append loader
-  const loader = document.createElement("div");
-  loader.className = "initial-loader";
-  loader.innerHTML = `
-        <div class="loader-content">
-            <div class="loader-spinner"></div>
-            <div class="loader-text">Loading BossGPT...</div>
-        </div>
-    `;
-  document.body.appendChild(loader);
 
-  // Remove loader after 3 seconds
-  setTimeout(() => {
-    loader.classList.add("fade-out");
-    setTimeout(() => {
-      loader.remove();
-    }, 500);
-  }, 3000);
-});
 
 // Notification System
 let isFetchingNotifications = false;
@@ -87,13 +67,21 @@ function fetchNotificationsAndOpen(showDropdown = true) {
     });
 }
 
-function fetchNotifications(project_id) {
+function fetchNotifications(project_id, startDate = null, endDate = null) {
   return new Promise((resolve, reject) => {
-    fetch("?api=get_unreadnotifications&project_id=" + project_id)
+    let url = "?api=get_unreadnotifications&project_id=" + project_id;
+    if (startDate && endDate) {
+      const formattedStartDate = startDate;
+      const formattedEndDate = endDate;
+      // alert(formattedStartDate + " " + formattedEndDate);
+      url += `&start_date=${formattedStartDate}&end_date=${formattedEndDate}`;
+    }
+    fetch(url)
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
           updateNotificationDropdown(data.logs || []);
+          updateActivityBoard(data.logs || []);
           resolve();
         } else {
           console.error("Error fetching notifications:", data.message);
@@ -330,7 +318,14 @@ function scrollToBottom() {
   }
 }
 const aiMessageClasses = "ai-message d-flex align-items-start intro-message";
-
+function hideWelcomeLogo() {
+  const chatMessages = document.getElementById("chatMessages");
+  if (!chatMessages) return;
+  const existingLogo = chatMessages.querySelector('.welcome-logo-container');
+  if (existingLogo) {
+    existingLogo.remove();
+  }
+}
 // Add this new function to append a welcome logo
 function appendWelcomeLogo() {
   const chatMessages = document.getElementById("chatMessages");
@@ -350,8 +345,7 @@ function appendWelcomeLogo() {
   // Always insert at the beginning of the chat container
   chatMessages.insertBefore(logoContainer, chatMessages.firstChild);
   
-  // Log to verify it's being called
-  console.log("Welcome logo added to chat container");
+
 }
 
 // Add styles for the welcome logo
@@ -715,19 +709,31 @@ let fcmTokenSaved = false;
 // Check if FCM is already enabled
 function checkFCMStatus() {
   const fcmToken = localStorage.getItem("fcm_token");
-  const reminderButton = document.getElementById("reminderButton");
-
-  if (reminderButton) {
-    if (fcmToken) {
-      reminderButton.classList.add("active");
-      reminderButton.querySelector("span").textContent = "Reminders Active";
-      fcmTokenSaved = true;
-    } else {
-      reminderButton.classList.remove("active");
-      reminderButton.querySelector("span").textContent = "Turn on Reminders";
-      fcmTokenSaved = false;
-    }
+  const showFcmPopup = document.getElementsByClassName('showFcmPopup');
+  if (fcmToken && Notification.permission === 'granted') {
+    showFcmPopup[0].style.display = 'none';
+    // alert('fcmToken: ' + fcmToken);
+   saveFCMToken(fcmToken);
+  }else{
+    showFcmPopup[0].style.display = 'flex';
   }
+  // if (reminderButton) {
+  //   if (fcmToken) {
+  //     reminderButton.classList?.add("active");
+  //     const span = reminderButton.querySelector("span");
+  //     if (span) {
+  //       span.textContent = "Reminders Active";
+  //     }
+  //     fcmTokenSaved = true;
+  //   } else {
+  //     reminderButton.classList?.remove("active");
+  //     const span = reminderButton.querySelector("span");
+  //     if (span) {
+  //       span.textContent = "Turn on Reminders";
+  //     }
+  //     fcmTokenSaved = false;
+  //   }
+  // }
 }
 
 // Initialize FCM
@@ -741,7 +747,7 @@ function initializeFCM() {
 
   // Request permission and get token
   messaging
-    .getToken({ vapidKey: "YOUR_VAPID_KEY" })
+    .getToken({ vapidKey: 'BNvQzVggQ4j6sTH5W6sxSa4K8Q-K0BhPn2tJT1en85dcp1P46M4EFJjoxe_uJI3PnEgQ06LO2mgv0SvcpBfyL00' })
     .then((currentToken) => {
       if (currentToken) {
         saveFCMToken(currentToken);
@@ -752,7 +758,7 @@ function initializeFCM() {
       }
     })
     .catch((err) => {
-      console.log("An error occurred while retrieving token. ", err);
+      // console.log("An error occurred while retrieving token. ", err);
     });
 
   // Handle token refresh
@@ -777,6 +783,29 @@ function initializeFCM() {
 
 // Save token to database
 function saveFCMToken(token) {
+  if(!token){
+    return;
+    Toast("error", "Error", "No FCM token found", "topRight");
+  }
+   // Save to database
+   fetch("?api=update_fcm_token", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ fcm_token: token }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        fcmTokenSaved = true;
+        // console.log("FCM token saved to database");
+      } else {
+        console.error("Failed to save FCM token to database");
+      }
+    })
+    .catch((error) => {
+      console.error("Error saving FCM token:", error);
+    });
+  return;
   localStorage.setItem("fcm_token", token);
 
   // Update UI
@@ -786,24 +815,7 @@ function saveFCMToken(token) {
     reminderButton.querySelector("span").textContent = "Reminders Active";
   }
 
-  // Save to database
-  fetch("?api=update_fcm_token", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ fcm_token: token }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.success) {
-        fcmTokenSaved = true;
-        console.log("FCM token saved to database");
-      } else {
-        console.error("Failed to save FCM token to database");
-      }
-    })
-    .catch((error) => {
-      console.error("Error saving FCM token:", error);
-    });
+ 
 }
 
 // Show browser notification
@@ -963,13 +975,14 @@ function loadFirebaseScript() {
       firebaseMessagingScript.onload = () => {
         // Initialize Firebase
         const firebaseConfig = {
-          apiKey: "YOUR_API_KEY",
-          authDomain: "YOUR_AUTH_DOMAIN",
-          projectId: "YOUR_PROJECT_ID",
-          storageBucket: "YOUR_STORAGE_BUCKET",
-          messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-          appId: "YOUR_APP_ID",
+          apiKey: "AIzaSyAPByoVru7fAR1Mk8_y8AW73vWVRwEDma4",
+          authDomain: "bossgpt-367ab.firebaseapp.com",
+          projectId: "bossgpt-367ab",
+          storageBucket: "bossgpt-367ab.firebasestorage.app",
+          messagingSenderId: "1078128619253",
+          appId: "1:1078128619253:web:edf3e5f2306ab349191fbc"
         };
+        
 
         firebase.initializeApp(firebaseConfig);
         resolve();
@@ -985,27 +998,27 @@ function loadFirebaseScript() {
 // Check notification permission on page load
 document.addEventListener("DOMContentLoaded", function () {
   // Wait 3 seconds after page load to check notification permission
-  setTimeout(() => {
-    // Only show modal if permission hasn't been granted or denied yet
-    if (Notification.permission === "default") {
-      // Show the notification permission modal
-      const notificationModal = new bootstrap.Modal(
-        document.getElementById("notificationPermissionModal")
-      );
-      notificationModal.show();
-    } else if (Notification.permission === "granted" && !fcmTokenSaved) {
-      // If permission is already granted but token not saved
-      if (typeof firebase !== "undefined" && firebase.messaging) {
-        initializeFCM();
-      } else {
-        loadFirebaseScript()
-          .then(() => {
-            initializeFCM();
-          })
-          .catch((error) => {
-            console.error("Error loading Firebase:", error);
-          });
-      }
-    }
-  }, 3000); // 3 second delay
+  // setTimeout(() => {
+  //   // Only show modal if permission hasn't been granted or denied yet
+  //   if (Notification.permission === "default") {
+  //     // Show the notification permission modal
+  //     const notificationModal = new bootstrap.Modal(
+  //       document.getElementById("notificationPermissionModal")
+  //     );
+  //     notificationModal.show();
+  //   } else if (Notification.permission === "granted" && !fcmTokenSaved) {
+  //     // If permission is already granted but token not saved
+  //     if (typeof firebase !== "undefined" && firebase.messaging) {
+  //       initializeFCM();
+  //     } else {
+  //       loadFirebaseScript()
+  //         .then(() => {
+  //           initializeFCM();
+  //         })
+  //         .catch((error) => {
+  //           console.error("Error loading Firebase:", error);
+  //         });
+  //     }
+  //   }
+  // }, 3000); // 3 second delay
 });

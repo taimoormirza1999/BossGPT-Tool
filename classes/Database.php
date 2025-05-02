@@ -1,5 +1,6 @@
 <?php
-
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 class Database
 {
     private static $instance = null;
@@ -20,7 +21,7 @@ class Database
             );
         } catch (PDOException $e) {
             error_log("Database connection failed: " . $e->getMessage());
-            throw new Exception("Unable to connect to database. Please try again later.");
+            // throw new Exception("Unable to connect to database. Please try again later.");
         }
     }
 
@@ -50,6 +51,10 @@ class Database
                 pro_plan BOOLEAN DEFAULT FALSE,
                 fcm_token VARCHAR(255) NULL,
                 verification_token VARCHAR(255) NULL,
+                telegram_chat_id BIGINT NULL,
+                discord_id VARCHAR(50) DEFAULT NULL,
+                bio TEXT NULL,
+                avatar_image VARCHAR(255) NULL,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )",
 
@@ -154,9 +159,15 @@ class Database
             foreach ($queries as $query) {
                 $this->conn->exec($query);
             }
+            return true;
         } catch (PDOException $e) {
-            error_log("Table creation failed: " . $e->getMessage());
-            throw new Exception("Database setup failed. Please contact administrator.");
+            error_log("❌ Table creation failed: " . $e->getMessage(), 3, __DIR__ . '/../logs/db_errors.log');
+
+            echo "❌ Table creation error: " . $e->getMessage();
+            return false;
+            // error_log("Table creation failed: " . $e->getMessage());
+            
+            // throw new Exception("Database setup failed. Please contact administrator.");
         }
     }
 }
