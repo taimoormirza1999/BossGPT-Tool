@@ -2,6 +2,7 @@
 // Required for direct task updates
 require_once __DIR__ . '/ProjectManager.php';
 require_once __DIR__ . '/GoogleCalendarManager.php';
+// require_once __DIR__ . '/../functions.php';
 class AIAssistant
 {
     private $api_key;
@@ -696,7 +697,7 @@ class AIAssistant
         try {
             if (!$this->calendar->isAuthenticated()) {
                 return [
-                    'message' => 'Please connect your Google Calendar first. I\'ll help you schedule events once you\'re connected. <button class="btn btn-primary" onclick="window.location.href=\'calendar/connect-calendar.php\'">Connect Calendar</button>',
+                    'message' => renderAIErrorMessage(),
                     'action' => 'connect_calendar'
                 ];
             }
@@ -709,7 +710,7 @@ class AIAssistant
                 } else {
                     // No refresh token available, need to reconnect
                     return [
-                        'message' => 'Your calendar connection has expired. Please reconnect your Google Calendar. <button class="btn btn-primary" onclick="window.location.href=\'calendar/connect-calendar.php\'">Reconnect Calendar</button>',
+                        'message' => renderAIErrorMessage("Your calendar connection has expired","Please connect your calendar to schedule the event and get calendar notifications.","/calendar/connect-calendar.php"),
                         'action' => 'connect_calendar'
                     ];
                 }
@@ -761,12 +762,7 @@ class AIAssistant
             $displayTime = $startDateTime->format('g:i A') . ' - ' . $endDateTime->format('g:i A');
 
             return [
-                'message' => "✅ Event scheduled successfully!\n\n" .
-                    "📅 Event: {$eventDetails['summary']}\n" .
-                    "📆 Date: " . $startDateTime->format('l, F j, Y') . "\n" .
-                    "⏰ Time: {$displayTime} (Dubai Time)\n" .
-                    "📝 Description: {$eventDetails['description']}\n\n" .
-                    "View in Calendar: <a href='{$createdEvent->htmlLink}' target='_blank'>Open in Google Calendar</a>",
+                'message' => renderAICalendarSuccessMessage("Event Scheduled successfully", $eventDetails['summary'], $startDateTime->format('l, F j, Y'), $displayTime . " (Dubai Time)", $eventDetails['description'], $createdEvent->htmlLink),
                 'event' => $eventDetails,
                 'success' => true
             ];
@@ -778,7 +774,7 @@ class AIAssistant
             $errorMsg = $e->getMessage();
             if (strpos($errorMsg, 'insufficient authentication scopes') !== false) {
                 return [
-                    'message' => "I need additional permissions to schedule this event. Please reconnect your calendar: <button class='btn btn-main-primary' onclick=\"window.location.href='calendar/connect-calendar.php'\">Reconnect Calendar</button>",
+                    'message' => "I need additional permissions to schedule this event. Please reconnect your calendar: <button class='btn btn-error' onclick=\"window.location.href='calendar/connect-calendar.php'\">Reconnect Calendar</button>",
                     'error' => true,
                     'action' => 'reconnect_calendar'
                 ];
@@ -786,7 +782,7 @@ class AIAssistant
             
             // Return a generic error message instead of the raw error
             return [
-                'message' => "I wasn't able to schedule your event. Please try reconnecting your calendar: <button class='btn btn-main-primary' onclick=\"window.location.href='calendar/connect-calendar.php'\">Reconnect Calendar</button>",
+                'message' => "I wasn't able to schedule your event. Please try reconnecting your calendar: <button class='btn btn-error' onclick=\"window.location.href='calendar/connect-calendar.php'\">Reconnect Calendar</button>",
                 'error' => true,
                 'action' => 'reconnect_calendar'
             ];

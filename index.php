@@ -354,6 +354,12 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 
         function include_dashboard()
         {
+            if(isset($_SESSION['user_id'])){
+            if(!isset($_GET['page'])){
+                header('Location: ?page=dashboard');
+                exit;
+            }
+            }
             require_once 'components/misc.php';
             ?>
             <?php

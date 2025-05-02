@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (
         message &&
         (
-          message.textContent.includes('Please connect your Google') 
+          message.textContent.includes('Sorry, I encountered an error while') 
           // message.innerHTML.includes('calendar/connect-calendar.php')
         )
       ) {
