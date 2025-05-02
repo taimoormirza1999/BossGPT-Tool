@@ -438,12 +438,12 @@ document.addEventListener("DOMContentLoaded", function () {
       const row = document.createElement('tr');
 
       row.innerHTML = `
-            <td style="width: 20%; text-align: center;">${task.title ? escapeHtml(task.title) : '-'}</td>
+            <td class="text-capitalize" style="width: 20%; text-align: center; ">${task.title ? escapeHtml(task.title) : '-'}</td>
             <td style="width: 25%; text-align: center;" class="d-flex align-items-center gap-2">
                 ${renderAssignedUsers(task.assigned_users)}
             </td>
             <td style="width: 15%; text-align: center;">${formatDate(task.due_date)}</td>
-            <td style="width: 40%; text-align: center;">${task.description ? escapeHtml(task.description) : '-'}</td>
+            <td  class="text-capitalize" style="width: 40%; text-align: center;">${task.description ? escapeHtml(task.description) : '-'}</td>
         `;
 
       tableBody.appendChild(row);

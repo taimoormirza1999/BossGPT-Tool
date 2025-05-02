@@ -279,11 +279,10 @@
                 <?php } ?>
                 // Load projects
             function loadProjects() {
-                // showLoading();
+
                 fetch('?api=get_projects')
                     .then(response => response.json())
                     .then(data => {
-                        // console.log("Loaded projects: ", data.projects);
                         if (data.success) {
                             const projectDropdown = document.getElementById('projectDropdown');
                             <?php if(isPage('profile')){ ?>
@@ -302,7 +301,7 @@
                                     const li = document.createElement('li');
                                     li.className = 'dropdown-item';
                                     li.innerHTML = `
-                        <button class="dropdown-item" type="button" data-id="${project.id}" title="${escapeHtml(project.title)}">
+                        <button class="dropdown-item text-capitalize" type="button" data-id="${project.id}" title="${escapeHtml(project.title)}">
                             ${escapeHtml(project.title)}
                         </button>
                     `;
@@ -556,7 +555,7 @@ $button1.text(selectedProjectTitle);
                         // Format the dates into 'YYYY-MM-DD' format (or adjust based on your format needs)
                         requestData.start_date = startDate;
                         requestData.end_date = endDate;
-                        alert(startDate+" "+endDate);
+                        // alert(startDate+" "+endDate);
                     }
 
                         fetch('?api=get_tasks', {

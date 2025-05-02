@@ -161,8 +161,8 @@ if (isset($_GET['api'])) {
                         $data = json_decode(file_get_contents('php://input'), true);
                         header('Content-Type: application/json');
                     
-                        if (!isset($data['username']) || !isset($data['email'])) {
-                            throw new Exception('Username and Email are required.');
+                        if (!isset($data['username']) || !isset($data['email']) || !isset($data['bio'])) {
+                            throw new Exception('Username and Email, Bio are required.');
                         }
                     
                         if (!isset($_SESSION['user_id'])) {

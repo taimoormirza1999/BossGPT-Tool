@@ -84,6 +84,7 @@ function include_profile($images)
         div#profile .form-control {
             background-color: transparent;
             border: 1px solid rgba(156, 156, 156, 1);
+            color: white !important;
         }
 
         div#profile input.form-control {

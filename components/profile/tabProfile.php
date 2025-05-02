@@ -27,11 +27,11 @@
         <div class="mb-3">
             <label for="profileBio" class="form-label">Bio</label>
             <textarea class="form-control" id="profileBio" rows="3" placeholder="Tell us about yourself..."
-                value="<?php echo $_SESSION['bio'] ?? ''; ?>"></textarea>
+                value="<?php echo $_SESSION['bio'] ?? ''; ?>"><?php echo $_SESSION['bio'] ?? ''; ?></textarea>
         </div>
         <div class="mt-2 d-flex justify-content-between items-center">
             <!-- <login with google button -->
-            <button class="btn btn-main-primary" type="button" id="loginWithGoogle">
+            <button class="btn btn-main-primary" onclick="window.location.href='<?php echo $_ENV['BASE_URL'] ?>/calendar/connect-calendar.php'" type="button" id="loginWithGoogle">
                 <?= getGoogleIcon() ?>Link your Google Account
             </button>
             <button class="btn btn-main-primary px-4" id="updateprofileSubmitbtn" type="submit">Update</button>
