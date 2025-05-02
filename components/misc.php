@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (
         message &&
         (
-          message.textContent.includes('Sorry I encountered an error') 
+          message.textContent.includes('Sorry, I encountered an error') 
           // message.innerHTML.includes('calendar/connect-calendar.php')
         )
       ) {
