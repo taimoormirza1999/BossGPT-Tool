@@ -6,7 +6,6 @@ if (session_id() === '') {
   }
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/constant.php';
-
 // Load environment variables
 loadEnv(__DIR__ . '/../.env');
 
@@ -26,6 +25,7 @@ if (isset($_GET['code'])) {
     // Store token in session
     $_SESSION['access_token'] = $token;
     header('Location: ../');
+
     exit;
 } else {
     echo "Failed to authenticate with Google Calendar.";

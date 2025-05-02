@@ -710,7 +710,7 @@ class AIAssistant
                 } else {
                     // No refresh token available, need to reconnect
                     return [
-                        'message' => renderAIErrorMessage("Your calendar connection has expired","Please connect your calendar to schedule the event and get calendar notifications.","/calendar/connect-calendar.php"),
+                        'message' => renderAIErrorMessage("Your calendar connection has expired","Please connect your calendar to schedule the event and get calendar notifications.","'".$_ENV['BASE_URL']."/calendar/connect-calendar.php"),
                         'action' => 'connect_calendar'
                     ];
                 }
@@ -774,7 +774,7 @@ class AIAssistant
             $errorMsg = $e->getMessage();
             if (strpos($errorMsg, 'insufficient authentication scopes') !== false) {
                 return [
-                    'message' => "I need additional permissions to schedule this event. Please reconnect your calendar: <button class='btn btn-error' onclick=\"window.location.href='calendar/connect-calendar.php'\">Reconnect Calendar</button>",
+                    'message' => "I need additional permissions to schedule this event. Please reconnect your calendar: <button class='btn btn-error' onclick=\"window.location.href='".$_ENV['BASE_URL']."/calendar/connect-calendar.php'\">Reconnect Calendar</button>",
                     'error' => true,
                     'action' => 'reconnect_calendar'
                 ];
@@ -782,7 +782,7 @@ class AIAssistant
             
             // Return a generic error message instead of the raw error
             return [
-                'message' => "I wasn't able to schedule your event. Please try reconnecting your calendar: <button class='btn btn-error' onclick=\"window.location.href='calendar/connect-calendar.php'\">Reconnect Calendar</button>",
+                'message' => "I wasn't able to schedule your event. Please try reconnecting your calendar: <button class='btn btn-error' onclick=\"window.location.href='".$_ENV['BASE_URL']."'calendar/connect-calendar.php'\">Reconnect Calendar</button>",
                 'error' => true,
                 'action' => 'reconnect_calendar'
             ];

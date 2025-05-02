@@ -254,7 +254,7 @@ while scheduling your event",$messageDescription="Please connect your calendar t
     font-size: 0.89rem;
 ">'.$messageDescription.'</p>
         <div class="d-flex align-items-center justify-content-center gap-3">
-        <button class="btn btn-chat btn-error" onclick="window.location.href=\''.$link.'\'">Connect</button>
+        <button class="btn btn-chat btn-error" onclick="window.location.href=\''.$_ENV['BASE_URL'].$link.'\'">Connect</button>
         </div>
         </div>';
     }
@@ -272,7 +272,7 @@ while scheduling your event",$messageDescription="Please connect your calendar t
        <p class="mb-0"><strong>Time:</strong> '.$time.'</p>
        <p class="mb-0"><strong>Description:</strong> '.$description.'</p>
         <div class="d-flex align-items-center justify-content-center gap-3">
-        <button class="btn btn-chat btn-error mt-1" onclick="window.location.href=\''.$link.'\'">Open in Calendar</button>
+        <button class="btn btn-chat btn-error mt-1" onclick="openLink(\''.$link.'\',true)">Open in Calendar</button>
         </div>
         </div>';
     }
