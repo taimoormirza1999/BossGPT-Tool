@@ -159,7 +159,7 @@
                                             content += `
                 <div class="cta-message">
                     <button class="btn btn-main-primary" onclick="openNewProjectModal()">
-                        <i class="fas fa-plus-circle"></i> Create New Project
+                        <i class="fas fa-plus-circle"></i>New Project
                     </button>
                 </div>`;
                                         }
@@ -194,6 +194,7 @@
                 <div class="chat-input">
                     <?php
                     $prompts = [
+                        "📑 book a meeting with Taimoor",
                         "📑 set a reminder for task #number",
                         "📑 suggest tasks for my project",
                         "🎯 Create task 'Your Task' and assign it to myself",
@@ -261,20 +262,46 @@
                             let promptText = button.innerText;
                             let inputField = document.getElementById("messageInput");
                             let aiSendMessageBtn = document.getElementById("aiSendMessageBtn");
-
                             // Set input field value
                             inputField.value = promptText;
-
                             // Trigger the input event to resize the textarea
                             const inputEvent = new Event('input', { bubbles: true });
                             inputField.dispatchEvent(inputEvent);
-
                             // Auto-submit the form
                             setTimeout(() => {
                                 // aiSendMessageBtn.click();
                                 // chatForm.submit();
                             }, 200); // Small delay to make it smooth
                         }
+
+                     
+document.addEventListener("DOMContentLoaded", function () {
+    <?php if (isset($_SESSION['pending_calendar_command'])): ?>
+        // alert('DOMContentLoaded');
+        const replayMessage = <?php echo json_encode($_SESSION['pending_calendar_command']); ?>;
+        // if (replayMessage) {
+            const messageInput = document.getElementById('messageInput');
+            const sendBtn = document.getElementById('aiSendMessageBtn');
+
+            // Step 1: Populate the input field
+            messageInput.value = decodeURIComponent(replayMessage);
+
+            // Step 2: Wait 3 seconds then simulate form submission
+            sendBtn.click();
+            <?php
+                if (isset($_SESSION['pending_calendar_command']) && $_SESSION['pending_calendar_command']) {
+                    unset($_SESSION['pending_calendar_command']);
+                }
+                ?>
+
+            // setTimeout(() => {
+                // Uncomment to send message automatically:
+            // }, 3000);
+        // }
+    <?php endif; ?>
+});
+</script>
+
                     </script>
                 </div>
             </div>

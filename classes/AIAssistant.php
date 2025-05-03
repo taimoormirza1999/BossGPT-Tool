@@ -677,7 +677,8 @@ class AIAssistant
             'reminder',
             'set up',
             'arrange',
-            'plan'
+            'plan',
+            'google calendar',
         ];
 
         $message = strtolower($message);
@@ -696,6 +697,7 @@ class AIAssistant
     {
         try {
             if (!$this->calendar->isAuthenticated()) {
+                $_SESSION['pending_calendar_command'] = $message;
                 return [
                     'message' => renderAIErrorMessage(),
                     'action' => 'connect_calendar'
@@ -708,9 +710,10 @@ class AIAssistant
                     $client->fetchAccessTokenWithRefreshToken($client->getRefreshToken());
                     $_SESSION['access_token'] = $client->getAccessToken();
                 } else {
+                    $_SESSION['pending_calendar_command'] = $message;
                     // No refresh token available, need to reconnect
                     return [
-                        'message' => renderAIErrorMessage("Your calendar connection has expired","Please connect your calendar to schedule the event and get calendar notifications.","'".$_ENV['BASE_URL']."/calendar/connect-calendar.php"),
+                        'message' => renderAIErrorMessage("Your calendar connection has expired","Please connect your calendar to schedule the event and get calendar notifications.","/calendar/connect-calendar.php"),
                         'action' => 'connect_calendar'
                     ];
                 }
@@ -769,12 +772,12 @@ class AIAssistant
 
         } catch (Exception $e) {
             error_log("Calendar Request Error: " . $e->getMessage());
-            
             // Provide more detailed error message based on error type
             $errorMsg = $e->getMessage();
             if (strpos($errorMsg, 'insufficient authentication scopes') !== false) {
+                $_SESSION['pending_calendar_command'] = $message;
                 return [ 
-                    'message' => renderAIErrorMessage("Your calendar connection has expired","Please connect your calendar to schedule the event and get calendar notifications.","'".$_ENV['BASE_URL']."/calendar/connect-calendar.php"),
+                    'message' => renderAIErrorMessage("Your calendar connection has expired","Please connect your calendar to schedule the event and get calendar notifications.","/calendar/connect-calendar.php"),
                     'error' => true,
                     'action' => 'reconnect_calendar'
                 ];
@@ -782,7 +785,7 @@ class AIAssistant
             
             // Return a generic error message instead of the raw error
             return [
-                'message' => renderAIErrorMessage("Your calendar connection has expired","Please connect your calendar to schedule the event and get calendar notifications.","'".$_ENV['BASE_URL']."/calendar/connect-calendar.php"),
+                'message' => renderAIErrorMessage("222Your calendar connection has expired","Please connect your calendar to schedule the event and get calendar notifications.","/calendar/connect-calendar.php"),
                 'error' => true,
                 'action' => 'reconnect_calendar'
             ];
@@ -844,7 +847,7 @@ class AIAssistant
             $eventDetails['summary'] = 'New Event';
         }
         if (!isset($eventDetails['description']) || empty($eventDetails['description'])) {
-            $eventDetails['description'] = 'Event scheduled via AI Assistant';
+            $eventDetails['description'] = 'Event scheduled via BossGpt AI Assistant';
         }
 
         return $eventDetails;

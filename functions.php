@@ -67,7 +67,7 @@ function sendProjectUpdateEmail($email, $username, $projectTitle, $updateMessage
     return sendTemplateEmail($email, $subject, $template, $data);
 }
 
-function getLogoImage($bottomMargin = "0", $topMargin = "-1rem", $width = "15rem", $height = "auto", $positionClass = "position-absolute top-0 start-50 translate-middle", $positionStyle = "position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);", $src="https://res.cloudinary.com/da6qujoed/image/upload/v1742651528/bossgpt-transparent_n4axv7.png")
+function getLogoImage($bottomMargin = "0", $topMargin = "-1rem", $width = "15rem", $height = "auto", $positionClass = "lg:position-absolute top-0 start-50 translate-middle non-login-page-logo", $positionStyle = "", $src="https://res.cloudinary.com/da6qujoed/image/upload/v1742651528/bossgpt-transparent_n4axv7.png")
     {
         return '<img src=' . $src . ' alt="Logo"
                 class="' . $positionClass . '" 
@@ -258,7 +258,7 @@ while scheduling your event",$messageDescription="Please connect your calendar t
         </div>
         </div>';
     }
-    function renderAICalendarSuccessMessage($messageHeader="Event Scheduled successfully", $title="Meeting with Taimoor",$date="Saturday, May 3, 2025", $time="10:00AM - 11:00AM(Dubai Time)",$description="Event scheduled via AI Assistant.", $link = "/calendar/connect-calendar.php") {
+    function renderAICalendarSuccessMessage($messageHeader="Event Scheduled successfully", $title="Meeting with Taimoor",$date="Saturday, May 3, 2025", $time="10:00AM - 11:00AM(Dubai Time)",$description="Event scheduled via BossGpt AI Assistant.", $link = "/calendar/connect-calendar.php") {
         return '<div class="success-message-block">
         <div class="d-flex align-items-start ">'.getSuccessIcon().' <p class="success-message-title mb-0">'.$messageHeader.'</p></div>
         <p class="d-flex align-items-start justify-content-between mb-1"  style="

@@ -226,9 +226,7 @@ class ProjectManager
                         explode(',', $task['assigned_user_ids']),
                         explode(',', $task['assigned_usernames'])
                     ) : [];
-                // unset($task['assigned_usernames']);
-                // unset($task['assigned_user_ids']);
-                // $task['assigned_users'] = [];
+              
                 if (isset($startDate)){
                 foreach ($task['assigned_users'] as $userId => $username) {
                     // Get the avatar image from your database or any source

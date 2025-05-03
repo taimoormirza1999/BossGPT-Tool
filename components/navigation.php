@@ -4,7 +4,7 @@
             <?php echo getLogoImage($bottomMargin = '0.4rem', $topMargin = "0.4rem", $width = "11rem", $height = "auto", $positionClass = " ", $positionStyle = " ", $src = "https://res.cloudinary.com/da6qujoed/image/upload/v1742651528/bossgpt-transparent_n4axv7.png"); ?>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"><?php echo getMenuIcon(); ?></span>
+            <span class="navbar-toggler-icon bg-transparent"><?php echo getMenuIcon(); ?></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
@@ -19,7 +19,7 @@
                     data-bs-target="#newProjectModal" style="background: rgba(255, 255, 255, 0.1)!important;
 border: 1.3px solid rgba(255, 255, 255, 0.35)!important;
 box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1)!important;">
-                    <?php echo getAddSquareIcon(); ?> New Project
+                    <?php echo getAddSquareIcon(); ?> New&nbsp;Project
                 </button>
                 <button onclick="openLink('<?php echo $_ENV['BASE_URL'] ?>/garden.php',false)"
                     class="btn btn-outline-light btn-logout" data-bs-toggle="tooltip" data-bs-placement="bottom"

@@ -83,11 +83,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     exit;
             }
         }
-    } catch (Exception $e) {
-        $error_message = $e->getMessage();
-    }
+    }catch(Exception $e){$error_message = $e->getMessage();}
 }
-
 // API Endpoint Handler
 require_once './api_endPoints.php';
 ?>
@@ -247,7 +244,6 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
     } else {
         $page = $_GET['page'] ?? ($auth->isLoggedIn() ? 'dashboard' : 'login');
     }
-
     if (!$auth->isLoggedIn() && !in_array($page, ['login', 'register'])) {
         header('Location: ?page=login');
         exit;
@@ -320,8 +316,8 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
             ?>
             <div class="d-flex justify-content-center align-items-center min-vh-100 register-page">
                 <div class="row justify-content-center w-100 position-relative">
-                    <?php echo getLogoImage(); ?>
-                    <div class="col-md-6 col-lg-12 mt-5">
+                <?php echo getLogoImage("", "-70px"); ?>
+                    <div class="col-md-6 col-lg-12 lg:mt-5">
                         <div class="card">
                             <div class="card-body">
                                 <h2 class="card-title text-center mb-4">Register</h2>
@@ -508,8 +504,8 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
         ?>
         <div class="d-flex justify-content-center align-items-center min-vh-100 aitone-page">
             <div class="row justify-content-center w-100 position-relative">
-                <?php echo getLogoImage(); ?>
-                <div class="col-md-6 col-lg-5 mt-5">
+            <?php echo getLogoImage("", "-70px"); ?>
+                <div class="col-md-6 col-lg-5 lg:mt-5">
                     <div class="card">
                         <div class="card-body text-center">
                             <h2 class="card-title text-center mb-4">How do you like your<br>AI Boss to be?</h2>
@@ -529,16 +525,13 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
             document.addEventListener('DOMContentLoaded', function () {
                 const toneOptions = document.querySelectorAll('.ai-tone-option');
                 let selectedTone = 'friendly'; // Default selection
-
                 // Get existing settings from localStorage if available
                 const savedTone = localStorage.getItem('aiToneMode');
                 if (savedTone) {
                     selectedTone = savedTone;
                 }
-
                 // Set initial selection in both storage keys for compatibility
                 localStorage.setItem('aiToneMode', selectedTone);
-
                 // Set initial active indicators based on saved tone
                 toneOptions.forEach(option => {
                     const optionTone = option.getAttribute('data-tone');
@@ -556,10 +549,8 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                         toneOptions.forEach(opt => {
                             opt.querySelector('.tone-indicator').classList.remove('active');
                         });
-
                         // Add active class to selected option
                         this.querySelector('.tone-indicator').classList.add('active');
-
                         // Update selected tone
                         selectedTone = this.getAttribute('data-tone');
                         localStorage.setItem('aiToneMode', selectedTone);
