@@ -96,6 +96,20 @@ require_once './api_endPoints.php';
 <html lang="en">
 
 <head>
+<script>
+ const applyTheme = new Promise((resolve) => {
+    const savedTheme = localStorage.getItem('userTheme') || 'system-mode';
+    
+    // Wait for body to exist
+    const interval = setInterval(() => {
+      if (document.body) {
+        document.body.classList.add(savedTheme);
+        clearInterval(interval);
+        resolve(); 
+      }
+    }, 1);
+  });
+</script>
     <!-- Google Tag Manager -->
 
     <script>(function (w, d, s, l, i) {

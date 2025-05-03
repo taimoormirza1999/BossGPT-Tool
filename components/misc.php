@@ -127,27 +127,15 @@ document.addEventListener("DOMContentLoaded", function () {
     // List of all possible theme classes
     const themes = ['light-mode', 'dark-mode', 'brown-mode', 'purple-mode', 'black-mode', 'system-mode'];
 
-    // Remove all theme classes from the body
-    themes.forEach(function (currentTheme) {
-      $('body').removeClass(currentTheme);
-    });
-
-    // Add the selected theme
-    $('body').addClass(theme);
-
-    // Store the selected theme in localStorage
+    themes.forEach(t => document.body.classList.remove(t));
+    document.body.classList.add(theme);
     localStorage.setItem('userTheme', theme);
   }
 
   // Function to initialize theme from localStorage
   function initializeTheme() {
     const savedTheme = localStorage.getItem('userTheme');
-    if (savedTheme) {
-      changeTheme(savedTheme);
-    } else {
-      // Set default theme if none is saved
-      changeTheme('system-mode');
-    }
+    changeTheme(savedTheme || 'system-mode');
   }
 
   function toggleThemeClick() {
@@ -156,9 +144,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Initialize theme when DOM is loaded
-  document.addEventListener('DOMContentLoaded', function () {
-    initializeTheme();
-  });
+  document.addEventListener('DOMContentLoaded', initializeTheme);
 
   // AI Tone Management
   function changeAITone(tone) {
