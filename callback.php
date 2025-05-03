@@ -29,14 +29,16 @@ try {
         $google_account_info = $google_oauth->userinfo->get();
         $email = $google_account_info->email;
         $name = $google_account_info->name;
+        $picture = $google_account_info->picture;
         // Initialize our Google Auth handler
         $googleAuth = new GoogleAuth();
         // Register or login user
         $result = $googleAuth->registerWithGoogle($email, $name);
-        $_SESSION['user_email'] = $email;
-        $_SESSION['user_name'] = $name;
+        $_SESSION['email'] = $email;
+        $_SESSION['name'] = $name;
         $_SESSION['result11'] = $result;
         $_SESSION['result'] = $result;
+        $_SESSION['avatar_image'] = $picture;
         // Set a welcome or return message based on whether this is a new user
         if ($result['is_new_user'] && $result['is_pro_member'] == 0) {
             $_SESSION['welcome_message'] = "Welcome to BossGPT! Your account has been created.";
