@@ -13,7 +13,7 @@ $client = new Google_Client();
 $client->setClientId($_ENV['GOOGLE_CLIENT_ID']);
 $client->setClientSecret($_ENV['GOOGLE_CLIENT_SECRET']);
 $client->setRedirectUri($_ENV['GOOGLE_CALENDAR_REDIRECT_URI']);
-$client->addScope(Google_Service_Calendar::CALENDAR);
+// $client->addScope(Google_Service_Calendar::CALENDAR);
 $client->addScope(Google_Service_Calendar::CALENDAR_EVENTS);
 $client->setAccessType('offline');
 $client->setPrompt('consent');
@@ -25,7 +25,6 @@ if (isset($_GET['code'])) {
     // Store token in session
     $_SESSION['access_token'] = $token;
     header('Location: ../');
-
     exit;
 } else {
     echo "Failed to authenticate with Google Calendar.";

@@ -782,10 +782,10 @@ class AIAssistant
                     'action' => 'reconnect_calendar'
                 ];
             }
-            
+            $_SESSION['pending_calendar_command'] = $message;
             // Return a generic error message instead of the raw error
             return [
-                'message' => renderAIErrorMessage("222Your calendar connection has expired","Please connect your calendar to schedule the event and get calendar notifications.","/calendar/connect-calendar.php"),
+                'message' => renderAIErrorMessage("Your calendar connection has expired","Please connect your calendar to schedule the event and get calendar notifications.","/calendar/connect-calendar.php"),
                 'error' => true,
                 'action' => 'reconnect_calendar'
             ];
@@ -849,7 +849,6 @@ class AIAssistant
         if (!isset($eventDetails['description']) || empty($eventDetails['description'])) {
             $eventDetails['description'] = 'Event scheduled via BossGpt AI Assistant';
         }
-
         return $eventDetails;
     }
 }

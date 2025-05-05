@@ -72,6 +72,12 @@ if (isset($_GET['api'])) {
 
                 echo json_encode(['success' => true, 'avatar' => $row['avatar_image']]);
                 exit;
+                case 'unset_session':
+                    unset($_SESSION['pending_calendar_command']);
+                    header('Content-Type: application/json');
+                    echo json_encode(['status' => 'success']);
+                exit;
+            
             case 'save_telegram_chat_id':
                 $data = json_decode(file_get_contents('php://input'), true);
             

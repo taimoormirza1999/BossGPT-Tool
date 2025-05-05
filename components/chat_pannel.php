@@ -7,7 +7,7 @@
             <div class="text-white border-0 rounded-t-lg header">
                 <h5 class="" id="AiToneModalLabel"><img
                         src="https://res.cloudinary.com/da6qujoed/image/upload/v1744704440/robot_pfahvf.svg"
-                        class="w-10 h-10"> &nbsp;AI Tone</h5>
+                        class="w-10 h-10"> &nbsp;AI Personality</h5>
                 <button type="button" class="btn btn-link p-0 text-white close_icon"
                     onclick="DynamicClose('#AiToneModal')"><?php echo getCloseSquareIcon(); ?></button>
             </div>
@@ -275,29 +275,22 @@
                         }
 
                      
-document.addEventListener("DOMContentLoaded", function () {
+ document.addEventListener("DOMContentLoaded", function () {
     <?php if (isset($_SESSION['pending_calendar_command'])): ?>
-        // alert('DOMContentLoaded');
         const replayMessage = <?php echo json_encode($_SESSION['pending_calendar_command']); ?>;
-        // if (replayMessage) {
+
+        setTimeout(() => {
             const messageInput = document.getElementById('messageInput');
             const sendBtn = document.getElementById('aiSendMessageBtn');
 
-            // Step 1: Populate the input field
-            messageInput.value = decodeURIComponent(replayMessage);
+            if (messageInput && sendBtn) {
+                messageInput.value = decodeURIComponent(replayMessage);
+                sendBtn.click();
 
-            // Step 2: Wait 3 seconds then simulate form submission
-            sendBtn.click();
-            <?php
-                if (isset($_SESSION['pending_calendar_command']) && $_SESSION['pending_calendar_command']) {
-                    unset($_SESSION['pending_calendar_command']);
-                }
-                ?>
-
-            // setTimeout(() => {
-                // Uncomment to send message automatically:
-            // }, 3000);
-        // }
+                // Unset session from PHP
+                fetch('?api=unset_session');
+            }
+        }, 100);
     <?php endif; ?>
 });
 </script>
