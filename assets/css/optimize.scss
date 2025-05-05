@@ -1546,7 +1546,8 @@ body {
       .notification-icon-user_removed {
         background: $notiifcationicon-color4;
       }
-      .notification-icon-task_created {
+      .notification-icon-task_created,
+      .notification-icon-task_deleted {
         background: $notiifcationicon-color1;
       }
       .notification-icon-task_status_updated,

@@ -251,6 +251,14 @@ if (isset($_GET['api'])) {
                 $tasks = $project_manager->getTasks($data['project_id'], $startDate, $endDate);
                 $response = ['success' => true, 'tasks' => $tasks];
                 break;
+            case 'get_task_by_id':
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (!isset($data['task_id'])) {
+                    throw new Exception('Task ID is required');
+                }
+                $task = $project_manager->getTaskById($data['task_id']);
+                $response = ['success' => true, 'task' => $task];
+                break;
 
             case 'update_task_status':
                 $data = json_decode(file_get_contents('php://input'), true);

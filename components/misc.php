@@ -71,6 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
     user_removed: `<?= getProfileDeleteIcon(); ?>`,
     user_assigned: `<?= getProfileIcon(); ?>`,
     task_created: `<?= getclipboardIcon(); ?>`,
+    task_deleted: `<?= getclipboardIcon(); ?>`,
     task_status_updated: `<?= getclipboardIcon(); ?>`,
     task_picture_removed: `<?= getclipboardIcon(); ?>`,
     task_updated: `<?= getclipboardIcon(); ?>`,
@@ -142,6 +143,17 @@ document.addEventListener("DOMContentLoaded", function () {
     const themeContainer = document.querySelector('.theme-icon-container');
     themeContainer.classList.toggle('d-none');
   }
+
+  // Add new click event listener for document
+  document.addEventListener('click', function(event) {
+    const themeContainer = document.querySelector('.theme-icon-container');
+    const themeButton = document.getElementById('btn-theme');
+    
+    // If click is outside both the theme container and theme button
+    if (!themeContainer.contains(event.target) && !themeButton.contains(event.target)) {
+        themeContainer.classList.add('d-none');
+    }
+  });
 
   // Initialize theme when DOM is loaded
   document.addEventListener('DOMContentLoaded', initializeTheme);

@@ -427,6 +427,9 @@ function getActionTypeDisplay(action_type) {
     task_created: {
       text: "New Task Created",
     },
+    task_deleted: {
+      text: "Task Deleted",
+    },
     user_removed: {
       text: "User Removed",
     },

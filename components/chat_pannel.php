@@ -250,12 +250,7 @@
                                 }
                             });
 
-                            // Reset height when form is submitted
-                            document.getElementById('chatForm').addEventListener('submit', function () {
-                                setTimeout(() => {
-                                    // messageInput.style.height = 'auto';
-                                }, 100);
-                            });
+                          
                         }
 
                         function handlePromptClick(button) {
@@ -268,10 +263,7 @@
                             const inputEvent = new Event('input', { bubbles: true });
                             inputField.dispatchEvent(inputEvent);
                             // Auto-submit the form
-                            setTimeout(() => {
-                                // aiSendMessageBtn.click();
-                                // chatForm.submit();
-                            }, 200); // Small delay to make it smooth
+                          
                         }
 
                      

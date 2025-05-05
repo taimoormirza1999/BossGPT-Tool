@@ -221,8 +221,7 @@
                 }
 
                 // Create the debounced update function
-                const debouncedUpdateTaskStatus = debounce((taskId, newStatus,loadingAllTasks=true) => {
-                    // showLoading();
+                const debouncedUpdateTaskStatus = debounce((taskId, newStatus, loadingAllTasks = true) => {
                     fetch('?api=update_task_status', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -234,13 +233,14 @@
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                if(loadingAllTasks){
+                            if (loadingAllTasks) {
                                     loadTasks(currentProject);
+                            } else {
+                                loadTaskById(taskId);
                                 }
                             }
                         })
-                        .catch(error => console.error('Error updating task status:', error))
-                        .finally();
+                    .catch(error => console.error('Error updating task status:', error));
                 }, 0);
                 let currentProject = null;
                 const savedProject = getLastSelectedProject();
@@ -547,6 +547,162 @@ $button1.text(selectedProjectTitle);
                         });
                 }
 
+                // Add this function to update a single task in the UI
+                function updateSingleTaskInBoard(task) {
+                    // Find the existing task element
+                    const existingTaskElement = document.querySelector(`[data-id="${task.id}"]`);
+                    if (!existingTaskElement) return;
+
+                    // Get the plant image based on task status and garden data
+                    const getPlantImage = (task) => {
+                        // If we have garden data, use it
+                        if (task.garden && task.garden.stage && task.garden.plant_type) {
+                            switch (task.garden.stage) {
+                                case 'dead': return 'dead.png';
+                                case 'sprout': return 'seed.png';
+                                case 'growing': return 'flower3.png';
+                                case 'tree':
+                                    // Return the specific tree type image
+                                    return `${task.garden.plant_type}.png`;
+                                default: return 'seed.png';
+                            }
+                        }
+
+                        // Fallback to status-based images if no garden data
+                        switch (task.status) {
+                            case 'todo': return 'seed.png';
+                            case 'in_progress': return 'flower3.png';
+                            case 'done':
+                                // Default to treelv3 if no plant_type specified
+                                return task.garden?.plant_type ? `${task.garden.plant_type}.png` : 'treelv3.png';
+                            default: return 'seed.png';
+                        }
+                    };
+
+                    // Update the plant image
+                    const plantImage = existingTaskElement.querySelector('.inner-plant');
+                    if (plantImage) {
+                        plantImage.src = `assets/images/garden/${getPlantImage(task)}`;
+                    }
+
+                    // Update task label/status
+                    const taskLabel = existingTaskElement.querySelector('.task-label');
+                    if (taskLabel) {
+                        taskLabel.className = `task-label ${task.status}`;
+                        taskLabel.textContent = task.status.replace('_', ' ').toUpperCase();
+                    }
+
+                    // Get the correct column based on the task's status
+                    const targetColumn = document.getElementById(`${task.status}Tasks`);
+                    if (!targetColumn) return;
+
+                    // Move the task to the correct column if it's not already there
+                    if (existingTaskElement.parentElement.id !== `${task.status}Tasks`) {
+                        targetColumn.appendChild(existingTaskElement);
+                    }
+
+                    // Update other task details if needed
+                    const titleElement = existingTaskElement.querySelector('.task-title');
+                    if (titleElement) {
+                        titleElement.textContent = task.title;
+                    }
+
+                    const descriptionElement = existingTaskElement.querySelector('.task-description');
+                    if (descriptionElement) {
+                        descriptionElement.textContent = task.description || '';
+                    }
+
+                    const dueDateElement = existingTaskElement.querySelector('.due-date');
+                    if (dueDateElement) {
+                        dueDateElement.textContent = task.due_date || '';
+                    }
+
+                    // Update assignees if present
+                    const assigneesContainer = existingTaskElement.querySelector('.task-assignees');
+                    if (assigneesContainer && task.assigned_users) {
+                        assigneesContainer.innerHTML = Object.values(task.assigned_users)
+                            .map(user => `<span class="assignee">${user.username}</span>`)
+                            .join(', ');
+                    }
+
+                    // Reinitialize drag and drop
+                    initializeDragAndDrop();
+                }
+
+                // Add the loadTaskById function
+                function loadTaskById(taskId) {
+                    return fetch('?api=get_task_by_id', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ task_id: taskId })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                            // Find the existing task element
+                            const existingTaskElement = document.querySelector(`[data-id="${taskId}"]`);
+                            if (!existingTaskElement) return;
+
+                            // Get the correct column based on the task's status
+                            const targetColumn = document.getElementById(`${data.task.status}Tasks`);
+                            if (!targetColumn) return;
+
+                            // Update plant image
+                            const plantImage = existingTaskElement.querySelector('.inner-plant');
+                            if (plantImage) {
+                                const plantImageSrc = getPlantImage(data.task);
+                                plantImage.src = `assets/images/garden/${plantImageSrc}`;
+                            }
+
+                            // Update task label
+                            const taskLabels = existingTaskElement.querySelector('.task-card-labels');
+                            if (taskLabels) {
+                                taskLabels.innerHTML = `
+                                    ${data.task.status === 'todo' ? '<span class="task-label label-red"></span>' : ''}
+                                    ${data.task.status === 'in_progress' ? '<span class="task-label label-orange"></span>' : ''}
+                                    ${data.task.status === 'done' ? '<span class="task-label label-green"></span>' : ''}
+                                    <span class="task-label label-blue"></span>
+                                `;
+                            }
+
+                            // Move task to correct column if needed
+                            if (existingTaskElement.parentElement !== targetColumn) {
+                                targetColumn.appendChild(existingTaskElement);
+                            }
+
+                            // Reinitialize drag and drop
+                            initializeDragAndDrop();
+                        }
+                    })
+                    .catch(error => console.error('Error loading task:', error));
+                }
+
+                // Helper function to get plant image based on task status and garden data
+                function getPlantImage(task) {
+                    // If we have garden data, use it
+                    if (task.garden && task.garden.stage && task.garden.plant_type) {
+                        switch (task.garden.stage) {
+                            case 'dead': return 'dead.png';
+                            case 'sprout': return 'seed.png';
+                            case 'growing': return 'flower3.png';
+                            case 'tree':
+                                // Return the specific tree type image
+                                return `${task.garden.plant_type}.png`;
+                            default: return 'seed.png';
+                        }
+                    }
+
+                    // Fallback to status-based images if no garden data
+                    switch (task.status) {
+                        case 'todo': return 'seed.png';
+                        case 'in_progress': return 'flower3.png';
+                        case 'done':
+                            // Default to treelv3 if no plant_type specified
+                            return task.garden?.plant_type ? `${task.garden.plant_type}.png` : 'treelv3.png';
+                        default: return 'seed.png';
+                    }
+                }
+
                 // Load tasks
                     function loadTasks(projectId, startDate=null, endDate=null) {
                         // showLoading();
@@ -712,10 +868,9 @@ $button1.text(selectedProjectTitle);
                     ` : '';
                     // Get plant stage based on task status and garden data
                     const getPlantImage = (task) => {
-                        // console.log(task);
                         // If we have garden data, use it
-                        if (task.garden.plant_stage && task.garden.plant_type) {
-                            switch (task.garden.plant_stage) {
+                        if (task.garden && task.garden.stage && task.garden.plant_type) {
+                            switch (task.garden.stage) {
                                 case 'dead': return 'dead.png';
                                 case 'sprout': return 'seed.png';
                                 case 'growing': return 'flower3.png';
@@ -785,7 +940,7 @@ $button1.text(selectedProjectTitle);
                         const bgColor = `hsl(${hue}, 50%, 40%)`; // Consistent saturation and lightness
                         return `
                                         <span class="task-assignee text-capitalize" style="background-color: ${bgColor}; color: white;">
-                                            ${escapeHtml(username[0].charAt(0).toUpperCase() + username[1].charAt(0).toUpperCase())}
+                                            ${escapeHtml(username[0]?.charAt(0).toUpperCase() + username[1]?.charAt(0).toUpperCase())}
                                         </span>
                                         `;
                     }).join('')}
@@ -846,7 +1001,30 @@ $button1.text(selectedProjectTitle);
                             const newStatus = column.dataset.status;
                             const taskId = draggingCard.dataset.id;
 
-                            // Optimistic UI update - move card immediately
+                            // Update plant image based on new status
+                            const plantImage = draggingCard.querySelector('.inner-plant');
+                            if (plantImage) {
+                                // For in_progress, always show flower3.png
+                                if (newStatus === 'in_progress') {
+                                    plantImage.src = 'assets/images/garden/flower3.png';
+                                } else if (newStatus === 'todo') {
+                                    plantImage.src = 'assets/images/garden/seed.png';
+                                }
+                                // For 'done' status, keep existing plant type image
+                            }
+
+                            // Update task label
+                            const taskLabels = draggingCard.querySelector('.task-card-labels');
+                            if (taskLabels) {
+                                taskLabels.innerHTML = `
+                                    ${newStatus === 'todo' ? '<span class="task-label label-red"></span>' : ''}
+                                    ${newStatus === 'in_progress' ? '<span class="task-label label-orange"></span>' : ''}
+                                    ${newStatus === 'done' ? '<span class="task-label label-green"></span>' : ''}
+                                    <span class="task-label label-blue"></span>
+                                `;
+                            }
+
+                            // Move card to new column
                             column.appendChild(draggingCard);
                             draggingCard.dataset.status = newStatus;
 

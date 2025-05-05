@@ -39,6 +39,7 @@
         </div>
     </form>
     <script>
+        const updateprofileSubmitbtn = document.getElementById('updateprofileSubmitbtn');
         // Clicking avatar triggers file input
         document.getElementById('avatarPreview').addEventListener('click', function () {
             document.getElementById('avatarImage').click();
@@ -50,6 +51,7 @@
 
             const formData = new FormData();
             formData.append('avatar', file);
+            updateprofileSubmitbtn.disabled = true;
 
             try {
                 const res = await fetch('?api=upload_profile_image', {
@@ -62,35 +64,40 @@
                 if (res.ok && data.success) {
                     // Update avatar preview immediately
                     document.getElementById('avatarPreview').src = data.image_url;
-
+                    iziToast.destroy();
                     iziToast.success({
                         title: 'Success',
                         message: 'Profile image updated!'
                     });
                 } else {
+                    iziToast.destroy();
                     iziToast.error({
                         title: 'Error',
                         message: data.message || 'Upload failed'
                     });
                 }
+                updateprofileSubmitbtn.disabled = false;
             } catch (err) {
+                iziToast.destroy();
                 iziToast.error({
                     title: 'Error',
                     message: 'Network error or server is offline.'
                 });
-                console.log(err);
+              
+                updateprofileSubmitbtn.disabled = false;
             }
         });
 
         document.getElementById('updateprofileSubmitbtn').addEventListener('click', function (e) {
     e.preventDefault(); // prevent normal form submission
-
+    // updateprofileSubmitbtn.disabled = true;
     const username = document.getElementById('profileUserName').value.trim();
     const name = document.getElementById('profileName').value.trim();
     const email = document.getElementById('profileEmail').value.trim();
     const bio = document.getElementById('profileBio').value.trim();
 
     if (!username || !email) {
+        iziToast.destroy();
         iziToast.error({
             title: 'Error',
             message: 'Username and Email are required.'
@@ -106,11 +113,14 @@
     .then(response => response.json())
     .then(data => {
         if (data.success) {
+            iziToast.destroy();
             iziToast.success({
                 title: 'Success',
                 message: 'Profile updated successfully!'
             });
+
         } else {
+            iziToast.destroy();
             iziToast.error({
                 title: 'Error',
                 message: 'Error: ' + data.message
@@ -118,11 +128,13 @@
         }
     })
     .catch(error => {
+        iziToast.destroy();
         iziToast.error({
             title: 'Error',
             message: 'Unexpected error occurred.'
         });
     });
+    
 });
 
     </script>

@@ -30,6 +30,7 @@ class AIAssistant
             $stmt = $this->db->prepare("
                 SELECT * FROM tasks 
                 WHERE project_id = ? 
+                AND status != 'deleted'
                 ORDER BY created_at
             ");
             $stmt->execute([$project_id]);
@@ -215,17 +216,12 @@ class AIAssistant
                                             'enum' => ['todo', 'in_progress', 'done'],
                                             'description' => 'Current status of the task'
                                         ],
-                                        'assignees' => [
-                                            'type' => 'array',
-                                            'items' => [
-                                                'type' => 'integer',
-                                                'description' => 'ID of the user to be assigned to the task'
-                                            ],
-                                            'minItems' => 1,
-                                            'description' => 'User IDs assigned to the task (at least one required)'
+                                        'assignee_username' => [
+                                            'type' => 'string',
+                                            'description' => 'Username of the project member to assign the task to. If not provided or user not found, task will be assigned to the current user.'
                                         ]
                                     ],
-                                    'required' => ['title', 'description', 'due_date', 'status', 'assignees']
+                                    'required' => ['title', 'due_date']
                                 ]
                             ]
                         ],
@@ -330,7 +326,40 @@ class AIAssistant
                         ],
                         'required' => ['suggestions']
                     ]
-                ]
+                ],
+                [
+                    'name' => 'delete_task',
+                    'description' => 'Delete a task by its title',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'task_title' => [
+                                'type' => 'string',
+                                'description' => 'Title of the task to delete'
+                            ]
+                        ],
+                        'required' => ['task_title']
+                    ]
+                ],
+                [
+                    'name' => 'update_task_status',
+                    'description' => 'Update a task status by its title',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'task_title' => [
+                                'type' => 'string',
+                                'description' => 'Title of the task to update'
+                            ],
+                            'new_status' => [
+                                'type' => 'string',
+                                'enum'=> ['todo', 'in_progress', 'done'],
+                                'description'=> 'New status for the task. Must be one of: todo, in_progress, done'
+                            ]
+                        ],
+                        'required'=> ['task_title', 'new_status']
+                    ]
+                    ],
             ];
 
             $curl = curl_init();
@@ -369,25 +398,29 @@ class AIAssistant
             }
 
             // Save user message
-            $stmt = $this->db->prepare(
-                "INSERT INTO chat_history (project_id, message, sender, function_call) 
-                 VALUES (?, ?, ?, ?)"
-            );
-            $stmt->execute([
-                $project_id,
-                $enhanced_message,
-                'user',
-                null
-            ]);
+            // $stmt = $this->db->prepare(
+            //     "INSERT INTO chat_history (project_id, message, sender, function_call) 
+            //      VALUES (?, ?, ?, ?)"
+            // );
+            // $stmt->execute([
+            //     $project_id,
+            //     $enhanced_message,
+            //     'user',
+            //     null
+            // ]);
 
             // Process function calls if any
             if (isset($result['choices'][0]['message']['function_call'])) {
                 $function_call = $result['choices'][0]['message']['function_call'];
                 $this->executeFunctionCall($function_call, $project_id);
             }
-
             // Save AI response
-            $ai_message = $result['choices'][0]['message']['content'] ?? 'Tasks have been created successfully.';
+            $ai_message = isset($GLOBALS['custom_ai_message']) 
+                ? $GLOBALS['custom_ai_message'] 
+                : ($result['choices'][0]['message']['content'] ?? 'Operation completed successfully.');
+
+            // Clear the custom message after using it
+            unset($GLOBALS['custom_ai_message']);
 
             // Check if the message is a JSON response for subtask dates and clean it
             if ($ai_message && preg_match('/\{\s*"task_id":\s*\d+,\s*"subtasks":\s*\[\s*\{\s*"id":\s*\d+,\s*"due_date":/i', $ai_message)) {
@@ -549,12 +582,98 @@ class AIAssistant
                     }
                 }
                 break;
+            case 'delete_task':
+                if (isset($arguments['task_title'])) {
+                    // Find task ID by title
+                    $taskId = $this->findTaskIdByTitle($project_id, $arguments['task_title']);
+                    if ($taskId) {
+                        // Get task info before deletion for the message
+                        $taskStmt = $this->db->prepare("SELECT title FROM tasks WHERE id = ?");
+                        $taskStmt->execute([$taskId]);
+                        $task = $taskStmt->fetch();
+                        
+                        $projectManager = new ProjectManager();
+                        $projectManager->deleteTask($taskId);
+                        
+                        // Override the default AI message with a custom deletion confirmation
+                        $GLOBALS['custom_ai_message'] = "Task '{$task['title']}' has been successfully deleted.";
+                    } else {
+                        $GLOBALS['custom_ai_message'] = "Could not find a task with the title '{$arguments['task_title']}'. Please check the task name and try again.";
+                    }
+                }
+                break;
+            case 'update_task_status':
+                if (isset($arguments['task_title']) && isset($arguments['new_status'])) {
+                    // Find task ID by title
+                    $taskId = $this->findTaskIdByTitle($project_id, $arguments['task_title']);
+                    if ($taskId) {
+                        // Get task info before update for the message
+                        $taskStmt = $this->db->prepare("SELECT title, status FROM tasks WHERE id = ?");
+                        $taskStmt->execute([$taskId]);
+                        $task = $taskStmt->fetch();
+                        
+                        // Normalize the status value
+                        $statusMap = [
+                            'to do' => 'todo',
+                            'todo' => 'todo',
+                            'to-do' => 'todo',
+                            'in progress' => 'in_progress',
+                            'inprogress' => 'in_progress',
+                            'in-progress' => 'in_progress',
+                            'done' => 'done',
+                            'complete' => 'done',
+                            'completed' => 'done',
+                            'finish' => 'done',
+                            'finished' => 'done'
+                        ];
+                        
+                        $normalizedStatus = strtolower($arguments['new_status']);
+                        $normalizedStatus = $statusMap[$normalizedStatus] ?? $normalizedStatus;
+                        
+                        if (!in_array($normalizedStatus, ['todo', 'in_progress', 'done'])) {
+                            $GLOBALS['custom_ai_message'] = "Invalid status '{$arguments['new_status']}'. Status must be one of: todo, in progress, or done.";
+                            break;
+                        }
+                        
+                        $projectManager = new ProjectManager();
+                        $projectManager->updateTaskStatus($taskId, $normalizedStatus);
+                        
+                        // Override the default AI message with a custom update confirmation
+                        $GLOBALS['custom_ai_message'] = "Task '{$task['title']}' has been moved from '{$task['status']}' to '{$normalizedStatus}'.";
+                    } else {
+                        $GLOBALS['custom_ai_message'] = "Could not find a task with the title '{$arguments['task_title']}'. Please check the task name and try again.";
+                    }
+                }
+                break;
         }
     }
 
     private function createSingleTask($project_id, $task)
     {
         try {
+            // First, let's find the user ID if a username was specified
+            $assignees = [];
+            if (isset($task['assignee_username'])) {
+                // Look up the user ID from project_users table
+                $stmt = $this->db->prepare("
+                    SELECT u.id 
+                    FROM users u 
+                    JOIN project_users pu ON u.id = pu.user_id 
+                    WHERE pu.project_id = ? AND u.username = ?
+                ");
+                $stmt->execute([$project_id, $task['assignee_username']]);
+                $user = $stmt->fetch();
+                if ($user) {
+                    $assignees[] = $user['id'];
+                }
+            }
+            
+            // If no specific assignee found or specified, use current user
+            if (empty($assignees)) {
+                $assignees = [$_SESSION['user_id']];
+            }
+
+            // Create the task
             $stmt = $this->db->prepare(
                 "INSERT INTO tasks (project_id, title, description, picture, status, due_date) 
                  VALUES (?, ?, ?, ?, ?, ?)"
@@ -562,7 +681,7 @@ class AIAssistant
             $stmt->execute([
                 $project_id,
                 $task['title'],
-                $task['description'],
+                $task['description'] ?? '',
                 isset($task['picture']) ? $task['picture'] : null,
                 $task['status'] ?? 'todo',
                 $task['due_date'] ?? null
@@ -570,19 +689,26 @@ class AIAssistant
 
             $task_id = $this->db->lastInsertId();
 
-            // Ensure assignees are provided
-            if (!isset($task['assignees']) || !is_array($task['assignees']) || count($task['assignees']) === 0) {
-                throw new Exception("At least one assignee is required for the task '{$task['title']}'");
-            }
-
             // Insert task assignees
             $assigneeStmt = $this->db->prepare("INSERT INTO task_assignees (task_id, user_id) VALUES (?, ?)");
-            foreach ($task['assignees'] as $user_id) {
+            $gardenStmt = $this->db->prepare(
+                "INSERT INTO user_garden (task_id, user_id, plant_type, size, stage) 
+                 VALUES (?, ?, ?, ?, ?)"
+            );
+            
+            foreach ($assignees as $user_id) {
                 $assigneeStmt->execute([$task_id, $user_id]);
+                $gardenStmt->execute([
+                    $task_id,
+                    $user_id,
+                    'treelv2',  // Default plant type
+                    'medium',    // Default size
+                    'sprout'    // Changed from 'seed' to 'sprout'
+                ]);
             }
 
             // Log task creation with assignees
-            $assigneeNames = $this->getAssigneeNames($task['assignees']);
+            $assigneeNames = $this->getAssigneeNames($assignees);
             $this->logActivity(
                 $project_id,
                 'task_created',

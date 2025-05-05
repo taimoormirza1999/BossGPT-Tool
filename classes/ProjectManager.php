@@ -216,9 +216,7 @@ class ProjectManager
             // Fetch and return the results
             // $stmt->execute([$_SESSION['user_id'], $project_id]);
             $stmt->execute();
-
             $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
             // Process the concatenated strings into arrays
             foreach ($tasks as &$task) {
                 $task['assigned_users'] = $task['assigned_usernames'] ?
@@ -243,7 +241,6 @@ class ProjectManager
             
                 // Parse subtasks JSON
                 $task['subtasks'] = json_decode($task['subtasks'] ?? '[]', true) ?? [];
-                
                 // Add garden info if available
                 $task['garden'] = [
                     'stage' => $task['plant_stage'] ?? null,
@@ -257,7 +254,6 @@ class ProjectManager
                 unset($task['plant_size']);
             }
             unset($task);
-
             return $tasks;
         } catch (Exception $e) {
             error_log("Get Tasks Error: " . $e->getMessage());
@@ -276,17 +272,32 @@ class ProjectManager
             ");
             $stmt->execute([$task_id]);
             $task = $stmt->fetch();
+            // Normalize the status value
+            $validStatuses = ['todo', 'in_progress', 'done'];
+            $normalizedStatus = in_array($status, $validStatuses) ? $status : 'todo';
 
             $stmt = $this->db->prepare(
                 "UPDATE tasks SET status = ? WHERE id = ?"
             );
-            $stmt->execute([$status, $task_id]);
+            $stmt->execute([$normalizedStatus, $task_id]);
+            // Update the garden stage based on status
+            $gardenStmt = $this->db->prepare(
+                "UPDATE user_garden 
+                 SET stage = CASE 
+                     WHEN ? = 'todo' THEN 'sprout'
+                     WHEN ? = 'in_progress' THEN 'growing'
+                     WHEN ? = 'done' THEN 'tree'
+                     ELSE stage 
+                 END 
+                 WHERE task_id = ?"
+            );
+            $gardenStmt->execute([$normalizedStatus, $normalizedStatus, $normalizedStatus, $task_id]);
 
             // Log the activity
             $this->logActivity(
                 $task['project_id'],
                 'task_status_updated',
-                "Updated status of task '{$task['title']}' to $status"
+                "Updated status of task '{$task['title']}' to $normalizedStatus"
             );
 
             return true;
@@ -653,6 +664,99 @@ class ProjectManager
         $stmt->execute([$project_id]);
         return $stmt->fetch()['title'];
     }
+    public function getTaskById($task_id)
+{
+    try {
+        $query = "
+            SELECT 
+                t.id, 
+                t.project_id, 
+                t.title, 
+                t.description, 
+                t.picture, 
+                t.status, 
+                t.due_date, 
+                t.created_at, 
+                t.updated_at, 
+                COALESCE(GROUP_CONCAT(DISTINCT u.avatar_image SEPARATOR ', '), '') AS assigned_user_avatars,
+                COALESCE(GROUP_CONCAT(DISTINCT u.username SEPARATOR ', '), '') AS assigned_usernames,
+                COALESCE(GROUP_CONCAT(DISTINCT u.id SEPARATOR ', '), '') AS assigned_user_ids,
+                COALESCE(
+                    (
+                        SELECT CONCAT('[', 
+                            GROUP_CONCAT(
+                                CONCAT(
+                                    '{\"id\":', s.id, 
+                                    ',\"title\":\"', s.title, 
+                                    '\",\"description\":\"', COALESCE(s.description, ''), 
+                                    '\",\"status\":\"', s.status, 
+                                    '\",\"due_date\":\"', COALESCE(s.due_date, ''), '\"}'
+                                ) 
+                                SEPARATOR ','
+                            ), 
+                        ']') 
+                        FROM subtasks s 
+                        WHERE s.task_id = t.id
+                    ), '[]'
+                ) AS subtasks,
+                g.stage as plant_stage,
+                g.plant_type,
+                g.size as plant_size
+            FROM tasks t
+            LEFT JOIN task_assignees ta ON t.id = ta.task_id
+            LEFT JOIN users u ON ta.user_id = u.id
+            LEFT JOIN user_garden g ON t.id = g.task_id AND g.user_id = :user_id
+            WHERE t.id = :task_id AND t.status != 'deleted'
+            GROUP BY t.id, t.project_id, t.title, t.description, t.picture, t.status, t.due_date, t.created_at, t.updated_at, g.stage, g.plant_type, g.size
+            LIMIT 1
+        ";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':user_id', $_SESSION['user_id']);
+        $stmt->bindParam(':task_id', $task_id);
+        $stmt->execute();
+
+        $task = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$task) {
+            return null;
+        }
+
+        // Assigned users
+        $task['assigned_users'] = $task['assigned_usernames'] ?
+            array_combine(
+                explode(',', $task['assigned_user_ids']),
+                explode(',', $task['assigned_usernames'])
+            ) : [];
+
+        foreach ($task['assigned_users'] as $userId => $username) {
+            $task['assigned_users'][$userId] = [
+                'id' => $userId,
+                'username' => $username,
+                'avatar_image' => 'fdcvx' // replace with your actual avatar logic
+            ];
+        }
+
+        // Parse subtasks
+        $task['subtasks'] = json_decode($task['subtasks'] ?? '[]', true) ?? [];
+
+        // Garden info
+        $task['garden'] = [
+            'stage' => $task['plant_stage'] ?? null,
+            'plant_type' => $task['plant_type'] ?? null,
+            'size' => $task['plant_size'] ?? null
+        ];
+
+        unset($task['plant_stage'], $task['plant_type'], $task['plant_size']);
+
+        return $task;
+
+    } catch (Exception $e) {
+        error_log("Get Task By ID Error: " . $e->getMessage());
+        throw $e;
+    }
+}
+
 }
 
 ?>
