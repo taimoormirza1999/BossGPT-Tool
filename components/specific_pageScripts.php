@@ -468,13 +468,14 @@ $button1.text(selectedProjectTitle);
 
                 // Load chat history
                 function loadChatHistory(projectId, currentOffset = 0, reset = true) {
+                    // if (loading) return;
                     loading = true;
                     if (reset) {
                         offset = 0;
                         allLoaded = false;
                         chatMessages.innerHTML = '';
                     }
-                    showChatLoading();
+                    // showChatLoading(); 
 
                     const oldScrollHeight = chatMessages.scrollHeight;
                     fetch('?api=get_chat_history', {
@@ -535,10 +536,7 @@ $button1.text(selectedProjectTitle);
                         })
                         .finally(() => {
                             loading = false;
-                            setTimeout(() => {
-                                hideChatLoading();
-                            }, 500);
-
+                            hideChatLoading(); // Remove the setTimeout
                         });
                 }
 
@@ -1051,7 +1049,7 @@ $button1.text(selectedProjectTitle);
                     appendMessage(message, 'user');
                     messageInput.value = '';
 
-                    showChatLoading();
+                    // showChatLoading();
                     fetch('?api=send_message', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -2688,7 +2686,6 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                 });
             }
         }
-        initializeChatLoading();
     </script>
 
 

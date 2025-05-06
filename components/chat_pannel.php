@@ -120,7 +120,7 @@
                                 async function showMessage(message) {
 
                                     // Show loading animation first
-                                    showChatLoading();
+                                    // showChatLoading();
 
                                     // Wait for loading animation
                                     await new Promise(resolve => setTimeout(resolve, 1500));
