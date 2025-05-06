@@ -1,28 +1,20 @@
 <script>
   <?php if(isLoginUserPage()){ ?>
+  <?php if(!isPage('profile')){ ?>
   // Initial Loader
 document.addEventListener("DOMContentLoaded", function () {
-  
   function hideAiErrorMessages() {
-    console.log("Hiding AI Error Messages");
     document.querySelectorAll('.ai-message').forEach(el => {
       const message = el.querySelector('.message.ai');
-      // console.log(message.textContent);
       const errorMessage = <?php echo json_encode(renderAIErrorMessage()); ?>;
       const calendarSuccessMessage = <?php echo json_encode(renderAICalendarSuccessMessage()); ?>;
       if (
         message &&
         (
           message.textContent.includes('Sorry, I encountered an error while') 
-          // message.innerHTML.includes('calendar/connect-calendar.php')
         )
       ) {
-        // console.log("Got it "+message.textContent);
-        // message.parentElement.style.backgroundColor = 'red';
-        // el.classList.remove("d-flex");
-        // el.classList.add("d-none");
         message.innerHTML = errorMessage;
-        // message.innerHTML = calendarSuccessMessage;
       }
     });
   }
@@ -56,7 +48,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 500);
   }, 3000);
 });
-  <?php } ?>
+  
+  <?php } } ?>
   document.addEventListener('DOMContentLoaded', function () {
     var enableNotificationsBtn = false;
     <?php if (!isset($_SESSION['fcm_token']) || $_SESSION['fcm_token'] == '0'): ?>
@@ -95,7 +88,7 @@ document.addEventListener("DOMContentLoaded", function () {
       new bootstrap.Tooltip(el);
     });
   });
-
+  <?php if(!isPage('profile')){ ?>
   function closeChatPannel() {
     const chatPannel = document.querySelector('.chat-pannel');
     chatPannel.classList.add('d-none');
@@ -105,6 +98,7 @@ document.addEventListener("DOMContentLoaded", function () {
     $('.open-icon-btn').removeClass('d-none');
     console.log($('.open-icon-btn'));
   }
+  
   function DynamicClose(targetSelector) {
     const TargetElement = document.querySelector(targetSelector);
     TargetElement.classList.add('d-none');
@@ -116,7 +110,7 @@ document.addEventListener("DOMContentLoaded", function () {
       TargetElement.classList.add('show');
     }
   }
-
+  
   function openChatPannel() {
     const openIconBtn = document.querySelector('.open-icon-btn');
     $(openIconBtn).toggleClass('d-none');
@@ -124,6 +118,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const chatPannel = document.querySelector('.chat-pannel');
     chatPannel.classList.remove('d-none');
   }
+  <?php } ?>
   function changeTheme(theme) {
     // List of all possible theme classes
     const themes = ['light-mode', 'dark-mode', 'brown-mode', 'purple-mode', 'black-mode', 'system-mode'];
@@ -132,7 +127,6 @@ document.addEventListener("DOMContentLoaded", function () {
     document.body.classList.add(theme);
     localStorage.setItem('userTheme', theme);
   }
-
   // Function to initialize theme from localStorage
   function initializeTheme() {
     const savedTheme = localStorage.getItem('userTheme');
@@ -155,25 +149,22 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+  <?php if(!isPage('profile')){ ?>
   // Initialize theme when DOM is loaded
   document.addEventListener('DOMContentLoaded', initializeTheme);
-
   // AI Tone Management
   function changeAITone(tone) {
     // Remove active class from all tone indicators
     document.querySelectorAll('.tone-indicator').forEach(indicator => {
       indicator.classList.remove('active');
     });
-
     // Add active class to selected tone
     const selectedToneIndicator = document.querySelector(`[data-tone="${tone}"] .tone-indicator`);
     if (selectedToneIndicator) {
       selectedToneIndicator.classList.add('active');
     }
-
     // Store the selected tone in localStorage - using only aiToneMode
     localStorage.setItem('aiToneMode', tone);
-
     // Close the AI Tone modal
     const aiToneModal = document.getElementById('AiToneModal');
     if (aiToneModal) {
@@ -231,6 +222,7 @@ document.addEventListener("DOMContentLoaded", function () {
       aiToneModal.style.display = 'block';
     }
   }
+  <?php } ?>
   function openLink(link, newPage = true) {
     if (newPage) {
       window.open(link, '_blank');
@@ -261,19 +253,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const date = new Date(dateString);
     return date.toLocaleString();
   }
-  function timeAgo(dateString) {
-    const now = new Date();
-    const past = new Date(dateString);
-    const diffSeconds = Math.floor((now - past) / 1000);
 
-    if (diffSeconds < 60) return 'just now';
-    const minutes = Math.floor(diffSeconds / 60);
-    if (minutes < 60) return minutes + ' minutes ago';
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return hours + ' hours ago';
-    const days = Math.floor(hours / 24);
-    return days + ' days ago';
-  }
   function escapeHtml(text) {
     return text
       .replace(/&/g, "&amp;")
@@ -282,7 +262,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
   }
-
+<?php if(isPage('profile')){ ?>
   function updateActivityBoard(logs) {
     const activityContainer = document.getElementById('activityLogList');
     if (!activityContainer) return; // Safety check
@@ -333,16 +313,8 @@ document.addEventListener("DOMContentLoaded", function () {
       activityContainer.innerHTML += activityItem;
     });
   }
-
+  <?php } ?>
  
-
-
-
-
-
-
-
-
 
   function clearRewardfulCookies() {
     const cookies = document.cookie.split(";");
@@ -358,11 +330,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
  
-  function markAsEnabledNotification() {
-    // alert('markAsEnabledNotification called');
-  // 1. Check browser Notification permission
-  // console.log(Notification.permission)
-  
+  function markAsEnabledNotification() {  
   if (Notification.permission === 'granted') {
     // 2. Gather any payload you need (e.g. existing FCM token you stored)
     const payload = {
@@ -371,10 +339,6 @@ document.addEventListener("DOMContentLoaded", function () {
     checkFCMStatus();
   }
 }
-
-
-
-
 
   <?php if (isPage('profile')) { ?>
     function renderAssignedUsers(assignedUsers) {
@@ -424,15 +388,13 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     }).join('');
   }
-
-    
     function formatDate(dateString) {
     if (!dateString) return '-';
     const date = new Date(dateString);
     return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
   }
-   // Helper functions
-   function formatDate(date) {
+    // Helper functions
+    function formatDate(date) {
     // Check if the date is valid
     const validDate = new Date(date);
     if (isNaN(validDate)) {
@@ -442,7 +404,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const options = { day: '2-digit', month: 'short' };
     return validDate.toLocaleDateString('en-GB', options);
   }
-
+   if (isProfilePage()) {
     function updateCardsBoard(tasks) {
     const tableBody = document.getElementById('tasksTableBody');
 
@@ -481,7 +443,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       return date.toISOString().split('T')[0]; // YYYY-MM-DD
     }
-  function loadTasks2(projectId, startDate = null, endDate = null) {
+    function loadTasks2(projectId, startDate = null, endDate = null) {
                 // Add startDate and endDate to the data if provided
                 let requestData = { project_id: projectId };
                 if (startDate && endDate) {
@@ -507,5 +469,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     .catch(error => console.error('Error loading tasks:', error))
                     .finally();
             }
+          } 
   <?php } ?>
 </script>

@@ -81,7 +81,9 @@ function fetchNotifications(project_id, startDate = null, endDate = null) {
       .then((data) => {
         if (data.success) {
           updateNotificationDropdown(data.logs || []);
-          updateActivityBoard(data.logs || []);
+          if(isProfilePage()){
+            updateActivityBoard(data.logs || []);
+          }
           resolve();
         } else {
           console.error("Error fetching notifications:", data.message);
@@ -278,7 +280,6 @@ backdrop-filter: blur(8px);
 function showChatLoading() {
   const chatMessages = document.querySelector(".chat-messages");
   if (!chatMessages) return;
-
   const loadingElement = document.createElement("div");
   loadingElement.className = "chat-loading";
   loadingElement.innerHTML = `
@@ -313,9 +314,9 @@ function openNewProjectModal() {
   modal.show();
 }
 function scrollToBottom() {
-  if (welcomeThread) {
-    welcomeThread.scrollTop = welcomeThread.scrollHeight;
-  }
+  // if (welcomeThread) {
+  //   welcomeThread.scrollTop = welcomeThread.scrollHeight;
+  // }
 }
 const aiMessageClasses = "ai-message d-flex align-items-start intro-message";
 function hideWelcomeLogo() {
@@ -512,11 +513,11 @@ function updateNotificationDropdown(notifications) {
             
            
             #notificationDropdownMenu.dropdown-menu {
-               background: rgba(255, 255, 255, 0.8);
-backdrop-filter: blur(3.1px);
-border-radius: 12px;
-width: 300px; 
-overflow-x: hidden;    
+                background: rgba(255, 255, 255, 0.8);
+                backdrop-filter: blur(3.1px);
+                border-radius: 12px;
+                width: 300px; 
+                overflow-x: hidden;    
             }
 
             #notificationDropdownMenu.dark-mode .dropdown-menu {
@@ -535,7 +536,6 @@ overflow-x: hidden;
   } else {
     badge.style.display = "none";
   }
-
 
   // Update notification list
   if (notifications.length > 0) {

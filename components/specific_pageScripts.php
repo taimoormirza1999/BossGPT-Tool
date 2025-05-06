@@ -1,9 +1,10 @@
 <!-- Reminder button -->
-<?php if(isLoginUserPage()){ ?>
+<?php if(isLoginUserPage() && !isAitonePage()){ ?>
 <!-- Flatpickr JS -->
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>      
 <script>
-                document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', function () {
+                if(!isProfilePage()){
                     // 1) The tree images
                     const treeImages = [
                         { file: 'treelv2.png', alt: 'Tree Level 2' },
@@ -14,10 +15,8 @@
                         { file: 'treelv7.png', alt: 'Tree Level 7' },
                         { file: 'treelv8.png', alt: 'Tree Level 8' },
                     ];
-
                     const container = document.getElementById('taskTreeContainer');
                     const hiddenInput = document.getElementById('selectedTreeType');
-
                     // 2) Build and insert the images
                     let html = '';
                     treeImages.forEach(({ file, alt }) => {
@@ -41,7 +40,7 @@
                             optionDiv.classList.add('selected');
                         });
                     });
-                 
+                }
                     function loadActivityLog() {
                     fetch('?api=get_activity_log', {
                         method: 'POST',
@@ -153,12 +152,9 @@
                     console.log(data);
                 })
         }
-
     
-        document.addEventListener('DOMContentLoaded', function () {
-                      // console.log('window.rewardful →', window.rewardful);
+            document.addEventListener('DOMContentLoaded', function () {
                       <?php if (isset($_GET['pro-member']) && $_GET['pro-member'] == 'true') { ?>
-                // alert('updateProStatus');
                 updateProStatus();
             <?php } ?>
             // Check if we're on the garden stats page
@@ -167,7 +163,6 @@
                 // Skip the dashboard-specific code for garden stats page
                 return;
             }
-
             const currentProject = getLastSelectedProject();
             // First check if we're on the dashboard page
             const isDashboard = document.querySelector('.chat-container') !== null;
@@ -254,7 +249,7 @@
                 const messageInput = document.getElementById('messageInput');
                 const createProjectBtn = document.getElementById('createProjectBtn');
                 const loadingIndicator = document.querySelector('.loading');
-            <?php if(!isPage('profile')){ ?>
+                <?php if(!isPage('profile')){ ?>
                 const chatLoader = document.getElementById('mychatLoader');
                 // Show/hide loading indicator
                 function showChatLoading() {
@@ -309,7 +304,7 @@
                                     <?php if(isPage('profile')){ ?>
                                     // projectDropdown1.appendChild(li);
                                     const liClone = li.cloneNode(true);
-projectDropdown1.appendChild(liClone);
+                     projectDropdown1.appendChild(liClone);
                                     <?php } ?>
                                 });
                             }
@@ -387,7 +382,7 @@ projectDropdown1.appendChild(liClone);
 
                         <?php if(isPage('profile') ){ ?>
                             if (selectedButton1.length) {
-    selectedProjectTitle = selectedButton1.attr('title');
+                                selectedProjectTitle = selectedButton1.attr('title');
 }
                         <?php } ?>
                     }
@@ -503,11 +498,11 @@ $button1.text(selectedProjectTitle);
                                         chatMessages.innerHTML = '';
                                         appendWelcomeLogo();
                                         data.history.reverse().forEach(msg => appendMessage(msg.message, msg.sender));
-                                        // scrollToBottom();
+                                     
                                     } else {
                                         hideWelcomeLogo();
                                         data.history.forEach(msg => appendMessage(msg.message, msg.sender, 'top'));
-                                        // scrollToBottom();
+                                     
                                         // 2) AFTER prepending, restore the scroll position
                                         const newScrollHeight = chatMessages.scrollHeight;
                                         chatMessages.scrollTop = newScrollHeight - oldScrollHeight;
@@ -1093,7 +1088,6 @@ $button1.text(selectedProjectTitle);
                     const description = document.getElementById('projectDescription').value.trim();
 
                     if (!title) {
-                        // alert('Please enter a project title');
                         showToastAndHideModal(
                             '',
                             'error',
@@ -1112,12 +1106,16 @@ $button1.text(selectedProjectTitle);
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                // No need to call loadProjects() here since selectProject will refresh the UI
                                 bootstrap.Modal.getInstance(document.getElementById('newProjectModal')).hide();
                                 document.getElementById('projectTitle').value = '';
                                 document.getElementById('projectDescription').value = '';
+                                selectProject(data.project_id, title);
                                 Toast("success", "Success", "Project created successfully", "bottomCenter");
-                                selectProject(data.project_id, title);  // Pass the title here
+                                // First load the projects to refresh the dropdown
+                                loadProjects().then(() => {
+                                    // Then select the new project
+                                    selectProject(data.project_id, title);
+                                });
                             }
                         })
                         .catch(error => console.error('Error creating project:', error))
@@ -1274,6 +1272,7 @@ $button1.text(selectedProjectTitle);
                     };
                 }
 
+                if(!isProfilePage()){
                 // Add event listener for save button
                 document.getElementById('saveTaskBtn').addEventListener('click', function () {
                     const taskId = document.getElementById('editTaskId').value;
@@ -1325,7 +1324,7 @@ $button1.text(selectedProjectTitle);
                         sendUpdateTask(null);
                     }
                 });
-
+            }
 
                 const assignUserModal = document.getElementById('assignUserModal');
                 assignUserModal.addEventListener('shown.bs.modal', function () {
@@ -1341,7 +1340,7 @@ $button1.text(selectedProjectTitle);
                     fetch(`?api=get_all_project_users&project_id=${getLastSelectedProject()}`)
                         .then(async response => {
                             const text = await response.text();
-                            console.log('Raw response:', text); // Debug log
+                            // console.log('Raw response:', text); // Debug log
                             try {
                                 return JSON.parse(text);
                             } catch (e) {
@@ -1441,13 +1440,7 @@ $button1.text(selectedProjectTitle);
 
                 });
 
-                // Handle "New User" selection
-                // document.getElementById('userSelect').addEventListener('change', function () {
-                //     if (this.value === 'new') {
-                //         new bootstrap.Modal(document.getElementById('addUserModal')).show();
-                //         this.value = ''; // Reset dropdown selection
-                //     }
-                // });
+            
                 $('#addUserBtn').click(function () {
                     $('#addUserModal').modal('show');
                 });
@@ -1509,6 +1502,7 @@ $button1.text(selectedProjectTitle);
                         })
                         .finally(hideLoading);
                 });
+               if(!isProfilePage()){
                 // Helper functions
                 function appendMessage(message, sender) {
                     // Check if message is a raw JSON response for subtask dates
@@ -1579,6 +1573,8 @@ $button1.text(selectedProjectTitle);
                     chatMessages.scrollTop = chatMessages.scrollHeight;
                 }
 
+            }
+
          
 
                 // Initial load
@@ -1593,7 +1589,7 @@ $button1.text(selectedProjectTitle);
                     ?>
                 }
 
-
+                if(!isProfilePage()){
                 // Initialize Select2 for the edit task assignees
                 $('#editTaskAssignees').select2({
                     placeholder: 'Select users to assign',
@@ -1875,10 +1871,6 @@ $button1.text(selectedProjectTitle);
 
                 // Add this inside the DOMContentLoaded event listener, where other modal handlers are defined
             
-
-              
-             
-
                 function openAISubtaskGeneration(task) {
                     if (!currentProject) {
                         alert('Please select a project first.');
@@ -1947,12 +1939,12 @@ $button1.text(selectedProjectTitle);
                     const avatarDiv = document.createElement('div');
                     avatarDiv.className = 'ai-avatar';
                     avatarDiv.innerHTML = `
-    <div class="chat-loading-avatar">
-      <img src="https://res.cloudinary.com/da6qujoed/image/upload/v1742656707/logoIcon_pspxgh.png" 
-           alt="Logo" class="logo-icon" 
-           style="filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3)); margin-top: 0; margin-bottom: 0; width: 1.5rem; height: auto">
-    </div>
-  `;
+                    <div class="chat-loading-avatar">
+                    <img src="https://res.cloudinary.com/da6qujoed/image/upload/v1742656707/logoIcon_pspxgh.png" 
+                        alt="Logo" class="logo-icon" 
+                        style="filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3)); margin-top: 0; margin-bottom: 0; width: 1.5rem; height: auto">
+                    </div>
+                `;
 
                     // Suggestions container
                     const suggestionsContainer = document.createElement('div');
@@ -1963,19 +1955,19 @@ $button1.text(selectedProjectTitle);
                         const suggestionDiv = document.createElement('div');
                         suggestionDiv.className = 'suggestion-item border p-2 mb-2';
                         suggestionDiv.innerHTML = `
-      <strong>${escapeHtml(suggestion.title)}</strong><br>
-      <span class="my-2">${escapeHtml(suggestion.description)}</span><br>
-      <div class="d-flex mt-1" style="justify-content: space-between; flex-direction: row-reverse;">
-        <div class="suggested-task-due-date">
-          ${suggestion.due_date ? `
-            <?php echo getCalendarIcon(); ?>
-            <em class="text-muted"> Due: ${escapeHtml(suggestion.due_date)}</em>` : ''}
-        </div>
-        <button class="btn btn-sm btn-add-task mt-1">
-          <?php echo getAddIcon(); ?> Add Task
-        </button>
-      </div>
-    `;
+                            <strong>${escapeHtml(suggestion.title)}</strong><br>
+                            <span class="my-2">${escapeHtml(suggestion.description)}</span><br>
+                            <div class="d-flex mt-1" style="justify-content: space-between; flex-direction: row-reverse;">
+                                <div class="suggested-task-due-date">
+                                ${suggestion.due_date ? `
+                                    <?php echo getCalendarIcon(); ?>
+                                    <em class="text-muted"> Due: ${escapeHtml(suggestion.due_date)}</em>` : ''}
+                                </div>
+                                <button class="btn btn-sm btn-add-task mt-1">
+                                <?php echo getAddIcon(); ?> Add Task
+                                </button>
+                            </div>
+                            `;
                         suggestionDiv.querySelector('button').addEventListener('click', () => {
                             addSuggestedTask(suggestion);
                         });
@@ -2031,8 +2023,7 @@ $button1.text(selectedProjectTitle);
                         imageModal.show();
                     }
                 });
-
-              
+    
                 // New event listener for removing task picture
                 document.getElementById('removeTaskPictureBtn').addEventListener('click', function () {
                     if (!confirm('Are you sure you want to remove the picture from this task?')) {
@@ -2424,8 +2415,6 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                     }
                 });
 
-
-
                 // Image preview for new task modal
                 document.getElementById('newTaskPicture').addEventListener('change', function (e) {
                     const file = this.files[0];
@@ -2576,29 +2565,6 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                 }
             }
 
-
-            // --- Dark Mode Toggle Code ---
-            const toggleDarkModeBtn = document.getElementById('toggleDarkModeBtn');
-            if (toggleDarkModeBtn) {
-                // Check localStorage to apply dark mode preference on load
-                if (localStorage.getItem('preferredDarkMode') === 'false') {
-                    document.body.classList.remove('dark-mode');
-                } else {
-                    document.body.classList.add('dark-mode');
-                }
-
-                // Toggle dark mode when the button is clicked
-                toggleDarkModeBtn.addEventListener('click', function () {
-                    document.body.classList.toggle('dark-mode');
-                    if (document.body.classList.contains('dark-mode')) {
-                        localStorage.setItem('preferredDarkMode', 'true');
-                    } else {
-                        localStorage.setItem('preferredDarkMode', 'false');
-                    }
-                });
-            }
-            // --- End Dark Mode Toggle Code ---
-
             // Add mouse movement tracking for task card hover effects
             document.addEventListener('mousemove', function (e) {
                 document.querySelectorAll('.task-card:hover').forEach(function (card) {
@@ -2645,7 +2611,7 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                     })
                     .finally(hideLoading);
             });
-  
+        }
         }); // End of DOMContentLoaded
 
        

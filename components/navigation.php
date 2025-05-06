@@ -17,17 +17,19 @@
             <div class="d-flex align-items-center nav-btn-container">
                 <button type="button" class="btn btn-main-primary" data-bs-toggle="modal"
                     data-bs-target="#newProjectModal" style="background: rgba(255, 255, 255, 0.1)!important;
-border: 1.3px solid rgba(255, 255, 255, 0.35)!important;
-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1)!important;">
+                    border: 1.3px solid rgba(255, 255, 255, 0.35)!important;
+                    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1)!important;">
                     <?php echo getAddSquareIcon(); ?> New&nbsp;Project
                 </button>
                 <button onclick="openLink('<?php echo $_ENV['BASE_URL'] ?>/garden.php',false)"
                     class="btn btn-outline-light btn-logout" data-bs-toggle="tooltip" data-bs-placement="bottom"
                     title="My Garden"><?php echo getTreeIcon(); ?></button>
                 <button type="button" class="btn btn-outline-light btn-logout" data-bs-toggle="tooltip"
-                    data-bs-placement="bottom" onclick="openModal('assignUserModal')" title="Invite User"><?php echo getAddUserIcon(); ?></button>
+                    data-bs-placement="bottom" onclick="openModal('assignUserModal')"
+                    title="Invite User"><?php echo getAddUserIcon(); ?></button>
                 <button type="button" class="btn btn-outline-light btn-logout " data-bs-toggle="tooltip"
-                    data-bs-placement="bottom" onclick="openModal('activityLogModal')" title="Project Activity"><?php echo getClockIcon(); ?></button>
+                    data-bs-placement="bottom" onclick="openModal('activityLogModal')"
+                    title="Project Activity"><?php echo getClockIcon(); ?></button>
                 <!-- Notification Icon with Red Badge -->
                 <?php
                 $unreadNotifications = 0;
@@ -69,29 +71,25 @@ box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1)!important;">
                 ];
                 ?>
 
-<button class="btn btn-icon-only" id="btn-theme" onclick="toggleThemeClick()" data-bs-toggle="tooltip"
-    data-bs-placement="bottom" title="Switch Theme">
-    
-    <?php echo getThemeIcon(); ?>
-
-    <div class="theme-icon-container d-none">
-        <h6>Theme</h6>
-        <div class="theme-icon-content-container">
-            <?php foreach ($themes as $themeClass => $themeName): ?>
-                <div class="theme-icon-content-item">
-                    <div class="theme-icon-color" onclick="changeTheme('<?php echo $themeClass; ?>')"></div>
-                    <span><?php echo htmlspecialchars($themeName); ?></span>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    </div>
-
-</button>
-
+                <button class="btn btn-icon-only" id="btn-theme" onclick="toggleThemeClick()" data-bs-toggle="tooltip"
+                    data-bs-placement="bottom" title="Switch Theme">
+                    <?php echo getThemeIcon(); ?>
+                    <div class="theme-icon-container d-none">
+                        <h6>Theme</h6>
+                        <div class="theme-icon-content-container">
+                            <?php foreach ($themes as $themeClass => $themeName): ?>
+                                <div class="theme-icon-content-item">
+                                    <div class="theme-icon-color" onclick="changeTheme('<?php echo $themeClass; ?>')"></div>
+                                    <span><?php echo htmlspecialchars($themeName); ?></span>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </button>
                 <img src="<?= $_SESSION['avatar_image'] ?>"
                     style="  object-fit: cover;object-position: center;cursor: pointer;width: 47px; height: 47px; border-radius: 50%; border: 1.6px solid rgba(248, 249, 250, 0.5);"
-                    class=" btn-logout" id="avatar_image_nav" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Profile"
-                    onclick="openLink('<?php echo $_ENV['BASE_URL'] ?>?page=profile',false)" />
+                    class=" btn-logout" id="avatar_image_nav" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                    title="Profile" onclick="openLink('<?php echo $_ENV['BASE_URL'] ?>?page=profile',false)" />
                 <!-- Logout Form -->
                 <form method="POST" class="d-inline">
                     <input type="hidden" name="action" value="logout">
