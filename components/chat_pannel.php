@@ -194,16 +194,18 @@
                 <div class="chat-input">
                     <?php
                     $prompts = [
-                        "📑 book a meeting with Taimoor",
-                        "📑 set a reminder for task #number",
-                        "📑 suggest tasks for my project",
-                        "🎯 Create task 'Your Task' and assign it to myself",
+                        "Add 'title' into my calendar",
+                        "🔄 Mark 'title' as done",
+                        "✏️ Move 'title' to in progress",
+                        "✏️ Move 'title' to to do",
+                        "🎯 Create task 'task' and assign it to myself",
+                        "Delete task 'title'",
+                        "📑 Set a reminder for task #number",
+                        "📑 Suggest tasks for my project",
                         "📋 Create tasks for Your Feature",
                         "✏️ Move task #number to in_progress",
                         "👥 Assign task 'Your Task' to @name",
-                        "📅 Set deadline for task #number to next Friday",
-                        "📝 Update description of task 'Your Task'",
-                        "🔄 Mark task #number as completed",
+                        "📅 Set deadline 'title' to next Friday",
                         "📊 Show project progress",
                         "📑 List all tasks in current project",
                         "🔍 Show tasks assigned to me"

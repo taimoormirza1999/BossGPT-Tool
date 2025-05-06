@@ -146,7 +146,7 @@ class AIAssistant
             }
             // Check if this is a task status update request
             $enhanced_message = $message;
-            if (preg_match('/move\s+task\s+[\'"]?([^\'"]*)[\'"]\s+from\s+todo\s+to\s+in\s+progress/i', $message, $matches)) {
+            if (preg_match('/move\\s+task\\s+[\\\'"]?([^\\\'"]*)[\\\'"]\\s+from\\s+todo\\s+to\\s+in\\s+progress/i', $message, $matches)) {
                 $task_title = $matches[1];
                 error_log("Detected task status update request for: $task_title");
 
@@ -155,6 +155,85 @@ class AIAssistant
                 if ($task_id) {
                     $enhanced_message = "$message (Task ID: $task_id)";
                     error_log("Enhanced message with task ID: $enhanced_message");
+                }
+            }
+
+            // Recognize more natural language status update commands
+            if (
+                preg_match('/mark\\s+[\\\'"]?([^\\\'"]+)[\\\'"]?\\s+as\\s+(todo|in progress|done)/i', $message, $matches) ||
+                preg_match('/set\\s+[\\\'"]?([^\\\'"]+)[\\\'"]?\\s+to\\s+(todo|in progress|done)/i', $message, $matches) ||
+                preg_match('/put\\s+[\\\'"]?([^\\\'"]+)[\\\'"]?\\s+to\\s+(todo|in progress|done)/i', $message, $matches) ||
+                preg_match('/change\\s+[\\\'"]?([^\\\'"]+)[\\\'"]?\\s+to\\s+(todo|in progress|done)/i', $message, $matches)
+            ) {
+                $task_title = $matches[1];
+                $new_status = $matches[2];
+                // Normalize status
+                $statusMap = [
+                    'to do' => 'todo',
+                    'todo' => 'todo',
+                    'to-do' => 'todo',
+                    'in progress' => 'in_progress',
+                    'inprogress' => 'in_progress',
+                    'in-progress' => 'in_progress',
+                    'done' => 'done',
+                    'complete' => 'done',
+                    'completed' => 'done',
+                    'finish' => 'done',
+                    'finished' => 'done'
+                ];
+                $normalizedStatus = strtolower($new_status);
+                $normalizedStatus = $statusMap[$normalizedStatus] ?? $normalizedStatus;
+
+                // Find the task ID
+                $task_id = $this->findTaskIdByTitle($project_id, $task_title);
+                if ($task_id) {
+                    // Directly update the task status here!
+                    $projectManager = new ProjectManager();
+                    $projectManager->updateTaskStatus($task_id, $normalizedStatus);
+
+                    // Optionally, log the activity and return a success message
+                    return [
+                        'message' => "Task '{$task_title}' has been marked as {$normalizedStatus}.",
+                        'success' => true
+                    ];
+                }
+            }
+
+            // Recognize natural language calendar event requests for tasks
+            if (
+                preg_match('/(save|add|put)\\s+[\\\'"]?([^\\\'"]+)[\\\'"]?\\s+(to|on|into)\\s+my\\s+calendar/i', $message, $matches)
+            ) {
+                $task_title = $matches[2];
+
+                // Find the task in the current project context
+                $task = null;
+                foreach ($context['tasks'] as $t) {
+                    if (strcasecmp($t['title'], $task_title) === 0) {
+                        $task = $t;
+                        break;
+                    }
+                }
+
+                if ($task) {
+                    // Compose a message to create a calendar event
+                    $eventMessage = "Schedule an event for the task '{$task['title']}' on my calendar. Description: {$task['description']}. Due date: {$task['due_date']}";
+                    // Use your existing calendar handler
+                    $calendarResponse = $this->handleCalendarRequest($eventMessage);
+
+                    // Save AI response for calendar request
+                    $stmt->execute([
+                        $project_id,
+                        $calendarResponse['message'],
+                        'ai',
+                        null
+                    ]);
+
+                    return $calendarResponse;
+                } else {
+                    return [
+                        'message' => "Could not find a task with the title '{$task_title}'.",
+                        'error' => true
+                    ];
                 }
             }
 

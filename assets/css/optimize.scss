@@ -678,10 +678,10 @@ body {
   @include theme-bgcolor($default-mode-card-task-bgcolor);
   @extend .font-primary;
   background-image: $bg-img1-black;
-  background-size: cover;
-  background-position: top;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+  background-size: cover!important;
+  background-position: top!important;
+  background-repeat: no-repeat!important;
+  background-attachment: fixed!important;
   overflow-y: hidden!important;
   // overflow-y: hidden;
   // login/register pa ges
@@ -1413,7 +1413,7 @@ body {
         color: $white-color;
         background: $dark-mode-modal-bgcolor;
         border: $dark-mode-modal-border;
-        max-height: 60vh;
+        max-height: 80vh;
         border-radius: 16px !important;
         border: $boder-width_1_3 solid rgba(211, 211, 211, 0.5)!important;
         backdrop-filter: blur(6.35px);
