@@ -96,6 +96,16 @@ function include_profile($images)
         div#profile textarea.form-control::placeholder {
             color: rgba(255, 255, 255, 0.8) !important;
         }
+        div#profile .tab-pane {
+        opacity: 0;
+        transition: all 1.4s ease-in-out;
+        position: relative;
+        z-index: 0;
+        }
+        div#profile .tab-pane.active {
+        opacity: 1;
+        z-index: 1;
+        }
     </style>
     <div class="container-fluid pb-3">
         <!-- Main Content Area -->
@@ -110,6 +120,7 @@ function include_profile($images)
                             #profileTabs .nav-link {
                                 padding: 0.5rem;
                             }
+                           
                         </style>
                         <?php
                         $tabs = [
@@ -123,7 +134,7 @@ function include_profile($images)
                             <?php foreach ($tabs as $index => $tab): ?>
                                 <li class="nav-item" role="presentation">
                                     <button
-                                        class="nav-link bg-transparent border-0 font-secondaryLight  <?php echo $index === 0 ? 'active' : ''; ?>"
+                                        class="nav-link bg-transparent border-0   <?php echo $index === 0 ? 'active font-secondaryBold' : ' font-secondaryLight'; ?>"
                                         id="<?php echo $tab['id']; ?>-tab" data-bs-toggle="tab"
                                         data-bs-target="#<?php echo $tab['id']; ?>" type="button" role="tab"
                                         style="font-size: 1.2rem; font-weight: 700;">
@@ -248,6 +259,25 @@ function include_profile($images)
 
       
 
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all tab buttons
+            const tabButtons = document.querySelectorAll('#profileTabs button[data-bs-toggle="tab"]');
+            // Add click event listener to each tab button
+            tabButtons.forEach(button => {
+                button.addEventListener('shown.bs.tab', function(event) {
+                    // Remove bold class from all tabs
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('font-secondaryBold');
+                        btn.classList.add('font-secondaryLight');
+                    });
+                    
+                    // Add bold class to active tab
+                    event.target.classList.remove('font-secondaryLight');
+                    event.target.classList.add('font-secondaryBold');
+                });
+            });
         });
 
     </script>

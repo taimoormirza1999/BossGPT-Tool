@@ -1,8 +1,6 @@
 <?php
 require './vendor/autoload.php';
-//Added to load the environment variables
-// error_reporting(E_ALL);
-// ini_set('display_errors', 1);
+
 require_once './classes/UserManager.php';
 require_once './classes/Notification.php';
 require_once './classes/NotificationManager.php';
@@ -34,8 +32,6 @@ require_once './classes/AIAssistant.php';
 // Initialize database and handle API requests
 $database = Database::getInstance();
 $database->initializeTables();
-
-
 
 // Move the POST handling code here, after all classes are defined
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -93,6 +89,7 @@ require_once './api_endPoints.php';
 <html lang="en">
 
 <head>
+    <?php if(!isAitonePage() && isLoginUserPage()){?>
 <script>
  const applyTheme = new Promise((resolve) => {
     const savedTheme = localStorage.getItem('userTheme') || 'system-mode';
@@ -106,7 +103,13 @@ require_once './api_endPoints.php';
       }
     }, 1);
   });
+  function isProfilePage(url = window.location.href) {
+  // Parse the URL and its query parameters
+  const parsed = new URL(url, window.location.origin);
+  return parsed.searchParams.get('page') === 'profile';
+}
 </script>
+<?php } ?>
     <!-- Google Tag Manager -->
 
     <script>(function (w, d, s, l, i) {
@@ -125,23 +128,35 @@ require_once './api_endPoints.php';
     <meta name="fcm_token_value" content="0" id="fcm_token_value">
 
     <title>BOSS GPT - Project Manager AI</title>
+    <!-- Render All Pages -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom js -->
+    <?php if(!isAitonePage()){?>
+    <script src="./assets/js/custom.js"></script>
+    <?php if (isLoginUserPage()) { ?>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <?php } ?>
+    
+    <?php if (isLoginUserPage()) { ?>
+    <?php if (!isPage('profile')) { ?>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <?php } ?>
+    <?php } ?>
+    <!-- Flatpickr Core CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <?php } ?>
     <!-- iziToast CSS & JS -->
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/izitoast/dist/css/iziToast.min.css">
     <script src="https://cdn.jsdelivr.net/npm/izitoast/dist/js/iziToast.min.js"></script>
-    <!-- Flatpickr Core CSS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <!-- Tailwind CSS -->
     <!-- <script src="https://unpkg.com/@tailwindcss/browser@4"></script> -->
     <!-- Initialize user ID for project management -->
     <script>
         window.userId = <?php echo isset($_SESSION['user_id']) ? json_encode($_SESSION['user_id']) : 'null'; ?>;
     </script>
-    <!-- Custom js -->
-    <script src="./assets/js/custom.js"></script>
+
 
     <script type="module">
         import { DotLottie } from "https://cdn.jsdelivr.net/npm/@lottiefiles/dotlottie-web/+esm";
@@ -464,17 +479,21 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 
         <?php 
         if(isLoginUserPage()){
+          if(!isAitonePage()){
             require_once 'components/specific_pageScripts.php';
+          }
         }
         ?>
     </div>
-
+    <?php if(!isAitonePage()){?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Firebase -->
     <script type="module" src="assets/js/firbase.js"></script>
+    <?php } ?>
     <?php 
         if(isLoginUserPage()){?>
+        <?php if(!isAitonePage()){?>
             <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <!-- Pusher -->
@@ -484,12 +503,8 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                 const iconImage = `<?php echo getIconImage(0, 0, "1.5rem"); ?>`
                 const welcomeLogoImage = `<?php echo getIconImage(0, 0, '3.7rem'); ?>`;
             </script>
-        <?php } ?>
+        <?php } } ?>
    
-  
-
-
-
 
 
 
@@ -504,10 +519,8 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                     <div class="card">
                         <div class="card-body text-center">
                             <h2 class="card-title text-center mb-4">How do you like your<br>AI Boss to be?</h2>
-
                             <!-- Replace the existing AI tone options with the helper function -->
                             <?php echo renderAIToneOptions(); ?>
-
                             <button id="continueToDashboard" class="btn btn-primary w-100 mt-3">Continue to
                                 Dashboard</button>
                         </div>
@@ -515,11 +528,11 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                 </div>
             </div>
         </div>
-
+<?php if (isAitonePage()) { ?>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 const toneOptions = document.querySelectorAll('.ai-tone-option');
-                let selectedTone = 'friendly'; // Default selection
+                let selectedTone = 'friendly';
                 // Get existing settings from localStorage if available
                 const savedTone = localStorage.getItem('aiToneMode');
                 if (savedTone) {
@@ -536,7 +549,6 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                         option.querySelector('.tone-indicator').classList.remove('active');
                     }
                 });
-
                 // Handle tone selection
                 toneOptions.forEach(option => {
                     option.addEventListener('click', function () {
@@ -551,14 +563,13 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                         localStorage.setItem('aiToneMode', selectedTone);
                     });
                 });
-
                 // Handle continue button
                 document.getElementById('continueToDashboard').addEventListener('click', function () {
                     window.location.href = '?page=dashboard';
                 });
             });
         </script>
-
+        <?php } ?>
         <?php
     }
 

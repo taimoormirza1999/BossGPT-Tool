@@ -26,6 +26,10 @@ function isPage($pageName) {
     return strpos($_SERVER['REQUEST_URI'], $pageName) !== false;
 }
 
+function isAitonePage() {
+    return strpos($_SERVER['REQUEST_URI'], 'aitone') !== false;
+}
+
 function isLoginUserPage() {
     $loginPages = ['profile', 'dashboard', 'aitone', 'garden'];
 
@@ -44,4 +48,6 @@ function isLoginUserPage() {
 
     return false;
 }
+
+?>
 
