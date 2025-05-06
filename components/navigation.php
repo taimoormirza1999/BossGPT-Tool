@@ -88,9 +88,9 @@ box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1)!important;">
 
 </button>
 
-                <image src="<?php echo $_SESSION['avatar_image'] ?? $images['default-user-image'] ?>"
+                <img src="<?= $_SESSION['avatar_image'] ?>"
                     style="  object-fit: cover;object-position: center;cursor: pointer;width: 47px; height: 47px; border-radius: 50%; border: 1.6px solid rgba(248, 249, 250, 0.5);"
-                    class=" btn-logout" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Profile"
+                    class=" btn-logout" id="avatar_image_nav" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Profile"
                     onclick="openLink('<?php echo $_ENV['BASE_URL'] ?>?page=profile',false)" />
                 <!-- Logout Form -->
                 <form method="POST" class="d-inline">

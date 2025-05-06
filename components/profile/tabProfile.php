@@ -52,6 +52,7 @@
             const formData = new FormData();
             formData.append('avatar', file);
             updateprofileSubmitbtn.disabled = true;
+            updateprofileSubmitbtn.innerText = 'Updating Profile Image...';
 
             try {
                 const res = await fetch('?api=upload_profile_image', {
@@ -62,7 +63,7 @@
                 const data = await res.json();
 
                 if (res.ok && data.success) {
-                    // Update avatar preview immediately
+                    document.getElementById('avatar_image_nav').src = data.image_url;
                     document.getElementById('avatarPreview').src = data.image_url;
                     iziToast.destroy();
                     iziToast.success({
@@ -77,6 +78,7 @@
                     });
                 }
                 updateprofileSubmitbtn.disabled = false;
+                updateprofileSubmitbtn.innerText = 'Update';
             } catch (err) {
                 iziToast.destroy();
                 iziToast.error({
@@ -85,6 +87,7 @@
                 });
               
                 updateprofileSubmitbtn.disabled = false;
+                updateprofileSubmitbtn.innerText = 'Update';
             }
         });
 

@@ -372,11 +372,6 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
             }
             require_once 'components/misc.php';
             ?>
-            <?php
-
-
-            ?>
-
             <div class="container-fluid pb-3">
                 <!-- New Tab Navigation -->
                 <?php
@@ -403,7 +398,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                 <div class="dropdown">
                                     <button class="btn btn-link dropdown-toggle" type="button" data-bs-toggle="dropdown"
                                         aria-expanded="false" id="projectDropdownButton">
-                                        Select Project
+                                        Select&nbsp;Project
                                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
                                             xmlns="http://www.w3.org/2000/svg">
                                             <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5"
