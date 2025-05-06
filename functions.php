@@ -67,7 +67,7 @@ function sendProjectUpdateEmail($email, $username, $projectTitle, $updateMessage
     return sendTemplateEmail($email, $subject, $template, $data);
 }
 
-function getLogoImage($bottomMargin = "0", $topMargin = "-1rem", $width = "15rem", $height = "auto", $positionClass = "position-absolute top-0 start-50 translate-middle", $positionStyle = "position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);", $src="https://res.cloudinary.com/da6qujoed/image/upload/v1742651528/bossgpt-transparent_n4axv7.png")
+function getLogoImage($bottomMargin = "0", $topMargin = "-1rem", $width = "15rem", $height = "auto", $positionClass = "lg:position-absolute top-0 start-50 translate-middle non-login-page-logo", $positionStyle = "", $src="https://res.cloudinary.com/da6qujoed/image/upload/v1742651528/bossgpt-transparent_n4axv7.png")
     {
         return '<img src=' . $src . ' alt="Logo"
                 class="' . $positionClass . '" 
@@ -114,6 +114,14 @@ function getLogoImage($bottomMargin = "0", $topMargin = "-1rem", $width = "15rem
     function getCloseSquareIcon()
     {
         return file_get_contents('assets/icons/close-square.svg');
+    }
+    function getErrorIcon()
+    {
+        return file_get_contents('assets/icons/error.svg');
+    }
+    function getSuccessIcon()
+    {
+        return file_get_contents('assets/icons/tick.svg');
     }
     function getTreeIcon()
     {
@@ -237,6 +245,37 @@ function getLogoImage($bottomMargin = "0", $topMargin = "-1rem", $width = "15rem
         $html .= '</div>';
         return $html;
     } 
+    function renderAIErrorMessage($messageTitle="Sorry! I encountered an error 
+while scheduling your event",$messageDescription="Please connect your calendar to schedule the event and get calendar notifications.
+", $link = "/calendar/connect-calendar.php") {
+        return '<div class="error-message-block">
+        <div class="d-flex align-items-start ">'.getErrorIcon().' <p class="error-message-title mb-0">'.$messageTitle.'</p></div>
+        <p class="d-flex align-items-start justify-content-between mb-1"  style="
+    font-size: 0.89rem;
+">'.$messageDescription.'</p>
+        <div class="d-flex align-items-center justify-content-center gap-3">
+        <button class="btn btn-chat btn-error" onclick="window.location.href=\''.$_ENV['BASE_URL'].$link.'\'">Connect</button>
+        </div>
+        </div>';
+    }
+    function renderAICalendarSuccessMessage($messageHeader="Event Scheduled successfully", $title="Meeting with Taimoor",$date="Saturday, May 3, 2025", $time="10:00AM - 11:00AM(Dubai Time)",$description="Event scheduled via BossGpt AI Assistant.", $link = "/calendar/connect-calendar.php") {
+        return '<div class="success-message-block">
+        <div class="d-flex align-items-start ">'.getSuccessIcon().' <p class="success-message-title mb-0">'.$messageHeader.'</p></div>
+        <p class="d-flex align-items-start justify-content-between mb-1"  style="
+    font-size: 0.89rem;
+    ">'.$title.'</p>
+        <strong class="d-flex align-items-start justify-content-between mb-1"  style="
+    font-size: 0.89rem;
+">Details:</strong>
+ <div class="">
+       <p class="mb-0"><strong>Date:</strong> '.$date.'</p>
+       <p class="mb-0"><strong>Time:</strong> '.$time.'</p>
+       <p class="mb-0"><strong>Description:</strong> '.$description.'</p>
+        <div class="d-flex align-items-center justify-content-center gap-3">
+        <button class="btn btn-chat btn-error mt-1" onclick="openLink(\''.$link.'\',true)">Open in Calendar</button>
+        </div>
+        </div>';
+    }
     function renderCustomModal($modalId, $headerText, $bodyContent, $footerButtons = '') {
     return '
     <h2>'.$modalId.'</h2>

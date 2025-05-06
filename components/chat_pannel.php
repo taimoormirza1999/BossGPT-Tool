@@ -7,7 +7,7 @@
             <div class="text-white border-0 rounded-t-lg header">
                 <h5 class="" id="AiToneModalLabel"><img
                         src="https://res.cloudinary.com/da6qujoed/image/upload/v1744704440/robot_pfahvf.svg"
-                        class="w-10 h-10"> &nbsp;AI Tone</h5>
+                        class="w-10 h-10"> &nbsp;AI Personality</h5>
                 <button type="button" class="btn btn-link p-0 text-white close_icon"
                     onclick="DynamicClose('#AiToneModal')"><?php echo getCloseSquareIcon(); ?></button>
             </div>
@@ -159,7 +159,7 @@
                                             content += `
                 <div class="cta-message">
                     <button class="btn btn-main-primary" onclick="openNewProjectModal()">
-                        <i class="fas fa-plus-circle"></i> Create New Project
+                        <i class="fas fa-plus-circle"></i>New Project
                     </button>
                 </div>`;
                                         }
@@ -194,15 +194,18 @@
                 <div class="chat-input">
                     <?php
                     $prompts = [
-                        "📑 set a reminder for task #number",
-                        "📑 suggest tasks for my project",
-                        "🎯 Create task 'Your Task' and assign it to myself",
+                        "Add 'title' into my calendar",
+                        "🔄 Mark 'title' as done",
+                        "✏️ Move 'title' to in progress",
+                        "✏️ Move 'title' to to do",
+                        "🎯 Create task 'task' and assign it to myself",
+                        "Delete task 'title'",
+                        "📑 Set a reminder for task #number",
+                        "📑 Suggest tasks for my project",
                         "📋 Create tasks for Your Feature",
                         "✏️ Move task #number to in_progress",
                         "👥 Assign task 'Your Task' to @name",
-                        "📅 Set deadline for task #number to next Friday",
-                        "📝 Update description of task 'Your Task'",
-                        "🔄 Mark task #number as completed",
+                        "📅 Set deadline 'title' to next Friday",
                         "📊 Show project progress",
                         "📑 List all tasks in current project",
                         "🔍 Show tasks assigned to me"
@@ -249,32 +252,43 @@
                                 }
                             });
 
-                            // Reset height when form is submitted
-                            document.getElementById('chatForm').addEventListener('submit', function () {
-                                setTimeout(() => {
-                                    // messageInput.style.height = 'auto';
-                                }, 100);
-                            });
+                          
                         }
 
                         function handlePromptClick(button) {
                             let promptText = button.innerText;
                             let inputField = document.getElementById("messageInput");
                             let aiSendMessageBtn = document.getElementById("aiSendMessageBtn");
-
                             // Set input field value
                             inputField.value = promptText;
-
                             // Trigger the input event to resize the textarea
                             const inputEvent = new Event('input', { bubbles: true });
                             inputField.dispatchEvent(inputEvent);
-
                             // Auto-submit the form
-                            setTimeout(() => {
-                                // aiSendMessageBtn.click();
-                                // chatForm.submit();
-                            }, 200); // Small delay to make it smooth
+                          
                         }
+
+                     
+ document.addEventListener("DOMContentLoaded", function () {
+    <?php if (isset($_SESSION['pending_calendar_command'])): ?>
+        const replayMessage = <?php echo json_encode($_SESSION['pending_calendar_command']); ?>;
+
+        setTimeout(() => {
+            const messageInput = document.getElementById('messageInput');
+            const sendBtn = document.getElementById('aiSendMessageBtn');
+
+            if (messageInput && sendBtn) {
+                messageInput.value = decodeURIComponent(replayMessage);
+                sendBtn.click();
+
+                // Unset session from PHP
+                fetch('?api=unset_session');
+            }
+        }, 100);
+    <?php endif; ?>
+});
+</script>
+
                     </script>
                 </div>
             </div>

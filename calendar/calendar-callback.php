@@ -6,7 +6,6 @@ if (session_id() === '') {
   }
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/constant.php';
-
 // Load environment variables
 loadEnv(__DIR__ . '/../.env');
 
@@ -14,7 +13,7 @@ $client = new Google_Client();
 $client->setClientId($_ENV['GOOGLE_CLIENT_ID']);
 $client->setClientSecret($_ENV['GOOGLE_CLIENT_SECRET']);
 $client->setRedirectUri($_ENV['GOOGLE_CALENDAR_REDIRECT_URI']);
-$client->addScope(Google_Service_Calendar::CALENDAR);
+// $client->addScope(Google_Service_Calendar::CALENDAR);
 $client->addScope(Google_Service_Calendar::CALENDAR_EVENTS);
 $client->setAccessType('offline');
 $client->setPrompt('consent');

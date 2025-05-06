@@ -156,6 +156,7 @@ class Auth
     try {
         $stmt = $this->db->prepare("UPDATE users SET avatar_image = ? WHERE id = ?");
         $stmt->execute([$imagePath, $userId]);
+        $_SESSION['avatar_image'] = $imagePath;
         return true;
     } catch (Exception $e) {
         error_log("Avatar upload error: " . $e->getMessage());

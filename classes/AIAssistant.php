@@ -2,6 +2,7 @@
 // Required for direct task updates
 require_once __DIR__ . '/ProjectManager.php';
 require_once __DIR__ . '/GoogleCalendarManager.php';
+// require_once __DIR__ . '/../functions.php';
 class AIAssistant
 {
     private $api_key;
@@ -29,6 +30,7 @@ class AIAssistant
             $stmt = $this->db->prepare("
                 SELECT * FROM tasks 
                 WHERE project_id = ? 
+                AND status != 'deleted'
                 ORDER BY created_at
             ");
             $stmt->execute([$project_id]);
@@ -144,7 +146,7 @@ class AIAssistant
             }
             // Check if this is a task status update request
             $enhanced_message = $message;
-            if (preg_match('/move\s+task\s+[\'"]?([^\'"]*)[\'"]\s+from\s+todo\s+to\s+in\s+progress/i', $message, $matches)) {
+            if (preg_match('/move\\s+task\\s+[\\\'"]?([^\\\'"]*)[\\\'"]\\s+from\\s+todo\\s+to\\s+in\\s+progress/i', $message, $matches)) {
                 $task_title = $matches[1];
                 error_log("Detected task status update request for: $task_title");
 
@@ -153,6 +155,85 @@ class AIAssistant
                 if ($task_id) {
                     $enhanced_message = "$message (Task ID: $task_id)";
                     error_log("Enhanced message with task ID: $enhanced_message");
+                }
+            }
+
+            // Recognize more natural language status update commands
+            if (
+                preg_match('/mark\\s+[\\\'"]?([^\\\'"]+)[\\\'"]?\\s+as\\s+(todo|in progress|done)/i', $message, $matches) ||
+                preg_match('/set\\s+[\\\'"]?([^\\\'"]+)[\\\'"]?\\s+to\\s+(todo|in progress|done)/i', $message, $matches) ||
+                preg_match('/put\\s+[\\\'"]?([^\\\'"]+)[\\\'"]?\\s+to\\s+(todo|in progress|done)/i', $message, $matches) ||
+                preg_match('/change\\s+[\\\'"]?([^\\\'"]+)[\\\'"]?\\s+to\\s+(todo|in progress|done)/i', $message, $matches)
+            ) {
+                $task_title = $matches[1];
+                $new_status = $matches[2];
+                // Normalize status
+                $statusMap = [
+                    'to do' => 'todo',
+                    'todo' => 'todo',
+                    'to-do' => 'todo',
+                    'in progress' => 'in_progress',
+                    'inprogress' => 'in_progress',
+                    'in-progress' => 'in_progress',
+                    'done' => 'done',
+                    'complete' => 'done',
+                    'completed' => 'done',
+                    'finish' => 'done',
+                    'finished' => 'done'
+                ];
+                $normalizedStatus = strtolower($new_status);
+                $normalizedStatus = $statusMap[$normalizedStatus] ?? $normalizedStatus;
+
+                // Find the task ID
+                $task_id = $this->findTaskIdByTitle($project_id, $task_title);
+                if ($task_id) {
+                    // Directly update the task status here!
+                    $projectManager = new ProjectManager();
+                    $projectManager->updateTaskStatus($task_id, $normalizedStatus);
+
+                    // Optionally, log the activity and return a success message
+                    return [
+                        'message' => "Task '{$task_title}' has been marked as {$normalizedStatus}.",
+                        'success' => true
+                    ];
+                }
+            }
+
+            // Recognize natural language calendar event requests for tasks
+            if (
+                preg_match('/(save|add|put)\\s+[\\\'"]?([^\\\'"]+)[\\\'"]?\\s+(to|on|into)\\s+my\\s+calendar/i', $message, $matches)
+            ) {
+                $task_title = $matches[2];
+
+                // Find the task in the current project context
+                $task = null;
+                foreach ($context['tasks'] as $t) {
+                    if (strcasecmp($t['title'], $task_title) === 0) {
+                        $task = $t;
+                        break;
+                    }
+                }
+
+                if ($task) {
+                    // Compose a message to create a calendar event
+                    $eventMessage = "Schedule an event for the task '{$task['title']}' on my calendar. Description: {$task['description']}. Due date: {$task['due_date']}";
+                    // Use your existing calendar handler
+                    $calendarResponse = $this->handleCalendarRequest($eventMessage);
+
+                    // Save AI response for calendar request
+                    $stmt->execute([
+                        $project_id,
+                        $calendarResponse['message'],
+                        'ai',
+                        null
+                    ]);
+
+                    return $calendarResponse;
+                } else {
+                    return [
+                        'message' => "Could not find a task with the title '{$task_title}'.",
+                        'error' => true
+                    ];
                 }
             }
 
@@ -214,17 +295,12 @@ class AIAssistant
                                             'enum' => ['todo', 'in_progress', 'done'],
                                             'description' => 'Current status of the task'
                                         ],
-                                        'assignees' => [
-                                            'type' => 'array',
-                                            'items' => [
-                                                'type' => 'integer',
-                                                'description' => 'ID of the user to be assigned to the task'
-                                            ],
-                                            'minItems' => 1,
-                                            'description' => 'User IDs assigned to the task (at least one required)'
+                                        'assignee_username' => [
+                                            'type' => 'string',
+                                            'description' => 'Username of the project member to assign the task to. If not provided or user not found, task will be assigned to the current user.'
                                         ]
                                     ],
-                                    'required' => ['title', 'description', 'due_date', 'status', 'assignees']
+                                    'required' => ['title', 'due_date']
                                 ]
                             ]
                         ],
@@ -329,7 +405,40 @@ class AIAssistant
                         ],
                         'required' => ['suggestions']
                     ]
-                ]
+                ],
+                [
+                    'name' => 'delete_task',
+                    'description' => 'Delete a task by its title',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'task_title' => [
+                                'type' => 'string',
+                                'description' => 'Title of the task to delete'
+                            ]
+                        ],
+                        'required' => ['task_title']
+                    ]
+                ],
+                [
+                    'name' => 'update_task_status',
+                    'description' => 'Update a task status by its title',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'task_title' => [
+                                'type' => 'string',
+                                'description' => 'Title of the task to update'
+                            ],
+                            'new_status' => [
+                                'type' => 'string',
+                                'enum'=> ['todo', 'in_progress', 'done'],
+                                'description'=> 'New status for the task. Must be one of: todo, in_progress, done'
+                            ]
+                        ],
+                        'required'=> ['task_title', 'new_status']
+                    ]
+                    ],
             ];
 
             $curl = curl_init();
@@ -368,25 +477,29 @@ class AIAssistant
             }
 
             // Save user message
-            $stmt = $this->db->prepare(
-                "INSERT INTO chat_history (project_id, message, sender, function_call) 
-                 VALUES (?, ?, ?, ?)"
-            );
-            $stmt->execute([
-                $project_id,
-                $enhanced_message,
-                'user',
-                null
-            ]);
+            // $stmt = $this->db->prepare(
+            //     "INSERT INTO chat_history (project_id, message, sender, function_call) 
+            //      VALUES (?, ?, ?, ?)"
+            // );
+            // $stmt->execute([
+            //     $project_id,
+            //     $enhanced_message,
+            //     'user',
+            //     null
+            // ]);
 
             // Process function calls if any
             if (isset($result['choices'][0]['message']['function_call'])) {
                 $function_call = $result['choices'][0]['message']['function_call'];
                 $this->executeFunctionCall($function_call, $project_id);
             }
-
             // Save AI response
-            $ai_message = $result['choices'][0]['message']['content'] ?? 'Tasks have been created successfully.';
+            $ai_message = isset($GLOBALS['custom_ai_message']) 
+                ? $GLOBALS['custom_ai_message'] 
+                : ($result['choices'][0]['message']['content'] ?? 'Operation completed successfully.');
+
+            // Clear the custom message after using it
+            unset($GLOBALS['custom_ai_message']);
 
             // Check if the message is a JSON response for subtask dates and clean it
             if ($ai_message && preg_match('/\{\s*"task_id":\s*\d+,\s*"subtasks":\s*\[\s*\{\s*"id":\s*\d+,\s*"due_date":/i', $ai_message)) {
@@ -548,12 +661,98 @@ class AIAssistant
                     }
                 }
                 break;
+            case 'delete_task':
+                if (isset($arguments['task_title'])) {
+                    // Find task ID by title
+                    $taskId = $this->findTaskIdByTitle($project_id, $arguments['task_title']);
+                    if ($taskId) {
+                        // Get task info before deletion for the message
+                        $taskStmt = $this->db->prepare("SELECT title FROM tasks WHERE id = ?");
+                        $taskStmt->execute([$taskId]);
+                        $task = $taskStmt->fetch();
+                        
+                        $projectManager = new ProjectManager();
+                        $projectManager->deleteTask($taskId);
+                        
+                        // Override the default AI message with a custom deletion confirmation
+                        $GLOBALS['custom_ai_message'] = "Task '{$task['title']}' has been successfully deleted.";
+                    } else {
+                        $GLOBALS['custom_ai_message'] = "Could not find a task with the title '{$arguments['task_title']}'. Please check the task name and try again.";
+                    }
+                }
+                break;
+            case 'update_task_status':
+                if (isset($arguments['task_title']) && isset($arguments['new_status'])) {
+                    // Find task ID by title
+                    $taskId = $this->findTaskIdByTitle($project_id, $arguments['task_title']);
+                    if ($taskId) {
+                        // Get task info before update for the message
+                        $taskStmt = $this->db->prepare("SELECT title, status FROM tasks WHERE id = ?");
+                        $taskStmt->execute([$taskId]);
+                        $task = $taskStmt->fetch();
+                        
+                        // Normalize the status value
+                        $statusMap = [
+                            'to do' => 'todo',
+                            'todo' => 'todo',
+                            'to-do' => 'todo',
+                            'in progress' => 'in_progress',
+                            'inprogress' => 'in_progress',
+                            'in-progress' => 'in_progress',
+                            'done' => 'done',
+                            'complete' => 'done',
+                            'completed' => 'done',
+                            'finish' => 'done',
+                            'finished' => 'done'
+                        ];
+                        
+                        $normalizedStatus = strtolower($arguments['new_status']);
+                        $normalizedStatus = $statusMap[$normalizedStatus] ?? $normalizedStatus;
+                        
+                        if (!in_array($normalizedStatus, ['todo', 'in_progress', 'done'])) {
+                            $GLOBALS['custom_ai_message'] = "Invalid status '{$arguments['new_status']}'. Status must be one of: todo, in progress, or done.";
+                            break;
+                        }
+                        
+                        $projectManager = new ProjectManager();
+                        $projectManager->updateTaskStatus($taskId, $normalizedStatus);
+                        
+                        // Override the default AI message with a custom update confirmation
+                        $GLOBALS['custom_ai_message'] = "Task '{$task['title']}' has been moved from '{$task['status']}' to '{$normalizedStatus}'.";
+                    } else {
+                        $GLOBALS['custom_ai_message'] = "Could not find a task with the title '{$arguments['task_title']}'. Please check the task name and try again.";
+                    }
+                }
+                break;
         }
     }
 
     private function createSingleTask($project_id, $task)
     {
         try {
+            // First, let's find the user ID if a username was specified
+            $assignees = [];
+            if (isset($task['assignee_username'])) {
+                // Look up the user ID from project_users table
+                $stmt = $this->db->prepare("
+                    SELECT u.id 
+                    FROM users u 
+                    JOIN project_users pu ON u.id = pu.user_id 
+                    WHERE pu.project_id = ? AND u.username = ?
+                ");
+                $stmt->execute([$project_id, $task['assignee_username']]);
+                $user = $stmt->fetch();
+                if ($user) {
+                    $assignees[] = $user['id'];
+                }
+            }
+            
+            // If no specific assignee found or specified, use current user
+            if (empty($assignees)) {
+                $assignees = [$_SESSION['user_id']];
+            }
+
+            // Create the task
             $stmt = $this->db->prepare(
                 "INSERT INTO tasks (project_id, title, description, picture, status, due_date) 
                  VALUES (?, ?, ?, ?, ?, ?)"
@@ -561,7 +760,7 @@ class AIAssistant
             $stmt->execute([
                 $project_id,
                 $task['title'],
-                $task['description'],
+                $task['description'] ?? '',
                 isset($task['picture']) ? $task['picture'] : null,
                 $task['status'] ?? 'todo',
                 $task['due_date'] ?? null
@@ -569,19 +768,26 @@ class AIAssistant
 
             $task_id = $this->db->lastInsertId();
 
-            // Ensure assignees are provided
-            if (!isset($task['assignees']) || !is_array($task['assignees']) || count($task['assignees']) === 0) {
-                throw new Exception("At least one assignee is required for the task '{$task['title']}'");
-            }
-
             // Insert task assignees
             $assigneeStmt = $this->db->prepare("INSERT INTO task_assignees (task_id, user_id) VALUES (?, ?)");
-            foreach ($task['assignees'] as $user_id) {
+            $gardenStmt = $this->db->prepare(
+                "INSERT INTO user_garden (task_id, user_id, plant_type, size, stage) 
+                 VALUES (?, ?, ?, ?, ?)"
+            );
+            
+            foreach ($assignees as $user_id) {
                 $assigneeStmt->execute([$task_id, $user_id]);
+                $gardenStmt->execute([
+                    $task_id,
+                    $user_id,
+                    'treelv2',  // Default plant type
+                    'medium',    // Default size
+                    'sprout'    // Changed from 'seed' to 'sprout'
+                ]);
             }
 
             // Log task creation with assignees
-            $assigneeNames = $this->getAssigneeNames($task['assignees']);
+            $assigneeNames = $this->getAssigneeNames($assignees);
             $this->logActivity(
                 $project_id,
                 'task_created',
@@ -676,7 +882,8 @@ class AIAssistant
             'reminder',
             'set up',
             'arrange',
-            'plan'
+            'plan',
+            'google calendar',
         ];
 
         $message = strtolower($message);
@@ -695,8 +902,9 @@ class AIAssistant
     {
         try {
             if (!$this->calendar->isAuthenticated()) {
+                $_SESSION['pending_calendar_command'] = $message;
                 return [
-                    'message' => 'Please connect your Google Calendar first. I\'ll help you schedule events once you\'re connected. <button class="btn btn-primary" onclick="window.location.href=\'calendar/connect-calendar.php\'">Connect Calendar</button>',
+                    'message' => renderAIErrorMessage(),
                     'action' => 'connect_calendar'
                 ];
             }
@@ -707,9 +915,10 @@ class AIAssistant
                     $client->fetchAccessTokenWithRefreshToken($client->getRefreshToken());
                     $_SESSION['access_token'] = $client->getAccessToken();
                 } else {
+                    $_SESSION['pending_calendar_command'] = $message;
                     // No refresh token available, need to reconnect
                     return [
-                        'message' => 'Your calendar connection has expired. Please reconnect your Google Calendar. <button class="btn btn-primary" onclick="window.location.href=\'calendar/connect-calendar.php\'">Reconnect Calendar</button>',
+                        'message' => renderAIErrorMessage("Your calendar connection has expired","Please connect your calendar to schedule the event and get calendar notifications.","/calendar/connect-calendar.php"),
                         'action' => 'connect_calendar'
                     ];
                 }
@@ -761,32 +970,27 @@ class AIAssistant
             $displayTime = $startDateTime->format('g:i A') . ' - ' . $endDateTime->format('g:i A');
 
             return [
-                'message' => "✅ Event scheduled successfully!\n\n" .
-                    "📅 Event: {$eventDetails['summary']}\n" .
-                    "📆 Date: " . $startDateTime->format('l, F j, Y') . "\n" .
-                    "⏰ Time: {$displayTime} (Dubai Time)\n" .
-                    "📝 Description: {$eventDetails['description']}\n\n" .
-                    "View in Calendar: <a href='{$createdEvent->htmlLink}' target='_blank'>Open in Google Calendar</a>",
+                'message' => renderAICalendarSuccessMessage("Event Scheduled successfully", $eventDetails['summary'], $startDateTime->format('l, F j, Y'), $displayTime . " (Dubai Time)", $eventDetails['description'], $createdEvent->htmlLink),
                 'event' => $eventDetails,
                 'success' => true
             ];
 
         } catch (Exception $e) {
             error_log("Calendar Request Error: " . $e->getMessage());
-            
             // Provide more detailed error message based on error type
             $errorMsg = $e->getMessage();
             if (strpos($errorMsg, 'insufficient authentication scopes') !== false) {
-                return [
-                    'message' => "I need additional permissions to schedule this event. Please reconnect your calendar: <button class='btn btn-main-primary' onclick=\"window.location.href='calendar/connect-calendar.php'\">Reconnect Calendar</button>",
+                $_SESSION['pending_calendar_command'] = $message;
+                return [ 
+                    'message' => renderAIErrorMessage("Your calendar connection has expired","Please connect your calendar to schedule the event and get calendar notifications.","/calendar/connect-calendar.php"),
                     'error' => true,
                     'action' => 'reconnect_calendar'
                 ];
             }
-            
+            $_SESSION['pending_calendar_command'] = $message;
             // Return a generic error message instead of the raw error
             return [
-                'message' => "I wasn't able to schedule your event. Please try reconnecting your calendar: <button class='btn btn-main-primary' onclick=\"window.location.href='calendar/connect-calendar.php'\">Reconnect Calendar</button>",
+                'message' => renderAIErrorMessage("Your calendar connection has expired","Please connect your calendar to schedule the event and get calendar notifications.","/calendar/connect-calendar.php"),
                 'error' => true,
                 'action' => 'reconnect_calendar'
             ];
@@ -848,9 +1052,8 @@ class AIAssistant
             $eventDetails['summary'] = 'New Event';
         }
         if (!isset($eventDetails['description']) || empty($eventDetails['description'])) {
-            $eventDetails['description'] = 'Event scheduled via AI Assistant';
+            $eventDetails['description'] = 'Event scheduled via BossGpt AI Assistant';
         }
-
         return $eventDetails;
     }
 }

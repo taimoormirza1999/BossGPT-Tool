@@ -14,16 +14,19 @@
         </div>
     </div>
     <script>
+        const togglePassword = document.getElementById('togglePassword');
 document.getElementById('togglePassword').addEventListener('click', function () {
     const passwordInput = document.getElementById('password');
     const newPassword = passwordInput.value.trim();
-
+    togglePassword.disabled = true;
     if (!newPassword) {
+        iziToast.destroy();
         iziToast.error({
             title: 'Error',
             message: 'Please enter a password!',
             position: 'topRight'
         });
+        togglePassword.disabled = false;
         return;
     }
 
@@ -37,6 +40,7 @@ document.getElementById('togglePassword').addEventListener('click', function () 
     .then(response => response.json())
     .then(data => {
         if (data.success) {
+          iziToast.destroy();
           iziToast.success({
             title: 'Success',
             message: 'Password updated successfully!',
@@ -44,6 +48,7 @@ document.getElementById('togglePassword').addEventListener('click', function () 
           });
             passwordInput.value = ''; // clear the input
         } else {
+            iziToast.destroy();
             iziToast.error({
                 title: 'Error',
                 message: 'Failed to update password: ' + data.message,
@@ -53,12 +58,14 @@ document.getElementById('togglePassword').addEventListener('click', function () 
     })
     .catch(error => {
         console.error('Error updating password:', error);
+        iziToast.destroy();
         iziToast.error({
             title: 'Error',
             message: 'An unexpected error occurred.',
             position: 'topRight'
         });
     });
+    togglePassword.disabled = false;
 });
 </script>
     

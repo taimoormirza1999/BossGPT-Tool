@@ -3,12 +3,39 @@
   // Initial Loader
 document.addEventListener("DOMContentLoaded", function () {
   
-  // function checkFCMStatus(){
-  //   const token = localStorage.getItem('fcm_token');
-  //   if(token){
-  //     document.getElementById('fcmContent').style.display = 'block';
-  //   }
-  // }
+  function hideAiErrorMessages() {
+    console.log("Hiding AI Error Messages");
+    document.querySelectorAll('.ai-message').forEach(el => {
+      const message = el.querySelector('.message.ai');
+      // console.log(message.textContent);
+      const errorMessage = <?php echo json_encode(renderAIErrorMessage()); ?>;
+      const calendarSuccessMessage = <?php echo json_encode(renderAICalendarSuccessMessage()); ?>;
+      if (
+        message &&
+        (
+          message.textContent.includes('Sorry, I encountered an error while') 
+          // message.innerHTML.includes('calendar/connect-calendar.php')
+        )
+      ) {
+        // console.log("Got it "+message.textContent);
+        // message.parentElement.style.backgroundColor = 'red';
+        // el.classList.remove("d-flex");
+        // el.classList.add("d-none");
+        message.innerHTML = errorMessage;
+        // message.innerHTML = calendarSuccessMessage;
+      }
+    });
+  }
+
+  // Run once on load
+  hideAiErrorMessages();
+
+  // Watch for dynamic AI messages
+  const chatContainer = document.getElementById('chatMessages');
+  if (chatContainer) {
+    const observer = new MutationObserver(() => hideAiErrorMessages());
+    observer.observe(chatContainer, { childList: true, subtree: true });
+  }
   // Create and append loader
   const loader = document.createElement("div");
   loader.className = "initial-loader";
@@ -44,6 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
     user_removed: `<?= getProfileDeleteIcon(); ?>`,
     user_assigned: `<?= getProfileIcon(); ?>`,
     task_created: `<?= getclipboardIcon(); ?>`,
+    task_deleted: `<?= getclipboardIcon(); ?>`,
     task_status_updated: `<?= getclipboardIcon(); ?>`,
     task_picture_removed: `<?= getclipboardIcon(); ?>`,
     task_updated: `<?= getclipboardIcon(); ?>`,
@@ -100,27 +128,15 @@ document.addEventListener("DOMContentLoaded", function () {
     // List of all possible theme classes
     const themes = ['light-mode', 'dark-mode', 'brown-mode', 'purple-mode', 'black-mode', 'system-mode'];
 
-    // Remove all theme classes from the body
-    themes.forEach(function (currentTheme) {
-      $('body').removeClass(currentTheme);
-    });
-
-    // Add the selected theme
-    $('body').addClass(theme);
-
-    // Store the selected theme in localStorage
+    themes.forEach(t => document.body.classList.remove(t));
+    document.body.classList.add(theme);
     localStorage.setItem('userTheme', theme);
   }
 
   // Function to initialize theme from localStorage
   function initializeTheme() {
     const savedTheme = localStorage.getItem('userTheme');
-    if (savedTheme) {
-      changeTheme(savedTheme);
-    } else {
-      // Set default theme if none is saved
-      changeTheme('system-mode');
-    }
+    changeTheme(savedTheme || 'system-mode');
   }
 
   function toggleThemeClick() {
@@ -128,10 +144,19 @@ document.addEventListener("DOMContentLoaded", function () {
     themeContainer.classList.toggle('d-none');
   }
 
-  // Initialize theme when DOM is loaded
-  document.addEventListener('DOMContentLoaded', function () {
-    initializeTheme();
+  // Add new click event listener for document
+  document.addEventListener('click', function(event) {
+    const themeContainer = document.querySelector('.theme-icon-container');
+    const themeButton = document.getElementById('btn-theme');
+    
+    // If click is outside both the theme container and theme button
+    if (!themeContainer.contains(event.target) && !themeButton.contains(event.target)) {
+        themeContainer.classList.add('d-none');
+    }
   });
+
+  // Initialize theme when DOM is loaded
+  document.addEventListener('DOMContentLoaded', initializeTheme);
 
   // AI Tone Management
   function changeAITone(tone) {
