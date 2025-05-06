@@ -348,7 +348,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const sessionAvatar = <?php echo json_encode($_SESSION['avatar_image']); ?>;
 
     if (!assignedUsers || !Object.keys(assignedUsers).length) {
-      return '<span class="text-muted">No Assignee</span>';
+      return '<span class="text-muted" style="height: 3rem;display: flex;justify-content: center;align-items: center;" >No Assignee</span>';
     }
 
     return Object.entries(assignedUsers).map(([id, user]) => {
@@ -426,7 +426,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       row.innerHTML = `
             <td class="text-capitalize" style="width: 20%; text-align: center; ">${task.title ? escapeHtml(task.title) : '-'}</td>
-            <td style="width: 25%; text-align: center;" class="d-flex align-items-center gap-2">
+            <td style="width: auto; text-align: center;" class="d-flex justify-content-center align-items-center gap-2">
                 ${renderAssignedUsers(task.assigned_users)}
             </td>
             <td style="width: 15%; text-align: center;">${formatDate(task.due_date)}</td>

@@ -461,18 +461,15 @@ function getActionTypeDisplay(action_type) {
 }
 
 function formatTimeAgo(dateString) {
-  // Create date objects
-  const date = new Date(dateString + " UTC"); // Treat the server time as UTC
+  const date = new Date(dateString); // Let JavaScript handle the format properly
   const now = new Date();
 
-  // Calculate time differences
   const diffInMs = now - date;
   const diffInSeconds = Math.floor(diffInMs / 1000);
   const diffInMinutes = Math.floor(diffInSeconds / 60);
   const diffInHours = Math.floor(diffInMinutes / 60);
   const diffInDays = Math.floor(diffInHours / 24);
 
-  // Return appropriate time format
   if (diffInDays > 0) {
     if (diffInDays === 1) return "yesterday";
     if (diffInDays <= 7) return `${diffInDays} days ago`;

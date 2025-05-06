@@ -226,15 +226,16 @@ class ProjectManager
                     ) : [];
               
                 if (isset($startDate)){
-                foreach ($task['assigned_users'] as $userId => $username) {
-                    // Get the avatar image from your database or any source
-                    // $avatarImage = getAvatarForUser($userId); // Replace with your actual logic
-            
-                    // Structure the data as id, username, and avatar
+                $avatars = explode(',', $task['assigned_user_avatars']);
+                $userIds = explode(',', $task['assigned_user_ids']);
+                $usernames = explode(',', $task['assigned_usernames']);
+                
+                foreach ($userIds as $index => $userId) {
+                    $avatar = isset($avatars[$index]) && trim($avatars[$index]) ? trim($avatars[$index]) : 'https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg';
                     $task['assigned_users'][$userId] = [
                         'id' => $userId,
-                        'username' => $username,
-                        'avatar_image' => "fdcvx"
+                        'username' => $usernames[$index],
+                        'avatar_image' => $avatar
                     ];
                 }
             }
