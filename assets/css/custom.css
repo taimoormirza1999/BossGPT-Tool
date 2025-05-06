@@ -230,9 +230,6 @@
     border: 0.5px solid var(--bs-primary-black);
   }
   
-
-
-  
   /* ===============================
        7) FORMS / INPUTS
        =============================== */
@@ -254,6 +251,8 @@
     max-height: 350px!important;
     overflow-y: auto;
     color: white!important;
+    resize: none;
+    max-height: 100px !important;
   }
   button#aiSendMessageBtn{
     height: 3rem;
