@@ -2,9 +2,17 @@
 require_once 'config/constants.php';
 switch ($page) {
     case 'login':
+        if(isset($_SESSION['user_id'])){
+            header('Location: ?page=dashboard');
+            exit;
+        }
         include_login_page();
         break;
     case 'register':
+        if(isset($_SESSION['user_id'])){
+            header('Location: ?page=dashboard');
+            exit;
+        }
         include_register_page();
         break;
     case 'dashboard':
