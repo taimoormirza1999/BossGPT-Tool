@@ -274,7 +274,7 @@ class ProjectManager
             $stmt->execute([$task_id]);
             $task = $stmt->fetch();
             // Normalize the status value
-            $validStatuses = ['todo', 'in_progress', 'done'];
+            $validStatuses = ['todo', 'in_progress', 'done','deleted'];
             $normalizedStatus = in_array($status, $validStatuses) ? $status : 'todo';
 
             $stmt = $this->db->prepare(

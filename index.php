@@ -407,7 +407,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                         aria-label="Close"
                         onclick="openChatPannel()"><?php echo getIconImage(0, 0, "2.5rem", "auto", "https://res.cloudinary.com/da6qujoed/image/upload/v1742656707/logoIcon_pspxgh.png", 0); ?></button>
                     <!-- Tasks Panel (Board) - now spans 9 columns -->
-                    <div class="col-12 col-md-9 tasks-panel">
+                    <div class="col-12 col-lg-9 tasks-panel">
                         <div class="card h-100 projects_card">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <div class="dropdown">
