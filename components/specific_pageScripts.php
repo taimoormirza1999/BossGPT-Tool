@@ -803,7 +803,7 @@ $button1.text(selectedProjectTitle);
                                                             <div class="subtask-title ${subtask.status === 'done' ? 'text-decoration-line-through' : ''}">${escapeHtml(subtask.title)}</div>
                                                             ${subtask.due_date ? `
                                                                 <small class="text-muted due-date ${isOverdue ? 'overdue' : ''}">
-                                                                    <i class="bi bi-calendar-event"></i>
+                                                                  ${SVGCalendar()}
                                                                     ${subtask.due_date}
                                                                 </small>
                                                             ` : ''}
@@ -817,16 +817,13 @@ $button1.text(selectedProjectTitle);
                                         </div>
                                         <div class="d-flex gap-2 mt-2 justify-content-center">
                                             <button class="btn btn-sm btn-link add-subtask-btn" data-task-id="${task.id}">
-                                                Add Subtask
+                                               ${SVGAdd()} Add Subtask
                                             </button>
                                             <button class="btn btn-sm btn-link ai-update-dates-btn" data-task-id="${task.id}">
-                                                AI Update Dates
+                                              ${SVGAI()}AI Update Dates
                                             </button>
                                              <button class="btn btn-sm btn-link ai-add-subtask-btn" data-task-id="${task.id}">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
-</svg>
-  Generate AI Subtasks
+                                            ${SVGAI()}AI Subtasks
                                             </button>
                                         </div>
                                     </div>`;
@@ -834,14 +831,9 @@ $button1.text(selectedProjectTitle);
                             html += `<div class="mt-2 ${task.status !== 'in_progress' ? 'hover-show-subtasks' : 'hover-show-subtasks'}">
                                         <div class="d-flex gap-2 justify-content-center">
                                             <button class="btn btn-sm btn-link add-subtask-btn" data-task-id="${task.id}">
-                                                <i class="bi bi-plus-circle"></i> Add Subtask
+                                                ${SVGAdd()} Add Subtask
                                             </button>
-                                            <button class="btn btn-sm btn-link ai-add-subtask-btn" data-task-id="${task.id}" style="display: flex; align-items: center; gap: 6px;">
-                                             
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="white" stroke-width="1.5" viewBox="0 0 24 24" width="20" height="20">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z"/>
-  </svg>
- Generate AI Subtasks
+                                            <button class="btn btn-sm btn-link ai-add-subtask-btn" data-task-id="${task.id}" style="display: flex; align-items: center; gap: 6px;">${SVGAI()}Generate AI Subtasks
                                             </button>
                                         </div>
                                      </div>`;
@@ -1231,7 +1223,7 @@ $button1.text(selectedProjectTitle);
                             const isOverdue = dueDate && dueDate < new Date();
 
                             subtaskElement.innerHTML = `
-                                <div class="form-check me-2">
+                                <div class="form-check me-2 align-self-start">
                                     <input class="form-check-input subtask-status" type="checkbox" 
                                            ${subtask.status === 'done' ? 'checked' : ''}>
                                 </div>
@@ -1245,11 +1237,11 @@ $button1.text(selectedProjectTitle);
                                                style="max-width: 150px;"
                                                ${subtask.status === 'done' ? 'disabled' : ''}>
                                         <small class="due-date ${isOverdue ? 'overdue' : ''}">
-                                            <i class="bi bi-calendar-event"></i>
+                                            ${SVGCalendar()}
                                         </small>
                                     </div>
                                 </div>
-                                <button class="btn btn-sm btn-link text-danger delete-subtask-btn" data-id="${subtask.id}">
+                                <button class="btn btn-sm btn-link text-danger delete-subtask-btn deleteUser" data-id="${subtask.id}">
                                     <?php echo getTrashIcon(); ?>
                                 </button>
                             `;
@@ -1364,7 +1356,7 @@ $button1.text(selectedProjectTitle);
                                         let actionButtons = "<div>";
                                         if (user.role != "Creator") {
                                             actionButtons += `
-                                            <button class="btn btn-sm btn-outline-danger deleteUser" data-id="${user.id}">
+                                            <button class="btn btn-sm btn-outline-danger deleteUser " data-id="${user.id}">
                                                 <?php echo getTrashIcon(); ?>
                                             </button>`;
                                         }
@@ -1572,12 +1564,8 @@ $button1.text(selectedProjectTitle);
                 }
 
             }
-
-         
-
                 // Initial load
                 loadProjects();
-
                 // Auto-load the saved project if available
                 if (isDashboard) {
                     <?php
@@ -1662,7 +1650,6 @@ $button1.text(selectedProjectTitle);
                 // Handle new task creation
                 document.getElementById('createTaskBtn').addEventListener('click', function () {
                     if (!currentProject) {
-                        // alert('Please select a project first');
                         showToastAndHideModal(
                             'newTaskModal',
                             'error',
@@ -1682,15 +1669,16 @@ $button1.text(selectedProjectTitle);
                     const plantTypeRaw = selectedTree ? selectedTree.dataset.tree : '';
                     const plantType = plantTypeRaw.replace('.png', '');
                     // console.warn(selectedTree)
-                    if (!title) {
+                    if (!title || !description || !dueDate || !assignees) {
                         showToastAndHideModal(
                             'newTaskModal',
                             'error',
                             'Error',
-                            'Please enter a task title'
+                            'Please fill all the required fields'
                         );
                         return;
                     }
+                   
 
                     if (!plantType) {
                         showToastAndHideModal(
@@ -1725,18 +1713,18 @@ $button1.text(selectedProjectTitle);
                                     );
                                     $('#newTaskAssignees').val(null).trigger('change');
 
-                                    // Close modal and refresh
-                                    bootstrap.Modal.getInstance(document.getElementById('newTaskModal')).hide();
-                                    loadTasks(currentProject);
-                                } else {
-                                    throw new Error(data.message || 'Failed to create task');
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error creating task:', error);
-                                showToastAndHideModal('newTaskModal', 'error', 'Error', 'Failed to create task');
-                            })
-                            .finally(hideLoading);
+                                // Close modal and refresh
+                                bootstrap.Modal.getInstance(document.getElementById('newTaskModal')).hide();
+                                loadTasks(currentProject);
+                            } else {
+                                throw new Error(data.message || 'Failed to create task');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error creating task:', error);
+                            showToastAndHideModal('newTaskModal', 'error', 'Error', 'Failed to create task');
+                        })
+                        .finally(hideLoading);
                     }
                     if (pictureInput.files && pictureInput.files[0]) {
                         const reader = new FileReader();
@@ -2013,14 +2001,14 @@ $button1.text(selectedProjectTitle);
                 }
 
                 // Add this new code to handle image clicks (add it where other event listeners are defined)
-                document.addEventListener('click', function (e) {
-                    if (e.target.classList.contains('enlarge-image')) {
-                        const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
-                        const enlargedImage = document.getElementById('enlargedImage');
-                        enlargedImage.src = e.target.src;
-                        imageModal.show();
-                    }
-                });
+                // document.addEventListener('click', function (e) {
+                //     if (e.target.classList.contains('enlarge-image')) {
+                //         const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+                //         const enlargedImage = document.getElementById('enlargedImage');
+                //         enlargedImage.src = e.target.src;
+                //         imageModal.show();
+                //     }
+                // });
     
                 // New event listener for removing task picture
                 document.getElementById('removeTaskPictureBtn').addEventListener('click', function () {
@@ -2310,31 +2298,24 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                 const style = document.createElement('style');
                 style.textContent = `
                     #subtasksList .subtask-item {
-                        background-color: var(--bs-light);
+                       background-color: transparent;
+    transition: all 0.2s ease;
+    border: solid rgba(255, 255, 255, 0.25) !important;
                         transition: all 0.2s ease;
                     }
 
                     #subtasksList .subtask-item:hover {
-                        background-color: var(--bs-light);
-                        transform: translateX(4px);
+                        transform: translateY(4px);
                     }
-
-
                     #subtasksList .delete-subtask-btn {
                     border: 0 !important;
-    background: transparent !important;
-    font-size: 1.2rem !important;
-    margin-top: -1.2rem;
-                        opacity: 0;
+                    width: 50px!important;
+                    font-size: 1.2rem !important;
+                    margin-top: -1.2rem;
+                       
                         transition: opacity 0.2s ease;
                     }
 
-                    #subtasksList .subtask-item:hover .delete-subtask-btn {
-                        opacity: 1;
-                    }
-                    
-                   
-                   
                     .timeline-container {
                         position: relative;
                     }
@@ -2525,17 +2506,17 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
                 }
 
                 // Add event delegation for enlarging images when clicked
-                document.addEventListener('click', function (e) {
+                // document.addEventListener('click', function (e) {
                     // Check if the clicked element is an image preview in either modal
-                    if (e.target.id === 'imagePreview' || e.target.id === 'editImagePreview') {
-                        openEnlargedImage(e.target.src);
-                    }
+                    // if (e.target.id === 'imagePreview' || e.target.id === 'editImagePreview') {
+                    //     openEnlargedImage(e.target.src);
+                    // }
 
                     // Also handle task pictures in the task cards
-                    if (e.target.classList.contains('enlarge-image')) {
-                        openEnlargedImage(e.target.src);
-                    }
-                });
+                    // if (e.target.classList.contains('enlarge-image')) {
+                    //     openEnlargedImage(e.target.src);
+                    // }
+                // });
 
                 // Add this event delegation handler before the closing of isDashboard block
                 document.addEventListener('click', function (e) {
@@ -2735,39 +2716,45 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
             updatePopupVisibility();
         }
 
-        // Add this new function after the closePopup function
-        // function handleEnableNowBtn() {
-        //     alert("Enable Now Button Clicked");
-        //     // Hide the notification popup
-        //     const notificationPopup = document.getElementById('reminderButton');
-        //     if (notificationPopup) {
-        //         notificationPopup.style.display = 'none';
-        //     }
+      
 
-        //     // Show the notification permission modal
-        //     const notificationModal = new bootstrap.Modal(
-        //         document.getElementById("notificationPermissionModal")
-        //     );
-        //     notificationModal.show();
+const input = document.getElementById('newTaskDueDate');
+const input1 = document.getElementById('editTaskDueDate');
+const input2 = document.getElementById('subtaskDueDate');
+const parent = input?.parentElement;
+const parent1 = input1?.parentElement;
+const parent2 = input2?.parentElement;
 
-        //     // Add event listener to show the popup again if the modal is dismissed
-        //     const notificationModalEl = document.getElementById("notificationPermissionModal");
-        //     notificationModalEl.addEventListener('hidden.bs.modal', function onHidden() {
-        //         // Only show the popup again if we don't have FCM token yet
-        //         const fcmToken = localStorage.getItem('fcm_token');
-        //         if (!fcmToken && notificationPopup) {
-        //             notificationPopup.style.display = '';
-        //         } else if (notificationPopup) {
-        //             // If we now have FCM token, permanently remove the popup
-        //             notificationPopup.remove();
-        //         }
-        //         // Remove this listener to prevent multiple bindings
-        //         notificationModalEl.removeEventListener('hidden.bs.modal', onHidden);
-        //     });
-        // }
-    </script>
+    const flatpickrInstance = flatpickr(input, {
+    enableTime: false,
+    dateFormat: "Y-m-d",
+    position: "below",
+    theme: 'dark',
+    appendTo: parent,
+    });
+    const flatpickrInstance1 = flatpickr(input1, {
+    enableTime: false,
+    dateFormat: "Y-m-d",
+    position: "below",
+    theme: 'dark',
+    appendTo: parent1,
+    });
+
+    const flatpickrInstance2 = flatpickr(input2, {
+    enableTime: false,
+    dateFormat: "Y-m-d",
+    position: "below",
+    theme: 'dark',
+    appendTo: parent2,
+    });
+
+// Later, to get the selected dates:
+const selectedDate = flatpickrInstance.selectedDates[0];
+const selectedDate1 = flatpickrInstance1.selectedDates[0];
+const selectedDate2 = flatpickrInstance2.selectedDates[0];// JS Date object
+const dueDate = selectedDate ? selectedDate.toISOString() : null;
+</script>
  <?php
-
 // Reminder button
 if(isLoginUserPage()){
             if (!isset($_SESSION['telegram_token'])) {
@@ -2783,11 +2770,12 @@ if(isLoginUserPage()){
             if (!isset($_SESSION['discord_token'])) {
                 echo getPopupAlert('Link Discord', 'Link your Discord to stay updated!', 'reminderButton', '<h6 class="font-secondaryBold button-text" id="enableNowBtn" onclick="openLink(\'' . $_ENV['DISCORD_BOT_INVITE_URL'] . '\')">Enable Now</h6>', 'special-popup-container', 'https://res.cloudinary.com/da6qujoed/image/upload/v1745510472/discord_zowxul.png');
             }
-            // if (!isset($_SESSION['fcm_token'])) {
+            if (isset($_SESSION['fcm_token_permission'])) {
                 if(isset($_SESSION['user_id'])){
+                    
                 echo getPopupAlert('Enable Notifications', 'Stay updated! Enable browser notifications to get the 
                 latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold button-text" id="enableNowBtn" onclick="openModal(\'notificationPermissionModal\')">Enable Now</h6>','showFcmPopup');
-            // }   
+            }   
             }
 
         }

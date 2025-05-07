@@ -196,11 +196,21 @@
   flex-wrap: wrap;
   margin-bottom: 0;
 }
-.delete-task-btn svg path {
+.delete-task-btn svg path, .deleteUser svg path{
   stroke: #FF5733 !important;
 }
+.deleteUser {
+  height: 40px;
+  width: 40px;
+  padding: 0!important;
+  background: #ff58333a !important;
+  border-radius: 50%!important;
+  border: 1.3px solid #FF5733;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .delete-task-btn {
-  /* background-color: rgb(187, 7, 10) !important; */
   opacity: 0;
   transition: opacity 0.34s;
   position: absolute;
@@ -338,7 +348,7 @@
 .activity-log-item {
   padding: 12px;
   border-radius: 16px;
-  border: 1px solid rgb(151 151 151 / 50%);
+  border: solid rgba(255, 255, 255, 0.25) !important;
 }
 
 

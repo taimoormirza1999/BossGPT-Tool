@@ -278,6 +278,7 @@ backdrop-filter: blur(8px);
 
 // Show Chat Loading Animation
 function showChatLoading() {
+  initializeChatLoading();
   const chatMessages = document.querySelector(".chat-messages");
   if (!chatMessages) return;
   const loadingElement = document.createElement("div");
@@ -735,7 +736,6 @@ function initializeFCM() {
   }
 
   const messaging = firebase.messaging();
-
   // Request permission and get token
   messaging
     .getToken({ vapidKey: 'BNvQzVggQ4j6sTH5W6sxSa4K8Q-K0BhPn2tJT1en85dcp1P46M4EFJjoxe_uJI3PnEgQ06LO2mgv0SvcpBfyL00' })
@@ -764,7 +764,6 @@ function initializeFCM() {
         console.log("Unable to retrieve refreshed token ", err);
       });
   });
-
   // Handle foreground messages
   messaging.onMessage((payload) => {
     console.log("Message received. ", payload);

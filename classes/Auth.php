@@ -60,6 +60,7 @@ class Auth
             $_SESSION['telegram_token'] = $user['telegram_chat_id'];
             $_SESSION['discord_token'] = $user['discord_id'];
             $_SESSION['avatar_image'] = $user['avatar_image'];
+            $_SESSION['fcm_token_permission'] = true;
             // Update FCM token if available in the session
             if (isset($_SESSION['fcm_token']) && $_SESSION['fcm_token'] !== '0') {
                 $this->updateFcmToken($user['id'], $_SESSION['fcm_token']);
