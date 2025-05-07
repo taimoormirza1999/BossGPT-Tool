@@ -232,6 +232,7 @@
                                     loadTasks(currentProject);
                             } else {
                                 loadTaskById(taskId);
+                                fetchNotifications(currentProject);
                                 }
                             }
                         })

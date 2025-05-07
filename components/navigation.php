@@ -86,7 +86,7 @@
                         </div>
                     </div>
                 </button>
-                <img src="<?= $_SESSION['avatar_image'] ?>"
+                <img src="<?= $_SESSION['avatar_image'] ?? $images['default-user-image'] ?>"
                     style="  object-fit: cover;object-position: center;cursor: pointer;width: 47px; height: 47px; border-radius: 50%; border: 1.6px solid rgba(248, 249, 250, 0.5);"
                     class=" btn-logout" id="avatar_image_nav" data-bs-toggle="tooltip" data-bs-placement="bottom"
                     title="Profile" onclick="openLink('<?php echo $_ENV['BASE_URL'] ?>?page=profile',false)" />
@@ -99,3 +99,23 @@
             </div>
         </div>
 </nav>
+
+<style>
+@keyframes bell-shake {
+  0% { transform: rotate(0); }
+  10% { transform: rotate(-15deg); }
+  20% { transform: rotate(10deg); }
+  30% { transform: rotate(-10deg); }
+  40% { transform: rotate(6deg); }
+  50% { transform: rotate(-4deg); }
+  60% { transform: rotate(2deg); }
+  70% { transform: rotate(-1deg); }
+  80% { transform: rotate(1deg); }
+  90% { transform: rotate(0); }
+  100% { transform: rotate(0); }
+}
+.bell-animate {
+  animation: bell-shake 1s cubic-bezier(.36,.07,.19,.97) both;
+  animation-iteration-count: 10; /* 10 seconds if 1s per shake */
+}
+</style>

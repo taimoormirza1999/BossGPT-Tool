@@ -306,7 +306,7 @@ while scheduling your event",$messageDescription="Please connect your calendar t
        <p class="mb-0"><strong>Time:</strong> '.$time.'</p>
        <p class="mb-0"><strong>Description:</strong> '.$description.'</p>
         <div class="d-flex align-items-center justify-content-center gap-3">
-        <button class="btn btn-chat btn-error mt-1" onclick="openLink(\''.$link.'\',true)">Open in Calendar</button>
+        <button class="btn btn-chat btn-error mt-1" onclick="openLink(\''.$link.'\',true)">Open&nbsp;in&nbsp;Calendar</button>
         </div>
         </div>';
     }

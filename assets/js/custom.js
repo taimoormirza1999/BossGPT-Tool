@@ -1,5 +1,3 @@
-
-
 // Notification System
 let isFetchingNotifications = false;
 let isDropdownOpen = false;
@@ -66,6 +64,16 @@ function fetchNotificationsAndOpen(showDropdown = true) {
       isFetchingNotifications = false;
     });
 }
+function animateBellIcon(duration = 10000) { // 10 seconds default
+  const bellBtn = document.getElementById('notificationDropdown');
+  if (!bellBtn) return;
+  const bellSvg = bellBtn.querySelector('svg');
+  if (!bellSvg) return;
+  bellSvg.classList.add('bell-animate');
+  setTimeout(() => {
+    bellSvg.classList.remove('bell-animate');
+  }, duration);
+}
 
 function fetchNotifications(project_id, startDate = null, endDate = null) {
   return new Promise((resolve, reject) => {
@@ -80,6 +88,7 @@ function fetchNotifications(project_id, startDate = null, endDate = null) {
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
+          animateBellIcon();
           updateNotificationDropdown(data.logs || []);
           if(isProfilePage()){
             updateActivityBoard(data.logs || []);
@@ -509,7 +518,7 @@ function updateNotificationDropdown(notifications) {
                 background: rgba(255, 255, 255, 0.8);
                 backdrop-filter: blur(3.1px);
                 border-radius: 12px;
-                width: 300px; 
+                width: 310px; 
                 overflow-x: hidden;    
             }
             #notificationDropdownMenu.dark-mode .dropdown-menu {
