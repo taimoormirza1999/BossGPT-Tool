@@ -18,15 +18,11 @@ function include_profile($images)
             padding: 0.3rem 0.5rem;
         }
 
-        .flatpickr-calendar {
-            position: absolute;
-            z-index: 9999;
-            top: 100%;
-            left: 0;
+        .flatpickr-calendar.rangeMode.animate.arrowTop.arrowLeft.rightMost.open{
+            top: 277px !important;
         }
-
-        .flatpickr-calendar.open {
-            top: 260px !important;
+        .flatpickr-calendar.rangeMode.animate.arrowTop.arrowLeft.rightMost.open:before, .flatpickr-calendar.rangeMode.animate.arrowTop.arrowLeft.rightMost.open:after{
+            display: none !important;
         }
     </style>
     <style>

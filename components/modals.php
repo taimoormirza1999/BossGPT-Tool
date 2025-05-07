@@ -120,7 +120,7 @@
                         <h6 class="border-bottom pb-2 d-flex justify-content-between align-items-center">
                             Subtasks
                             <button type="button" class="btn btn-sm btn-main-primary" id="addSubtaskInModalBtn">
-                                <i class="bi bi-plus"></i> Add Subtask
+                                <i class="bi bi-plus-circle"></i> Add Subtask
                             </button>
                         </h6>
                         <div id="subtasksList" class="mt-3">
@@ -234,7 +234,7 @@
     </div>
     <!-- Add this after the other modals -->
     <div class="modal fade" id="addSubtaskModal" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Add Subtask</h5>
@@ -266,7 +266,7 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    ] <button type="button" class="btn btn-main-primary" id="saveSubtaskBtn">Add Subtask</button>
+                     <button type="button" class="btn btn-main-primary" id="saveSubtaskBtn">Add Subtask</button>
                 </div>
             </div>
         </div>

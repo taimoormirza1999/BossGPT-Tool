@@ -120,7 +120,7 @@
                                 async function showMessage(message) {
 
                                     // Show loading animation first
-                                    showChatLoading();
+                                    // showChatLoading();
 
                                     // Wait for loading animation
                                     await new Promise(resolve => setTimeout(resolve, 1500));
@@ -195,35 +195,33 @@
                     <?php
                     $prompts = [
                         "Add 'title' into my calendar",
-                        "🔄 Mark 'title' as done",
-                        "✏️ Move 'title' to in progress",
-                        "✏️ Move 'title' to to do",
-                        "🎯 Create task 'task' and assign it to myself",
+                        "Mark 'title' as done",
+                        "Move 'title' to in progress",
+                        "Move 'title' to to do",
+                        "Create task 'task' and assign it to myself",
                         "Delete task 'title'",
-                        "📑 Set a reminder for task #number",
-                        "📑 Suggest tasks for my project",
-                        "📋 Create tasks for Your Feature",
-                        "✏️ Move task #number to in_progress",
-                        "👥 Assign task 'Your Task' to @name",
-                        "📅 Set deadline 'title' to next Friday",
-                        "📊 Show project progress",
-                        "📑 List all tasks in current project",
-                        "🔍 Show tasks assigned to me"
+                        "Set a reminder for task #number",
+                        "Suggest tasks for my project",
+                        "Create tasks for Your Feature",
+                        "Move task #number to in_progress",
+                        "Assign task 'Your Task' to @name",
+                        "Set deadline 'title' to next Friday",
+                        "Show project progress",
+                        "List all tasks in current project",
+                        "Show tasks assigned to me"
                     ];
 
                     function renderPromptButtons($prompts)
                     {
                         foreach ($prompts as $prompt) {
                             echo '<button style="border-radius: 20px!important;" class="btn btn-outline-light  prompt-btn" type="button" onclick="handlePromptClick(this)">' . $prompt . '</button>';
-                        }
-                    }
+                        }}
                     ?>
-
                     <!-- Prompt suggestions -->
                     <div class="prompt-suggestions">
                         <div class="nav nav-tabs border-0 flex-nowrap overflow-auto mb-0 px-0"
                             style="scrollbar-width: none; -ms-overflow-style: none;">
-                            <?php renderPromptButtons($prompts); ?>
+                            <i class="bi bi-stars text-white"></i>  <?php renderPromptButtons($prompts); ?>
                         </div>
                     </div>
 

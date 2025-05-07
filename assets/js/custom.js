@@ -278,6 +278,7 @@ backdrop-filter: blur(8px);
 
 // Show Chat Loading Animation
 function showChatLoading() {
+  initializeChatLoading();
   const chatMessages = document.querySelector(".chat-messages");
   if (!chatMessages) return;
   const loadingElement = document.createElement("div");
@@ -463,13 +464,11 @@ function getActionTypeDisplay(action_type) {
 function formatTimeAgo(dateString) {
   const date = new Date(dateString); // Let JavaScript handle the format properly
   const now = new Date();
-
   const diffInMs = now - date;
   const diffInSeconds = Math.floor(diffInMs / 1000);
   const diffInMinutes = Math.floor(diffInSeconds / 60);
   const diffInHours = Math.floor(diffInMinutes / 60);
   const diffInDays = Math.floor(diffInHours / 24);
-
   if (diffInDays > 0) {
     if (diffInDays === 1) return "yesterday";
     if (diffInDays <= 7) return `${diffInDays} days ago`;
@@ -498,17 +497,14 @@ function updateNotificationDropdown(notifications) {
   if (!document.getElementById("notification-dark-mode-styles")) {
     const styleSheet = document.createElement("style");
     styleSheet.id = "notification-dark-mode-styles";
-    styleSheet.textContent = `
-            
-            .notification-text {
+    styleSheet.textContent = `  
+           .notification-text {
                color: rgba(131, 131, 131, 1);
                white-space: normal;
             }
            .text-muted {
                 color: #a0a0a0 !important;
             }
-            
-           
             #notificationDropdownMenu.dropdown-menu {
                 background: rgba(255, 255, 255, 0.8);
                 backdrop-filter: blur(3.1px);
@@ -516,16 +512,12 @@ function updateNotificationDropdown(notifications) {
                 width: 300px; 
                 overflow-x: hidden;    
             }
-
             #notificationDropdownMenu.dark-mode .dropdown-menu {
                 border-width: 0.25rem !important;
-            }
-           
-       
+            } 
         `;
     document.head.appendChild(styleSheet);
   }
-
   // Update badge
   if (notifications.length > 0) {
     badge.textContent = notifications.length;
@@ -744,7 +736,6 @@ function initializeFCM() {
   }
 
   const messaging = firebase.messaging();
-
   // Request permission and get token
   messaging
     .getToken({ vapidKey: 'BNvQzVggQ4j6sTH5W6sxSa4K8Q-K0BhPn2tJT1en85dcp1P46M4EFJjoxe_uJI3PnEgQ06LO2mgv0SvcpBfyL00' })
@@ -773,7 +764,6 @@ function initializeFCM() {
         console.log("Unable to retrieve refreshed token ", err);
       });
   });
-
   // Handle foreground messages
   messaging.onMessage((payload) => {
     console.log("Message received. ", payload);
