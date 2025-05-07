@@ -29,6 +29,10 @@
   /* Dark Purple */
   --bs-primary-darkpurple-linear-gradient: linear-gradient(135deg, #240121ba 0%, #4f014275 100%);
   }
+  html {
+    font-size: 97%!important; 
+    zoom: 0.986;
+  }
   .nav-background {
     backdrop-filter: blur(8px) !important;
   }
