@@ -64,7 +64,7 @@
   background: #fff;
   padding: 0;
   margin: 0;
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1.3px solid rgba(255, 255, 255, 0.5);
   border-radius: 12px!important;
   word-wrap: break-word;
   transition: all 0.3s ease 0.3s;
@@ -78,7 +78,7 @@
   opacity: 1;
   max-height: 500px;
   padding: 0.75rem;
-  margin: 0.5rem 0;
+  margin: 1rem 0;
 }
 
 .task-card.dragging {
@@ -140,7 +140,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.0);
   display: none;
   justify-content: center;
   align-items: center;
@@ -243,18 +243,15 @@
   border-radius: 20px;
   cursor: help;
 }
-
-
 .due-date i {
   font-size: 0.9rem;
 }
-
 .subtask-item {
-  padding: 0.5rem;
-  border-radius: 10px;
+  padding: 0.4rem 0.75rem;
+  border-radius: 12px!important;
   background-color: rgba(0, 0, 0, 0.02);
-  margin-bottom: 0.25rem;
-  border: 1px solid rgb(255 255 255 / 48%);
+  margin-bottom: 0.75rem!important;
+  border: 1.3px solid rgb(255 255 255 / 48%);
   border-radius: 20px;
 }
 
@@ -760,10 +757,6 @@ body.dark-mode .nav-tabs::-webkit-scrollbar-track {
 
 .task-description {
   border-radius: 12px;
-}
-
-.subtask-item {
-  border-radius: 10px;
 }
 
 .activity-log-item {

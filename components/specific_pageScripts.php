@@ -833,7 +833,7 @@ $button1.text(selectedProjectTitle);
                                             <button class="btn btn-sm btn-link add-subtask-btn" data-task-id="${task.id}">
                                                 ${SVGAdd()} Add Subtask
                                             </button>
-                                            <button class="btn btn-sm btn-link ai-add-subtask-btn" data-task-id="${task.id}" style="display: flex; align-items: center; gap: 6px;">${SVGAI()}Generate AI Subtasks
+                                            <button class="btn btn-sm btn-link ai-add-subtask-btn" data-task-id="${task.id}" style="display: flex; align-items: center; gap: 6px;">${SVGAI()} AI Subtasks
                                             </button>
                                         </div>
                                      </div>`;
@@ -917,7 +917,6 @@ $button1.text(selectedProjectTitle);
                             ${task.assigned_users ? `
                                 <div class="task-assignees d-flex gap-1 border-0 m-0 p-0">
                                     ${Object.entries(task.assigned_users).map(([id, username]) => {
-                        // Generate background color based on user ID
                         // First user gets rgba(61, 127, 41, 1), others get varied hues
                         const hues = [61, 200, 0, 280, 30, 320, 170, 60, 340, 250]; // Green, blue, red, purple, orange, etc.
                         const index = parseInt(id) % hues.length;
@@ -1087,7 +1086,7 @@ $button1.text(selectedProjectTitle);
                         return;
                     }
 
-                    showLoading();
+                    // showLoading();
                     fetch('?api=create_project', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -1109,7 +1108,7 @@ $button1.text(selectedProjectTitle);
                             }
                         })
                         .catch(error => console.error('Error creating project:', error))
-                        .finally(hideLoading);
+                        .finally();
                 });
 
                 // Add new functions for task editing
@@ -1123,7 +1122,7 @@ $button1.text(selectedProjectTitle);
                     $(editTaskAssignees).empty();  // Clear using jQuery
 
                     // Fetch all users to populate the multi-select
-                    showLoading();
+                    // showLoading();
                     fetch('?api=get_project_users', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -1172,7 +1171,7 @@ $button1.text(selectedProjectTitle);
                             console.error('Error loading assigned users:', error);
                             alert('Error loading assigned users.');
                         })
-                        .finally(hideLoading);
+                        .finally();
 
                     // Add this new section to load task activity log
                     showLoading();
@@ -1909,13 +1908,13 @@ $button1.text(selectedProjectTitle);
                 });
 
                 // Add event delegation for delete subtask buttons
-                $(document).on('click', '.delete-subtask-btn', function (e) {
-                    e.stopPropagation(); // Prevent task card click event
-                    if (confirm('Are you sure you want to delete this subtask?')) {
-                        const subtaskId = $(this).data('id');
-                        deleteSubtask(subtaskId);
-                    }
-                });
+                // $(document).on('click', '.delete-subtask-btn', function (e) {
+                //     e.stopPropagation(); // Prevent task card click event
+                //     if (confirm('Are you sure you want to delete this subtask?')) {
+                //         const subtaskId = $(this).data('id');
+                //         deleteSubtask(subtaskId);
+                //     }
+                // });
 
                 function renderSuggestedTasks(suggestions) {
                     const wrapper = document.createElement('div');
@@ -1974,7 +1973,7 @@ $button1.text(selectedProjectTitle);
                         alert('Please select a project first');
                         return;
                     }
-                    showLoading();
+                    // showLoading();
                     fetch('?api=create_task', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -1997,7 +1996,7 @@ $button1.text(selectedProjectTitle);
                             console.error('Error adding suggested task:', error);
                             alert('Error adding suggested task');
                         })
-                        .finally(hideLoading);
+                        .finally();
                 }
 
                 // Add this new code to handle image clicks (add it where other event listeners are defined)
@@ -2694,6 +2693,7 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
 
         function closePopup(button) {
             let popup = button.parentElement;
+            // const type = popup.dataset.popupType;
             const reminderId = popup.dataset.reminderId;
 
             // Check if this is the notification reminder or enable now button
