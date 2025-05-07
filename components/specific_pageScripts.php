@@ -1174,7 +1174,7 @@ $button1.text(selectedProjectTitle);
                         .finally();
 
                     // Add this new section to load task activity log
-                    showLoading();
+                    // showLoading();
                     fetch('?api=get_task_activity_log', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -2691,7 +2691,7 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
             });
         }
 
-        function closePopup(button) {
+        function closePopup(button, type) {
             let popup = button.parentElement;
             // const type = popup.dataset.popupType;
             const reminderId = popup.dataset.reminderId;
@@ -2702,10 +2702,16 @@ ERROR: If parent due date exists and any subtask date would be after it, FAIL.
 
             if (isEnableNowBtn) {
                 alert("Enable Now Button Clicked");
-                // Handle the Enable Now button click
                 return;
             }
-
+            // alert(type);
+            // if(type == 'telegram'){
+                fetch('?api=disabled_notification_popups', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: type })
+                });
+            // }
             // For other reminders
             popup.remove();
             // Delete from database/backend for regular reminders
@@ -2757,24 +2763,28 @@ const dueDate = selectedDate ? selectedDate.toISOString() : null;
  <?php
 // Reminder button
 if(isLoginUserPage()){
-            if (!isset($_SESSION['telegram_token'])) {
+                if (isset($_SESSION['telegram_token']) && isset($_SESSION['telegram_token_permission_disabled'])) {
+
+                if($_SESSION['telegram_token'] == '0' && $_SESSION['telegram_token_permission_disabled'] == false){
                 echo getPopupAlert(
                     'Link Telegram',
                     'Link your Telegram to stay updated!',
                     'reminderButton',
                     '<h6 class="font-secondaryBold button-text" id="enableNowBtn" onclick="openLink(\'https://t.me/BossGPTAssistantBot?start=connect_' . $_SESSION['user_id'] . '\')">Enable Now</h6>',
                     'special-popup-container',
-                    'https://res.cloudinary.com/da6qujoed/image/upload/v1745509466/sendicon_zvrv33.png'
+                    'https://res.cloudinary.com/da6qujoed/image/upload/v1745509466/sendicon_zvrv33.png',
+                    'telegram'
                 );
+            }}
+            if (isset($_SESSION['discord_token']) && isset($_SESSION['discord_token_permission_disabled']) && $_SESSION['discord_token_permission_disabled'] == '0') {
+                echo getPopupAlert('Link Discord', 'Link your Discord to stay updated!', 'reminderButton', '<h6 class="font-secondaryBold button-text" id="enableNowBtn" onclick="openLink(\'' . $_ENV['DISCORD_BOT_INVITE_URL'] . '\')">Enable Now</h6>', 'special-popup-container', 
+                'https://res.cloudinary.com/da6qujoed/image/upload/v1745510472/discord_zowxul.png', 'discord');
             }
-            if (!isset($_SESSION['discord_token'])) {
-                echo getPopupAlert('Link Discord', 'Link your Discord to stay updated!', 'reminderButton', '<h6 class="font-secondaryBold button-text" id="enableNowBtn" onclick="openLink(\'' . $_ENV['DISCORD_BOT_INVITE_URL'] . '\')">Enable Now</h6>', 'special-popup-container', 'https://res.cloudinary.com/da6qujoed/image/upload/v1745510472/discord_zowxul.png');
-            }
-            if (isset($_SESSION['fcm_token_permission'])) {
+            if (isset($_SESSION['fcm_token_permission_disabled']) && $_SESSION['fcm_token_permission_disabled'] == '0') {
                 if(isset($_SESSION['user_id'])){
                     
                 echo getPopupAlert('Enable Notifications', 'Stay updated! Enable browser notifications to get the 
-                latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold button-text" id="enableNowBtn" onclick="openModal(\'notificationPermissionModal\')">Enable Now</h6>','showFcmPopup');
+                latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold button-text" id="enableNowBtn" onclick="openModal(\'notificationPermissionModal\')">Enable Now</h6>','showFcmPopup', 'https://res.cloudinary.com/da6qujoed/image/upload/v1743687520/belliconImage_vnxkhi.png', 'fcm_permission_reminder');
             }   
             }
 
