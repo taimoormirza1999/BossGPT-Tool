@@ -57,10 +57,12 @@ class Auth
             $_SESSION['name'] = $user['name'];
             $_SESSION['bio'] = $user['bio'];
             $_SESSION['pro_member'] = $user['pro_member'];
-            $_SESSION['telegram_token'] = $user['telegram_chat_id'];
-            $_SESSION['discord_token'] = $user['discord_id'];
+            $_SESSION['telegram_token'] = $user['telegram_chat_id'] ?? '0';
+            $_SESSION['discord_token'] = $user['discord_id'] ?? '0';
             $_SESSION['avatar_image'] = $user['avatar_image'];
-            $_SESSION['fcm_token_permission'] = true;
+            $_SESSION['fcm_token_permission_disabled'] = '0';
+            $_SESSION['telegram_token_permission_disabled'] = '0';
+            $_SESSION['discord_token_permission_disabled'] = '0';
             // Update FCM token if available in the session
             if (isset($_SESSION['fcm_token']) && $_SESSION['fcm_token'] !== '0') {
                 $this->updateFcmToken($user['id'], $_SESSION['fcm_token']);

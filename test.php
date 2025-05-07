@@ -8,11 +8,11 @@ ini_set('display_errors', 1);
 // require './classes/Database.php';
 require 'functions.php';
 
-if (sendEmailAWS('taimoorhamza1999@gmail.com', 'Hello from BossGPT')) {
-    echo "Sent!";
-} else {
-    echo "Failed :(";
-}
+// if (sendEmailAWS('taimoorhamza1999@gmail.com', 'Hello from BossGPT')) {
+//     echo "Sent!";
+// } else {
+//     echo "Failed :(";
+// }
 // $database = Database::getInstance();
 // echo $database->initializeTables();
 // if($database->initializeTables()){
@@ -26,6 +26,11 @@ if (sendEmailAWS('taimoorhamza1999@gmail.com', 'Hello from BossGPT')) {
 // echo "<script>alert('Notification Sent');</script>";
 // error_reporting(E_ALL);
 // ini_set('display_errors', 1);
+
+echo (
+    (!isset($_SESSION['telegram_token']) && $_SESSION['telegram_token'] == '0') &&
+    (!isset($_SESSION['telegram_token_permission_disabled']) || $_SESSION['telegram_token_permission_disabled'] == '0')
+);
 
 if (session_id() === '') {
     session_start();

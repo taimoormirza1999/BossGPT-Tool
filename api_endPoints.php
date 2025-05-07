@@ -77,6 +77,19 @@ if (isset($_GET['api'])) {
                     header('Content-Type: application/json');
                     echo json_encode(['status' => 'success']);
                 exit;
+                case 'disabled_notification_popups':
+                    $data = json_decode(file_get_contents('php://input'), true);
+                    $type = $data['type'] ?? '';
+                    
+                    if ($type === 'telegram') {
+                        $_SESSION['telegram_token_permission_disabled'] = 1;
+                    } elseif ($type === 'discord') {
+                        $_SESSION['discord_token_permission_disabled'] = 1;
+                    } else {
+                        $_SESSION['fcm_token_permission_disabled'] = 1;
+                    }
+                    echo json_encode(['status' => 'success']);
+                exit;
             
             case 'save_telegram_chat_id':
                 $data = json_decode(file_get_contents('php://input'), true);
@@ -123,6 +136,7 @@ if (isset($_GET['api'])) {
                     exit;
                 }
                 break;
+
             case 'get_chat_history':
                 $data = json_decode(file_get_contents('php://input'), true);
                 if (!isset($data['project_id'])) {
