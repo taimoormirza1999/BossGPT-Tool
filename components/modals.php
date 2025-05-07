@@ -97,8 +97,8 @@
                         </div>
                         <!-- Remove Picture Button - only shown when a picture exists -->
                         <div class="mb-3" id="taskPictureContainer" style="display:none;">
-                            <button type="button" class="btn btn-danger" id="removeTaskPictureBtn">Remove
-                                Picture</button>
+                            <!-- <button type="button" class="btn btn-danger" id="removeTaskPictureBtn">Remove
+                                Picture</button> -->
                         </div>
 
                         <!-- Add Tree Selection for Edit Task -->

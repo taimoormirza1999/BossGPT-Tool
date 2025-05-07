@@ -719,6 +719,7 @@ $button1.text(selectedProjectTitle);
                     updateCardsBoard(data.tasks);
                 <?php } else { ?>
                     updateTasksBoard(data.tasks);
+                    fetchNotifications(currentProject);
                 <?php } ?>
                                 }
                             })
@@ -1689,7 +1690,7 @@ $button1.text(selectedProjectTitle);
                         return;
                     }
                     function sendCreateTask(pictureData) {
-                        showLoading();
+                        // showLoading();
                         fetch('?api=create_task', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -1723,7 +1724,7 @@ $button1.text(selectedProjectTitle);
                             console.error('Error creating task:', error);
                             showToastAndHideModal('newTaskModal', 'error', 'Error', 'Failed to create task');
                         })
-                        .finally(hideLoading);
+                        .finally();
                     }
                     if (pictureInput.files && pictureInput.files[0]) {
                         const reader = new FileReader();
@@ -2010,7 +2011,7 @@ $button1.text(selectedProjectTitle);
                 // });
     
                 // New event listener for removing task picture
-                document.getElementById('removeTaskPictureBtn').addEventListener('click', function () {
+                document.getElementById('editRemovePreviewBtn').addEventListener('click', function () {
                     if (!confirm('Are you sure you want to remove the picture from this task?')) {
                         return;
                     }
