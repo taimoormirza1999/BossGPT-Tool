@@ -4,16 +4,17 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 require 'vendor/autoload.php';
+require_once 'config/constants.php';
 function sendTemplateEmail($to, $subject, $template, $data)
 {
     try {
         $mail = new PHPMailer(true);
         // SMTP Configuration
         $mail->isSMTP();
-        $mail->Host = 'email-smtp.us-east-1.amazonaws.com';
+        $mail->Host = $_ENV['AWS_SMTP_HOST'];
         $mail->SMTPAuth = true;
-        $mail->Username = 'AKIAZBQNTRAPZVUXHAV4';
-        $mail->Password = 'BMuaIhdcAnWFN7zTywJAROyVNdyoBNy+vp1JcFw6dVVd';
+        $mail->Username = $_ENV['AWS_SMTP_USERNAME'];
+        $mail->Password = $_ENV['AWS_SMTP_PASSWORD'];
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
         // Email Headers
@@ -40,10 +41,10 @@ function sendEmailAWS($to, $subject)
 
         // SMTP Configuration
         $mail->isSMTP();
-        $mail->Host = 'email-smtp.us-east-1.amazonaws.com';
+        $mail->Host = $_ENV['AWS_SMTP_HOST'];
         $mail->SMTPAuth = true;
-        $mail->Username = 'AKIAZBQNTRAPZVUXHAV4';
-        $mail->Password = 'BMuaIhdcAnWFN7zTywJAROyVNdyoBNy+vp1JcFw6dVVd';
+        $mail->Username = $_ENV['AWS_SMTP_USERNAME'];
+        $mail->Password = $_ENV['AWS_SMTP_PASSWORD'];
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
         

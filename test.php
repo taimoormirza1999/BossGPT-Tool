@@ -7,11 +7,11 @@ ini_set('display_errors', 1);
 // require './config/constants.php';
 // require './classes/Database.php';
 require 'functions.php';
-      // if (sendTemplateEmail('taimoorhamza1999@gmail.com', 'Hello from BossGPT','welcome',null)) {
-      //       echo "Sent!";
-      //   } else {
-      //       echo "Failed :(";
-      //   }
+        if (sendTemplateEmail('taimoorhamza1999@gmail.com', 'Hello from BossGPT','welcome',null)) {
+            echo "Sent!";
+        } else {
+            echo "Failed :(";
+        }
       // $database = Database::getInstance();
       // echo $database->initializeTables();
       // if($database->initializeTables()){
