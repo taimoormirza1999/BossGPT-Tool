@@ -10,14 +10,14 @@ function sendTemplateEmail($to, $subject, $template, $data)
         $mail = new PHPMailer(true);
         // SMTP Configuration
         $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com';
+        $mail->Host = 'email-smtp.us-east-1.amazonaws.com';
         $mail->SMTPAuth = true;
-        $mail->Username = 'taimoorhamza199@gmail.com';
-        $mail->Password = 'qyiujnhjbwtmpkma';
+        $mail->Username = 'AKIAZBQNTRAPZVUXHAV4';
+        $mail->Password = 'BMuaIhdcAnWFN7zTywJAROyVNdyoBNy+vp1JcFw6dVVd';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
         // Email Headers
-        $mail->setFrom('taimoorhamza199@gmail.com', 'BossGPT AI Manager');
+        $mail->setFrom('contact@bossgpt.com', 'BossGPT AI Manager');
         $mail->addAddress($to);
         $mail->isHTML(true);
         $mail->Subject = $subject;
@@ -42,10 +42,11 @@ function sendEmailAWS($to, $subject)
         $mail->isSMTP();
         $mail->Host = 'email-smtp.us-east-1.amazonaws.com';
         $mail->SMTPAuth = true;
-        $mail->Username = 'taimoorherogram@';
-        $mail->Password = 'Gujranwala123@$';
+        $mail->Username = 'AKIAZBQNTRAPZVUXHAV4';
+        $mail->Password = 'BMuaIhdcAnWFN7zTywJAROyVNdyoBNy+vp1JcFw6dVVd';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
+        
 
         // Email Headers
         $mail->setFrom('contact@bossgpt.com', 'BossGPT AI Manager');

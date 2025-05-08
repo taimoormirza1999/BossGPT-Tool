@@ -15,7 +15,7 @@
                 </li>
             </ul>
             <div class="d-flex align-items-center nav-btn-container">
-                <button type="button" class="btn btn-main-primary" data-bs-toggle="tooltip"
+                <button type="button" onclick="openModal('newProjectModal')" class="btn btn-main-primary" data-bs-toggle="tooltip"
                     data-bs-placement="bottom" title="Create New Project"
                     data-bs-target="#newProjectModal" style="background: rgba(255, 255, 255, 0.1)!important;
                     border: 1.3px solid rgba(255, 255, 255, 0.35)!important;

@@ -238,8 +238,8 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 ?>
 
 <body
-    style="background-color:<?php echo isset($_GET['page']) && ($_GET['page'] == 'login' || $_GET['page'] == 'register') ? '#000' : ''; ?> "
-    class="system-mode">
+    style="background-color:<?php echo isset($_GET['page']) && ($_GET['page'] == 'login' || $_GET['page'] == 'register') ? '#000' : '#000'; ?> "
+    class="system-mode <?php if (isPage('register') || isPage('login') || isPage('aitone')){echo  'page-scrollable';} ?>">
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5JFVBHSJ" height="0" width="0"
             style="display:none;visibility:hidden"></iframe></noscript>

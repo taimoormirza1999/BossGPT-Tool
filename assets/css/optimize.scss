@@ -208,6 +208,9 @@ $geist-fonts: (
 .text-purple{
   color: #82A1FF !important;
 }
+.page-scrollable{
+  overflow-y: scroll!important;
+}
 @mixin hover-up($translateValue: -5px, $duration: 0.3s) {
   transition: all $duration ease-in-out;
   &:hover {

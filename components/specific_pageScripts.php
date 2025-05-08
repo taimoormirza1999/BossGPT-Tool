@@ -374,17 +374,15 @@
                     if (!selectedProjectTitle) {
                         const selectedButton = $(`#projectDropdown button[data-id="${projectId}"]`);
                         if(isPage('profile')){ 
-       const selectedButton1 = $(`#projectDropdown1 button[data-id="${projectId}"]`);
+                        const selectedButton1 = $(`#projectDropdown1 button[data-id="${projectId}"]`);
                         }
                         if (selectedButton.length) {
-                            selectedProjectTitle = selectedButton.attr('title');
+                        selectedProjectTitle = selectedButton.attr('title');
                         }
-    
-
                         <?php if(isPage('profile') ){ ?>
                             if (selectedButton1.length) {
                                 selectedProjectTitle = selectedButton1.attr('title');
-}
+                            }
                         <?php } ?>
                     }
 
@@ -394,11 +392,10 @@
                     // Clear and update the button text
                     $button.text(selectedProjectTitle);
                     <?php if(isPage('profile')){ ?>
-$button1.text(selectedProjectTitle);
-<?php } ?>
+                    $button1.text(selectedProjectTitle);
+                    <?php } ?>
                     // Add the SVG back if it exists
                     if ($svg.length > 0) {
-                        
                         $button.append($svg);
                         <?php if(isPage('profile') ){ ?>
                             $button.append(`
@@ -428,10 +425,8 @@ $button1.text(selectedProjectTitle);
                     projectId = parseInt(projectId);
                     currentProject = parseInt(projectId);
                     $('#myselectedcurrentProject').val(currentProject);
-
                     // Save current project to localStorage for persistence
                     localStorage.setItem(`lastSelectedProject_${userId}`, currentProject);
-
                     // Update dropdown selection state
                     $('#projectDropdown button').removeClass('active').attr('data-selected', false);
                     $(`#projectDropdown button[data-id="${projectId}"]`).addClass('active').attr('data-selected', true);
@@ -446,11 +441,9 @@ $button1.text(selectedProjectTitle);
                     });
 
                     // call to fetch notifications
-                    fetchNotificationsAndOpen(false);
+                    fetchNotificationsAndOpen(false,false);
 
                     // Load project data
-                  
-                    
                     <?php if (!isPage('profile')) { ?>
                         loadTasks(projectId);
                         loadChatHistory(projectId);
@@ -698,7 +691,8 @@ $button1.text(selectedProjectTitle);
                 }
 
                 // Load tasks
-                    function loadTasks(projectId, startDate=null, endDate=null) {
+                    function loadTasks(projectId, startDate=null, endDate=null, notify=false) {
+                        // alert('loadTasks');
                         // showLoading();
                          // Add startDate and endDate to the data if provided
                     if (startDate && endDate) {
@@ -720,7 +714,9 @@ $button1.text(selectedProjectTitle);
                     updateCardsBoard(data.tasks);
                 <?php } else { ?>
                     updateTasksBoard(data.tasks);
-                    fetchNotifications(currentProject);
+                   
+                        fetchNotifications(currentProject,null,null,notify);
+                    
                 <?php } ?>
                                 }
                             })
@@ -1041,7 +1037,7 @@ $button1.text(selectedProjectTitle);
 
                     appendMessage(message, 'user');
                     messageInput.value = '';
-
+                    playMessageSound();
                     // showChatLoading();
                     fetch('?api=send_message', {
                         method: 'POST',
@@ -1065,7 +1061,7 @@ $button1.text(selectedProjectTitle);
                                 } else {
                                     appendMessage(data.message, 'ai');
                                 }
-                                loadTasks(currentProject);
+                                loadTasks(currentProject,null,null,false);
                             }
                         })
                         .catch(error => console.error('Error sending message:', error))
@@ -1102,10 +1098,11 @@ $button1.text(selectedProjectTitle);
                                 document.getElementById('projectDescription').value = '';
                                 selectProject(data.project_id, title);
                                 Toast("success", "Success", "Project created successfully", "bottomCenter");
+                                fetchNotifications(data.project_id,null,null,true);
                                 // First load the projects to refresh the dropdown
                                 loadProjects().then(() => {
                                     // Then select the new project
-                                    selectProject(data.project_id, title);
+                                selectProject(data.project_id, title);
                                 });
                             }
                         })
@@ -1713,10 +1710,10 @@ $button1.text(selectedProjectTitle);
                                         opt.classList.remove('selected')
                                     );
                                     $('#newTaskAssignees').val(null).trigger('change');
-
+                                    Toast('success','Task Created','Task created successfully!');
                                 // Close modal and refresh
                                 bootstrap.Modal.getInstance(document.getElementById('newTaskModal')).hide();
-                                loadTasks(currentProject);
+                                loadTasks(currentProject,null,null,true);
                             } else {
                                 throw new Error(data.message || 'Failed to create task');
                             }
@@ -1752,14 +1749,15 @@ $button1.text(selectedProjectTitle);
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                loadTasks(currentProject);
+                                loadTasks(currentProject,null,null,true);
+                                Toast('success','Task Deleted','Task deleted successfully!');
                             } else {
                                 throw new Error(data.message || 'Failed to delete task');
                             }
                         })
                         .catch(error => {
                             console.error('Error deleting task:', error);
-                            alert('Failed to delete task. Please try again.');
+                            Toast('error','Task Deleted','Failed to delete task. Please try again.');
                         })
                         .finally();
                 }
@@ -1865,16 +1863,16 @@ $button1.text(selectedProjectTitle);
                     }
                     // Construct a prompt that instructs the AI to generate subtasks including the correct project and task IDs
                     const prompt = `
- Please generate a list of detailed subtasks for the following task using AI.
- Project ID: ${currentProject}
- Task ID: ${task.id}
- Task Details:
- Title: ${task.title}
- Description: ${task.description || 'No description provided'}
- ${task.due_date ? 'Due Date: ' + task.due_date : ''}
- 
- Consider the overall project context and the existing tasks to ensure the subtasks are relevant, actionable, and detailed.
- Return the response using a function call named "create_multiple_subtasks" with parameters: task_id and subtasks (each having title, description, and due_date).
+                    Please generate a list of detailed subtasks for the following task using AI.
+                    Project ID: ${currentProject}
+                    Task ID: ${task.id}
+                    Task Details:
+                    Title: ${task.title}
+                    Description: ${task.description || 'No description provided'}
+                    ${task.due_date ? 'Due Date: ' + task.due_date : ''}
+                    
+                    Consider the overall project context and the existing tasks to ensure the subtasks are relevant, actionable, and detailed.
+                    Return the response using a function call named "create_multiple_subtasks" with parameters: task_id and subtasks (each having title, description, and due_date).
                     `;
                     showLoading();
                     fetch('?api=send_message', {
@@ -1989,7 +1987,7 @@ $button1.text(selectedProjectTitle);
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                loadTasks(currentProject);
+                                loadTasks(currentProject,null,null,true);
                             } else {
                                 alert('Failed to add task: ' + data.message);
                             }
@@ -2130,51 +2128,51 @@ $button1.text(selectedProjectTitle);
                     const mainDueDate = task.due_date ? new Date(task.due_date.replace(/\s*<[^>]*>/g, '')).toISOString().split('T')[0] : null;
 
                     const prompt = `
-STRICT DEADLINE ASSIGNMENT REQUEST:
-Task: "${task.title}"
-Current Date: ${new Date().toISOString().split('T')[0]}
-PARENT TASK DUE DATE: ${mainDueDate || 'Not set'}
+                    STRICT DEADLINE ASSIGNMENT REQUEST:
+                    Task: "${task.title}"
+                    Current Date: ${new Date().toISOString().split('T')[0]}
+                    PARENT TASK DUE DATE: ${mainDueDate || 'Not set'}
 
-CRITICAL CONSTRAINTS:
-1. PARENT TASK DUE DATE IS ABSOLUTE DEADLINE
-2. ALL subtask deadlines MUST be BEFORE ${mainDueDate || 'parent due date'} 
-3. Last subtask deadline must have at least 24 hours buffer before parent deadline
-4. NO EXCEPTIONS to these constraints
+                    CRITICAL CONSTRAINTS:
+                    1. PARENT TASK DUE DATE IS ABSOLUTE DEADLINE
+                    2. ALL subtask deadlines MUST be BEFORE ${mainDueDate || 'parent due date'} 
+                    3. Last subtask deadline must have at least 24 hours buffer before parent deadline
+                    4. NO EXCEPTIONS to these constraints
 
-SCHEDULING REQUIREMENTS:
-- Create extremely aggressive timeline with NO SLACK
-- Distribute subtasks across available time window
-- Earlier dates preferred - create urgency
-- Consider task dependencies (earlier subtasks first)
-- Account for task complexity in duration
-- NO FLEXIBLE or LOOSE deadlines
-- Maximum pressure for quick completion
+                    SCHEDULING REQUIREMENTS:
+                    - Create extremely aggressive timeline with NO SLACK
+                    - Distribute subtasks across available time window
+                    - Earlier dates preferred - create urgency
+                    - Consider task dependencies (earlier subtasks first)
+                    - Account for task complexity in duration
+                    - NO FLEXIBLE or LOOSE deadlines
+                    - Maximum pressure for quick completion
 
-Current Subtasks (Must maintain IDs):
-${task.subtasks.map(st => `- ID: ${st.id}, Title: ${st.title} (Current due: ${st.due_date || 'None'})`).join('\n')}
+                    Current Subtasks (Must maintain IDs):
+                    ${task.subtasks.map(st => `- ID: ${st.id}, Title: ${st.title} (Current due: ${st.due_date || 'None'})`).join('\n')}
 
-CRITICAL RESPONSE FORMAT INSTRUCTIONS:
-You must respond using ONLY this exact format:
-{
-    "task_id": ${task.id},
-    "subtasks": [
-        {
-            "id": <existing_subtask_id>,
-            "due_date": "YYYY-MM-DD"
-        }
-    ]
-}
+                    CRITICAL RESPONSE FORMAT INSTRUCTIONS:
+                    You must respond using ONLY this exact format:
+                    {
+                        "task_id": ${task.id},
+                        "subtasks": [
+                            {
+                                "id": <existing_subtask_id>,
+                                "due_date": "YYYY-MM-DD"
+                            }
+                        ]
+                    }
 
-VALIDATION RULES:
-1. ALL due_dates MUST be <= ${mainDueDate || 'parent due date'}
-2. ALL due_dates MUST be >= current date
-3. MUST maintain existing subtask IDs
-4. MUST use YYYY-MM-DD format
-5. NO additional text or explanations
-6. Dates MUST create high pressure timeline
+                    VALIDATION RULES:
+                    1. ALL due_dates MUST be <= ${mainDueDate || 'parent due date'}
+                    2. ALL due_dates MUST be >= current date
+                    3. MUST maintain existing subtask IDs
+                    4. MUST use YYYY-MM-DD format
+                    5. NO additional text or explanations
+                    6. Dates MUST create high pressure timeline
 
-ERROR: If parent due date exists and any subtask date would be after it, FAIL.
-`;
+                    ERROR: If parent due date exists and any subtask date would be after it, FAIL.
+                    `;
 
                     showLoading();
                     fetch('?api=send_message', {

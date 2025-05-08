@@ -2,7 +2,7 @@
 let isFetchingNotifications = false;
 let isDropdownOpen = false;
 
-function fetchNotificationsAndOpen(showDropdown = true) {
+function fetchNotificationsAndOpen(showDropdown = true, notify = true) {
   if (isFetchingNotifications) return;
   isFetchingNotifications = true;
   isDropdownOpen = true;
@@ -18,7 +18,7 @@ function fetchNotificationsAndOpen(showDropdown = true) {
     return;
   }
 
-  fetchNotifications(currentProject)
+  fetchNotifications(currentProject,null,null,notify)
     .then(() => {
       if (showDropdown && !isDropdownOpen) {
         dropdown.show(); //toggle dropdown
@@ -75,7 +75,7 @@ function animateBellIcon(duration = 10000) { // 10 seconds default
   }, duration);
 }
 
-function fetchNotifications(project_id, startDate = null, endDate = null) {
+function fetchNotifications(project_id, startDate = null, endDate = null, notify = true) {
   return new Promise((resolve, reject) => {
     let url = "?api=get_unreadnotifications&project_id=" + project_id;
     if (startDate && endDate) {
@@ -88,7 +88,10 @@ function fetchNotifications(project_id, startDate = null, endDate = null) {
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
-          animateBellIcon();
+          if(notify){
+            playNotificationSound();
+            animateBellIcon();
+          }
           updateNotificationDropdown(data.logs || []);
           if(isProfilePage()){
             updateActivityBoard(data.logs || []);
@@ -515,8 +518,8 @@ function updateNotificationDropdown(notifications) {
                 color: #a0a0a0 !important;
             }
             #notificationDropdownMenu.dropdown-menu {
-                background: rgba(255, 255, 255, 0.8);
-                backdrop-filter: blur(3.1px);
+                background: rgba(255, 255, 255, 0.8)!important;
+                backdrop-filter: blur(20.1px)!important;
                 border-radius: 12px;
                 width: 310px; 
                 overflow-x: hidden;    
@@ -545,7 +548,7 @@ function updateNotificationDropdown(notifications) {
         const iconClass = getNotificationIconClass(notification.action_type);
 
         return `
-                <div class="dropdown-item border-bottom pt-2">
+                <div class="dropdown-item border-bottom pt-2 pb-2">
                     <div class="d-flex align-items-start">
                         <div class="notification-icon ${iconClass} ${
           isDarkMode ? actionType.darkBgColor : actionType.bgColor
@@ -614,7 +617,7 @@ function appendNotification(notification) {
   const iconClass = getNotificationIconClass(notification.action_type);
 
   const newNotification = `
-  <div class="dropdown-item border-bottom pt-2">
+  <div class="dropdown-item border-bottom pt-2 pb-2">
       <div class="d-flex align-items-start">
           <div class="notification-icon ${iconClass} ${
             isDarkMode ? actionType.darkBgColor : actionType.bgColor
@@ -1021,3 +1024,19 @@ document.addEventListener("DOMContentLoaded", function () {
   //   }
   // }, 3000); // 3 second delay
 });
+
+// Add this function after the showNotification function
+function playNotificationSound(notificationStatus=true) {
+  if(notificationStatus){
+    const audio = new Audio('https://res.cloudinary.com/da6qujoed/video/upload/v1746715207/sound_reminder_lobghc.mp3'); // Replace with your sound URL
+    audio.play().catch(error => {
+      console.error('Error playing notification sound:', error);
+    });
+  }
+}
+function playMessageSound() {
+  const audio = new Audio('https://res.cloudinary.com/da6qujoed/video/upload/v1746715618/messagesound_sx3qye.mp3'); // Replace with your sound URL
+  audio.play().catch(error => {
+    console.error('Error playing notification sound:', error);
+  });
+}
