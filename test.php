@@ -7,7 +7,16 @@ ini_set('display_errors', 1);
 // require './config/constants.php';
 // require './classes/Database.php';
 require 'functions.php';
-        if (sendTemplateEmail('taimoorhamza1999@gmail.com', 'Hello from BossGPT','welcome',null)) {
+$emailData = [
+    'email' => 'taimoorhamza1999@gmail.com',
+    'subject' => 'Hello from BossGPT',
+    'template' => 'welcome',
+    'data' => null
+];
+$emailDataJson = escapeshellarg(json_encode($emailData)); // Convert array to JSON and escape it
+$command = "php sendEmail.php $emailDataJson > /dev/null 2>&1 &";
+exec($command,$output,$return_var);
+        if ($return_var == 0) {
             echo "Sent!";
         } else {
             echo "Failed :(";
