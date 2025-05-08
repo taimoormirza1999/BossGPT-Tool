@@ -6,8 +6,7 @@ if (session_id() === '') {
   }
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/constant.php';
-// Load environment variables
-loadEnv(__DIR__ . '/../.env');
+
 
 $client = new Google_Client();
 $client->setClientId($_ENV['GOOGLE_CLIENT_ID']);
