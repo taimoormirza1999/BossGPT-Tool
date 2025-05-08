@@ -17,7 +17,7 @@ function sendTemplateEmail($to, $subject, $template, $data)
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
         // Email Headers
-        $mail->setFrom('contact@bossgpt.com', 'BossGPT AI Manager');
+        $mail->setFrom('contact@bossgpt.com', 'BossGPT.com');
         $mail->addAddress($to);
         $mail->isHTML(true);
         $mail->Subject = $subject;
