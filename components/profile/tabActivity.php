@@ -35,7 +35,7 @@
                                                     </div>
                                                 </div>
 
-                                                <div id="activityLogList" class="list-group w-1/2 mx-auto"
+                                                <div id="activityLogList" class="hide-scrollbar list-group w-1/2 mx-auto"
                                                     style="max-height: 95%; overflow-y: auto; width: 55%;">
                                                     <!-- Repeat for more activities dynamically -->
                                                 </div>

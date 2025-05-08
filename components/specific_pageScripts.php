@@ -802,7 +802,7 @@ $button1.text(selectedProjectTitle);
                                                                    ${subtask.status === 'done' ? 'checked' : ''}>
                                                         </div>
                                                         <div class="flex-grow-1">
-                                                            <div class="subtask-title ${subtask.status === 'done' ? 'text-decoration-line-through' : ''}">${escapeHtml(subtask.title)}</div>
+                                                            <div class="subtask-title text-capitalize ${subtask.status === 'done' ? 'text-decoration-line-through' : ''}">${escapeHtml(subtask.title)}</div>
                                                             ${subtask.due_date ? `
                                                                 <small class="text-muted due-date ${isOverdue ? 'overdue' : ''}">
                                                                   ${SVGCalendar()}
@@ -912,19 +912,19 @@ $button1.text(selectedProjectTitle);
                             </button>
                         </div>
                         ${taskPictureHtml}
-                        ${task.description ? `<div class="task-description">${escapeHtml(task.description)}</div>` : ''}
+                        ${task.description ? `<div class="task-description text-capitalize">${escapeHtml(task.description)}</div>` : ''}
                         <div class="task-meta">
                             ${dueDateHtml}
                             ${plantBallHtml}
                             ${task.assigned_users ? `
                                 <div class="task-assignees d-flex gap-1 border-0 m-0 p-0">
                                     ${Object.entries(task.assigned_users).map(([id, username]) => {
-                        // First user gets rgba(61, 127, 41, 1), others get varied hues
-                        const hues = [61, 200, 0, 280, 30, 320, 170, 60, 340, 250]; // Green, blue, red, purple, orange, etc.
-                        const index = parseInt(id) % hues.length;
-                        const hue = hues[index];
-                        const bgColor = `hsl(${hue}, 50%, 40%)`; // Consistent saturation and lightness
-                        return `
+                                     // First user gets rgba(61, 127, 41, 1), others get varied hues
+                            const hues = [61, 200, 0, 280, 30, 320, 170, 60, 340, 250]; // Green, blue, red, purple, orange, etc.
+                            const index = parseInt(id) % hues.length;
+                            const hue = hues[index];
+                            const bgColor = `hsl(${hue}, 50%, 40%)`; // Consistent saturation and lightness
+                            return `
                                         <span class="task-assignee text-capitalize" style="background-color: ${bgColor}; color: white;">
                                             ${escapeHtml(username[0]?.charAt(0).toUpperCase() + username[1]?.charAt(0).toUpperCase())}
                                         </span>

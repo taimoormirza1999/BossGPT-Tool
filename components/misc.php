@@ -293,12 +293,20 @@ function SVGAdd(){
       const parts = username.trim().split(' ');
       let initials = '';
 
-      if (parts.length === 1) {
-        initials = parts[0].substring(0, 2).toUpperCase(); // 2 letters
+      const avatar = "<?php echo $_SESSION['avatar_image'] ?? ''; ?>";
+      const fullName = "<?php echo $_SESSION['full_name'] ?? 'User'; ?>"; // You can change 'full_name' based on your session variable
+
+
+      if (avatar && avatar !== '0') {
+        initials = `<img src="${avatar}" alt="Avatar" class="rounded-circle" style="width: 3rem; height: 3rem; object-fit: cover;">`;
       } else {
-        const firstInitial = parts[0][0] ? parts[0][0].toUpperCase() : '';
-        const secondInitial = parts[1][0] ? parts[1][0].toUpperCase() : '';
-        initials = firstInitial + '.' + secondInitial;
+        if (parts.length === 1) {
+          initials = parts[0].substring(0, 2).toUpperCase(); // e.g. "Al"
+        } else {
+          const firstInitial = parts[0][0] ? parts[0][0].toUpperCase() : '';
+          const secondInitial = parts[1][0] ? parts[1][0].toUpperCase() : '';
+          initials = `${firstInitial}.${secondInitial}`; // e.g. "A.B"
+        }
       }
 
       const createdAt = formatDateTime(log.created_at);
@@ -309,16 +317,16 @@ function SVGAdd(){
       <div class="list-group-item border-0 list-group-item-action bg-transparent text-white d-flex align-items-start border-light border rounded mb-2">
         <div class="me-3">
           <div class="rounded-circle text-white d-flex align-items-center justify-content-center"
-               style="width: 3.1rem; height: 3.1rem; background: rgba(42, 95, 255, 1);">
+               style="width: 3rem; height: 3rem; background: rgba(42, 95, 255, 1);">
             ${initials}
           </div>
         </div>
         <div class="flex-grow-1">
-          <div>
-            <strong>${username}</strong> moved <span class="text-decoration-underline">${description}</span> as <strong>${actionType}</strong>.
+          <div class="text-capitalize text-xs">
+            <strong>@${username}</strong> moved <span class="">${description}</span> as <strong>${actionType}</strong>.
           </div>
-          <small class="text-muted d-flex align-items-center mt-1">
-            <i class="bi bi-clock me-1"></i> ${createdAt}
+          <small class="d-flex align-items-center mt-1 text-purple text-sm">
+            <?php echo getTimerIcon(); ?> &nbsp; ${createdAt}
           </small>
         </div>
       </div>

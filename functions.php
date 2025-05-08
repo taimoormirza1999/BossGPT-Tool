@@ -194,6 +194,10 @@ function getLogoImage($bottomMargin = "0", $topMargin = "-1rem", $width = "15rem
     {
         return file_get_contents('assets/icons/clock.svg');
     }
+    function getTimerIcon()
+    {
+        return file_get_contents('assets/icons/timer.svg');
+    }
     function getAddUserIcon()
     {
         return file_get_contents('assets/icons/user-add.svg');

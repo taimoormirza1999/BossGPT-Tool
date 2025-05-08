@@ -24,8 +24,9 @@ function include_profile($images)
         .flatpickr-calendar.rangeMode.animate.arrowTop.arrowLeft.rightMost.open:before, .flatpickr-calendar.rangeMode.animate.arrowTop.arrowLeft.rightMost.open:after{
             display: none !important;
         }
-    </style>
-    <style>
+        button#dateRangeButtonCardTab{
+            background: transparent!important;
+        }
         .tabs-pannel .nav-tabs .nav-link.active {
             color: #fff !important;
         }

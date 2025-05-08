@@ -205,7 +205,9 @@ $geist-fonts: (
 .overflex-x-scroll {
   overflow-x: scroll;
 }
-
+.text-purple{
+  color: #82A1FF !important;
+}
 @mixin hover-up($translateValue: -5px, $duration: 0.3s) {
   transition: all $duration ease-in-out;
   &:hover {
@@ -736,6 +738,10 @@ body {
     select.flatpickr-monthDropdown-months {
       color: $white-color !important;
     }
+    .flatpickr-day.inRange {
+      background: #e6e6e6 !important;
+      color: #000 !important;
+    }
     .flatpickr-months {
       padding: 0.4rem 0;
       border-radius: 12px !important;
@@ -935,8 +941,8 @@ body {
     }
   }
   .navbar {
-    background: rgba(20, 20, 35, 0.3) !important;
-    backdrop-filter: blur(16px) !important;
+    background: rgba(20, 20, 35, 0.1) !important;
+    backdrop-filter: blur(36px) !important;
     // box-shadow: 0 4px 30px $black-color-10 !important;
     border-bottom: 0;
     @media (max-width: 768px) {
