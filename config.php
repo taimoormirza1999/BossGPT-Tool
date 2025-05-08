@@ -1,6 +1,5 @@
 <?php
-require_once 'env.php';
-loadEnv();
+require_once 'config/constants.php';
 
 require_once 'vendor/autoload.php';
 

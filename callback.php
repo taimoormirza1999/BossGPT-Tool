@@ -5,8 +5,7 @@ if (session_id() === '') {
   }
 // Include required files
 require_once 'config.php';
-require_once 'env.php';
-loadEnv();
+require_once 'config/constants.php';
 // Make sure Database class is available (index.php contains the Database class)
 if (!class_exists('Database')) {
     require_once __DIR__ . '/index.php';

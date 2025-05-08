@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/../functions.php';
-require_once __DIR__ . '/../env.php';
-loadEnv();
+require_once __DIR__ . '/../config/constants.php';
 // Make sure the Database class is available
 if (!class_exists('Database')) {
     require_once __DIR__ . '/../index.php';
