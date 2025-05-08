@@ -57,7 +57,9 @@ function include_profile($images)
             object-fit: cover;
             object-position: center;
         }
-
+        button#dateRangeButtonCardTab{
+            background: transparent!important;
+        }
 
 
         div#profile {
