@@ -25,7 +25,7 @@ $data = [
     'grant_type' => 'authorization_code',
     'code' => $code,
     'redirect_uri' => $_ENV['DISCORD_REDIRECT_URI'],
-  'scope' => 'identify bot'
+    'scope' => 'identify bot'
 ];
 
 $options = [
@@ -81,7 +81,13 @@ try {
     $stmt->execute([$discord_id, $_SESSION['user_id']]);
     $_SESSION['discord_token'] = $discord_id;
     echo "✅ Your Discord is now connected successfully!";
-    header("Location: " . 'https://discord.gg/zCjmGfF7');
+    // header("Location: " . 'https://discord.gg/zCjmGfF7');
+    header("Location: "
+    . "https://discord.com/oauth2/authorize"
+    . "?client_id=" . urlencode($_ENV['DISCORD_CLIENT_ID'])
+    . "&scope=bot"
+    . "&permissions=3072"
+);
 } catch (PDOException $e) {
     header("Location: " . $_ENV['BASE_URL'] . "/");
     exit("❌ DB Error: " . $e->getMessage());
