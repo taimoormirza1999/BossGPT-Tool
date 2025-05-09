@@ -148,6 +148,7 @@ $geist-fonts: (
 $text-sizes: (
   xs: 0.75rem,  // text-xs
   sm: 0.875rem, // text-sm
+  sm-1: 0.92rem, // text-sm
   base: 1rem,   // text-base (you can skip if you like)
   lg: 1.125rem, // text-lg
   xl: 1.25rem   // text-xl
@@ -444,10 +445,12 @@ $text-sizes: (
           .suggestion-item {
             background-color: $card-body-ai-message-bgcolor !important;
           }
+          @extend .text-sm-1;
         }
       }
       .message.user {
         @include theme-bgcolor($card-body-message-user-bgcolor);
+        @extend .text-sm-1;
       }
     }
   }

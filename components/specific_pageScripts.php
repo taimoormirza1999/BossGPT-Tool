@@ -2691,14 +2691,14 @@ function popupBottomPosition(){
                 const discordpopup=document.querySelector('.popup-alert.discord_popup');
                 if(!fcmpopup){
                 
-                telegrampopup.style.setProperty('bottom', '20px', 'important');
-                discordpopup.style.setProperty('bottom', '20px', 'important');
+                telegrampopup?.style.setProperty('bottom', '20px', 'important');
+                discordpopup?.style.setProperty('bottom', '20px', 'important');
                 }
                 if(!telegrampopup && !fcmpopup){
-                    discordpopup.style.setProperty('bottom', '20px', 'important');
+                    discordpopup?.style.setProperty('bottom', '20px', 'important');
                 }
                 if(!discordpopup && !fcmpopup){
-                    telegrampopup.style.setProperty('bottom', '20px', 'important');
+                    telegrampopup?.style.setProperty('bottom', '20px', 'important');
                 }
             }
         function updatePopupVisibility() {
