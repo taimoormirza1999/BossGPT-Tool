@@ -2694,10 +2694,10 @@ function popupBottomPosition(){
                 telegrampopup.style.setProperty('bottom', '20px', 'important');
                 discordpopup.style.setProperty('bottom', '20px', 'important');
                 }
-                if(!telegrampopup){
+                if(!telegrampopup && !fcmpopup){
                     discordpopup.style.setProperty('bottom', '20px', 'important');
                 }
-                if(!discordpopup){
+                if(!discordpopup && !fcmpopup){
                     telegrampopup.style.setProperty('bottom', '20px', 'important');
                 }
             }
