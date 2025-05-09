@@ -99,7 +99,6 @@ function sendTelegramMessage($chat_id, $text, array $buttons = null) {
             'inline_keyboard' => $buttons
         ]);
     }
-
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_POST,           true);
     curl_setopt($ch, CURLOPT_POSTFIELDS,     $payload);

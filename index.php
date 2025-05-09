@@ -428,7 +428,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                 <div class="d-flex align-items-end">
                                     <button type="button" class="btn btn-sm btn-main-primary me-2" data-bs-toggle="modal"
                                         data-bs-target="#newTaskModal">
-                                        <?php echo getAddSquareIcon(); ?>New&nbsp;Task
+                                        <?php echo getAddSquareIcon(); ?>Create&nbsp;Task
                                     </button>
                                    
                                 </div>
@@ -497,7 +497,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
             <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <!-- Pusher -->
-            <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+            <!-- <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script> -->
                     <!-- for logoIcon -->
             <script>
                 const iconImage = `<?php echo getIconImage(0, 0, "1.5rem"); ?>`

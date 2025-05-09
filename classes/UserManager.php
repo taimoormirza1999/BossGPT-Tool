@@ -14,11 +14,11 @@ class UserManager
         $stmt->execute([$id]); // Execute the query with the provided ID
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-    public function createOrAssignUser($email, $projectId = null, $role = null, $BASE_URL, $invited_by = null)
+    public function createOrAssignUser($email, $projectId = null, $role = null, $BASE_URL, $invited_by = null, $projectname = null)
     {
+        $projectname = $projectname ?? "BossGPT";
         try {
             $this->db->beginTransaction();
-
             // Check if user exists by email
             $stmt = $this->db->prepare("SELECT id, username, invited_by FROM users WHERE email = ?");
             $stmt->execute([$email]);
@@ -34,7 +34,6 @@ class UserManager
                 if ($projectId && $role) {
                     $stmt = $this->db->prepare("SELECT 1 FROM project_users WHERE project_id = ? AND user_id = ?");
                     $stmt->execute([$projectId, $userId]);
-
                     if (!$stmt->fetch()) {
                         // User not yet assigned to this project
                         $stmt = $this->db->prepare(
@@ -61,10 +60,10 @@ class UserManager
                     // If invited_by is null (user hasn't been invited yet), set invited_by
                     $stmt = $this->db->prepare("UPDATE users SET invited_by = ? WHERE id = ?");
                     $stmt->execute([$_SESSION['user_id'], $userId]);  // Set the inviter to the logged-in user
-                }
-
+                    }
                 $this->db->commit();
-
+                  // Send invite email with credentials
+                  $this->sendExistingUserProjectInvite($email, $existingUsername, $BASE_URL, $projectname, $projectId);
                 return [
                     'success' => true,
                     'user_id' => $userId,
@@ -74,7 +73,6 @@ class UserManager
             } else {
                 // Create new user
                 $tempPassword = $this->generateTempPassword();
-                
                 // Generate username from email
                 $username = explode('@', $email)[0];
                 $baseUsername = $username;
@@ -94,7 +92,6 @@ class UserManager
                 $hashedPassword = password_hash($tempPassword, PASSWORD_DEFAULT);
                 $stmt->execute([$username, $email, $hashedPassword, $_SESSION['user_id']]);
                 $userId = $this->db->lastInsertId();
-
                 // If projectId and role are provided, add user to project
                 if ($projectId && $role) {
                     $stmt = $this->db->prepare(
@@ -115,7 +112,7 @@ class UserManager
                     ]);
                 }
                 $this->db->commit();
-                // Send welcome email with credentials
+                // Send invite email with credentials
                 $this->sendInviteUserEmail($email, $username, $tempPassword, $BASE_URL, "testingtoken");
                 
                 return [
@@ -204,12 +201,39 @@ class UserManager
         ];
 
         // $emailDataJson = escapeshellarg(json_encode($emailData)); // Convert array to JSON and escape it
-        $emailDataJson = escapeshellarg(json_encode($emailData));
-        $command = "php sendEmail.php $emailDataJson > /dev/null 2>&1 &";
-        exec($command);
+        // $emailDataJson = escapeshellarg(json_encode($emailData));
+        // $command = "php sendEmail.php $emailDataJson > /dev/null 2>&1 &";
+        // exec($command);
 
         // return "Welcome email is being processed asynchronously.";
-        //    return  sendTemplateEmail($emailData['email'], $emailData['subject'], $emailData['template'], $emailData['data']);
+           return  sendTemplateEmail($emailData['email'], $emailData['subject'], $emailData['template'], $emailData['data']);
+
+    }
+    public function sendExistingUserProjectInvite($email, $username, $BASE_URL, $projectname, $projectId)
+    {
+        $subject = "Project Invite to join";
+        $template = 'invite_user';
+        // Prepare data for email template
+        $emailData = [
+            'email' => $email,
+            'subject' => $subject,
+            'template' => $template,
+            'data' => [
+                'username' => $username,
+                'projectname' => $projectname,
+                'projectId' => $projectId,
+                'BASE_URL' => $BASE_URL
+            ]
+        ];
+        // $emailDataJson = escapeshellarg(json_encode($emailData)); // Convert array to JSON and escape it
+        // $emailDataJson = escapeshellarg(json_encode($emailData));
+        // $command = "php sendEmail.php $emailDataJson > /dev/null 2>&1 &";
+        // exec($command);
+        // return "Welcome email is being processed asynchronously.";
+            if($_ENV['EMAILMODE']=='testing'){
+                sendTemplateEmail($emailData['email'], $emailData['subject'], $emailData['template'], $emailData['data']);
+            }
+           return "Email sent";
 
     }
     public function projectUsersNewUserAddedEmail($newUserUsername, $projectTilte, $newRole, $projectAllUsers)
@@ -232,10 +256,13 @@ class UserManager
                     'time' => date('H:i:s')
                 ]
             ];
+            if($_ENV['EMAILMODE']=='testing'){
+                sendTemplateEmail($user['email'], $subject, $template, $emailData);
+            }
             // sendTemplateEmail($user['email'], $subject, $template, $emailData);
-            $emailDataJson = escapeshellarg(json_encode($emailData));
-            $command = "php sendEmail.php $emailDataJson > /dev/null 2>&1 &";
-            exec($command);
+            // $emailDataJson = escapeshellarg(json_encode($emailData));
+            // $command = "php sendEmail.php $emailDataJson > /dev/null 2>&1 &";
+            // exec($command);
         }
         return $emailData;
         // return $newUser . " has been added to the project: " . $projectTilte . " at new Role: " . $newRole . " project All Users: " . implode(", ", $allUsers);

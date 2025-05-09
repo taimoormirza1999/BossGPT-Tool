@@ -145,6 +145,28 @@ $geist-fonts: (
   font-style: normal;
 }
 
+$text-sizes: (
+  xs: 0.75rem,  // text-xs
+  sm: 0.875rem, // text-sm
+  base: 1rem,   // text-base (you can skip if you like)
+  lg: 1.125rem, // text-lg
+  xl: 1.25rem   // text-xl
+);
+
+@each $name, $size in $text-sizes {
+  .text-#{$name} {
+    font-size: $size !important;
+    // optionally match Tailwind’s line-height
+    @if $name == xs {
+      line-height: 1rem !important; 
+    } @else if $name == sm {
+      line-height: 1.25rem !important;
+    } @else if $name == base {
+      line-height: 1.5rem !important;
+    }
+  }
+}
+
 // Utility Classes
 .font-primary {
   font-family: "Geist", sans-serif !important;

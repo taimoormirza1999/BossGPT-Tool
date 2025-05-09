@@ -355,45 +355,50 @@ if (isset($_GET['api'])) {
                         $data['email'],
                         $data['project_id'] ?? null,
                         $data['role'] ?? null,
-                        $_ENV['BASE_URL']
+                        $_ENV['BASE_URL'],
+                        $_SESSION['user_id'] ?? null,
+                        $projectTilte
                     );
-
                     // Set timezone to match your server/application timezone
                     // date_default_timezone_set('Asia/Manila'); // Adjust this to your timezone
 
                     // Send Notification
-                    $result = Notification::send('project_' . $data['project_id'], 'user_assigned', [
-                        'message' => 'New User joined as the ' . $data['role'] . ' in the project',
-                        'action_type' => 'user_assigned',
-                        'description' => 'New User joined as the ' . $data['role'] . ' in the project',
-                        'created_at' => date('Y-m-d H:i:s')
-                    ]);
+                    // $result = Notification::send('project_' . $data['project_id'], 'user_assigned', [
+                    //     'message' => 'New User joined as the ' . $data['role'] . ' in the project',
+                    //     'action_type' => 'user_assigned',
+                    //     'description' => 'New User joined as the ' . $data['role'] . ' in the project',
+                    //     'created_at' => date('Y-m-d H:i:s')
+                    // ]);
                     // Sending Email & Notification
-                    try {
-                        $emailSent = $userManager->projectUsersNewUserAddedEmail($data['username'], $projectTilte, $data['role'], $projectAllUsers, );
-                        if ($emailSent) {
-                            echo json_encode($response = [
-                                'success' => $emailSent,
-                                'message' => "An invite has been sent along with login credentials."
-                            ]);
-                            exit;
-                        } else {
-                            $response = [
-                                'success' => false,
-                                'message' => "Failed to send the invite."
-                            ];
-                        }
-                    } catch (Exception $e) {
-                        $response = [
-                            'success' => false,
-                            'message' => "Error: " . $e->getMessage()
-                        ];
-                    }
+
+                    // $emailSent = false;
+                    // Email to all user for new user joined vary important
+                    // try {
+                    //     $emailSent = $userManager->projectUsersNewUserAddedEmail($data['username'], $projectTilte, $data['role'], $projectAllUsers, );
+                    //     if ($emailSent) {
+                    //         echo json_encode($response = [
+                    //             'success' => $emailSent,
+                    //             'message' => "An invite has been sent along with login credentials."
+                    //         ]);
+                    //         exit;
+                    //     } else {
+                    //         $response = [
+                    //             'success' => false,
+                    //             'message' => "Failed to send the invite."
+                    //         ];
+                    //     }
+                    // } catch (Exception $e) {
+                    //     $response = [
+                    //         'success' => false,
+                    //         'message' => "Error: " . $e->getMessage()
+                    //     ];
+                    // }
 
 
                     echo json_encode([
                         'success' => true,
-                        'message' => 'User created successfully',
+                        'message' => 'User created successfully.',
+                        'response' => $response,
                         'data' => $result
                     ]);
 

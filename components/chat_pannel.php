@@ -214,20 +214,20 @@
                     function renderPromptButtons($prompts)
                     {
                         foreach ($prompts as $prompt) {
-                            echo '<button style="border-radius: 20px!important;" class="btn btn-outline-light  prompt-btn" type="button" onclick="handlePromptClick(this)">' . $prompt . '</button>';
+                            echo '<button style="border-radius: 20px!important;" class=" text-capitalize text-sm btn btn-outline-light  prompt-btn" type="button" onclick="handlePromptClick(this)">' . $prompt . '</button>';
                         }}
                     ?>
                     <!-- Prompt suggestions -->
                     <div class="prompt-suggestions">
                         <div class="nav nav-tabs border-0 flex-nowrap overflow-auto mb-0 px-0"
                             style="scrollbar-width: none; -ms-overflow-style: none;">
-                            <i class="bi bi-stars text-white"></i>  <?php renderPromptButtons($prompts); ?>
+                            <span class=" bg-transparent " style="padding-left: 1rem;" ><?php echo getAIIcon(); ?></span>  <?php renderPromptButtons($prompts); ?>
                         </div>
                     </div>
 
 
                     <form id="chatForm" class="d-flex">
-                        <textarea class="form-control me-2" id="messageInput" placeholder="Type your message..."
+                        <textarea class="form-control me-2 text-sm" id="messageInput" placeholder="Type your message..."
                             rows="1"></textarea>
                         <button type="submit" id="aiSendMessageBtn"
                             class="btn btn-send-primary"><?php echo file_get_contents("assets/icons/send.svg"); ?>

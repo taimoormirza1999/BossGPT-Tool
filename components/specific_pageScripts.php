@@ -305,7 +305,7 @@
                                     <?php if(isPage('profile')){ ?>
                                     // projectDropdown1.appendChild(li);
                                     const liClone = li.cloneNode(true);
-                     projectDropdown1.appendChild(liClone);
+                                    projectDropdown1.appendChild(liClone);
                                     <?php } ?>
                                 });
                             }
@@ -364,8 +364,18 @@
                     }
                 });
                 <?php } ?>
+                let hasSwitched = false;
                 // Select project
                 function selectProject(projectId, selectedProjectTitle = "") {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const switchProjectId = urlParams.get('switchproject')?urlParams.get('switchproject'):'';
+                    const switchProjectTitle = urlParams.get('title')?urlParams.get('title'):'';
+                    if (switchProjectId && switchProjectTitle && !hasSwitched ) {
+                        projectId = switchProjectId;
+                        selectedProjectTitle = switchProjectTitle;
+                        hasSwitched = true;
+                    }
+
                     const $button = $('#projectDropdownButton');
                     <?php if (isPage('profile')){ ?>
                     const $button1 = $('#projectDropdownButton1');
@@ -447,7 +457,7 @@
                     <?php if (!isPage('profile')) { ?>
                         loadTasks(projectId);
                         loadChatHistory(projectId);
-                        initPusher(projectId);
+                        // initPusher(projectId);
                     <?php } else { ?>
                         const today = new Date();
                         const startDate = formatDateForBackend(
@@ -460,6 +470,7 @@
                     <?php } ?>
                 }
 
+               
                 // Load chat history
                 function loadChatHistory(projectId, currentOffset = 0, reset = true) {
                     // if (loading) return;
@@ -691,7 +702,7 @@
                 }
 
                 // Load tasks
-                    function loadTasks(projectId, startDate=null, endDate=null, notify=false) {
+                function loadTasks(projectId, startDate=null, endDate=null, notify=false) {
                         // alert('loadTasks');
                         // showLoading();
                          // Add startDate and endDate to the data if provided
@@ -1424,11 +1435,7 @@
                                 .catch(error => console.error("Error deleting user:", error));
                         }
                     }
-
-
                 });
-
-            
                 $('#addUserBtn').click(function () {
                     $('#addUserModal').modal('show');
                 });
@@ -1564,6 +1571,7 @@
             }
                 // Initial load
                 loadProjects();
+                
                 // Auto-load the saved project if available
                 if (isDashboard) {
                     <?php
@@ -2674,10 +2682,25 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Initial setup of popup visibility
             updatePopupVisibility();
         });
-
+       
+function popupBottomPosition(){
+    const fcmpopup=document.querySelector('.popup-alert.fcm_popup');
+                const telegrampopup=document.querySelector('.popup-alert.telegram_popup');
+                const discordpopup=document.querySelector('.popup-alert.discord_popup');
+                if(!fcmpopup){
+                
+                telegrampopup.style.setProperty('bottom', '20px', 'important');
+                discordpopup.style.setProperty('bottom', '20px', 'important');
+                }
+                if(!telegrampopup){
+                    discordpopup.style.setProperty('bottom', '20px', 'important');
+                }
+                if(!discordpopup){
+                    telegrampopup.style.setProperty('bottom', '20px', 'important');
+                }
+            }
         function updatePopupVisibility() {
             const popups = document.querySelectorAll(".popup-alert");
 
@@ -2689,6 +2712,7 @@
                     popup.classList.add("hidden");
                 }
             });
+            popupBottomPosition();
         }
 
         function closePopup(button, type) {
@@ -2771,22 +2795,27 @@ if(isLoginUserPage()){
                     'Link your Telegram to stay updated!',
                     'reminderButton',
                     '<h6 class="font-secondaryBold button-text" id="enableNowBtn" onclick="openLink(\'https://t.me/BossGPTAssistantBot?start=connect_' . $_SESSION['user_id'] . '\')">Enable Now</h6>',
-                    'special-popup-container',
+                    'special-popup-container telegram_popup',
                     'https://res.cloudinary.com/da6qujoed/image/upload/v1745509466/sendicon_zvrv33.png',
                     'telegram'
                 );
             }}
             if (isset($_SESSION['discord_token']) && isset($_SESSION['discord_token_permission_disabled']) && $_SESSION['discord_token_permission_disabled'] == '0') {
-                echo getPopupAlert('Link Discord', 'Link your Discord to stay updated!', 'reminderButton', '<h6 class="font-secondaryBold button-text" id="enableNowBtn" onclick="openLink(\'' . $_ENV['DISCORD_BOT_INVITE_URL'] . '\')">Enable Now</h6>', 'special-popup-container', 
+                echo getPopupAlert('Link Discord', 'Link your Discord to stay updated!', 'reminderButton', '<h6 class="font-secondaryBold button-text" id="enableNowBtn" onclick="openLink(\'' . $_ENV['DISCORD_BOT_INVITE_URL'] . '\')">Enable Now</h6>', 'special-popup-container discord_popup', 
                 'https://res.cloudinary.com/da6qujoed/image/upload/v1745510472/discord_zowxul.png', 'discord');
             }
             if (isset($_SESSION['fcm_token_permission_disabled']) && $_SESSION['fcm_token_permission_disabled'] == '0') {
                 if(isset($_SESSION['user_id'])){
                     
                 echo getPopupAlert('Enable Notifications', 'Stay updated! Enable browser notifications to get the 
-                latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold button-text" id="enableNowBtn" onclick="openModal(\'notificationPermissionModal\')">Enable Now</h6>','showFcmPopup', 'https://res.cloudinary.com/da6qujoed/image/upload/v1743687520/belliconImage_vnxkhi.png', 'fcm_permission_reminder');
+                latest alerts instantly.', 'reminderButton', '<h6 class="font-secondaryBold button-text" id="enableNowBtn" onclick="openModal(\'notificationPermissionModal\')">Enable Now</h6>','showFcmPopup fcm_popup', 'https://res.cloudinary.com/da6qujoed/image/upload/v1743687520/belliconImage_vnxkhi.png', 'fcm_permission_reminder');
             }   
             }
 
         }
             ?>
+
+            <script>
+                
+
+            </script>

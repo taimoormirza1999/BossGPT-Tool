@@ -657,33 +657,33 @@ function appendNotification(notification) {
   }
 }
 
-function initPusher(currentProject) {
-  // Disable pusher logging
-  Pusher.logToConsole = false;
+// function initPusher(currentProject) {
+//   // Disable pusher logging
+//   Pusher.logToConsole = false;
 
-  var pusher = new Pusher("83a162dc942242f89892", {
-    cluster: "ap2",
-  });
+//   var pusher = new Pusher("83a162dc942242f89892", {
+//     cluster: "ap2",
+//   });
 
-  var channel = pusher.subscribe("project_" + currentProject);
+//   var channel = pusher.subscribe("project_" + currentProject);
 
-  channel.bind("project_created", function (data) {
-    appendNotification(data);
-    Toast("success", "Project Created", data.message, "topRight");
-  });
-  channel.bind("user_assigned", function (data) {
-    appendNotification(data);
-    Toast("success", "User Joined", data.message, "topRight");
-  });
-  channel.bind("task_created", function (data) {
-    appendNotification(data);
-    Toast("success", "Task Created", data.message, "topRight");
-  });
-  channel.bind("task_updated", function (data) {
-    appendNotification(data);
-    Toast("success", "Success", data.message, "topRight");
-  });
-}
+//   channel.bind("project_created", function (data) {
+//     appendNotification(data);
+//     Toast("success", "Project Created", data.message, "topRight");
+//   });
+//   channel.bind("user_assigned", function (data) {
+//     appendNotification(data);
+//     Toast("success", "User Joined", data.message, "topRight");
+//   });
+//   channel.bind("task_created", function (data) {
+//     appendNotification(data);
+//     Toast("success", "Task Created", data.message, "topRight");
+//   });
+//   channel.bind("task_updated", function (data) {
+//     appendNotification(data);
+//     Toast("success", "Success", data.message, "topRight");
+//   });
+// }
 
 // Handle prompt button clicks
 document.addEventListener("DOMContentLoaded", function () {

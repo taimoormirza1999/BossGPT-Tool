@@ -139,6 +139,10 @@ function getLogoImage($bottomMargin = "0", $topMargin = "-1rem", $width = "15rem
     {
         return file_get_contents('assets/icons/googleIcon.svg');
     }
+    function getAIIcon()
+    {
+        return file_get_contents('assets/icons/magicpen.svg');
+    }
     function getMenuIcon()
     {
         return file_get_contents('assets/icons/category.svg');
