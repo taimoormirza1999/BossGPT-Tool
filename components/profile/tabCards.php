@@ -32,15 +32,15 @@
     <table class="table text-white table-hover align-middle">
         <thead>
             <thead>
-                <tr>
-                    <th style="width: 20%;">Title</th>
-                    <th style="width: 25%;">Assign to</th>
-                    <th style="width: 15%;">Due Date</th>
-                    <th style="width: 40%;">Description</th>
+                <tr class="text-sm">
+                    <th class="text-lg" style="width: 20%;">Title</th>
+                    <th class="text-lg" style="width: 25%;">Assign to</th>
+                    <th class="text-lg" style="width: 15%;">Due Date</th>
+                    <th class="text-lg" style="width: 40%;">Description</th>
                 </tr>
             </thead>
         </thead>
-        <tbody id="tasksTableBody">
+        <tbody id="tasksTableBody" class="text-sm">
             <!-- Tasks will be inserted dynamically here -->
         </tbody>
     </table>

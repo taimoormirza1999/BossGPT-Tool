@@ -16,15 +16,12 @@
             </div>
         </div>
     </div>
-        <div class="card-header" style="
-                                            display: flex;
-                                            flex-direction: column;
-                                            justify-content: center;
-                                            /* align-items: center; */
-                                            padding: 12px 13px;
-                                            gap: 10px;
-                                            border-bottom: 0.5px solid;
-                                                        ">
+        <div class="card-header" style="display: flex;
+                                        flex-direction: column;
+                                        justify-content: center;
+                                        padding: 12px 13px;
+                                        gap: 10px;
+                                        border-bottom: 0.5px solid;">
             <h5 class="mb-0 flex items-center">
                 <?php echo getIconImage(0, 0, "2.5rem", "auto", "https://res.cloudinary.com/da6qujoed/image/upload/v1742656707/logoIcon_pspxgh.png", 0); ?>
                 &nbsp; Boss<span style="font-weight: 700;">GPT</span> Assistant
@@ -214,7 +211,7 @@
                     function renderPromptButtons($prompts)
                     {
                         foreach ($prompts as $prompt) {
-                            echo '<button style="border-radius: 20px!important;" class=" text-capitalize text-sm-1 btn btn-outline-light  prompt-btn" type="button" onclick="handlePromptClick(this)">' . $prompt . '</button>';
+                            echo '<button style="border-radius: 20px!important;" class=" text-capitalize text-sm-1 btn  prompt-btn" type="button" onclick="handlePromptClick(this)">' . $prompt . '</button>';
                         }}
                     ?>
                     <!-- Prompt suggestions -->
@@ -227,7 +224,7 @@
 
 
                     <form id="chatForm" class="d-flex">
-                        <textarea class="form-control me-2 text-sm-1" id="messageInput" placeholder="Type your message..."
+                        <textarea class="form-control me-2 text-sm-1" id="messageInput" placeholder="Ask from BossGPT"
                             rows="1"></textarea>
                         <button type="submit" id="aiSendMessageBtn"
                             class="btn btn-send-primary"><?php echo file_get_contents("assets/icons/send.svg"); ?>

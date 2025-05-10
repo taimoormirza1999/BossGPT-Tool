@@ -913,11 +913,12 @@
                             <span class="task-label label-blue"></span>
                         </div>
                         <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h6 class="mb-0 task_title">${escapeHtml(task.title)}</h6>
+                            <h6 class="mb-0 text-base task_title">${escapeHtml(task.title)}</h6>
                             <button class="btn btn-sm btn-danger delete-task-btn" data-id="${task.id}">
                                 <?php echo getTrashIcon(); ?>
                             </button>
                         </div>
+                         <p class="text-muted text-xs text-capitalize">${escapeHtml(task.description)}</p>
                         ${taskPictureHtml}
                         ${task.description ? `<div class="task-description text-capitalize">${escapeHtml(task.description)}</div>` : ''}
                         <div class="task-meta">

@@ -110,6 +110,7 @@ $transition-duration-50: 0.5s;
 $notification-icon-padding: 0.5rem;
 $boder-width_1_3: 1.3px;
 $boder-width_1_5: 1.5px;
+
 // ===============================
 // 2) FONTS
 // ===============================
@@ -122,7 +123,23 @@ $geist-fonts: (
   700: "Bold",
   900: "Black",
 );
-
+// 1. Map of breakpoints
+$breakpoints: (
+  mobileS: 320px,
+  mobileM: 375px,
+  mobileL: 425px,
+  tablet: 768px,
+  laptop: 1080px,
+  large: 1200px
+);
+// 2. Helper function: get a value out of the map, or fall back to the raw value
+@function _get-bp($val) {
+  @if $val != null and map-has-key($breakpoints, $val) {
+    @return map-get($breakpoints, $val);
+  } @else {
+    @return $val;
+  }
+}
 @each $weight, $suffix in $geist-fonts {
   @font-face {
     font-family: "Geist";
@@ -233,6 +250,27 @@ $text-sizes: (
 }
 .page-scrollable{
   overflow-y: scroll!important;
+}
+@mixin media-range($min: null, $max: null) {
+  // resolve names → px (or leave raw if not in map)
+  $min-resolved: if($min != null, _get-bp($min), null);
+  $max-resolved: if($max != null, _get-bp($max), null);
+
+  @if $min-resolved != null and $max-resolved != null {
+    @media (min-width: $min-resolved) and (max-width: $max-resolved) {
+      @content;
+    }
+  } @else if $min-resolved != null {
+    @media (min-width: $min-resolved) {
+      @content;
+    }
+  } @else if $max-resolved != null {
+    @media (max-width: $max-resolved) {
+      @content;
+    }
+  } @else {
+    @warn "media-range: you passed neither $min nor $max!";
+  }
 }
 @mixin hover-up($translateValue: -5px, $duration: 0.3s) {
   transition: all $duration ease-in-out;
@@ -452,6 +490,15 @@ $text-sizes: (
         @include theme-bgcolor($card-body-message-user-bgcolor);
         @extend .text-sm-1;
       }
+      .prompt-btn {
+        @include theme-bgcolor($card-body-ai-message-bgcolor);
+        &:hover{
+         background: $card-body-ai-message-bgcolor!important;
+        }
+      }
+      .chat-input form#chatForm{
+        background: $card-body-ai-message-bgcolor;
+      }
     }
   }
 }
@@ -489,6 +536,11 @@ $text-sizes: (
     .column_done {
       background: $main-bg !important;
       .task-card {
+        .enlarge-image{
+          @include media-range(mobileS,mobileL){
+            height: 9.5rem!important;
+          }
+        }
         .btn-sm.btn-link,
         .add-subtask-btn,
         .ai-add-subtask-btn,
@@ -579,7 +631,9 @@ body.system-mode {
     rgba(211, 211, 211, 0.5),
     $default-mode-card-task-bgcolor
   );
-
+  .open-icon-btn {
+    background: $default-mode-card-task-bgcolor;   
+  }
   @include theme-tab-panel(rgba(0, 0, 0, 0.8));
   @include theme-common-chat-pannel(
     #131313,
@@ -618,6 +672,9 @@ body.purple-mode {
     rgba(211, 211, 211, 0.5),
     $purple-mode-card-task-bgcolor
   );
+  .open-icon-btn {
+      background: $purple-mode-card-task-bgcolor;   
+    }
   @include theme-tab-panel($purple-mode-modal-container-bgcolor);
   @include theme-common-chat-pannel(
     $purple-mode-bar-bgcolor,
@@ -655,6 +712,9 @@ body.black-mode {
     rgba(211, 211, 211, 0.5),
     $black-mode-card-task-bgcolor
   );
+  .open-icon-btn {
+    background: $black-mode-card-task-bgcolor;   
+  }
   @include theme-tab-panel($black-mode-modal-container-bgcolor);
   @include theme-common-chat-pannel(
     $black-mode-bar-bgcolor,
@@ -692,6 +752,9 @@ body.brown-mode {
     rgba(211, 211, 211, 0.5),
     $brown-mode-card-task-bgcolor
   );
+  .open-icon-btn {
+    background: $brown-mode-card-task-bgcolor;   
+  }
   @include theme-tab-panel($brown-mode-modal-container-bgcolor);
   @include theme-common-chat-pannel(
     $brown-mode-bar-bgcolor,
@@ -784,6 +847,9 @@ body {
   background-attachment: fixed !important;
   overflow-y: hidden !important;
   overflow-x: hidden;
+  @include media-range(mobileS,mobileL ){
+    overflow-y: scroll !important;
+  }
   // overflow-y: hidden;
   // login/register pa ges
   h1,
@@ -973,15 +1039,28 @@ body {
     backdrop-filter: blur(36px) !important;
     // box-shadow: 0 4px 30px $black-color-10 !important;
     border-bottom: 0;
+
+    @media (max-width: 768px) {
+      overflow-x: hidden;
+    }
     @media (max-width: 768px) {
       overflow-x: hidden;
     }
     .navbar-brand {
       img {
-        @media (max-width: 768px) {
-          width: 9rem !important;
-          margin-left: 6px !important;
+        @include media-range(mobileS,mobileL ){
+          position: absolute;
+          top: 5px;
         }
+        @include media-range(mobileS, mobileM) {
+          width: 6.5rem !important;
+          margin-left: 0px !important;
+        }
+        @include media-range(mobileM, mobileL) {
+          width: 7.5rem !important;
+          margin-left: 0px !important;
+        }
+       
       }
     }
     .navbar-collapse {
@@ -1000,10 +1079,46 @@ body {
         }
       }
     }
+    #navbarProjectDropdownPlaceholder {
+      position: relative !important;
+      margin-left: 15%;
+      .dropdown-menu {
+        z-index: 99999 !important;
+        position: fixed !important;
+        left: 50% !important;
+        right: 0 !important;
+        transform: translateX(-50%);
+        right: 0 !important;
+        top: 56px !important;
+        max-width: 12rem !important;
+        min-width: unset !important;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(211, 211, 211, 0.5);
+        backdrop-filter: blur(4.3px);
+        border-radius: 16px;
+        li.dropdown-item{
+          text-align: center;
+          padding: 0.65rem 0.5rem !important;  
+          border: 0!important; 
+          .button.dropdown-item{
+           border: 0!important; 
+           @extend .text-sm-1;
+          }
+          &.active, &:active {
+            background: rgba(166, 28, 28, 1)!important;
+           
+          }
+         
+        }
+      }
+    }
     .navbar-toggler {
       @media (max-width: 768px) {
         padding: 0.4rem !important;
-        border: 1.3px solid $white-color-80 !important;
+        border: 0!important;
+        &:focus{
+          box-shadow: none!important;
+        }
       }
       .navbar-toggler-icon {
         @media (max-width: 768px) {
@@ -1138,14 +1253,15 @@ body {
     border: $boder-width_1_5 solid rgba(211, 211, 211, 0.5);
     backdrop-filter: blur(7.199999809265137px);
     @media (max-width: 768px) {
-      width: 99.5% !important;
+      border: 0;
+      width: 100vw !important;
     }
     .card-header {
       // box-shadow: 0px 4px 30px $black-color-10 !important;
       @media (max-width: 768px) {
-        display: flex !important;
-        flex-wrap: nowrap;
-        overflow-x: scroll;
+        display: none !important;
+        // flex-wrap: nowrap;
+        // overflow-x: scroll;
       }
       button {
         @include flex-center-hv;
@@ -1190,7 +1306,7 @@ body {
         @media (max-width: 768px) {
           overflow-x: scroll;
           flex-wrap: nowrap;
-          gap: 0.7rem;
+          gap: 0.3rem;
         }
         .col-10 {
           @media (max-width: 768px) {
@@ -1225,6 +1341,9 @@ body {
           // overflow: scroll;
           height: 40vh;
           overflow-y: scroll;
+          @include media-range(mobileS,mobileL ){
+            min-height:80vh;
+          }
           @extend .hide-scrollbar;
           .task-card {
             transition: all $transition-duration-34;
@@ -1245,6 +1364,18 @@ body {
               background: transparent !important;
               font-size: 1.2rem !important;
               margin-top: -1.2rem !important;
+            }
+            .task-assignee{
+            @include media-range(mobileS, mobileL){
+              width: 10px !important;
+              height: 25px !important;
+            }}
+            .plant-ball-container img{
+            @include media-range(mobileS, mobileL){
+              width: 25px!important;
+              height: 25px!important;
+            }
+
             }
             .due-date {
               @extend .due-date_size;
@@ -1318,7 +1449,9 @@ body {
     }
   }
   .chat-pannel {
+    display: block;
     @media (max-width: 768px) {
+      display: none;
       position: fixed !important;
       bottom: -16px;
       backdrop-filter: blur(15px);
@@ -1478,7 +1611,6 @@ body {
         @extend .hover-up;
       }
       .prompt-btn {
-        @include theme-bgcolor($dark-mode-prompt-btn-bgcolor);
         border-color: $dark-mode-prompt-btn-border;
         @extend .hover-up;
       }

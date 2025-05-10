@@ -19,7 +19,10 @@
   max-height: calc(100vh - 300px);
 }
 .chat-input form#chatForm{
-  padding: 9px 1rem;
+  position: relative;
+  margin: 8px 17px;
+  /* background: rgba(58, 59, 60, 1); */
+  border-radius: 10px;
 }
 .chat-input {
   padding: 0.3rem 0rem 1rem 0rem;
@@ -390,7 +393,7 @@
   transition: transform 0.2s;
   border-radius: 12px!important;
   border: 1px dashed var(--bs-primary-white55percent);
-  height: 11rem;
+  height: 10.5rem;
   object-fit: cover;
   width: 100%;
 }
@@ -604,7 +607,6 @@ body.dark-mode .nav-tabs .nav-link.active {
 }
 
 .task-card h6 {
-  font-size: 1.1em;
   margin-bottom: 0.5em;
   font-weight: 600;
 }
@@ -678,11 +680,11 @@ body.dark-mode .nav-tabs::-webkit-scrollbar-track {
   display: flex;
 }
 
-#projectDropdownButton.dropdown-toggle::after, #projectDropdownButton1.dropdown-toggle::after {
+#projectDropdownButton.dropdown-toggle::after, #projectDropdownButton1.dropdown-toggle::after,  button.projectDropdownButton::after{
   display: none !important;
 }
 
-#projectDropdownButton.dropdown-toggle, #projectDropdownButton1.dropdown-toggle {
+#projectDropdownButton.dropdown-toggle, #projectDropdownButton1.dropdown-toggle,   projectDropdownButton.dropdown-toggle {
   display: inline-flex;
   align-items: center;
   font-size: calc(var(--font-size, 1rem) + 0.15rem) !important;
@@ -690,20 +692,20 @@ body.dark-mode .nav-tabs::-webkit-scrollbar-track {
   color: white !important;
 }
 
-#projectDropdownButton.dropdown-toggle svg, #projectDropdownButton1.dropdown-toggle svg {
+#projectDropdownButton.dropdown-toggle svg, #projectDropdownButton1.dropdown-toggle svg,projectDropdownButton.dropdown-toggle svg {
   margin-left: 5px;
   width: 1.5rem;
   height: 1.5rem;
   transition: transform 0.2s;
 }
 
-#projectDropdownButton.dropdown-toggle[aria-expanded="true"] svg, #projectDropdownButton1.dropdown-toggle[aria-expanded="true"] svg {
+#projectDropdownButton.dropdown-toggle[aria-expanded="true"] svg, #projectDropdownButton1.dropdown-toggle[aria-expanded="true"] svg, projectDropdownButton.dropdown-toggle[aria-expanded="true"]  {
   transform: rotate(180deg);
   width: 1.5rem;
   height: 1.5rem;
 }
 
-#projectDropdownButton.dropdown-toggle:not(:has(svg))::after, #projectDropdownButton1.dropdown-toggle:not(:has(svg))::after {
+#projectDropdownButton.dropdown-toggle:not(:has(svg))::after, #projectDropdownButton1.dropdown-toggle:not(:has(svg))::after,projectDropdownButton.dropdown-toggle:not(:has(svg))::after {
   content: "";
   display: inline-block;
   width: 24px;
@@ -814,8 +816,8 @@ button#toggleDarkModeBtn:active {
 .btn-icon-only:hover,
 .btn-icon-only:focus,
 .btn-icon-only:active,
-.btn:not(.btn-primary):not(.btn-danger.delete-task-btn):not(.ai-add-subtask-btn):not(.btn-error):hover,
-.btn:not(.btn-primary):not(.btn-danger.delete-task-btn):not(.ai-add-subtask-btn):not(.btn-error):focus {
+.btn:not(.btn-primary):not(.btn-danger.delete-task-btn):not(.ai-add-subtask-btn):not(.btn-error):hover:not(.prompt-btn):hover,
+.btn:not(.btn-primary):not(.btn-danger.delete-task-btn):not(.ai-add-subtask-btn):not(.btn-error):not(.prompt-btn):focus {
   background: var(--bs-primary-white10percent) !important;
   color: var(--bs-primary-white) !important;
   box-shadow: none !important;

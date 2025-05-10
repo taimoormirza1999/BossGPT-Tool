@@ -70,8 +70,8 @@ function SVGAdd(){
       enableNotificationsBtn = true;
     <?php endif; ?>
     const openIconBtn = document.querySelector('.open-icon-btn');
-    $(openIconBtn).toggleClass('d-none');
-    $(openIconBtn).toggleClass('show');
+    // $(openIconBtn).toggleClass('d-none');
+    // $(openIconBtn).toggleClass('show');
   });
   const notificationIcons = {
     project_created: `<?= getFolderIcon(); ?>`,
@@ -106,11 +106,9 @@ function SVGAdd(){
   function closeChatPannel() {
     const chatPannel = document.querySelector('.chat-pannel');
     chatPannel.classList.add('d-none');
-
-    console.log($('.open-icon-btn'));
+  
     $('.open-icon-btn').addClass('show');
     $('.open-icon-btn').removeClass('d-none');
-    console.log($('.open-icon-btn'));
   }
   
   function DynamicClose(targetSelector) {
@@ -322,7 +320,7 @@ function SVGAdd(){
           </div>
         </div>
         <div class="flex-grow-1">
-          <div class="text-capitalize text-xs">
+          <div class="text-capitalize text-sm">
             <strong>@${username}</strong> moved <span class="">${description}</span> as <strong>${actionType}</strong>.
           </div>
           <small class="d-flex align-items-center mt-1 text-purple text-sm">

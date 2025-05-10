@@ -403,7 +403,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
 
                 <!-- Main Content Area -->
                 <div class="row sides-padding " style="width: 100%!important;">
-                    <button class="btn btn-link p-0 text-white show open-icon-btn " data-bs-dismiss="modal"
+                    <button class="btn btn-link p-0 text-white show open-icon-btn glow-btn" data-bs-dismiss="modal"
                         aria-label="Close"
                         onclick="openChatPannel()"><?php echo getIconImage(0, 0, "2.5rem", "auto", "https://res.cloudinary.com/da6qujoed/image/upload/v1742656707/logoIcon_pspxgh.png", 0); ?></button>
                     <!-- Tasks Panel (Board) - now spans 9 columns -->
@@ -436,7 +436,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                             </div>
                             <div class="card-body pb-0">
                                 <div class="row">
-                                    <div class="col-10 col-md-4">
+                                    <div class="px-1 col-10 col-md-4">
                                         <div class="task-column_section ">
                                             <h6 class="text-center task-column_header column_todo">To Do</h6>
                                             <div class="task-column" id="todoTasks" data-status="todo">
@@ -444,7 +444,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-10 col-md-4">
+                                    <div class="px-1 col-10 col-md-4">
                                         <div class="task-column_section">
                                             <h6 class="text-center task-column_header column_in_progress">In Progress</h6>
                                             <div class="task-column" id="inProgressTasks" data-status="in_progress">
@@ -452,7 +452,7 @@ function displayGoogleLoginBtn($text = "Sign in with Google")
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-10 col-md-4">
+                                    <div class="px-1 col-10 col-md-4">
                                         <div class="task-column_section">
                                             <h6 class="text-center task-column_header column_done">Done</h6>
                                             <div class="task-column" id="doneTasks" data-status="done">

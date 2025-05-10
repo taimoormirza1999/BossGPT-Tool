@@ -107,7 +107,7 @@ function include_profile($images)
     <div class="container-fluid pb-3">
         <!-- Main Content Area -->
         <div class="row sides-padding " style="width: 99.4%!important;">
-            <button class="btn btn-link p-0 text-white show open-icon-btn " data-bs-dismiss="modal" aria-label="Close"
+            <button class="btn btn-link p-0 text-white show open-icon-btn" data-bs-dismiss="modal" aria-label="Close"
                 onclick="openChatPannel()"><?php echo getIconImage(0, 0, "2.5rem", "auto", "https://res.cloudinary.com/da6qujoed/image/upload/v1742656707/logoIcon_pspxgh.png", 0); ?></button>
             <!-- Tasks Panel (Board) - now spans 9 columns -->
             <div class="col-12 col-md-12 tasks-panel">
@@ -131,10 +131,10 @@ function include_profile($images)
                             <?php foreach ($tabs as $index => $tab): ?>
                                 <li class="nav-item" role="presentation">
                                     <button
-                                        class="nav-link bg-transparent border-0   <?php echo $index === 0 ? 'active font-secondaryBold' : ' font-secondaryLight'; ?>"
+                                        class="nav-link bg-transparent border-0 text-lg  <?php echo $index === 0 ? 'active font-secondaryBold' : ' font-secondaryLight'; ?>"
                                         id="<?php echo $tab['id']; ?>-tab" data-bs-toggle="tab"
                                         data-bs-target="#<?php echo $tab['id']; ?>" type="button" role="tab"
-                                        style="font-size: 1.2rem; font-weight: 700;">
+                                        style=" font-weight: 700;">
                                         <?php echo htmlspecialchars($tab['label']); ?>
                                     </button>
                                 </li>
